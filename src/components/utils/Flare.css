@@ -1,0 +1,18 @@
+.flare-enabled .flare-light {
+  opacity: 1 !important;
+}
+
+.hover\:flare-enabled:hover .flare-light {
+  opacity: 1 !important;
+}
+
+/* Ensure text is always visible on mobile */
+@media (max-width: 1024px) {
+  /* .group h1, .group button {
+    opacity: 1;
+  } */
+
+  .group .group-hover\\:opacity-100 {
+    opacity: 1; /* Ensure the flare effect is always visible */
+  }
+}

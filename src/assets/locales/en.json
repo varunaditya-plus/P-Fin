@@ -1,0 +1,1569 @@
+{
+  "about": {
+    "description": "P-Stream is a fork of movie-web that is ensured to stay up even after the shutdown of movie-web.app. P-Stream runs on a private, self-hosted VPS. I run this site at a loss; there are very minimal ads due to my beliefs in free media.",
+    "help": "Can't find an answer? <0>Get support here.</0>",
+    "faqTitle": "Common questions",
+    "searchPlaceholder": "Search FAQ...",
+    "sections": {
+      "general": "General",
+      "search": "Search & Content Availability",
+      "playback": "Playback Issues",
+      "connections": "Connections",
+      "language": "Language & Subtitle Settings"
+    },
+    "q1": {
+      "title": "Where does the content come from?",
+      "body": "P-Stream does not host any content. When you click on something to watch, the internet is searched for the selected media (On the loading screen and in the 'video sources' tab you can see which source you're using). Media never gets uploaded by P-Stream, everything is through this searching mechanism.",
+      "section": "general"
+    },
+    "q2": {
+      "title": "Where can I request a show or movie?",
+      "body": "It's not possible to request a show or movie, P-Stream does not manage any content. All content is viewed through sources on the internet.",
+      "section": "search"
+    },
+    "q3": {
+      "title": "The search results display the show or movie, why can't I play it?",
+      "body": "Our search results are powered by The Movie Database (TMDB) and display regardless of whether our sources actually have the content.",
+      "section": "search"
+    },
+    "q4": {
+      "title": "What about my data and stuff?",
+      "body": "All data is synced to the community backend, anyone is free to use this as well.",
+      "section": "general"
+    },
+    "q5": {
+      "title": "How can I find out more?",
+      "body": "P-Stream has a Discord server that can be found at the header of this page!",
+      "section": "general"
+    },
+    "q6": {
+      "title": "Is there a P-Stream app?",
+      "body": "Yes! We now have an official desktop app available for download! https://github.com/p-stream/p-stream-desktop/releases",
+      "section": "general"
+    },
+    "q7": {
+      "title": "How do I make an account?",
+      "body": "Tap \"Sync to Cloud\" in the dropdown menu or go to Settings to create and sync a community account.",
+      "section": "general"
+    },
+    "q9": {
+      "title": "This media is missing / Can I request media?",
+      "body": "No—since we don't host content, we cannot add or change what's available. The content list is based on what's publicly accessible through the search mechanism.",
+      "section": "search"
+    },
+    "q10": {
+      "title": "I can't find the movie/show I'm searching for!",
+      "body": "TMDB powers our search. Try tapping the 🔎 icon for advanced search options if results aren't accurate.",
+      "section": "search"
+    },
+    "q11": {
+      "title": "Why am I seeing a black screen?",
+      "body": "Likely a corrupt or broken video file. Try switching sources.",
+      "section": "playback"
+    },
+    "q12": {
+      "title": "The episode I'm watching is incorrect.",
+      "body": "Switch to a different source. We don't control any content or episode accuracy.",
+      "section": "playback"
+    },
+    "q13": {
+      "title": "The video quality isn't what I expected.",
+      "body": "Try switching sources. Quality varies by provider; FED API often offers more options.",
+      "section": "playback"
+    },
+    "q14": {
+      "title": "4K isn't available.",
+      "body": "If 4K is not shown, it's likely unavailable from that source.",
+      "section": "playback"
+    },
+    "q15": {
+      "title": "Why is there no audio?",
+      "body": "Ensure your device isn't muted and try switching sources. Audio issues may be source-specific.",
+      "section": "playback"
+    },
+    "q16": {
+      "title": "The video is tinted or washed out.",
+      "body": "Could be a faulty file or an HDR video. Ensure your device supports HDR, or switch sources.",
+      "section": "playback"
+    },
+    "q17": {
+      "title": "I'm experiencing visual glitches.",
+      "body": "Visual bugs usually come from poor file uploads. Try switching sources.",
+      "section": "playback"
+    },
+    "q18": {
+      "title": "The source is loading slowly.",
+      "body": "Speed depends on the hosting site. Switch to another source for better performance.",
+      "section": "playback"
+    },
+    "q19": {
+      "title": "How do I switch sources?",
+      "body": "While playing, tap the ⚙️ icon, then choose another source under \"video sources\".",
+      "section": "playback"
+    },
+    "q20": {
+      "title": "What is FED API?",
+      "body": "FED API is our private scraper that pulls streams directly from Febbox. Each free Febbox account includes 100 GB/month of unlimited bandwidth, and we use your UI token to scrape content as if you're watching it yourself. Setup is easiest via desktop browser, but mobile instructions are available on our Discord.",
+      "section": "connections"
+    },
+    "q21": {
+      "title": "Does FED API work on all devices?",
+      "body": "Yes. Once set up, your token works across all devices!",
+      "section": "connections"
+    },
+    "q22": {
+      "title": "Why do I need the extension or custom proxy?",
+      "body": "Some sources block scrapers. The extension acts like a local proxy and bypasses such blocks using your IP, headers, and cookies.",
+      "section": "connections"
+    },
+    "q23": {
+      "title": "What is the extension? Is it safe?",
+      "body": "It's a local proxy tool used to access streams that restrict scrapers. It mimics your browsing session. It's also completly opensource and can be found on our github.",
+      "section": "connections"
+    },
+    "q24": {
+      "title": "My febbox token fails during setup. What should I do?",
+      "body": "Your ISP might be blocking FED API. Use a VPN to bypass the block, we recommend Cloudflare WARP because it's free and easy to use. You can also change your region in the admin panel.",
+      "section": "connections"
+    },
+    "q25": {
+      "title": "How do I change languages?",
+      "body": "We prioritize English, but some sources offer other languages. Try switching sources.",
+      "section": "language"
+    },
+    "q26": {
+      "title": "My subtitles aren't in sync.",
+      "body": "Use the \"Customize\" option in subtitle settings or tap [ and ] on your keyboard to adjust. You can also upload your own subtitle file.",
+      "section": "language"
+    },
+    "title": "About P-Stream and FAQ (^▽^)"
+  },
+  "actions": {
+    "copied": "Copied",
+    "copy": "Copy",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "auth": {
+    "createAccount": "Don't have an account yet 😬 <0>Create an account.</0>",
+    "deviceNameLabel": "Device name",
+    "deviceNamePlaceholder": "Personal phone",
+    "generate": {
+      "description": "Your passphrase acts as your username and password. Make sure to keep it safe as you will need to enter it to login to your account. <bold>Do NOT lose your passphrase!</bold>",
+      "next": "I have saved my passphrase",
+      "passphraseFrameLabel": "Passphrase",
+      "title": "Your passphrase",
+      "custom": "Custom",
+      "customPassphraseLabel": "Custom Passphrase",
+      "customPassphrasePlaceholder": "Enter your custom passphrase",
+      "useCustomPassphrase": "Use Custom Passphrase",
+      "invalidPassphraseCharacters": "Invalid passphrase characters. Only English letters, numbers 1-10, and normal symbols are allowed.",
+      "passphraseTooShort": "Passphrase must be at least 8 characters long.",
+      "usePasskeyInstead": "Use passkey instead"
+    },
+    "hasAccount": "Already have an account? <0>Login here.</0>",
+    "login": {
+      "description": "Please enter your passphrase to login to your account",
+      "deviceLengthError": "Please enter a device name",
+      "passphraseLabel": "12-Word passphrase",
+      "passphrasePlaceholder": "Passphrase",
+      "submit": "Login",
+      "title": "Login to your account",
+      "validationError": "Incorrect or incomplete passphrase /ᐠ. .ᐟ\\",
+      "usePasskey": "Use passkey",
+      "or": "or",
+      "noBackendUrl": "No backend URL"
+    },
+    "register": {
+      "information": {
+        "color1": "Profile color one",
+        "color2": "Profile color two",
+        "header": "Enter a name for your device then pick colors and a user icon of your choosing!",
+        "icon": "User icon",
+        "next": "Next",
+        "title": "Account information"
+      }
+    },
+    "backendSelection": {
+      "title": "Select Account Server",
+      "description": "Choose which backend server to connect to",
+      "customBackend": "Custom Backend",
+      "customBackendPlaceholder": "https://",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "active": "Active",
+      "selecting": "Selecting..."
+    },
+    "trust": {
+      "failed": {
+        "text": "Did you configure it correctly?",
+        "title": "Failed to reach server"
+      },
+      "noHostTitle": "Server not configured!",
+      "noHost": "The server has not been configured, therefore you cannot create an account",
+      "host": "You are connecting to <0>{{hostname}}</0> - please confirm you trust it before making an account...",
+      "no": "Go back",
+      "title": "Do you trust this server?",
+      "yes": "I trust this server 🤞"
+    },
+    "verify": {
+      "description": "Please enter your passphrase from earlier to confirm you have saved it and to create your account",
+      "invalidData": "Data is not valid",
+      "noMatch": "Passphrase doesn't match 😭",
+      "passphraseLabel": "Your 12-word passphrase",
+      "recaptchaFailed": "ReCaptcha validation failed",
+      "register": "Create account",
+      "title": "Confirm your account",
+      "passkeyDescription": "Please authenticate with your passkey to complete registration.",
+      "authenticatePasskey": "Authenticate with Passkey",
+      "passkeyError": "Passkey verification failed"
+    }
+  },
+  "errors": {
+    "badge": "It broke 💀",
+    "details": "Error details",
+    "reloadPage": "Reload the page",
+    "showError": "Show error details",
+    "title": "We encountered an error!"
+  },
+  "footer": {
+    "legal": {
+      "disclaimer": "Disclaimer ◝(ᵔᵕᵔ)◜",
+      "disclaimerText": "Please note: P-Stream does not host any files itself; instead, it only displays content from third-party providers. Legal issues should be taken up with them."
+    },
+    "links": {
+      "discord": "Discord",
+      "legal": "Legal / DMCA",
+      "github": "GitHub",
+      "twitter": "Twitter",
+      "funding": "Support us"
+    },
+    "tagline": "Watch your favorite shows and movies for free with no ads ever! (っ'ヮ'c)"
+  },
+  "global": {
+    "name": "P-Stream",
+    "pages": {
+      "about": "About and FAQ",
+      "legal": "Legal / DMCA",
+      "discover": "Discover",
+      "support": "Support",
+      "login": "Login",
+      "onboarding": "Setup",
+      "pagetitle": "{{title}} - P-Stream",
+      "register": "Register",
+      "settings": "Settings",
+      "migration": "Migrate Account",
+      "jip": "Jip",
+      "pas": "Pas"
+    },
+    "keyboardShortcuts": {
+      "title": "Keyboard Shortcuts",
+      "subtitle": "Hold ` to show this help anytime",
+      "groups": {
+        "videoPlayback": "Video Playback",
+        "jumpToPosition": "Jump to Position",
+        "audioVideo": "Audio & Video",
+        "subtitlesAccessibility": "Subtitles & Accessibility",
+        "interface": "Interface"
+      },
+      "shortcuts": {
+        "playPause": "Play/pause (or hold for 2x speed when enabled)",
+        "playPauseAlt": "Play/pause",
+        "skipForward5": "Skip forward 5 seconds",
+        "skipBackward5": "Skip backward 5 seconds",
+        "skipBackward10": "Skip backward 10 seconds",
+        "skipForward10": "Skip forward 10 seconds",
+        "skipForward1": "Skip forward 1 second",
+        "skipBackward1": "Skip backward 1 second",
+        "jumpTo0": "Jump to 0% (beginning)",
+        "jumpTo9": "Jump to 90%",
+        "increaseVolume": "Increase volume",
+        "decreaseVolume": "Decrease volume",
+        "mute": "Mute/unmute",
+        "changeSpeed": "Increase/decrease playback speed",
+        "toggleFullscreen": "Toggle fullscreen",
+        "toggleCaptions": "Toggle captions",
+        "randomCaption": "Select random caption from last used language",
+        "syncSubtitlesEarlier": "Sync subtitles earlier (-0.5s)",
+        "syncSubtitlesLater": "Sync subtitles later (+0.5s)",
+        "toggleNativeSubtitles": "Toggle native subtitles",
+        "barrelRoll": "Do a barrel roll! 🌀",
+        "closeOverlay": "Close overlay/modal",
+        "nextEpisode": "Next episode",
+        "previousEpisode": "Previous episode",
+        "widescreenMode": "to toggle the widescreen button visibility",
+        "copyLinkWithTime": "+ click the title to copy the link with time"
+      },
+      "conditions": {
+        "notInWatchParty": "Not in watch party",
+        "showsOnly": "Shows only"
+      },
+      "editInSettings": "Edit keyboard commands from settings",
+      "clickToEdit": "Click on a key badge to edit it",
+      "conflict": "conflict",
+      "conflicts": "conflicts",
+      "detected": "detected",
+      "resetAllToDefault": "Reset All to Default",
+      "pressKey": "Press a key...",
+      "none": "None",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes",
+      "resetToDefault": "Reset to default",
+      "numberKeySeeking": "Number key progress seeking",
+      "numberKeySeekingDescription": "Use number keys 0-9 to seek to specific positions in the video. 0 goes to the beginning, 1-8 jump to 10%-80%, and 9 goes to 90%."
+    }
+  },
+  "home": {
+    "bookmarks": {
+      "sectionTitle": "Bookmarks",
+      "showAll": "Show all",
+      "groups": {
+        "dropdown": {
+          "placeholderButton": "Add to group",
+          "empty": "No groups yet",
+          "removeFromGroup": "Remove from group",
+          "removeAll": "Remove all"
+        },
+        "reorder": {
+          "button": "Reorder",
+          "done": "Done",
+          "title": "Edit Group Order",
+          "description": "Drag and drop to reorder your bookmark groups",
+          "cancel": "Cancel",
+          "save": "Save"
+        },
+        "editGroup": {
+          "title": "Edit Group",
+          "description": "Edit the name and icon of your bookmark group",
+          "cancel": "Cancel",
+          "save": "Save",
+          "affectsBookmarks": "This will affect {{count}} bookmark(s)",
+          "nameLabel": "Group name",
+          "namePlaceholder": "Enter a name for your group"
+        }
+      },
+      "edit": {
+        "title": "Edit Bookmark",
+        "description": "Edit the details for this bookmark",
+        "cancel": "Cancel",
+        "save": "Save",
+        "groupsLabel": "Groups",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Enter a title for your bookmark",
+        "yearLabel": "Year",
+        "yearPlaceholder": "Enter a year for your bookmark"
+      },
+      "sorting": {
+        "label": "Sort by",
+        "options": {
+          "date": "Default (Date added)",
+          "titleAsc": "Title A-Z",
+          "titleDesc": "Title Z-A",
+          "yearAsc": "Release Date Oldest-Newest",
+          "yearDesc": "Release Date Newest-Oldest"
+        }
+      }
+    },
+    "continueWatching": {
+      "sectionTitle": "Continue Watching...",
+      "sorting": {
+        "label": "Sort by",
+        "options": {
+          "date": "Default (Date added)",
+          "titleAsc": "Title A-Z",
+          "titleDesc": "Title Z-A",
+          "yearAsc": "Release Date Oldest-Newest",
+          "yearDesc": "Release Date Newest-Oldest"
+        }
+      }
+    },
+    "mediaList": {
+      "stopEditing": "Stop editing"
+    },
+    "watchHistory": {
+      "sectionTitle": "Watch History",
+      "recentlyWatched": "Recently Watched"
+    },
+    "search": {
+      "allResults": "That's all we have...",
+      "failed": "Failed to find media, try again!",
+      "loading": "Loading...",
+      "noResults": "We couldn't find anything :(",
+      "placeholder": {
+        "default": "What do you want to watch?",
+        "extra": [
+          "What are you in the mood for?",
+          "Should we delete your browser history?",
+          "What do you want to stream?",
+          "P-Stream is the best site ever!",
+          "What's on your watchlist today?",
+          "How was your day?",
+          "My bad the site never works...",
+          "Isn't P-Stream just the best?",
+          ">ᴗ<"
+        ]
+      },
+      "empty": {
+        "default": "Welcome, find media to watch here!",
+        "extra": [
+          "There's nothing here :(",
+          "So empty...",
+          "Such emptiness.",
+          "Hi new user :3"
+        ]
+      },
+      "sectionTitle": "Search results",
+      "discoverMore": "Discover more",
+      "discover": "Discover"
+    },
+    "mediaCard": {
+      "moreInfo": "More Info",
+      "copyLink": "Copy Link",
+      "close": "Close"
+    },
+    "titles": {
+      "day": {
+        "default": "What would you like to watch this afternoon?",
+        "extra": ["Viva la P-Stream!"]
+      },
+      "morning": {
+        "default": "What would you like to watch this morning?",
+        "extra": ["Viva la P-Stream!"]
+      },
+      "night": {
+        "default": "What would you like to watch tonight?",
+        "extra": ["Viva la P-Stream!"]
+      },
+      "420": {
+        "default": "What would you like to watch this 4/20?",
+        "extra": ["Happy 4/20 🥳!"]
+      },
+      "69": {
+        "default": "Up for something spicy?",
+        "extra": ["Happy 69 day 😘!"]
+      },
+      "halloween": {
+        "default": "What spooky movie would you like to watch this Halloween?",
+        "extra": [
+          "Happy Halloween! 🎃👻",
+          "Boo! 👻",
+          "Trick or treat! 🍬",
+          "It's the Great Pumpkin, Charlie Brown!"
+        ]
+      }
+    },
+    "support": {
+      "title": "P-Stream needs your help!",
+      "description": "P-Stream is run at a loss, and we need help to keep it ad free! If you enjoy using P-Stream, please consider donating to help us cover our costs.",
+      "moreInfo": "More info",
+      "explanation": "If you aren't using the extension or don't have FED API set up, it may be harder to find content! We want to fix this, but it's a lot harder to provide content without expensive servers. So please, if you enjoy using P-Stream, please consider donating to help us cover our growing costs.",
+      "explanation2": "If you want more info, please join our ",
+      "discord": "Discord",
+      "thankYou": "Thank you for your support!",
+      "donate": "Donate",
+      "label": "Project Funding: ${{current}} / ${{goal}}",
+      "complete": "complete"
+    }
+  },
+  "media": {
+    "episodeDisplay": "S{{season}} - E{{episode}}",
+    "unreleased": "Unreleased",
+    "types": {
+      "movie": "Movie",
+      "show": "Show"
+    },
+    "episodeShort": "E",
+    "seasonShort": "S",
+    "seasonWatched": "Are you sure you want to mark the season as watched?",
+    "seasonUnwatched": "Are you sure you want to mark the season as unwatched?"
+  },
+  "details": {
+    "resume": "Resume",
+    "play": "Play",
+    "runtime": "Runtime:",
+    "language": "Language:",
+    "releaseDate": "Release Date:",
+    "rating": "Rating:",
+    "votes": "votes",
+    "tmdb": "View on TMDB",
+    "imdb": "View on IMDb",
+    "episodes": "Episodes",
+    "seasons": "Season/s",
+    "season": "Season",
+    "episode": "Episode",
+    "watched": "Watched {{watched}} of {{total}} ({{percentage}}%)",
+    "airs": "Airs",
+    "endsAt": "Ends at {{time}}",
+    "trailer": "Trailer",
+    "trailers": "Trailers",
+    "similar": "Similar",
+    "collection": {
+      "movies": "Movies",
+      "movie": "Movie",
+      "sortBy": "Sort by",
+      "releaseDate": "Release Date",
+      "rating": "Rating"
+    }
+  },
+  "migration": {
+    "loginRequired": "You must be logged in to migrate your data! Please go back and login to continue.",
+    "start": {
+      "title": "Migrate your data",
+      "explainer": "If you wish to migrate or backup your data, you can do so using the options below. This will allow you to keep your data when you switch backend servers.",
+      "options": {
+        "or": "or",
+        "direct": {
+          "description": "This will directly migrate your data to the new server. This is the fastest option. <br /><br />This option allows you to keep your passphrase the same!",
+          "title": "Direct migration",
+          "quality": "Easiest and fastest",
+          "action": "Transfer data"
+        },
+        "download": {
+          "description": "This will download your data to your device. You can then upload it to the new server or just keep it for safekeeping.",
+          "title": "Download data",
+          "quality": "More technical",
+          "action": "Download data"
+        },
+        "upload": {
+          "title": "Upload Data",
+          "description": "Upload your previously exported data file to restore your bookmarks and progress on this account.",
+          "quality": "Restore from backup",
+          "action": "Upload Data"
+        }
+      }
+    },
+    "preview": {
+      "downloadDescription": "Download includes:",
+      "uploadDescription": "Data to upload:",
+      "items": {
+        "bookmarks": "Bookmarked media",
+        "progress": "Watch progress",
+        "settings": "Settings & Preferences"
+      }
+    },
+    "direct": {
+      "title": "Direct migration",
+      "description": "Enter the destination backend URL to migrate your current account data to a new backend. This keeps your passphrase the same!",
+      "backendLabel": "Destination Backend URL",
+      "recaptchaLabel": "ReCaptcha Key (Optional)",
+      "toggleLable": "Needs ReCaptcha?",
+      "status": {
+        "error": "Failed to migrate your data. 😿",
+        "success": "Your data has been migrated successfully! 🎉"
+      },
+      "button": {
+        "migrate": "Migrate",
+        "processing": "Processing...",
+        "home": "Go home",
+        "login": "Continue to login"
+      }
+    },
+    "download": {
+      "title": "Download data",
+      "description": "This will download your data to your device. You can then upload it to the new server or just keep it for safekeeping.",
+      "status": {
+        "error": "Failed to download your data. 😿",
+        "success": "Your data has been downloaded successfully! 🎉"
+      },
+      "button": {
+        "download": "Download data",
+        "home": "Go home",
+        "login": "Continue to login"
+      }
+    },
+    "upload": {
+      "title": "Upload data",
+      "description": "Upload your previously exported data file to restore your bookmarks and progress on this account.",
+      "status": {
+        "processing": "Processing data...",
+        "error": "Failed to upload your data. 😿",
+        "success": "Your data has been uploaded successfully! 🎉",
+        "successLocal": "Your data has been saved locally! 🎉"
+      },
+      "file": {
+        "description": "Select the file you want to upload",
+        "select": "Select file",
+        "change": "Change file",
+        "name": "File name"
+      },
+      "exportedOn": "Exported on",
+      "previewTitle": "Preview:",
+      "button": {
+        "import": "Import data",
+        "processing": "Processing...",
+        "success": "Import complete",
+        "home": "Continue to home",
+        "saveLocal": "Save locally"
+      }
+    },
+    "back": "Go back"
+  },
+  "navigation": {
+    "banner": {
+      "offline": "Check your internet connection, silly goose! 🦢"
+    },
+    "menu": {
+      "about": "About and FAQ",
+      "logout": "Log out",
+      "register": "Sync to Cloud",
+      "settings": "Settings",
+      "support": "Support",
+      "discover": "Discover",
+      "development": "Development",
+      "desktop": "App Settings"
+    }
+  },
+  "notFound": {
+    "badge": "Not found",
+    "goHome": "Back to home",
+    "reloadButton": "Try again",
+    "message": "We looked everywhere: under the bins, in the closet, behind the proxy, but ultimately couldn't find the page you are looking for. (ಥ﹏ಥ)",
+    "title": "Couldn't find that page"
+  },
+  "downtimeNotice": {
+    "badge": "Issues",
+    "goHome": "Go home",
+    "message": "P-Stream is experiencing issues with some providers again, if you cant find or play a show please change the source. Expect this error to persist throughout the below times.",
+    "title": "Provider issues"
+  },
+  "onboarding": {
+    "defaultConfirm": {
+      "cancel": "Cancel",
+      "confirm": "Use default setup",
+      "description": "The default setup does not have the best streams. You'll be missing out on the best sources!",
+      "tip": "It's recommended to set up the extension and/or FED API!",
+      "title": "Are you sure?"
+    },
+    "extension": {
+      "back": "Go back",
+      "explainer": "Using the browser extension, you can get the best streams we have to offer. With just a simple install. 👌",
+      "explainerIos": "Unfortunately, the browser extension is not supported on iOS, Press <bold>Go back</bold> to choose another option.",
+      "extensionHelp": "If you've installed the extension but it's not detected, <bold>open the extension through your browsers extension menu</bold> and follow the steps on screen.",
+      "linkChrome": "Install Chrome extension",
+      "linkFirefox": "Install Firefox extension",
+      "linkUserscript": "Alternative Userscript",
+      "userscriptNote": "(The extension is more reliable than the userscript!)",
+      "notDetecting": "Installed on Chrome, but the site isn't detecting it? Try reloading the page!",
+      "notDetectingAction": "Reload page",
+      "status": {
+        "disallowed": "Extension is not enabled for this page (,,>﹏<,,)",
+        "disallowedAction": "Enable extension",
+        "failed": "Failed to request status",
+        "loading": "Waiting for you to install the extension",
+        "outdated": "Extension version too old",
+        "success": "Extension is working as expected!"
+      },
+      "submit": "Continue",
+      "title": "Let's start with an extension"
+    },
+    "proxy": {
+      "back": "Go back",
+      "explainer": "With the proxy method, you can get great quality streams by making a self-service proxy.",
+      "input": {
+        "errorConnection": "Could not connect to proxy",
+        "errorInvalidUrl": "Not a valid URL",
+        "errorNotProxy": "Expected a proxy but got a website",
+        "label": "Proxy URL",
+        "placeholder": "https://"
+      },
+      "link": "Learn how to make a proxy",
+      "submit": "Submit proxy",
+      "title": "Let's make a new proxy"
+    },
+    "start": {
+      "explainer": "To get the best streams possible, you will need to choose which streaming method you want to use.",
+      "moreInfo": {
+        "button": "Which setup should I choose?",
+        "title": "Understanding a setup",
+        "explainer": {
+          "intro": "P-Stream doesn't host videos. It relies on third-party websites for content, so you need to choose how it connects to those sites.",
+          "options": "Your Options:",
+          "extension": "Extension",
+          "extensionDescription": "The extension gives you access to the most sources. It acts as a local proxy and can handle sites that need special cookies or headers to load.",
+          "proxy": "Proxy",
+          "proxyDescription": "The proxy scrapes media from other websites. It bypasses browser restrictions (like CORS) to allow scraping.",
+          "default": "Default Setup",
+          "defaultDescription": "Uses P-Stream's built-in proxy. It's the easiest option but might be slower due to shared bandwidth.",
+          "fedapi": {
+            "fedapi": "Additional: Febbox token",
+            "fedapiDescription": "Bring your own FREE Febbox account to gain access to FED API, the best sources with 4K quality, Dolby Atmos, skip intro and the fastest load times! Highly recommended option!"
+          },
+          "outro": "If you have more questions on how this works, feel free to ask on the <0>P-Stream Discord</0> server!"
+        },
+        "recommended": {
+          "title": "Not sure what to choose?",
+          "subtitle": "Recommended Configurations:",
+          "desktop": {
+            "title": "Desktop:",
+            "description": "Extension (or app) + Febbox token"
+          },
+          "iOS": {
+            "title": "iOS:",
+            "description": "Custom proxy + Febbox token"
+          },
+          "android": {
+            "title": "Android:",
+            "description": "Extension + Febbox token"
+          }
+        }
+      },
+      "options": {
+        "or": "or",
+        "default": {
+          "text": "I don't want good quality streams, use the default setup."
+        },
+        "extension": {
+          "action": "Install extension",
+          "description": "Install browser extension and gain access to additional sources! Remember to enable it for this site.",
+          "quality": "Best quality + More sources",
+          "title": "Browser extension"
+        },
+        "desktopapp": {
+          "action": "Install Desktop app",
+          "description": "Install desktop app and gain access to additional sources! Simple and easy to use!",
+          "quality": "Best quality + Even more sources",
+          "title": "P-Stream Desktop app"
+        },
+        "proxy": {
+          "action": "Setup proxy",
+          "description": "Setup a free proxy in just 5 minutes! Improves loading reliability!",
+          "quality": "Good quality",
+          "title": "Custom proxy"
+        },
+        "addons": {
+          "title": "Additional sources:"
+        }
+      },
+      "title": "Let's get you setup with P-Stream 🥳"
+    }
+  },
+  "overlays": {
+    "close": "Close"
+  },
+  "player": {
+    "back": {
+      "default": "Back to home",
+      "short": "Back"
+    },
+    "casting": {
+      "to": "Casting to {{device}} 📺",
+      "device": "device",
+      "enabled": "Casting to device 🎬"
+    },
+    "menus": {
+      "downloads": {
+        "button": "Attempt download",
+        "hlsDownloader": "Or, go to the <0>hls downloader website</0> and paste the playlist URL from below.",
+        "disclaimer": "Downloads are taken directly from the provider. P-Stream does not have control over how the downloads are provided.",
+        "copyHlsPlaylist": "Copy HLS playlist link",
+        "downloadSubtitle": "Download current subtitle",
+        "downloadVideo": "Download video",
+        "desktopDisclaimer": "Download this video directly to your app for offline playback.",
+        "offlineButton": "Download for Offline Use",
+        "openIn": "Open in...",
+        "vlc": "VLC",
+        "iina": "IINA",
+        "outplayer": "Outplayer",
+        "hlsOpenInDisclaimer": "Opening HLS streams in an external player MAY NOT WORK!",
+        "hlsDisclaimer": "Downloads are taken directly from the provider. P-Stream does not have control over how the downloads are provided.<br /><br />Please note you are downloading an HLS playlist, <bold>it is not recommended to download if you are not familiar with advanced streaming formats</bold>. Try different sources for different formats.",
+        "onAndroid": {
+          "1": "To download on Android, click the download button then, on the new page, <bold>tap and hold</bold> on the video, then select <bold>save</bold>.",
+          "shortTitle": "Download / Android",
+          "title": "Downloading on Android"
+        },
+        "onIos": {
+          "1": "To download on iOS, click the download button then, on the new page, click <bold><ios_share /></bold>, then <bold>Save to Files <ios_files /></bold>.",
+          "shortTitle": "Download / iOS",
+          "title": "Downloading on iOS"
+        },
+        "onPc": {
+          "1": "On PC, click the download button then, on the new page, right click the video and select <bold>Save video as</bold>",
+          "shortTitle": "Download / PC",
+          "title": "Downloading on PC"
+        },
+        "title": "Download"
+      },
+      "episodes": {
+        "button": "Episodes",
+        "emptyState": "There are no episodes in this season, check back later (sorry :3)...",
+        "episodeBadge": "E{{episode}}",
+        "loadingError": "Error loading season",
+        "loadingList": "Loading...",
+        "loadingTitle": "Loading...",
+        "unairedEpisodes": "One or more episodes in this season have been disabled because they haven't been aired yet.",
+        "seasons": "Seasons",
+        "showMore": "Show more",
+        "showLess": "Show less",
+        "markAsWatched": "Mark as watched",
+        "markAsUnwatched": "Mark as unwatched",
+        "markAsFavorite": "Mark as favorite",
+        "favorites": "Favorites",
+        "noFavorites": "No favorite episodes yet. Star episodes to add them to your favorites!"
+      },
+      "playback": {
+        "speedLabel": "Playback speed",
+        "title": "Playback settings",
+        "disabled": "(Disabled in watch party)",
+        "speedBoosted": "2x",
+        "speedUnboosted": "{{speed}}x"
+      },
+      "quality": {
+        "automaticLabel": "Automatic quality",
+        "hint": "You can try <0>switching source</0> to get different quality options.",
+        "iosNoQuality": "Due to Apple-defined (common IOS L) limitations, quality selection is not available on iOS for this source. You can try <0>switching to another source</0> to get different quality options.",
+        "title": "Quality",
+        "auto": "Auto"
+      },
+      "settings": {
+        "downloadItem": "Download",
+        "enableSubtitles": "Enable Subtitles",
+        "experienceSection": "Viewing experience",
+        "playbackItem": "Playback settings",
+        "audioItem": "Audio",
+        "qualityItem": "Quality",
+        "sourceItem": "Source",
+        "subtitleItem": "Subtitles",
+        "videoSection": "Video settings"
+      },
+      "sources": {
+        "failed": {
+          "text": "There was an error while trying to find any videos... Try a different source?",
+          "title": "Failed to scrape"
+        },
+        "noEmbeds": {
+          "text": "We were unable to find any embeds, please try a different source.",
+          "title": "No embeds found"
+        },
+        "noStream": {
+          "text": "This source has no streams for this movie or show. /ᐠ - ˕ -マ Ⳋ",
+          "title": "No stream :("
+        },
+        "title": "Sources",
+        "unknownOption": "Unknown",
+        "findNextSource": "Find next source"
+      },
+      "subtitles": {
+        "customChoice": "Drop or upload file",
+        "pasteChoice": "Paste subtitle data",
+        "doubleClickToCopy": "Double click to copy subtitle data",
+        "customizeLabel": "Customize",
+        "previewLabel": "Subtitle preview:",
+        "offChoice": "Off",
+        "onChoice": "On",
+        "autoSelectChoice": "Auto select",
+        "autoSelectDifferentChoice": "Tap again to auto select different subtitle",
+        "SourceChoice": "Source Subtitles",
+        "OpenSubtitlesChoice": "External Subtitles",
+        "loadingExternal": "Loading external subtitles...",
+        "transcriptChoice": "Transcript",
+        "settings": {
+          "backlink": "Custom subtitles",
+          "delay": "Subtitle delay",
+          "fixCapitals": "Fix capitalization"
+        },
+        "title": "Subtitles",
+        "unknownLanguage": "Unknown",
+        "dropSubtitleFile": "Drop subtitle file here! >_<",
+        "scrapeButton": "Scrape subtitles",
+        "refresh": "Refresh External Subtitles",
+        "refreshing": "Refreshing...",
+        "empty": "There are no provided subtitles for this.",
+        "notFound": "None of the available options match your query",
+        "useNativeSubtitles": "Native video subtitles",
+        "useNativeSubtitlesDescription": "Broadcast subtitles for native fullscreen and PiP",
+        "delayLate": "Heard audio",
+        "delayEarly": "Saw caption",
+        "translate": {
+          "title": "Translate from {{language}}"
+        }
+      },
+      "watchparty": {
+        "watchpartyItem": "Watch Party",
+        "notice": "Legacy Watch Party might not be available for some sources",
+        "legacyWatchparty": "Use legacy Watch Party"
+      },
+      "audio": {
+        "default": "Default"
+      }
+    },
+    "metadata": {
+      "api": {
+        "text": "Could not load API metadata, please check your internet connection.",
+        "title": "Failed to load API metadata"
+      },
+      "legal": {
+        "badge": "Removed",
+        "text": "This media is no longer available due to a takedown notice or copyright claim. 😨",
+        "title": "Media has been removed"
+      },
+      "extensionPermission": {
+        "badge": "Permission Missing",
+        "button": "Use extension",
+        "text": "You have the browser extension, but we need your permission to get started using the extension. (¬_¬)",
+        "title": "Configure the extension"
+      },
+      "failed": {
+        "badge": "Failed",
+        "homeButton": "Go home",
+        "text": "Could not load the media's metadata from TMDB. Please check whether TMDB is down or blocked on your internet connection.",
+        "title": "Failed to load metadata"
+      },
+      "notFound": {
+        "badge": "Not found",
+        "homeButton": "Back to home",
+        "text": "We couldn't find the media you requested. Either it's been removed or you tampered with the URL (naughty, naughty).",
+        "title": "Couldn't find that media."
+      }
+    },
+    "nextEpisode": {
+      "replay": "Replay",
+      "next": "Next episode",
+      "nextSeason": "Next season"
+    },
+    "resume": {
+      "title": "Continue watching?",
+      "description": "This episode is {{percentage}}% watched",
+      "resume": "Resume",
+      "restart": "Restart"
+    },
+    "playbackError": {
+      "badge": "Playback error",
+      "errors": {
+        "errorAborted": "The fetching of the media was aborted by the user's request.",
+        "errorDecode": "Despite having previously been determined to be usable, an error occurred while trying to decode the media resource, resulting in an error.",
+        "errorGenericMedia": "Unknown media error occurred.",
+        "errorNetwork": "Some kind of network error occurred which prevented the media from being successfully fetched, despite having previously been available.",
+        "errorNotSupported": "The media or media provider object is not supported."
+      },
+      "autoResumeText": "There was an error trying to play the media 😖. Automatically trying the other sources...",
+      "copyDebugInfo": "Copy debug info",
+      "debugInfo": "Check console for more details.",
+      "homeButton": "Go home",
+      "resumeButton": "Try next sources",
+      "text": "There was an error trying to play the media 😖. Please try again or try a different source!",
+      "title": "Failed to play video!"
+    },
+    "scraping": {
+      "items": {
+        "failure": "Error occurred",
+        "notFound": "Doesn't have the video (╥﹏╥)",
+        "pending": "Checking for videos..."
+      },
+      "notFound": {
+        "badge": "Not found",
+        "detailsButton": "Show details",
+        "homeButton": "Go home",
+        "discoverButton": "Discover more",
+        "text": "We have searched through our providers and cannot find the media you are looking for! We do not host the media and have no control over what is available. Please click 'Show details' below for more details.",
+        "title": "We couldn't find that",
+        "onboarding": "More sources might be avalible using the extension or febbox token!",
+        "onboardingButton": "Do setup again"
+      },
+      "extensionFailure": {
+        "badge": "Extension disabled",
+        "homeButton": "Go home",
+        "enableExtension": "Enable extension",
+        "title": "Please enable the extension",
+        "text": "You've installed the P-Stream extension. To start using it, you need to enable the extension for this site."
+      },
+      "tips": {
+        "1": "Tap the gear icon to switch sources!",
+        "2": "Tap the title to copy the link!",
+        "3": "Tap and hold or hold SHIFT to show widescreen button instead of fullscreen!",
+        "4": "Some sources work better than others!",
+        "5": "Get the extension for more sources!",
+        "6": "Hold bookmarks to edit or delete them!",
+        "7": "Hold SHIFT and tap the title to copy the link with time!",
+        "8": "Set a custom subtitle color!",
+        "9": "Migrate your account to a new backend in settings!",
+        "10": "Join the Discord!",
+        "11": "Hold ` to view keyboard shortcuts!"
+      }
+    },
+    "time": {
+      "regular": "{{timeWatched}} / {{duration}}",
+      "remaining": "{{timeLeft}} left • Finish at {{timeFinished, datetime}}",
+      "shortRegular": "{{timeWatched}}",
+      "shortRemaining": "-{{timeLeft}}"
+    },
+    "segment": {
+      "intro": "Intro",
+      "recap": "Recap",
+      "credits": "Credits",
+      "preview": "Preview"
+    },
+    "skipTime": {
+      "intro": "Skip Intro",
+      "recap": "Skip Recap",
+      "credits": "Skip Credits",
+      "preview": "Skip Preview",
+      "skipSegments": "Skip Segments",
+      "submitSegment": "Submit Segment",
+      "noSegments": "No skip segments available",
+      "startsAt": "Starts at {{time}}",
+      "endsAt": "Ends at {{time}}",
+      "timeUnknown": "Time unknown",
+      "confidence": "confidence",
+      "submissions": "{{count}} submissions",
+      "connectApiKeyMessage": "To submit new segments, enter your TheIntroDB API key in the connections settings",
+      "endOfVideo": "End",
+      "feedback": {
+        "title": "Was this skip correct?",
+        "modal": {
+          "title": "Submit Timestamps to TheIntroDB",
+          "description": "Contribute to TheIntroDB by submitting accurate segment timestamps. All submissions are accepted by the community before being published.",
+          "segmentType": "Segment Type",
+          "types": {
+            "intro": "Intro",
+            "recap": "Recap",
+            "credits": "Credits",
+            "preview": "Preview"
+          },
+          "startTimeLabel": "Start (s)",
+          "endTimeLabel": "End (s)",
+          "placeholders": {
+            "start": {
+              "intro": "2:30 or 150 (leave empty for start at beginning)",
+              "recap": "2:30 or 150 (leave empty for start at beginning)",
+              "credits": "2:30 or 150 (required)",
+              "preview": "2:30 or 150 (required)"
+            },
+            "end": {
+              "intro": "3:30 or 210 (required)",
+              "recap": "3:30 or 210 (required)",
+              "credits": "3:30 or 210 (leave empty for end of media)",
+              "preview": "3:30 or 210 (leave empty for end of media)"
+            }
+          },
+          "whenToTitle": "Timestamps guide:",
+          "whenToDesc": "Enter timestamps in seconds (e.g. 150), mm:ss format (e.g. 2:30), or hh:mm:ss format (e.g. 1:42:20). We'll automatically convert the format for you.",
+          "guide": {
+            "startLabel": "Start:",
+            "startDesc": "Required - when credits begin rolling",
+            "endLabel": "End:",
+            "endDesc": "Optional - empty if extends to end",
+            "durationLabel": "Duration:",
+            "durationDesc": "Min 5s if end provided",
+            "excludeLabel": "Exclude:",
+            "excludeDesc": "Post-credits scenes",
+            "intro": {
+              "whenToTitle": "Intro timestamps guide:",
+              "startDesc": "Optional - leave empty if the intro starts at the beginning of the episode.",
+              "endDesc": "Required - when the intro ends (usually when the title card or main episode begins).",
+              "durationDesc": "Most intros are 30–90 seconds. Minimum 5s if both start and end are set.",
+              "excludeDesc": "Do not include cold opens or pre-intro scenes; only the main title sequence."
+            },
+            "recap": {
+              "whenToTitle": "Recap timestamps guide:",
+              "startDesc": "Optional - leave empty if the recap starts at the beginning of the episode.",
+              "endDesc": "Required - when the recap ends and the new content begins.",
+              "durationDesc": "Recaps vary in length. Minimum 5s if both start and end are set.",
+              "excludeDesc": "Only the \"previously on\" or recap segment; do not include the intro or new scenes."
+            },
+            "credits": {
+              "whenToTitle": "Credits timestamps guide:",
+              "startDesc": "Required - when the closing credits begin (e.g. when the first credit text appears).",
+              "endDesc": "Optional - leave empty if credits run to the end of the file.",
+              "durationDesc": "Minimum 5s if end is provided. Can extend to end of media.",
+              "excludeDesc": "Exclude mid-credits or post-credits scenes; only the main credit roll."
+            },
+            "preview": {
+              "whenToTitle": "Preview timestamps guide:",
+              "startDesc": "Required - when the preview starts (e.g. when the preview text appears).",
+              "endDesc": "Optional - leave empty if the preview ends at the end of the media.",
+              "durationDesc": "Preview varies in length. Minimum 5s.",
+              "excludeDesc": "Preview is usually 15-90 seconds at the end of the episode previewing the next episode."
+            }
+          },
+          "cancel": "Cancel",
+          "submit": "Submit",
+          "submitting": "Submitting...",
+          "error": {
+            "tidbKey": "TIDB API key is not set",
+            "mediaInfo": "Media information is not available",
+            "endTime": "End time is required",
+            "startTime": "Start time is required",
+            "submission": "Error submitting timestamps",
+            "segment": "No segment selected"
+          },
+          "success": {
+            "title": "Submission Successful! Thanks!"
+          }
+        }
+      }
+    }
+  },
+  "support": {
+    "title": "Support",
+    "text": "P-Stream is designed to be as user-friendly as possible. However, people still have questions and issues. This page is here to help resolve these shortcomings",
+    "q1": {
+      "body": "You can join the official <0>P-Stream discord</0> and ask questions there or you can email the one provided at the bottom of this page.",
+      "title": "Where can I get help?"
+    },
+    "q2": {
+      "body": "We have a <0>GitHub</0> where you can create a detailed issue in our repository. Additionally, if you wish, you can create a pull request to fix the issue yourself.",
+      "title": "How can I report a bug or issue?"
+    }
+  },
+  "jip": {
+    "title": "Jip",
+    "text": "movie-web didn't fall out of a coconut tree, it was made mostly by a single person (a very epic one at that)."
+  },
+  "pas": {
+    "title": "Pas",
+    "text": "P-Stream was a dream and Pas made it a reality."
+  },
+  "screens": {
+    "legal": {
+      "title": "Legal / DMCA"
+    },
+    "loadingApp": "Loading application",
+    "loadingUser": "Loading your profile",
+    "loadingUserError": {
+      "logout": "Logout",
+      "reset": "Reset custom server",
+      "disconnect": "Disconnect from backend",
+      "text": "Failed to load your profile",
+      "reload": "Reload",
+      "textWithReset": "Failed to load your profile from your custom server, want to reset back to the default server?",
+      "disconnectTitle": "Disconnect from backend?",
+      "disconnectMessage": "Disconnect from the account server, maintaining the most recent local data. Changes and watched content will not sync until you're signed in again.",
+      "disconnectConfirm": "Confirm",
+      "disconectCancel": "Cancel"
+    },
+    "migration": {
+      "failed": "Failed to migrate your data. 😿",
+      "inProgress": "Please hold, we are migrating your data. This shouldn't take long..."
+    }
+  },
+  "settings": {
+    "search": {
+      "placeholder": "Search settings..."
+    },
+    "all": {
+      "title": "All Settings"
+    },
+    "account": {
+      "accountDetails": {
+        "nicknameLabel": "Nickname",
+        "nicknamePlaceholder": "Enter your nickname",
+        "deviceNameLabel": "Device name",
+        "deviceNamePlaceholder": "Personal phone",
+        "editProfile": "Edit",
+        "logoutButton": "Log out"
+      },
+      "admin": {
+        "title": "Admin panel",
+        "text": "Test P-Stream's condition."
+      },
+      "actions": {
+        "delete": {
+          "button": "Delete account",
+          "confirmButton": "Delete account",
+          "confirmDescription": "Are you sure you want to delete your account? All your data will be lost! ૮₍˶Ó﹏Ò ⑅₎ა",
+          "confirmTitle": "Are you sure?",
+          "text": "This action is irreversible. All data will be deleted and nothing can be recovered.",
+          "title": "Delete account"
+        },
+        "migration": {
+          "title": "Account migration",
+          "text": "Migrate your account to a new server or download your data.",
+          "button": "Migrate account"
+        },
+        "title": "Actions",
+        "logoutAllDevices": {
+          "title": "End All Sessions",
+          "text": "This will sign you out from all devices linked to your account.",
+          "button": "Log Out of All Devices"
+        }
+      },
+      "devices": {
+        "deviceNameLabel": "Device name",
+        "unknownDevice": "Unknown device, error decrypting name",
+        "failed": "Failed to load sessions",
+        "removeDevice": "Remove",
+        "title": "Devices"
+      },
+      "profile": {
+        "finish": "Finish editing",
+        "firstColor": "Profile color one",
+        "secondColor": "Profile color two",
+        "title": "Edit profile picture",
+        "userIcon": "User icon"
+      },
+      "register": {
+        "cta": "Get started",
+        "text": "Share your watch progress between devices and keep them synced. ( ̧⸝⸝⍢⸝⸝)ෆ",
+        "title": "Sync to the Cloud"
+      },
+      "title": "Account"
+    },
+    "appearance": {
+      "activeTheme": "Active",
+      "themes": {
+        "blue": "Blue",
+        "custom": "Custom",
+        "default": "Default",
+        "gray": "Gray",
+        "red": "Red",
+        "teal": "Teal",
+        "classic": "Classic",
+        "green": "Green",
+        "mocha": "Mocha",
+        "pink": "Pink",
+        "noir": "Noir",
+        "ember": "Ember",
+        "acid": "Acid",
+        "spark": "Spark",
+        "grape": "Grape",
+        "spiderman": "Spiderman",
+        "forest": "Forest",
+        "wolverine": "Wolverine",
+        "popsicle": "Popsicle",
+        "hulk": "Hulk",
+        "autumn": "Autumn",
+        "cobalt": "Cobalt",
+        "frost": "Frost",
+        "christmas": "Christmas"
+      },
+      "customParts": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "tertiary": "Tertiary"
+      },
+      "title": "Appearance",
+      "options": {
+        "discover": "Discover section",
+        "discoverDescription": "Show the Discover section on the Homepage below your bookmarked media. Enabled by default.",
+        "discoverLabel": "Discover section",
+        "featured": "Featured media",
+        "featuredDescription": "Show a carousel of featured movies and shows at the top of your homepage! Disabled by default.",
+        "featuredLabel": "Featured media",
+        "modal": "Details modal",
+        "modalDescription": "Show the details modal when you click on a media card instead of going to the watch page. Proxy or Extension required for trailer. Disabled by default.",
+        "modalLabel": "Details modal",
+        "logos": "Image logos",
+        "logosDescription": "Show image logos instead of text titles in the details modal and featured section. Enabled by default.",
+        "logosNotice": "Most of the time, logos are English only. Other languages might want to disable this!",
+        "logosLabel": "Image logos",
+        "carouselView": "Carousel view",
+        "carouselViewDescription": "Display your currently watching and bookmark sections as carousels instead of a grid. Disabled by default.",
+        "carouselViewLabel": "Carousel view",
+        "minimalCards": "Minimal cards",
+        "minimalCardsDescription": "Hide text content (title, type, year) on media cards, showing only the poster image.",
+        "minimalCardsLabel": "Minimal cards",
+        "forceCompactEpisodeView": "Force compact episode view",
+        "forceCompactEpisodeViewDescription": "Force the episode carousel in the player to use the \"classic\" compact vertical view. Disabled by default.",
+        "homeSectionOrder": "Home section order",
+        "homeSectionOrderDescription": "Drag and drop to reorder the watching and bookmarks sections on your homepage. Group order can be editied from the home page.",
+        "forceCompactEpisodeViewLabel": "Compact episodes",
+        "homeSectionOrderGroups": "Reorder bookmark groups",
+        "pauseOverlay": "Pause overlay",
+        "pauseOverlayDescription": "Show a title/logo and description overlay when the player is paused and idle.",
+        "pauseOverlayLabel": "Pause overlay"
+      },
+      "sections": {
+        "watching": "Currently Watching",
+        "bookmarks": "Bookmarks"
+      }
+    },
+    "connections": {
+      "server": {
+        "description": "If you would like to connect to a custom backend to store your data, enable this and provide the URL. <0>Instructions.</0>",
+        "label": "Backend Server",
+        "urlLabel": "Custom server URL",
+        "selectBackend": "Select Backend Server",
+        "currentBackend": "Current Backend",
+        "changeWarning": "Changing backend server will log you out. Continue?",
+        "confirm": "Log out and change server",
+        "cancel": "Cancel",
+        "changeWarningTitle": "Change Backend Server",
+        "migration": {
+          "description": "<0>Migrate my data</0> to a new server.",
+          "link": "Migrate my data"
+        },
+        "documentation": "Backend documentation",
+        "error": "Error connecting to backend",
+        "notice": "Your account does NOT sync between backends, so remember which one you use!"
+      },
+      "setup": {
+        "doSetup": "Do setup",
+        "errorStatus": {
+          "description": "It seems that one or more items in this setup need your attention.",
+          "title": "Something needs your attention 😱"
+        },
+        "itemError": "There is something wrong with this setting. Go through setup again to fix it. (ᴗ_ ᴗ。)",
+        "items": {
+          "default": "Default setup",
+          "extension": "Extension",
+          "proxy": "Custom proxy",
+          "desktopapp": "Native app"
+        },
+        "redoSetup": "Redo setup",
+        "successStatus": {
+          "description": "All things are in place for you to start watching your favorite media. (๑>◡<๑)",
+          "title": "Everything is set up!"
+        },
+        "unsetStatus": {
+          "description": "Please click the button to the right to start the setup process.",
+          "title": "You haven't gone through setup"
+        }
+      },
+      "title": "Connections",
+      "workers": {
+        "addButton": "Add new worker",
+        "description": "To make the application function, all traffic is routed through proxies. Enable this if you want to bring your own workers. <0>Instructions.</0>",
+        "documentation": "Proxy documentation",
+        "emptyState": "No workers yet (｡•́︿•̀｡), add one below",
+        "label": "Use custom proxy workers",
+        "urlLabel": "Worker URLs",
+        "urlPlaceholder": "https://",
+        "proxyTMDB": {
+          "title": "Proxy TMDB",
+          "description": "Only needed if you can't access TheMovieDB directly, such as if your ISP blocks it. It is recomended to disable the Discover section to improve performance with this."
+        }
+      },
+      "tidb": {
+        "description": "Contribute to TheIntroDB by leaving feedback on intro, recap, and credits segments. <0>Learn more.</0>",
+        "tokenLabel": "API Key"
+      },
+      "trakt": {
+        "title": "Trakt",
+        "description": "Sync your watchlist and history with Trakt.",
+        "details": "Syncing might take a few minutes to complete. Changes on Trakt may conflict with local changes, so local items are prioritized.",
+        "connect": "Connect Trakt",
+        "syncing": "Syncing...",
+        "disconnect": "Disconnect"
+      }
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": "Application language",
+      "languageDescription": "Language applied to the entire application, only English has silly stuff 🙁.",
+      "thumbnail": "Generate thumbnails",
+      "thumbnailDescription": "Most of the time, videos don't have thumbnails. You can enable this setting to generate them on the fly but they can make your video slower.",
+      "thumbnailLabel": "Generate thumbnails",
+      "autoplay": "Autoplay",
+      "autoplayDescription": "Automatically play the next episode in a series after reaching the end. Can be enabled by users with the browser extension, a custom proxy, or with the default setup if allowed by the host.",
+      "autoplayLabel": "Autoplay",
+      "skipCredits": "Skip End Credits",
+      "skipCreditsDescription": "When enabled, automatically play the next episode at 99% completion to skip end credits. When disabled, wait until the episode is fully completed.",
+      "skipCreditsLabel": "Skip end credits",
+      "autoSkipSegments": "Auto Skip Segments",
+      "autoSkipSegmentsDescription": "When enabled, automatically skip intro, recap, and preview segments while watching.",
+      "autoSkipSegmentsLabel": "Auto skip segments",
+      "lowPerformanceMode": "Low performance/bandwidth mode",
+      "lowPerformanceModeDescription": "Optimizes the application for slower connections and devices by disabling bandwidth-heavy features. This mode reduces data usage and improves performance while keeping the core search and watch functionality intact. ",
+      "lowPerformanceModeLabel": "Low performance mode",
+      "holdToBoost": "Hold to boost speed",
+      "holdToBoostDescription": "Hold spacebar or touch and hold the screen to temporarily increase playback speed to 2x. Release to return to previous speed.",
+      "holdToBoostLabel": "Enable hold to boost",
+      "doubleClickToSeek": "Double tap to seek",
+      "doubleClickToSeekDescription": "Double tap on the left or right side of the player to seek 10 seconds forward or backward.",
+      "doubleClickToSeekLabel": "Enable double tap to seek",
+      "keyboardShortcuts": "Keyboard Shortcuts",
+      "keyboardShortcutsDescription": "Customize the keyboard shortcuts for the application. Hold ` to show this help anytime",
+      "keyboardShortcutsLabel": "Customize Keyboard Shortcuts",
+      "sourceOrder": "Reordering sources",
+      "sourceOrderDescription": "Drag and drop to reorder sources. This will determine the order in which sources are checked for the media you are trying to watch. If a source is greyed out, it means the <bold>extension</bold> is required for that source. <br><br> <strong>(The default order is best for most users)</strong>",
+      "sourceOrderEnableLabel": "Custom source order",
+      "showLess": "Show less",
+      "showMore": "Show more",
+      "embedOrder": "Reordering embeds",
+      "embedOrderDescription": "Drag and drop to reorder embeds. This will determine the order in which embeds are checked for the media you are trying to watch. <br><br> <strong>(The default order is best for most users)</strong>",
+      "embedOrderEnableLabel": "Custom embed order",
+      "manualSource": "Manual source selection",
+      "manualSourceDescription": "Require picking a source before scraping. Disables automatic source selection and opens the source picker when starting playback.",
+      "manualSourceLabel": "Manual source selection",
+      "autoResumeOnPlaybackError": "Auto resume on playback error",
+      "autoResumeOnPlaybackErrorDescription": "Automatically continue searching for other sources when the current source fails during playback. If disabled, you'll see an error screen with a manual resume option.",
+      "autoResumeOnPlaybackErrorLabel": "Auto resume on playback error",
+      "lastSuccessfulSource": "Last used source",
+      "lastSuccessfulSourceDescription": "Automatically prioritize the source that successfully provided content for the previous episode. This helps ensure continuity when watching series.",
+      "lastSuccessfulSourceEnableLabel": "Last used source"
+    },
+    "reset": "Reset",
+    "save": "Save",
+    "sidebar": {
+      "info": {
+        "appVersion": "App version",
+        "backendUrl": "Backend URL",
+        "backendVersion": "Backend version",
+        "hostname": "Hostname",
+        "insecure": "Insecure",
+        "nickname": "Nickname",
+        "notLoggedIn": "You are not logged in",
+        "secure": "Secure",
+        "title": "App stats",
+        "unknownVersion": "Unknown",
+        "userId": "User ID"
+      }
+    },
+    "subtitles": {
+      "backgroundLabel": "Background opacity",
+      "backgroundBlurEnabledLabel": "Background blur",
+      "backgroundBlurEnabledDescription": "Disabling caption background blur may fix some flickering issues",
+      "backgroundBlurLabel": "Background blur intensity",
+      "colorLabel": "Color",
+      "previewQuote": "Convinced life is meaningless, I lack the courage of my conviction.",
+      "textSizeLabel": "Text size",
+      "title": "Subtitles",
+      "textBoldLabel": "Bold text",
+      "verticalPositionLabel": "Vertical position",
+      "high": "High",
+      "low": "Default",
+      "textStyle": {
+        "title": "Text style",
+        "default": "Default",
+        "raised": "Raised",
+        "depressed": "Depressed",
+        "Border": "Border",
+        "dropShadow": "Drop Shadow"
+      },
+      "BorderThicknessLabel": "Border Thickness"
+    },
+    "unsaved": "You have unsaved changes... ฅ^•ﻌ•^ฅ"
+  },
+  "discover": {
+    "tabs": {
+      "movies": "Movies",
+      "tvshows": "TV Shows",
+      "editorpicks": "Editor Picks"
+    },
+    "carousel": {
+      "title": {
+        "loading": "Loading...",
+        "movies": "{{category}} Movies",
+        "tvshows": "{{category}} Shows",
+        "inCinemas": "In Cinemas",
+        "popular": "Most Popular",
+        "nowPlaying": "In Cinemas",
+        "topRated": "Top Rated",
+        "latestReleases": "Latest Releases",
+        "4kReleases": "4K Releases",
+        "onTheAir": "On The Air",
+        "latestTVReleases": "Latest TV Shows",
+        "popularOn": "Popular {{type}} on {{provider}}",
+        "editorPicksMovies": "Editor Picks Movies",
+        "editorPicksShows": "Editor Picks Shows",
+        "moviesOn": "Movies on {{provider}}",
+        "tvshowsOn": "Shows on {{provider}}",
+        "recommended": "Because You Watched: {{title}}",
+        "forYou": "For You",
+        "genreMovies": "{{genre}} Movies",
+        "genreShows": "{{genre}} Shows",
+        "categoryMovies": "{{category}} Movies",
+        "categoryShows": "{{category}} Shows",
+        "top10": "Top 10"
+      },
+      "change": "Change",
+      "more": "View more"
+    },
+    "featured": {
+      "playNow": "Play Now",
+      "moreInfo": "More Info"
+    },
+    "randomMovie": {
+      "button": "Watch Something Random",
+      "cancel": "Cancel Countdown",
+      "countdown": "{{countdown}}s",
+      "nowPlaying": "Now Playing",
+      "in": "in"
+    },
+    "page": {
+      "title": "Discover Movies & TV",
+      "subtitle": "Explore the latest hits and timeless classics.",
+      "loadMore": "Load more",
+      "loading": "Loading...",
+      "back": "Go back"
+    },
+    "viewLists": "View All Movie Lists",
+    "allLists": "All Movie Lists",
+    "scrollToTop": "Back to top"
+  },
+  "fedapi": {
+    "onboarding": {
+      "title": "Febbox token",
+      "description": "Bring your own FREE Febbox account to gain access to FED API, the best sources with 4K quality, Dolby Atmos, skip intro and the fastest load times! Highly recommended option!"
+    },
+    "setup": {
+      "title": "To get your UI token:",
+      "showVideo": "Show Video Tutorial",
+      "hideVideo": "Hide Video Tutorial",
+      "step": {
+        "1": "1. Go to <0>febbox.com</0> and log in with Google (use a fresh account!)",
+        "2": "2. Open DevTools or inspect the page",
+        "3": "3. Go to Application tab → Cookies",
+        "4": "4. Copy the 'ui' cookie's value.",
+        "5": "5. Close the tab, but do NOT logout!"
+      },
+      "tokenLabel": "Token",
+      "tokenExample": {
+        "button": "(Example)",
+        "title": "Example Token",
+        "description": "This is what a Febbox UI token looks like:",
+        "warning": "Don't try to use, it's fake.",
+        "close": "Got it"
+      },
+      "traffic": "{{used}} / 100GB High-speed Traffic • Resets in {{reset}}",
+      "trafficExplanation": "Febbox gives you 100GB/month of high-speed traffic, the streams might buffer more after you've used up your quota. Depends on your internet speed and the quality of the stream.",
+      "useMp4": "Enable MP4 streams. May be faster outside of the U.S., but audio tracks cannot be changed."
+    },
+    "status": {
+      "success": "success",
+      "api_down": "Cannot reach FED API!",
+      "invalid_token": "Failed to fetch a 'VIP' stream. Your token is invalid!"
+    }
+  },
+  "debrid": {
+    "title": "Debrid (Beta)",
+    "description": "Enter your Debrid API key to access Debrid services. Requires a paid <0>Real-Debrid</0> or <1>TorBox</1> account!",
+    "notice": "Notice: This may not work on all browsers, use Chromium for the best compatibility. If you hear no audio, use another source. :(",
+    "tokenLabel": "API Key",
+    "serviceOptions": {
+      "realdebrid": "Real Debrid",
+      "torbox": "TorBox"
+    },
+    "status": {
+      "failure": "Failed to connect to Debrid. Please check your API key.",
+      "api_down": "Hmm, something went wrong. Please try again later.",
+      "invalid_token": "Invalid API key or non-premium account. Debrid requires a premium account."
+    }
+  },
+  "watchParty": {
+    "status": {
+      "inSync": "In sync",
+      "outOfSync": "Out of sync"
+    },
+    "alone": "Alone",
+    "withCount": "With {{count}} others",
+    "isHost": "Hosting on <0>{{backendName}}</0>",
+    "isGuest": "Watching as a guest on <0>{{backendName}}</0>",
+    "hosting": "Hosting",
+    "watching": "Watching",
+    "syncing": "Syncing...",
+    "behindHost": "Behind host by {{seconds}} seconds",
+    "aheadOfHost": "Ahead of host by {{seconds}} seconds",
+    "showStatusOverlay": "Show status overlay",
+    "leaveWatchParty": "Leave Watch Party",
+    "shareCode": "Share this code with friends (click to copy link)",
+    "connectedAsGuest": "Connected to watch party as guest",
+    "hostParty": "Host a Watch Party",
+    "joinParty": "Join a Watch Party",
+    "viewers": "Viewers ({{count}})",
+    "copyCode": "Click to copy",
+    "join": "Join",
+    "cancel": "Cancel",
+    "save": "Save",
+    "emptyRoom": "No one is in this room yet",
+    "noHost": "No host in this watch party",
+    "invalidRoom": "Unable to connect to this room",
+    "contentMismatch": "Cannot join watch party: The content does not match the host's content.",
+    "episodeMismatch": "Cannot join watch party: You are watching a different episode than the host.",
+    "validating": "Validating watch party...",
+    "linkCopied": "Copied!",
+    "backendRequirement": "All users must use the same backend server",
+    "activeBackend": "Active Backend: {{backend}}"
+  }
+}
