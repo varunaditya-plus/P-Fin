@@ -22,9 +22,25 @@ const captioningPackages = [
 ];
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd());
+  const env = loadEnv(mode, process.cwd(), "");
+  const proxy = {
+    "/jellyfin": {
+      target: env.JELLYFIN_URL || "http://192.168.1.170:8096",
+      changeOrigin: true,
+      rewrite: (url: string) => url.replace(/^\/jellyfin/, ""),
+    },
+    "/seerr": {
+      target: env.SEERR_URL || "http://192.168.1.170:5055",
+      changeOrigin: true,
+      cookieDomainRewrite: "",
+      cookiePathRewrite: "/seerr",
+      rewrite: (url: string) => url.replace(/^\/seerr/, ""),
+    },
+  };
   return {
     base: env.VITE_BASE_URL || "/",
+    server: { host: "0.0.0.0", proxy },
+    preview: { host: "0.0.0.0", proxy },
     plugins: [
       million.vite({ auto: true, mute: true }),
       handlebars({
@@ -107,6 +123,7 @@ export default defineConfig(({ mode }) => {
       checker({
         overlay: {
           position: "tr",
+          initialIsOpen: false,
         },
         typescript: true, // check typescript build errors in dev server
         eslint: {
