@@ -1,5 +1,4 @@
-import { Qualities, Stream } from "@p-stream/providers";
-
+import { Qualities, Stream } from "@/backend/providers/disabled";
 import { QualityStore } from "@/stores/quality";
 
 export type SourceQuality = Qualities;

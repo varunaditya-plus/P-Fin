@@ -1,10 +1,9 @@
+import { isExtensionActiveCached } from "@/backend/extension/messaging";
 import {
   makeProviders,
   makeStandardFetcher,
   targets,
-} from "@p-stream/providers";
-
-import { isExtensionActiveCached } from "@/backend/extension/messaging";
+} from "@/backend/providers/disabled";
 import {
   makeExtensionFetcher,
   makeLoadBalancedSimpleProxyFetcher,

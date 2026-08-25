@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
-import { labelToLanguageCode } from "@p-stream/providers";
-
+import { labelToLanguageCode } from "@/backend/providers/disabled";
 import { CaptionListItem } from "@/stores/player/slices/source";
 
 export async function scrapeOpenSubtitlesCaptions(

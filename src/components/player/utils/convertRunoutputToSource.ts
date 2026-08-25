@@ -1,5 +1,4 @@
-import { Stream } from "@p-stream/providers";
-
+import { Stream } from "@/backend/providers/disabled";
 import {
   SourceFileStream,
   SourceQuality,
