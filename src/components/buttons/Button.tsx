@@ -22,7 +22,7 @@ interface Props {
 
 export function Button(props: Props) {
   const navigate = useNavigate();
-  const { onClick, href, loading } = props;
+  const { onClick, href, loading, disabled } = props;
   const cb = useCallback(
     (
       event: React.MouseEvent<
@@ -30,7 +30,10 @@ export function Button(props: Props) {
         MouseEvent
       >,
     ) => {
-      if (loading) return;
+      if (loading || disabled) {
+        event.preventDefault();
+        return;
+      }
       if (href && !onClick) {
         event.preventDefault();
         if (!href.includes("http")) {
@@ -40,7 +43,7 @@ export function Button(props: Props) {
         }
       } else onClick?.(event);
     },
-    [loading, href, onClick, navigate],
+    [loading, disabled, href, onClick, navigate],
   );
 
   let colorClasses = "bg-white hover:bg-gray-200 text-black";
@@ -94,6 +97,7 @@ export function Button(props: Props) {
     return (
       <a
         className={classes}
+        aria-disabled={disabled || loading}
         href={props.href}
         target="_blank"
         rel="noreferrer"
@@ -106,13 +110,18 @@ export function Button(props: Props) {
 
   if (props.href)
     return (
-      <a className={classes} onClick={cb}>
+      <a className={classes} onClick={cb} aria-disabled={disabled || loading}>
         {content}
       </a>
     );
 
   return (
-    <button type="button" onClick={cb} className={classes}>
+    <button
+      type="button"
+      onClick={cb}
+      className={classes}
+      disabled={disabled || loading}
+    >
       {content}
     </button>
   );
