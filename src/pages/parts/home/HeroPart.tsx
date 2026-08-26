@@ -1,6 +1,5 @@
 import classNames from "classnames";
-import { useCallback, useRef, useState } from "react";
-import Sticky from "react-sticky-el";
+import { useEffect, useRef, useState } from "react";
 
 import { SearchBarInput } from "@/components/form/SearchBar";
 import { ThinContainer } from "@/components/layout/ThinContainer";
@@ -47,14 +46,6 @@ export function HeroPart({
   const { isMobile } = useIsMobile();
   const { isTV } = useIsTV();
 
-  const stickStateChanged = useCallback(
-    (isFixed: boolean) => {
-      setShowBg(isFixed);
-      setIsSticky(isFixed);
-    },
-    [setIsSticky],
-  );
-
   const isPWA = useIsPWA();
   const isIOS = useIsIOS();
   const isIOSPWA = isIOS && isPWA;
@@ -66,6 +57,39 @@ export function HeroPart({
   const topOffset = isMobile
     ? navbarHeight + bannerSize + (isIOSPWA ? 34 : 0)
     : bannerSize + 14;
+
+  const stickyHolder = useRef<HTMLDivElement>(null);
+  const [fixedPosition, setFixedPosition] = useState<{
+    left: number;
+    width: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const holder = stickyHolder.current;
+    if (!holder) return;
+    const updatePosition = () => {
+      const rect = holder.getBoundingClientRect();
+      const fixed = rect.top < topOffset;
+      setShowBg(fixed);
+      setIsSticky(fixed);
+      setFixedPosition((previous) => {
+        if (!fixed) return null;
+        if (previous?.left === rect.left && previous.width === rect.width)
+          return previous;
+        return { left: rect.left, width: rect.width };
+      });
+    };
+    const resizeObserver = new ResizeObserver(updatePosition);
+    resizeObserver.observe(holder);
+    window.addEventListener("scroll", updatePosition, { passive: true });
+    window.addEventListener("resize", updatePosition);
+    updatePosition();
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("scroll", updatePosition);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [topOffset, setIsSticky, showTitle, isInFeatured]);
 
   const time = getTimeOfDay(new Date());
   const title = randomT(`home.titles.${time}`);
@@ -87,14 +111,20 @@ export function HeroPart({
           </div>
         ) : null}
 
-        <div className="relative h-20 z-30">
-          <Sticky
-            topOffset={-topOffset}
-            stickyStyle={{
-              paddingTop: `${topOffset}px`,
-            }}
-            onFixedToggle={stickStateChanged}
-            scrollElement="window"
+        <div ref={stickyHolder} className="relative h-20 z-30">
+          <div
+            style={
+              fixedPosition
+                ? {
+                    position: "fixed",
+                    top: 0,
+                    left: fixedPosition.left,
+                    width: fixedPosition.width,
+                    paddingTop: topOffset,
+                    transform: "translateZ(0)",
+                  }
+                : undefined
+            }
           >
             <SearchBarInput
               ref={inputRef}
@@ -105,7 +135,7 @@ export function HeroPart({
               isSticky={showBg}
               isInFeatured={isInFeatured}
             />
-          </Sticky>
+          </div>
         </div>
       </div>
     </ThinContainer>

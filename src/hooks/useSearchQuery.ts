@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 
-function decode(query: string | null | undefined) {
-  return query ? decodeURIComponent(query) : "";
+function queryValue(query: string | null | undefined) {
+  // React Router already decodes route parameters. Decoding again breaks
+  // literal percent signs and changes searches containing encoded text.
+  return query ?? "";
 }
 
 export function useSearchQuery(): [
@@ -12,16 +14,16 @@ export function useSearchQuery(): [
 ] {
   const navigate = useNavigate();
   const params = useParams<{ query: string }>();
-  const [search, setSearch] = useState(decode(params.query));
+  const [search, setSearch] = useState(queryValue(params.query));
 
   useEffect(() => {
-    setSearch(decode(params.query));
+    setSearch(queryValue(params.query));
   }, [params.query]);
 
   const updateParams = (inp: string, commitToUrl = false) => {
     setSearch(inp);
     if (!commitToUrl) return;
-    const current = decode(params.query);
+    const current = queryValue(params.query);
     if (inp === current) return;
     if (inp.length === 0) {
       navigate("/", { replace: true });
