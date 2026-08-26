@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
-import { mediaItemToId } from "@/backend/metadata/tmdb";
 import { DotList } from "@/components/text/DotList";
 import { Flare } from "@/components/utils/Flare";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
@@ -109,6 +108,7 @@ export interface MediaCardProps {
   forceSkeleton?: boolean;
   editable?: boolean;
   onEdit?: () => void;
+  hideBookmark?: boolean;
 }
 
 function checkReleased(media: MediaItem): boolean {
@@ -136,13 +136,14 @@ function MediaCardContent({
   forceSkeleton,
   editable,
   onEdit,
+  hideBookmark,
 }: MediaCardProps) {
   const { t } = useTranslation();
   const percentageString = `${Math.round(percentage ?? 0).toFixed(0)}%`;
 
   const isReleased = useCallback(() => checkReleased(media), [media]);
 
-  const canLink = linkable && !closable && isReleased();
+  const canLink = linkable && !closable;
 
   const dotListContent = [t(`media.types.${media.type}`)];
 
@@ -256,7 +257,7 @@ function MediaCardContent({
               </>
             ) : null}
 
-            {!closable && (
+            {!closable && !hideBookmark && (
               <div
                 className="absolute bookmark-button"
                 onClick={(e) => e.preventDefault()}
@@ -265,7 +266,7 @@ function MediaCardContent({
               </div>
             )}
 
-            {searchQuery.length > 0 && !closable ? (
+            {searchQuery.length > 0 && !closable && !hideBookmark ? (
               <div className="absolute" onClick={(e) => e.preventDefault()}>
                 <MediaBookmarkButton media={media} />
               </div>
@@ -341,29 +342,7 @@ function MediaCardContent({
 export function MediaCard(props: MediaCardProps) {
   const { media, onShowDetails, forceSkeleton } = props;
   const { showModal } = useOverlayStack();
-  const enableDetailsModal = usePreferencesStore(
-    (state) => state.enableDetailsModal,
-  );
-
-  const isReleased = useCallback(
-    () => checkReleased(props.media),
-    [props.media],
-  );
-
-  const canLink = props.linkable && !props.closable && isReleased();
-
-  let link = canLink
-    ? `/media/${encodeURIComponent(mediaItemToId(props.media))}`
-    : "#";
-  if (canLink && props.series) {
-    if (props.series.season === 0 && !props.series.episodeId) {
-      link += `/${encodeURIComponent(props.series.seasonId)}`;
-    } else {
-      link += `/${encodeURIComponent(
-        props.series.seasonId,
-      )}/${encodeURIComponent(props.series.episodeId)}`;
-    }
-  }
+  const canLink = props.linkable && !props.closable;
 
   const handleShowDetails = useCallback(async () => {
     if (onShowDetails) {
@@ -379,7 +358,7 @@ export function MediaCard(props: MediaCardProps) {
   }, [media, showModal, onShowDetails]);
 
   const handleCardClick = (e: React.MouseEvent) => {
-    if (enableDetailsModal && canLink) {
+    if (canLink) {
       e.preventDefault();
       handleShowDetails();
     }
@@ -416,7 +395,7 @@ export function MediaCard(props: MediaCardProps) {
 
   return (
     <Link
-      to={link}
+      to="#"
       tabIndex={-1}
       className={classNames(
         "tabbable",
