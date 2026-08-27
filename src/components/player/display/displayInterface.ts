@@ -54,6 +54,7 @@ export type DisplayInterfaceEvents = {
 };
 
 export interface qualityChangeOptions {
+  autoplay?: boolean;
   source: LoadableSource | null;
   automaticQuality: boolean;
   preferredQuality: SourceQuality | null;

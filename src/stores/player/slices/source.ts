@@ -32,6 +32,10 @@ export interface PlayerMetaEpisode {
 }
 
 export interface PlayerMeta {
+  jellyfinItemId?: string;
+  jellyfinSeriesId?: string;
+  jellyfinGenres?: string[];
+  jellyfinRating?: number;
   type: "movie" | "show";
   title: string;
   tmdbId: string;
@@ -112,6 +116,7 @@ export interface SourceSlice {
     stream: SourceSliceSource,
     captions: CaptionListItem[],
     startAt: number,
+    autoplay?: boolean,
   ): void;
   switchQuality(quality: SourceQuality): void;
   setMeta(meta: PlayerMeta, status?: PlayerStatus): void;
@@ -119,7 +124,7 @@ export interface SourceSlice {
   setSourceId(id: string | null): void;
   setEmbedId(id: string | null): void;
   enableAutomaticQuality(): void;
-  redisplaySource(startAt: number): void;
+  redisplaySource(startAt: number, autoplay?: boolean): void;
   setCaptionAsTrack(asTrack: boolean): void;
   addExternalSubtitles(): Promise<void>;
   translateCaption(
@@ -258,6 +263,7 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
     stream: SourceSliceSource,
     captions: CaptionListItem[],
     startAt: number,
+    autoplay?: boolean,
   ) {
     let qualities: string[] = [];
     if (stream.type === "file") qualities = Object.keys(stream.qualities);
@@ -275,15 +281,17 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
       s.currentAudioTrack = null;
     });
     const store = get();
-    store.redisplaySource(startAt);
+    store.redisplaySource(startAt, autoplay);
 
     // Trigger external subtitle scraping after stream is loaded
     // This runs asynchronously so it doesn't block the stream loading
-    setTimeout(() => {
-      store.addExternalSubtitles();
-    }, 100);
+    if (!store.meta?.jellyfinItemId) {
+      setTimeout(() => {
+        store.addExternalSubtitles();
+      }, 100);
+    }
   },
-  redisplaySource(startAt: number) {
+  redisplaySource(startAt: number, autoplay?: boolean) {
     const store = get();
     if (!store.source) return;
     const qualityPreferences = useQualityStore.getState();
@@ -298,6 +306,7 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
     store.display?.load({
       source: loadableStream.stream,
       startAt,
+      autoplay,
       automaticQuality: qualityPreferences.quality.automaticQuality,
       preferredQuality: qualityPreferences.quality.lastChosenQuality,
     });
@@ -423,7 +432,7 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   },
   async addExternalSubtitles() {
     const store = get();
-    if (!store.meta) return;
+    if (!store.meta || store.meta.jellyfinItemId) return;
 
     set((s) => {
       s.isLoadingExternalSubtitles = true;

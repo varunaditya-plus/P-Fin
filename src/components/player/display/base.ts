@@ -84,6 +84,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
   const { emit, on, off } = makeEmitter<DisplayInterfaceEvents>();
   let source: LoadableSource | null = null;
   let hls: Hls | null = null;
+  let videoSourceEvents: AbortController | null = null;
   let videoElement: HTMLVideoElement | null = null;
   let containerElement: HTMLElement | null = null;
   let isFullscreen = false;
@@ -176,6 +177,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
   }
 
   function setupSource(vid: HTMLVideoElement, src: LoadableSource) {
+    hls?.destroy();
     hls = null;
     if (src.type === "hls") {
       if (canPlayHlsNatively(vid)) {
@@ -189,6 +191,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       if (!hls) {
         hls = new Hls({
           autoStartLoad: true,
+          startPosition: startAt,
           maxBufferLength: 120, // 120 seconds
           maxMaxBufferLength: 240,
           abrEwmaDefaultEstimate: 5 * 1000 * 1000, // 5 Mbps default bandwidth estimate for better ABR decisions
@@ -214,7 +217,12 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
           "Failed to execute 'appendBuffer' on 'SourceBuffer': This SourceBuffer has been removed from the parent media source.",
         ];
         hls?.on(Hls.Events.ERROR, (event, data) => {
-          console.error("HLS error", data);
+          console.error(
+            "HLS error",
+            data.details,
+            `fatal=${data.fatal}`,
+            `status=${data.response?.code ?? "unknown"}`,
+          );
 
           // Extract detailed HLS error information
           const hlsErrorInfo = {
@@ -242,15 +250,12 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
             url: (data as any).url,
           };
 
-          if (
-            data.fatal &&
-            src?.url === data.frag?.baseurl &&
-            !exceptions.includes(data.error.message)
-          ) {
+          if (data.fatal && !exceptions.includes(data.error?.message ?? "")) {
             emit("error", {
-              message: data.error.message,
-              stackTrace: data.error.stack,
-              errorName: data.error.name,
+              message:
+                data.error?.message ?? "The video stream could not be loaded",
+              stackTrace: data.error?.stack,
+              errorName: data.error?.name ?? "HlsError",
               type: "hls",
               hls: hlsErrorInfo,
             });
@@ -363,15 +368,24 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     }
   }
 
+  function addVideoListener(event: string, listener: EventListener) {
+    videoElement?.addEventListener(event, listener, {
+      signal: videoSourceEvents?.signal,
+    });
+  }
+
   function setSource() {
     if (!videoElement || !source) return;
+    videoSourceEvents?.abort();
+    videoSourceEvents = new AbortController();
+    videoElement.autoplay = shouldAutoplayAfterLoad;
     setupSource(videoElement, source);
 
-    videoElement.addEventListener("play", () => {
+    addVideoListener("play", () => {
       emit("play", undefined);
       emit("loading", false);
     });
-    videoElement.addEventListener("error", () => {
+    addVideoListener("error", () => {
       const err = videoElement?.error ?? null;
       const errorDetails = getMediaErrorDetails(err);
       emit("error", {
@@ -380,9 +394,9 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         type: "htmlvideo",
       });
     });
-    videoElement.addEventListener("playing", () => emit("play", undefined));
-    videoElement.addEventListener("pause", () => emit("pause", undefined));
-    videoElement.addEventListener("canplay", () => {
+    addVideoListener("playing", () => emit("play", undefined));
+    addVideoListener("pause", () => emit("pause", undefined));
+    addVideoListener("canplay", () => {
       // Check if video has enough buffered data to play smoothly (at least 5 seconds ahead)
       const hasEnoughBuffer = (() => {
         if (!videoElement) return false;
@@ -426,14 +440,14 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         }
       }
     });
-    videoElement.addEventListener("waiting", () => emit("loading", true));
-    videoElement.addEventListener("volumechange", () =>
+    addVideoListener("waiting", () => emit("loading", true));
+    addVideoListener("volumechange", () =>
       emit(
         "volumechange",
         videoElement?.muted ? 0 : (videoElement?.volume ?? 0),
       ),
     );
-    videoElement.addEventListener("timeupdate", () => {
+    addVideoListener("timeupdate", () => {
       const currentTime = videoElement?.currentTime ?? 0;
       // Always emit time updates when seeking to prevent subtitle freezing
       // Also emit when progressing forward or when time changes significantly
@@ -447,7 +461,11 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         emit("time", currentTime);
       }
     });
-    videoElement.addEventListener("loadedmetadata", () => {
+    addVideoListener("loadedmetadata", () => {
+      if (videoElement && startAt > 0) {
+        videoElement.currentTime = startAt;
+        startAt = 0;
+      }
       if (
         source?.type === "hls" &&
         videoElement &&
@@ -466,7 +484,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         emit("duration", lastValidDuration);
       }
     });
-    videoElement.addEventListener("progress", () => {
+    addVideoListener("progress", () => {
       if (videoElement) {
         const bufferedTime = handleBuffered(
           videoElement.currentTime,
@@ -500,28 +518,25 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         }
       }
     });
-    videoElement.addEventListener("webkitendfullscreen", () => {
+    addVideoListener("webkitendfullscreen", () => {
       isFullscreen = false;
       emit("fullscreen", isFullscreen);
       if (!isFullscreen) emit("needstrack", false);
     });
-    videoElement.addEventListener(
-      "webkitplaybacktargetavailabilitychanged",
-      (e: any) => {
-        if (e.availability === "available") {
-          emit("canairplay", true);
-        }
-      },
-    );
-    videoElement.addEventListener(
+    addVideoListener("webkitplaybacktargetavailabilitychanged", (e: any) => {
+      if (e.availability === "available") {
+        emit("canairplay", true);
+      }
+    });
+    addVideoListener(
       "webkitpresentationmodechanged",
       webkitPresentationModeChange,
     );
-    videoElement.addEventListener("ratechange", () => {
+    addVideoListener("ratechange", () => {
       if (videoElement) emit("playbackrate", videoElement.playbackRate);
     });
 
-    videoElement.addEventListener("durationchange", () => {
+    addVideoListener("durationchange", () => {
       // Only emit duration if it's a valid value (> 0) to prevent progress reset during source switches
       const duration = videoElement?.duration ?? 0;
       if (duration > 0) {
@@ -535,6 +550,8 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
   }
 
   function unloadSource() {
+    videoSourceEvents?.abort();
+    videoSourceEvents = null;
     // Clear any pending quality change timeout
     if (qualityChangeTimeout) {
       clearTimeout(qualityChangeTimeout);
@@ -638,7 +655,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       emit("loading", true);
       startAt = ops.startAt;
       // Set autoplay flag if starting from beginning (indicates autoplay transition)
-      shouldAutoplayAfterLoad = ops.startAt === 0;
+      shouldAutoplayAfterLoad = ops.autoplay ?? true;
       setSource();
     },
     changeQuality(newAutomaticQuality, newPreferredQuality) {
@@ -713,6 +730,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
 
       // update state
       const isChangeable = await canChangeVolume();
+      if (!videoElement) return;
       if (isChangeable) {
         videoElement.volume = volume;
       } else {
