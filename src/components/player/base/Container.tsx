@@ -20,6 +20,7 @@ import { WatchPartyReporter } from "../internals/Backend/WatchPartyReporter";
 
 export interface PlayerProps {
   children?: ReactNode;
+  jellyfin?: boolean;
   showingControls: boolean;
   onLoad?: () => void;
 }
@@ -92,16 +93,16 @@ export function Container(props: PlayerProps) {
     <div className="relative">
       <BaseContainer>
         <MetaReporter />
-        <ThumbnailScraper />
-        <CastingInternal />
+        {!props.jellyfin ? <ThumbnailScraper /> : null}
+        {!props.jellyfin ? <CastingInternal /> : null}
         <VideoContainer />
-        <ProgressSaver />
+        {!props.jellyfin ? <ProgressSaver /> : null}
         <KeyboardEvents />
         <MediaSession />
-        <WatchPartyReporter />
-        <SkipTracker />
+        {!props.jellyfin ? <WatchPartyReporter /> : null}
+        {!props.jellyfin ? <SkipTracker /> : null}
         <WatchPartyResetter />
-        <AutoSkipSegments />
+        {!props.jellyfin ? <AutoSkipSegments /> : null}
         <div className="relative h-screen overflow-hidden">
           <VideoClickTarget showingControls={props.showingControls} />
           <HeadUpdater />

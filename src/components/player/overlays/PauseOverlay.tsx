@@ -47,7 +47,7 @@ export function PauseOverlay() {
   useEffect(() => {
     let mounted = true;
     const fetchLogo = async () => {
-      if (!meta?.tmdbId || !enableImageLogos) {
+      if (!meta?.tmdbId || meta.jellyfinItemId || !enableImageLogos) {
         setLogoUrl(null);
         return;
       }
@@ -66,11 +66,18 @@ export function PauseOverlay() {
     return () => {
       mounted = false;
     };
-  }, [meta?.tmdbId, meta?.type, enableImageLogos]);
+  }, [meta?.tmdbId, meta?.type, meta?.jellyfinItemId, enableImageLogos]);
 
   useEffect(() => {
     let mounted = true;
     const fetchDetails = async () => {
+      if (meta?.jellyfinItemId) {
+        setDetails({
+          voteAverage: meta.jellyfinRating ?? null,
+          genres: meta.jellyfinGenres ?? [],
+        });
+        return;
+      }
       if (!meta?.tmdbId) {
         setDetails({ voteAverage: null, genres: [] });
         return;
@@ -117,7 +124,15 @@ export function PauseOverlay() {
     return () => {
       mounted = false;
     };
-  }, [meta?.tmdbId, meta?.type, meta?.season, meta?.episode]);
+  }, [
+    meta?.tmdbId,
+    meta?.type,
+    meta?.season,
+    meta?.episode,
+    meta?.jellyfinItemId,
+    meta?.jellyfinRating,
+    meta?.jellyfinGenres,
+  ]);
 
   if (!meta) return null;
 

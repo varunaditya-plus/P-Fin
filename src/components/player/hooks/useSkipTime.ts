@@ -23,7 +23,7 @@ let fetchingForCacheKey: string | null = null;
 
 /** Cache key for skip segments – matches TIDB API (tmdbId + season + episode number). */
 function getSkipSegmentsCacheKey(meta: PlayerMeta | null): string | null {
-  if (!meta?.tmdbId) return null;
+  if (!meta?.tmdbId || meta.jellyfinItemId) return null;
   if (meta.type === "movie") return `skip-${meta.type}-${meta.tmdbId}`;
   if (meta.type === "show" && meta.season != null && meta.episode != null) {
     return `skip-${meta.type}-${meta.tmdbId}-${meta.season.number}-${meta.episode.number}`;

@@ -49,6 +49,8 @@ export async function downloadCaption(
     }
   } else {
     const response = await fetch(caption.url);
+    if (!response.ok)
+      throw new Error(`Could not load subtitle (${response.status}).`);
     const contentType = response.headers.get("content-type") || "";
     const charset = contentType.includes("charset=")
       ? contentType.split("charset=")[1].toLowerCase()

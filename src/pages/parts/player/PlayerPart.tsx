@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { BrandPill } from "@/components/layout/BrandPill";
@@ -11,6 +11,13 @@ import {
   SegmentData,
   useSkipTime,
 } from "@/components/player/hooks/useSkipTime";
+import {
+  JellyfinBookmarkButton,
+  JellyfinEpisodesRouter,
+  JellyfinInfoButton,
+  JellyfinNextEpisode,
+  JellyfinSettingsRouter,
+} from "@/components/player/jellyfin/JellyfinControls";
 import { PauseOverlay } from "@/components/player/overlays/PauseOverlay";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
@@ -22,6 +29,7 @@ import { ScrapingPartInterruptButton, Tips } from "./ScrapingPart";
 
 export interface PlayerPartProps {
   children?: ReactNode;
+  jellyfin?: boolean;
   backUrl: string;
   onLoad?: () => void;
   onMetaChange?: (meta: PlayerMeta) => void;
@@ -48,17 +56,21 @@ export function PlayerPart(props: PlayerPartProps) {
   const [isHoldingFullscreen, setIsHoldingFullscreen] = useState(false);
   const holdTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Shift") {
-      setIsShifting(true);
-    }
-  });
-
-  document.addEventListener("keyup", (event) => {
-    if (event.key === "Shift") {
-      setIsShifting(false);
-    }
-  });
+  useEffect(() => {
+    const down = (event: KeyboardEvent) => {
+      if (event.key === "Shift") setIsShifting(true);
+    };
+    const up = (event: KeyboardEvent) => {
+      if (event.key === "Shift") setIsShifting(false);
+    };
+    document.addEventListener("keydown", down);
+    document.addEventListener("keyup", up);
+    return () => {
+      document.removeEventListener("keydown", down);
+      document.removeEventListener("keyup", up);
+      if (holdTimeoutRef.current) clearTimeout(holdTimeoutRef.current);
+    };
+  }, []);
 
   const handleTouchStart = () => {
     if (holdTimeoutRef.current) {
@@ -98,14 +110,22 @@ export function PlayerPart(props: PlayerPartProps) {
   }, []);
 
   return (
-    <Player.Container onLoad={props.onLoad} showingControls={showTargets}>
+    <Player.Container
+      onLoad={props.onLoad}
+      showingControls={showTargets}
+      jellyfin={props.jellyfin}
+    >
       {props.children}
       <PauseOverlay />
       <Player.BlackOverlay
         show={showTargets && status === playerStatus.PLAYING}
       />
-      <Player.EpisodesRouter onChange={props.onMetaChange} />
-      <Player.SettingsRouter />
+      {props.jellyfin ? (
+        <JellyfinEpisodesRouter />
+      ) : (
+        <Player.EpisodesRouter onChange={props.onMetaChange} />
+      )}
+      {props.jellyfin ? <JellyfinSettingsRouter /> : <Player.SettingsRouter />}
       <Player.SubtitleView controlsShown={showTargets} />
 
       {status === playerStatus.PLAYING ? (
@@ -133,7 +153,7 @@ export function PlayerPart(props: PlayerPartProps) {
           showTargets ? "top-16" : "top-1"
         }`}
       >
-        <WatchPartyStatus />
+        {!props.jellyfin ? <WatchPartyStatus /> : null}
       </div>
 
       <Player.TopControls show={showTargets}>
@@ -152,9 +172,13 @@ export function PlayerPart(props: PlayerPartProps) {
               </span>
             )}
 
-            <Player.InfoButton />
+            {props.jellyfin ? <JellyfinInfoButton /> : <Player.InfoButton />}
 
-            <Player.BookmarkButton />
+            {props.jellyfin ? (
+              <JellyfinBookmarkButton />
+            ) : (
+              <Player.BookmarkButton />
+            )}
           </div>
           <div className="text-center hidden xl:flex justify-center items-center">
             <Player.EpisodeTitle />
@@ -166,7 +190,7 @@ export function PlayerPart(props: PlayerPartProps) {
             {status === playerStatus.PLAYING ? (
               <>
                 <Player.Airplay />
-                <Player.Chromecast />
+                {!props.jellyfin ? <Player.Chromecast /> : null}
               </>
             ) : null}
           </div>
@@ -174,9 +198,11 @@ export function PlayerPart(props: PlayerPartProps) {
       </Player.TopControls>
 
       <Player.BottomControls show={showTargets}>
-        {status !== playerStatus.PLAYING && !manualSourceSelection && <Tips />}
+        {!props.jellyfin &&
+          status !== playerStatus.PLAYING &&
+          !manualSourceSelection && <Tips />}
         <div className="flex items-center justify-center space-x-3 h-full">
-          {status === playerStatus.SCRAPING ? (
+          {!props.jellyfin && status === playerStatus.SCRAPING ? (
             <ScrapingPartInterruptButton />
           ) : null}
           {status === playerStatus.PLAYING ? (
@@ -200,15 +226,19 @@ export function PlayerPart(props: PlayerPartProps) {
           </Player.LeftSideControls>
           <div className="flex items-center space-x-3">
             <Player.Episodes inControl={inControl} />
-            <Player.SkipEpisodeButton
-              inControl={inControl}
-              onChange={props.onMetaChange}
-            />
+            {props.jellyfin ? (
+              <JellyfinNextEpisode compact controlsShowing={showTargets} />
+            ) : (
+              <Player.SkipEpisodeButton
+                inControl={inControl}
+                onChange={props.onMetaChange}
+              />
+            )}
             {status === playerStatus.PLAYING ? (
               <>
                 <Player.Pip />
                 <Player.Airplay />
-                <Player.Chromecast />
+                {!props.jellyfin ? <Player.Chromecast /> : null}
               </>
             ) : null}
             {status === playerStatus.PLAYBACK_ERROR ||
@@ -263,19 +293,25 @@ export function PlayerPart(props: PlayerPartProps) {
       <Player.TIDBSubmissionSuccessPopout />
       <Player.UnreleasedEpisodeOverlay />
 
-      <Player.NextEpisodeButton
-        controlsShowing={showTargets}
-        onChange={props.onMetaChange}
-        inControl={inControl}
-      />
+      {props.jellyfin ? (
+        <JellyfinNextEpisode controlsShowing={showTargets} />
+      ) : (
+        <Player.NextEpisodeButton
+          controlsShowing={showTargets}
+          onChange={props.onMetaChange}
+          inControl={inControl}
+        />
+      )}
 
-      <SkipSegmentButton
-        controlsShowing={showTargets}
-        segments={segments}
-        inControl={inControl}
-        onChangeMeta={props.onMetaChange}
-        onSkipTriggered={handleSkipTriggered}
-      />
+      {!props.jellyfin ? (
+        <SkipSegmentButton
+          controlsShowing={showTargets}
+          segments={segments}
+          inControl={inControl}
+          onChangeMeta={props.onMetaChange}
+          onSkipTriggered={handleSkipTriggered}
+        />
+      ) : null}
 
       <ThumbsFeedback
         controlsShowing={showTargets}

@@ -27,7 +27,7 @@ export function useInitializeSource() {
   const { selectLastUsedLanguageIfEnabled } = useCaptions();
 
   useEffect(() => {
-    if (sourceIdentifier) {
+    if (sourceIdentifier && !usePlayerStore.getState().meta?.jellyfinItemId) {
       selectLastUsedLanguageIfEnabled();
     }
   }, [sourceIdentifier, selectLastUsedLanguageIfEnabled]);

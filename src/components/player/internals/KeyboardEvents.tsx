@@ -1,10 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { getMetaFromId } from "@/backend/metadata/getmeta";
 import { MWMediaType } from "@/backend/metadata/types/mw";
 import { useCaptions } from "@/components/player/hooks/useCaptions";
 import { usePlayerMeta } from "@/components/player/hooks/usePlayerMeta";
 import { useVolume } from "@/components/player/hooks/useVolume";
+import { JellyfinPlaybackContext } from "@/components/player/jellyfin/JellyfinPlaybackContext";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePlayerStore } from "@/stores/player/store";
@@ -21,6 +29,7 @@ import {
 } from "@/utils/keyboardShortcuts";
 
 export function KeyboardEvents() {
+  const jellyfin = useContext(JellyfinPlaybackContext);
   const router = useOverlayRouter("");
   const display = usePlayerStore((s) => s.display);
   const mediaProgress = usePlayerStore((s) => s.progress);
@@ -41,8 +50,33 @@ export function KeyboardEvents() {
     (s) => s.setLastSuccessfulSource,
   );
 
-  const { toggleLastUsed, selectRandomCaptionFromLastUsedLanguage } =
-    useCaptions();
+  const {
+    toggleLastUsed: toggleLegacyCaptions,
+    selectRandomCaptionFromLastUsedLanguage: randomLegacyCaption,
+  } = useCaptions();
+  const toggleLastUsed = useCallback(async () => {
+    if (!jellyfin) return toggleLegacyCaptions();
+    const first = jellyfin.playback?.mediaSource.MediaStreams?.find(
+      (track) => track.Type === "Subtitle",
+    );
+    jellyfin.changeSubtitle(
+      jellyfin.subtitleIndex >= 0 ? -1 : (first?.Index ?? -1),
+    );
+  }, [jellyfin, toggleLegacyCaptions]);
+  const selectRandomCaptionFromLastUsedLanguage = useCallback(async () => {
+    if (!jellyfin) return randomLegacyCaption();
+    const tracks =
+      jellyfin.playback?.mediaSource.MediaStreams?.filter(
+        (track) => track.Type === "Subtitle",
+      ) ?? [];
+    const next =
+      tracks[
+        (tracks.findIndex((track) => track.Index === jellyfin.subtitleIndex) +
+          1) %
+          tracks.length
+      ];
+    if (next) jellyfin.changeSubtitle(next.Index);
+  }, [jellyfin, randomLegacyCaption]);
   const setShowVolume = useEmpheralVolumeStore((s) => s.setShowVolume);
   const setDelay = useSubtitleStore((s) => s.setDelay);
   const delay = useSubtitleStore((s) => s.delay);
@@ -90,6 +124,14 @@ export function KeyboardEvents() {
 
   // Episode navigation functions
   const navigateToNextEpisode = useCallback(async () => {
+    if (jellyfin) {
+      const index = jellyfin.episodes.findIndex(
+        (episode) => episode.Id === jellyfin.itemId,
+      );
+      const next = jellyfin.episodes[index + 1];
+      if (index >= 0 && next) jellyfin.playItem(next.Id, true);
+      return;
+    }
     if (!meta || meta.type !== "show" || !meta.episode) return;
 
     // Check if we're at the last episode of the current season
@@ -185,9 +227,18 @@ export function KeyboardEvents() {
     updateItem,
     sourceId,
     setLastSuccessfulSource,
+    jellyfin,
   ]);
 
   const navigateToPreviousEpisode = useCallback(async () => {
+    if (jellyfin) {
+      const index = jellyfin.episodes.findIndex(
+        (episode) => episode.Id === jellyfin.itemId,
+      );
+      const previous = jellyfin.episodes[index - 1];
+      if (index > 0 && previous) jellyfin.playItem(previous.Id);
+      return;
+    }
     if (!meta || meta.type !== "show" || !meta.episode) return;
 
     // Check if we're at the first episode of the current season
@@ -282,6 +333,7 @@ export function KeyboardEvents() {
     updateItem,
     sourceId,
     setLastSuccessfulSource,
+    jellyfin,
   ]);
 
   const dataRef = useRef({
