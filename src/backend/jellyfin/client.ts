@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 
-import { useJellyfinAuth } from "@/stores/jellyfin";
+import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
 
 export interface JellyfinMediaStream {
   Index: number;
@@ -11,6 +11,7 @@ export interface JellyfinMediaStream {
   Title?: string;
   IsDefault?: boolean;
   IsForced?: boolean;
+  IsOriginal?: boolean;
   IsExternal?: boolean;
   SupportsExternalStream?: boolean;
   DeliveryUrl?: string;
@@ -46,6 +47,7 @@ export interface JellyfinItem {
   IsVirtualItem?: boolean;
   CollectionType?: string;
   Overview?: string;
+  OriginalLanguage?: string;
   ProductionYear?: number;
   PremiereDate?: string;
   RunTimeTicks?: number;
@@ -103,7 +105,10 @@ export function getJellyfinSession() {
 }
 
 export function jellyfinUrl(path: string, query: Query = {}) {
-  const base = useJellyfinAuth.getState().session?.serverUrl ?? "/jellyfin";
+  const base =
+    useJellyfinAuth.getState().session?.serverUrl ??
+    useJellyfinServers.getState().selectedServer?.apiUrl ??
+    "/jellyfin";
   const url = new URL(
     `${base.replace(/\/$/, "")}/${path.replace(/^\//, "")}`,
     window.location.origin,
@@ -159,7 +164,13 @@ export async function loginJellyfin(
   persistSession = true,
 ) {
   const deviceId = nanoid();
-  const response = await fetch(jellyfinUrl("Users/AuthenticateByName"), {
+  const selectedServer = useJellyfinServers.getState().selectedServer;
+  const serverUrl = selectedServer?.apiUrl ?? "/jellyfin";
+  const authUrl = new URL(
+    `${serverUrl.replace(/\/$/, "")}/Users/AuthenticateByName`,
+    window.location.origin,
+  ).toString();
+  const response = await fetch(authUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -179,7 +190,10 @@ export async function loginJellyfin(
     User: { Id: string; Name: string };
   };
   const session = {
-    serverUrl: "/jellyfin",
+    serverUrl,
+    serverId: selectedServer?.id,
+    serverName: selectedServer?.name,
+    serverAddress: selectedServer?.url,
     accessToken: data.AccessToken,
     userId: data.User.Id,
     userName: data.User.Name,
@@ -221,7 +235,7 @@ export async function getLibraries(signal?: AbortSignal) {
     { signal },
   );
   return result.Items.filter((item) =>
-    ["movies", "tvshows", "mixed", "boxsets"].includes(
+    ["movies", "tvshows", "mixed", "boxsets", "playlists"].includes(
       item.CollectionType ?? "mixed",
     ),
   );

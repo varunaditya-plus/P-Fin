@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useJellyfinAuth } from "@/stores/jellyfin";
+import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
 
 import {
   findItemByProviderId,
@@ -33,6 +33,7 @@ beforeEach(() => {
   fetchMock.mockReset();
   vi.stubGlobal("fetch", fetchMock);
   useJellyfinAuth.getState().setSession(session);
+  useJellyfinServers.setState({ servers: [], selectedServer: null });
 });
 
 afterEach(() => {
@@ -140,6 +141,31 @@ describe("Jellyfin request boundaries", () => {
     );
     const result = await loginJellyfin("Example", "example-password", false);
     expect(result.deviceId).toMatch(/^[A-Za-z0-9_-]{21}$/);
+    expect(useJellyfinAuth.getState().session).toEqual(session);
+  });
+
+  it("authenticates against the selected server and retains its base path", async () => {
+    useJellyfinServers.getState().saveServer({
+      id: "remote-server",
+      name: "Remote Jellyfin",
+      url: "https://media.test/base",
+      apiUrl: "https://media.test/base",
+    });
+    fetchMock.mockResolvedValue(
+      jsonResponse({
+        AccessToken: "remote-token",
+        User: { Id: "remote-user", Name: "Example" },
+      }),
+    );
+    const result = await loginJellyfin("Example", "example-password", false);
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      "https://media.test/base/Users/AuthenticateByName",
+    );
+    expect(result).toMatchObject({
+      serverUrl: "https://media.test/base",
+      serverId: "remote-server",
+      serverName: "Remote Jellyfin",
+    });
     expect(useJellyfinAuth.getState().session).toEqual(session);
   });
 

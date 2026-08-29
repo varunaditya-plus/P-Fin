@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   SeerrError,
@@ -14,9 +14,26 @@ import {
 } from "./api";
 import { SeerrDetails } from "./types";
 
-vi.mock("@/backend/jellyfin/client", () => ({
-  getJellyfinSession: () => ({ userId: "jellyfin-user" }),
+const jellyfin = vi.hoisted(() => ({
+  session: { serverUrl: "/jellyfin", userId: "jellyfin-user" } as {
+    serverUrl: string;
+    userId: string;
+  } | null,
+  selectedServer: { apiUrl: "/jellyfin" },
 }));
+
+vi.mock("@/backend/jellyfin/client", () => ({
+  getJellyfinSession: () => jellyfin.session,
+}));
+vi.mock("@/stores/jellyfin", () => ({
+  useJellyfinAuth: { getState: () => jellyfin },
+  useJellyfinServers: { getState: () => jellyfin },
+}));
+
+beforeEach(() => {
+  jellyfin.session = { serverUrl: "/jellyfin", userId: "jellyfin-user" };
+  jellyfin.selectedServer = { apiUrl: "/jellyfin" };
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -33,6 +50,73 @@ function mockResponse(body: unknown, status = 200) {
 }
 
 describe("Seerr integration", () => {
+  it("rejects credentials and content requests for a custom Jellyfin server before sending them", async () => {
+    const fetch = mockResponse({});
+    jellyfin.session = {
+      serverUrl: "https://custom.example/jellyfin",
+      userId: "jellyfin-user",
+    };
+    await expect(
+      authenticateSeerr("custom-user", "custom-password"),
+    ).rejects.toMatchObject({ status: 403 });
+    await expect(getSeerrUser()).rejects.toMatchObject({ status: 403 });
+    await expect(getSeerrPage("/discover/movies")).rejects.toMatchObject({
+      status: 403,
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("permits configured-server sign-in before publishing a Jellyfin session, but rejects a selected custom server", async () => {
+    const fetch = mockResponse({ id: 1, permissions: 2 });
+    jellyfin.session = null;
+    jellyfin.selectedServer = { apiUrl: "https://custom.example" };
+    await expect(
+      authenticateSeerr("custom-user", "custom-password"),
+    ).rejects.toMatchObject({ status: 403 });
+    expect(fetch).not.toHaveBeenCalled();
+    jellyfin.selectedServer = { apiUrl: "/jellyfin" };
+    await expect(
+      authenticateSeerr("test-user", "test-password"),
+    ).resolves.toMatchObject({ id: 1 });
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("can clear the old Seerr cookie while connected to a custom server", async () => {
+    const fetch = mockResponse(undefined, 204);
+    jellyfin.session = {
+      serverUrl: "https://custom.example",
+      userId: "custom-user",
+    };
+    await logoutSeerr();
+    expect(fetch).toHaveBeenCalledWith(
+      "/seerr/api/v1/auth/logout",
+      expect.objectContaining({ method: "POST", credentials: "include" }),
+    );
+  });
+
+  it("rechecks the selected server before sending queued sign-in credentials", async () => {
+    let finishLogout: ((value: Response) => void) | undefined;
+    const fetch = mockResponse({ id: 1, permissions: 2 });
+    fetch.mockImplementationOnce(
+      () =>
+        new Promise<Response>((resolve) => {
+          finishLogout = resolve;
+        }),
+    );
+    const logout = logoutSeerr();
+    const login = authenticateSeerr("test-user", "test-password");
+    const rejectedLogin = expect(login).rejects.toMatchObject({ status: 403 });
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    jellyfin.session = {
+      serverUrl: "https://custom.example",
+      userId: "custom-user",
+    };
+    finishLogout?.(new Response(null, { status: 204 }));
+    await logout;
+    await rejectedLogin;
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("waits for pending logout before authenticating so old cookies cannot erase the new session", async () => {
     let finishLogout: ((value: Response) => void) | undefined;
     const fetch = mockResponse({ id: 1, permissions: 2 });

@@ -1,4 +1,5 @@
 import { getJellyfinSession } from "@/backend/jellyfin/client";
+import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
 import { MediaItem } from "@/utils/mediaTypes";
 
 import {
@@ -27,10 +28,26 @@ export class SeerrError extends Error {
   }
 }
 
+function requireConfiguredServer(path: string) {
+  if (path === "/auth/logout") return;
+  const session = useJellyfinAuth.getState().session;
+  const serverUrl =
+    session?.serverUrl ??
+    (path === "/auth/jellyfin"
+      ? useJellyfinServers.getState().selectedServer?.apiUrl
+      : undefined);
+  if (serverUrl !== "/jellyfin")
+    throw new SeerrError(
+      "Seerr is connected to this app's configured Jellyfin server. Change to that server to discover and request content.",
+      403,
+    );
+}
+
 export async function seerrFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  requireConfiguredServer(path);
   const controller = new AbortController();
   const abort = () => controller.abort();
   options.signal?.addEventListener("abort", abort, { once: true });
@@ -88,11 +105,12 @@ function changeSeerrSession<T>(operation: () => Promise<T>) {
 
 // Serialize cookie mutations so an older logout cannot erase a newer sign-in.
 // Seerr establishes its own HttpOnly session; passwords are never persisted.
-export function authenticateSeerr(
+export async function authenticateSeerr(
   username: string,
   password: string,
   _jellyfinToken?: string,
 ) {
+  requireConfiguredServer("/auth/jellyfin");
   return changeSeerrSession(() =>
     seerrFetch<SeerrUser>("/auth/jellyfin", {
       method: "POST",
