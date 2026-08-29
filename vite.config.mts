@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => {
           name: "P-Stream",
           short_name: "P-Stream",
           description:
-            "Watch your favorite shows and movies for free with no ads ever! (っ'ヮ'c)",
+            "Watch your Jellyfin library and discover content with Seerr.",
           theme_color: "#000000",
           background_color: "#000000",
           display: "standalone",
