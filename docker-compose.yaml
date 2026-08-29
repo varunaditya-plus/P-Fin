@@ -1,24 +1,9 @@
-version: "3.8"
-
 services:
-  movieweb:
-    build:
-      context: .
-      # args:
-      #   PWA_ENABLED: "false"
-      #   GA_ID: ""
-      #   APP_DOMAIN: ""
-      #   OPENSEARCH_ENABLED: "false"
-      #   TMDB_READ_API_KEY: ""
-      #   CORS_PROXY_URL: ""
-      #   DMCA_EMAIL: ""
-      #   NORMAL_ROUTER: "false"
-      #   BACKEND_URL: ""
-      #   HAS_ONBOARDING: "false"
-      #   ONBOARDING_CHROME_EXTENSION_INSTALL_LINK: ""
-      #   ONBOARDING_PROXY_INSTALL_LINK: ""
-      #   DISALLOWED_IDS: ""
-      #   CDN_REPLACEMENTS: ""
+  movie-fin:
+    build: .
+    environment:
+      JELLYFIN_URL: ${JELLYFIN_URL:-http://192.168.1.170:8096}
+      SEERR_URL: ${SEERR_URL:-http://192.168.1.170:5055}
     ports:
-      - "80:80"
+      - "8080:80"
     restart: unless-stopped

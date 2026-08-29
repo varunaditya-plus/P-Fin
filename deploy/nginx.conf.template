@@ -1,0 +1,28 @@
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Both services are fixed upstreams; credentials remain scoped to this client.
+    location /jellyfin/ {
+        proxy_pass ${JELLYFIN_URL}/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+        proxy_read_timeout 3600s;
+        # Access URLs contain user tokens for video and subtitles.
+        access_log off;
+    }
+    location /seerr/ {
+        proxy_pass ${SEERR_URL}/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $proxy_host;
+        proxy_cookie_path / /seerr/;
+        proxy_read_timeout 60s;
+    }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
