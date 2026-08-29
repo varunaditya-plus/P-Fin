@@ -1,66 +1,50 @@
-> [!WARNING]
-> This project is no longer maintained.
-> Due to legal pressure, I have to stop the project.
-> Thanks to everyone who contributed and supported the project!
+# P-Stream for Jellyfin
 
-# P-Stream
+P-Stream's interface and player, connected to Jellyfin for the library and playback and Seerr for discovery and requests.
 
-[![P-Stream Image](.github/P-Stream.png)](https://p-stream.github.io/docs/)
+## Run locally
 
-## Quick Deploy
+Requires Node.js 20+ and pnpm 9.14.4.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fp-stream%2Fp-stream)
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/p-stream/p-stream)
-
-**NOTE: To self-host, more setup is required. Check the [docs](https://p-stream.github.io/docs/) to properly set up!!!!**
-
-## Links And Resources
-
-| Service       | Link                                            | Source Code                                            |
-| ------------- | ----------------------------------------------- | ------------------------------------------------------ |
-| P-Stream Docs | [docs](https://docs.pstream.mov)                | [source code](https://github.com/p-stream/docs)        |
-| Extension     | [extension](https://docs.pstream.mov/extension) | [source code](https://github.com/p-stream/browser-ext) |
-| Proxy         | [simple-proxy](https://docs.pstream.mov/proxy)  | [source code](https://github.com/p-stream/sudo-proxy)  |
-| Backend       | [backend](https://server.fifthwit.net)          | [source code](https://github.com/p-stream/backend)     |
-| Frontend      | [P-Stream](https://docs.pstream.mov/instances)  | [source code](https://github.com/p-stream/p-stream)    |
-| Weblate       | [weblate](https://weblate.pstream.mov)          |                                                        |
-
-**_I provide these if you are not able to host yourself, though I do encourage hosting the frontend._**
-
-## Referrers
-
-- [FMHY (Voted as #1 streaming site of 2024, 2025)](https://fmhy.net)
-
-## Running Locally
-
-Type the following commands into your terminal / command line to run P-Stream locally
-
-```bash
-git clone https://github.com/p-stream/p-stream.git
-cd smov
-git pull
-pnpm install
-pnpm run dev
+```sh
+corepack enable
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-Then you can visit the local instance [here](http://localhost:5173) or, at local host on port 5173.
+Open `http://localhost:5173` and sign in with your Jellyfin account. The same credentials are used to establish a separate Seerr session. If that fails, `/discover` offers Seerr sign-in without blocking access to Jellyfin.
 
-## Updating a P-Stream Instance
+The default upstreams are `http://192.168.1.170:8096` (Jellyfin) and `http://192.168.1.170:5055` (Seerr). Copy `example.env` to `.env` to change them. Use base URLs without a trailing slash. Passwords and administrator API keys do not belong in environment files. Jellyfin user tokens are held in session storage; Seerr uses its HttpOnly session cookie. Sign out ends both sessions.
 
-To update a P-Stream instance you can type the below commands into a terminal at the root of your project.
+## Features
 
-```bash
-git remote add upstream https://github.com/p-stream/p-stream.git
-git fetch upstream # Grab the contents of the new remote source
-git checkout <YOUR_MAIN_BRANCH>  # Most likely this would be `origin/production`
-git merge upstream/production
-# * Fix any conflicts present during merge *
-git add .  # Add all changes made during merge and conflict fixing
-git commit -m "Update p-stream instance (merge upstream/production)"
-git push  # Push to YOUR repository
+- Home: continue watching, next up, latest items per library and favourites, plus paginated library browsing and Jellyfin-only search.
+- Cards: open details in the original modal style, with Jellyfin seasons, episodes, favourite and watched state.
+- Playback: the existing P-Stream player uses Jellyfin-negotiated direct streams or HLS, with resume/progress reporting, audio and subtitle selection, quality options and an episode queue.
+- `/discover`: Seerr discovery and search, availability, request permissions/quotas and season-aware requests. Available titles are matched against the current Jellyfin user's accessible library.
+- Existing colours, themes, cards, carousel styles and player controls are retained. Legacy provider routes, account backend syncing and external subtitle scraping are not mounted by this client.
+
+## Production
+
+```sh
+docker compose up --build -d
 ```
 
-## Contact Me / Discord
+Open `http://localhost:8080`. The included nginx configuration serves the built app and proxies `/jellyfin/` and `/seerr/` to the configured servers, including video range/HLS traffic and Seerr cookies. Set `JELLYFIN_URL` and `SEERR_URL` in `.env` or the container environment when deploying elsewhere.
 
-[Discord](https://fluxer.gg/VLEQLVSM)
+This is a client with two fixed service proxies. A static-only host needs equivalent reverse-proxy routes; uploading `dist` alone does not provide those connections. If serving the client over HTTPS, keep both service proxies on that same origin.
+
+For a local production-build check, use `pnpm build` then `pnpm preview`; preview includes the same upstream proxies.
+
+## Checks
+
+```sh
+pnpm typecheck
+pnpm test
+pnpm lint
+pnpm build
+```
+
+The original discontinued provider dependency has been removed. Retained legacy source files compile against a local compatibility module whose provider APIs are disabled. No streaming provider is used by the Jellyfin client.
+
+P-Stream remains credited under the existing [MIT licence](LICENSE.md).
