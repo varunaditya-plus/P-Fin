@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import loadVersion from "vite-plugin-package-version";
@@ -23,14 +24,26 @@ const captioningPackages = [
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  const sendServerConfig = (
+    _request: IncomingMessage,
+    response: ServerResponse,
+  ) => {
+    response.setHeader("Content-Type", "application/json");
+    response.setHeader("Cache-Control", "no-store");
+    response.end(
+      JSON.stringify({
+        jellyfinUrl: env.JELLYFIN_URL || "http://100.64.96.96:8096",
+      }),
+    );
+  };
   const proxy = {
     "/jellyfin": {
-      target: env.JELLYFIN_URL || "http://192.168.1.170:8096",
+      target: env.JELLYFIN_URL || "http://100.64.96.96:8096",
       changeOrigin: true,
       rewrite: (url: string) => url.replace(/^\/jellyfin/, ""),
     },
     "/seerr": {
-      target: env.SEERR_URL || "http://192.168.1.170:5055",
+      target: env.SEERR_URL || "http://100.64.96.96:5055",
       changeOrigin: true,
       cookieDomainRewrite: "",
       cookiePathRewrite: "/seerr",
@@ -39,9 +52,18 @@ export default defineConfig(({ mode }) => {
   };
   return {
     base: env.VITE_BASE_URL || "/",
-    server: { host: "0.0.0.0", proxy },
+    server: { host: "0.0.0.0", proxy, watch: { ignored: ["**/references/**"] } },
     preview: { host: "0.0.0.0", proxy },
     plugins: [
+      {
+        name: "jellyfin-server-config",
+        configureServer(server) {
+          server.middlewares.use("/server-config.json", sendServerConfig);
+        },
+        configurePreviewServer(server) {
+          server.middlewares.use("/server-config.json", sendServerConfig);
+        },
+      },
       million.vite({ auto: true, mute: true }),
       handlebars({
         vars: {
@@ -193,6 +215,7 @@ export default defineConfig(({ mode }) => {
 
     test: {
       environment: "jsdom",
+      include: ["src/**/*.{test,spec}.{ts,tsx}"],
     },
   };
 });

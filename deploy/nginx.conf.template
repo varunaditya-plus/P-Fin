@@ -4,10 +4,19 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    location = /server-config.json {
+        default_type application/json;
+        add_header Cache-Control "no-store";
+        return 200 '{"jellyfinUrl":"${JELLYFIN_URL}"}';
+    }
+
     # Both services are fixed upstreams; credentials remain scoped to this client.
     location /jellyfin/ {
         proxy_pass ${JELLYFIN_URL}/;
         proxy_http_version 1.1;
+        # Image and subtitle uploads are sent as base64 payloads.
+        client_max_body_size 30m;
+        proxy_connect_timeout 5s;
         proxy_set_header Host $proxy_host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_buffering off;
@@ -18,6 +27,7 @@ server {
     location /seerr/ {
         proxy_pass ${SEERR_URL}/;
         proxy_http_version 1.1;
+        proxy_connect_timeout 5s;
         proxy_set_header Host $proxy_host;
         proxy_cookie_path / /seerr/;
         proxy_read_timeout 60s;
