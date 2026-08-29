@@ -19,7 +19,7 @@ import {
   tertiaryOptions,
 } from "@themes/custom";
 
-const availableThemes = [
+export const availableThemes = [
   {
     id: "default",
     selector: "theme-default",
@@ -142,7 +142,7 @@ const availableThemes = [
   },
 ];
 
-function ThemePreview(props: {
+export function ThemePreview(props: {
   selector?: string;
   active?: boolean;
   inUse?: boolean;

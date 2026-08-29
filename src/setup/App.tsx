@@ -1,239 +1,149 @@
-import { ReactElement, Suspense, lazy, useEffect, useState } from "react";
-import { lazyWithPreload } from "react-lazy-with-preload";
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { ReactNode, Suspense, lazy, useEffect, useState } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
-import { convertLegacyUrl, isLegacyUrl } from "@/backend/metadata/getmeta";
-import { generateQuickSearchMediaUrl } from "@/backend/metadata/tmdb";
-import { DetailsModal } from "@/components/overlays/detailsModal";
+import { jellyfinRequest } from "@/backend/jellyfin/client";
+import { Button } from "@/components/buttons/Button";
+import { Loading } from "@/components/layout/Loading";
 import { KeyboardCommandsEditModal } from "@/components/overlays/KeyboardCommandsEditModal";
 import { KeyboardCommandsModal } from "@/components/overlays/KeyboardCommandsModal";
-import { NotificationModal } from "@/components/overlays/notificationsModal";
-import { SupportInfoModal } from "@/components/overlays/SupportInfoModal";
-import { TraktAuthHandler } from "@/components/TraktAuthHandler";
 import { useGlobalKeyboardEvents } from "@/hooks/useGlobalKeyboardEvents";
 import { useOnlineListener } from "@/hooks/usePing";
-import { AboutPage } from "@/pages/About";
-import { AdminPage } from "@/pages/admin/AdminPage";
-import { AllBookmarks } from "@/pages/bookmarks/AllBookmarks";
-import VideoTesterView from "@/pages/developer/VideoTesterView";
-import { DiscoverMore } from "@/pages/discover/AllMovieLists";
-import { Discover } from "@/pages/discover/Discover";
-import { MoreContent } from "@/pages/discover/MoreContent";
-import MaintenancePage from "@/pages/errors/MaintenancePage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
-import { JipPage } from "@/pages/Jip";
-import { LegalPage, shouldHaveLegalPage } from "@/pages/Legal";
-import { LoginPage } from "@/pages/Login";
-import { MigrationPage } from "@/pages/migration/Migration";
-import { MigrationDirectPage } from "@/pages/migration/MigrationDirect";
-import { MigrationDownloadPage } from "@/pages/migration/MigrationDownload";
-import { MigrationUploadPage } from "@/pages/migration/MigrationUpload";
-import { OnboardingPage } from "@/pages/onboarding/Onboarding";
-import { OnboardingExtensionPage } from "@/pages/onboarding/OnboardingExtension";
-import { OnboardingProxyPage } from "@/pages/onboarding/OnboardingProxy";
-import { PasPage } from "@/pages/Pas";
-import { RegisterPage } from "@/pages/Register";
-import { SupportPage } from "@/pages/Support";
-import { WatchHistory } from "@/pages/watchHistory/WatchHistory";
+import { JellyfinLogin } from "@/pages/jellyfin/JellyfinLogin";
 import { Layout } from "@/setup/Layout";
 import { useHistoryListener } from "@/stores/history";
 import { useClearModalsOnNavigation } from "@/stores/interface/overlayStack";
+import { useJellyfinAuth } from "@/stores/jellyfin";
 import { LanguageProvider } from "@/stores/language";
 
-const DeveloperPage = lazy(() => import("@/pages/DeveloperPage"));
-const TestView = lazy(() => import("@/pages/developer/TestView"));
-const PlayerView = lazyWithPreload(() => import("@/pages/PlayerView"));
-const SettingsPage = lazyWithPreload(() => import("@/pages/Settings"));
+const JellyfinPlayerView = lazy(() => import("@/pages/JellyfinPlayerView"));
+const JellyfinSettings = lazy(
+  () => import("@/pages/jellyfin/JellyfinSettings"),
+);
+const SeerrDiscover = lazy(() =>
+  import("@/pages/discover/SeerrDiscover").then((module) => ({
+    default: module.SeerrDiscover,
+  })),
+);
 
-PlayerView.preload();
-SettingsPage.preload();
-
-function LegacyUrlView({ children }: { children: ReactElement }) {
+function Authenticated({ children }: { children: ReactNode }) {
+  const session = useJellyfinAuth((state) => state.session);
   const location = useLocation();
-  const navigate = useNavigate();
-
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    const url = location.pathname;
-    if (!isLegacyUrl(url)) return;
-    convertLegacyUrl(location.pathname).then((convertedUrl) => {
-      navigate(convertedUrl ?? "/", { replace: true });
-    });
-  }, [location.pathname, navigate]);
-
-  if (isLegacyUrl(location.pathname)) return null;
+    if (!session) return;
+    let current = true;
+    setStatus("loading");
+    jellyfinRequest(`Users/${session.userId}`)
+      .then(() => {
+        if (current) setStatus("ready");
+      })
+      .catch(() => {
+        if (current) setStatus("error");
+      });
+    return () => {
+      current = false;
+    };
+  }, [session, attempt]);
+  if (!session)
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location.pathname + location.search }}
+      />
+    );
+  if (status === "loading")
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loading />
+      </div>
+    );
+  if (status === "error")
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6">
+        <p role="alert">Unable to connect to Jellyfin.</p>
+        <Button onClick={() => setAttempt((value) => value + 1)}>
+          Try again
+        </Button>
+      </div>
+    );
   return children;
 }
 
-function QuickSearch() {
-  const { query } = useParams<{ query: string }>();
-  const navigate = useNavigate();
+export const maintenanceTime = "";
 
-  useEffect(() => {
-    if (query) {
-      generateQuickSearchMediaUrl(query).then((url) => {
-        navigate(url ?? "/", { replace: true });
-      });
-    } else {
-      navigate("/", { replace: true });
-    }
-  }, [query, navigate]);
-
-  return null;
-}
-
-function QueryView() {
-  const { query } = useParams<{ query: string }>();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (query) {
-      navigate(`/browse/${encodeURIComponent(query)}`, { replace: true });
-    } else {
-      navigate("/", { replace: true });
-    }
-  }, [query, navigate]);
-
-  return null;
-}
-
-export const maintenanceTime = "March 31th 11:00 PM - 5:00 AM EST";
-
-function App() {
+export default function App() {
   useHistoryListener();
   useOnlineListener();
   useGlobalKeyboardEvents();
   useClearModalsOnNavigation();
-  const maintenance = false; // Shows maintance page
-  const [showDowntime, setShowDowntime] = useState(maintenance);
-
-  const handleButtonClick = () => {
-    setShowDowntime(false);
-  };
-
-  useEffect(() => {
-    const sessionToken = sessionStorage.getItem("downtimeToken");
-    if (!sessionToken && maintenance) {
-      setShowDowntime(true);
-      sessionStorage.setItem("downtimeToken", "true");
-    }
-  }, [setShowDowntime, maintenance]);
-
+  const session = useJellyfinAuth((state) => state.session);
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
+  const loginTarget =
+    from?.startsWith("/") && !from.startsWith("//") && from !== "/login"
+      ? from
+      : "/";
   return (
     <Layout>
-      <TraktAuthHandler />
       <LanguageProvider />
-      <NotificationModal id="notifications" />
       <KeyboardCommandsModal id="keyboard-commands" />
       <KeyboardCommandsEditModal id="keyboard-commands-edit" />
-      <SupportInfoModal id="support-info" />
-      <DetailsModal id="details" />
-      <DetailsModal id="discover-details" />
-      <DetailsModal id="player-details" />
-      {!showDowntime && (
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center">
+            <Loading />
+          </div>
+        }
+      >
         <Routes>
-          {/* functional routes */}
-          <Route path="/s/:query" element={<QuickSearch />} />
-          <Route path="/search/:type" element={<Navigate to="/browse" />} />
-          <Route path="/search/:type/:query?" element={<QueryView />} />
-          {/* pages */}
           <Route
-            path="/media/:media"
+            path="/login"
             element={
-              <LegacyUrlView>
-                <Suspense fallback={null}>
-                  <PlayerView />
-                </Suspense>
-              </LegacyUrlView>
+              session ? (
+                <Navigate to={loginTarget} replace />
+              ) : (
+                <JellyfinLogin />
+              )
             }
           />
           <Route
-            path="/media/:media/:season/:episode"
+            path="/*"
             element={
-              <LegacyUrlView>
-                <Suspense fallback={null}>
-                  <PlayerView />
-                </Suspense>
-              </LegacyUrlView>
+              <Authenticated>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/browse/:query?" element={<HomePage />} />
+                  <Route path="/discover" element={<SeerrDiscover />} />
+                  <Route
+                    path="/discover/*"
+                    element={<Navigate to="/discover" replace />}
+                  />
+                  <Route
+                    path="/play/:itemId"
+                    element={<JellyfinPlayerView />}
+                  />
+                  <Route path="/settings" element={<JellyfinSettings />} />
+                  <Route
+                    path="/media/*"
+                    element={<Navigate to="/" replace />}
+                  />
+                  <Route
+                    path="/onboarding/*"
+                    element={<Navigate to="/" replace />}
+                  />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Authenticated>
             }
           />
-          <Route path="/browse/:query?" element={<HomePage />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route
-            path="/onboarding/extension"
-            element={<OnboardingExtensionPage />}
-          />
-          <Route path="/onboarding/proxy" element={<OnboardingProxyPage />} />
-
-          {/* Migration pages - awaiting import and export fixes */}
-          <Route path="/migration" element={<MigrationPage />} />
-          <Route path="/migration/direct" element={<MigrationDirectPage />} />
-          <Route
-            path="/migration/download"
-            element={<MigrationDownloadPage />}
-          />
-          <Route path="/migration/upload" element={<MigrationUploadPage />} />
-
-          {shouldHaveLegalPage() ? (
-            <Route path="/legal" element={<LegalPage />} />
-          ) : null}
-          {/* Support page */}
-          <Route path="/support" element={<SupportPage />} />
-          <Route path="/jip" element={<JipPage />} />
-          <Route path="/pas" element={<PasPage />} />
-          {/* Discover pages */}
-          <Route path="/discover" element={<Discover />} />
-          <Route
-            path="/discover/more/:contentType/:mediaType"
-            element={<MoreContent />}
-          />
-          <Route
-            path="/discover/more/:contentType/:id/:mediaType"
-            element={<MoreContent />}
-          />
-          <Route path="/discover/more/:category" element={<MoreContent />} />
-          <Route path="/discover/all" element={<DiscoverMore />} />
-          {/* Bookmarks page */}
-          <Route path="/bookmarks" element={<AllBookmarks />} />
-          {/* Watch History page */}
-          <Route path="/watch-history" element={<WatchHistory />} />
-          {/* Settings page */}
-          <Route
-            path="/settings"
-            element={
-              <Suspense fallback={null}>
-                <SettingsPage />
-              </Suspense>
-            }
-          />
-          {/* admin routes */}
-          <Route path="/admin" element={<AdminPage />} />
-          {/* other */}
-          <Route path="/dev" element={<DeveloperPage />} />
-          <Route path="/dev/video" element={<VideoTesterView />} />
-          {/* developer routes that can abuse workers are disabled in production */}
-          {process.env.NODE_ENV === "development" ? (
-            <Route path="/dev/test" element={<TestView />} />
-          ) : null}
-          <Route path="*" element={<NotFoundPage />} />
         </Routes>
-      )}
-      {showDowntime && (
-        <MaintenancePage onHomeButtonClick={handleButtonClick} />
-      )}
+      </Suspense>
     </Layout>
   );
 }
-
-export default App;

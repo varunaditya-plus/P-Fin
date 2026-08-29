@@ -66,13 +66,16 @@ export function Footer() {
           <div className="inline-block">
             <BrandPill />
           </div>
-          <p className="mt-4 lg:max-w-[400px]">{t("footer.tagline")}</p>
+          <p className="mt-4 lg:max-w-[400px]">
+            Your Jellyfin library, with the P-Stream interface.
+          </p>
         </div>
         <div className="md:text-right">
-          <h3 className="font-semibold text-type-emphasis">
-            {t("footer.legal.disclaimer")}
-          </h3>
-          <p className="mt-3">{t("footer.legal.disclaimerText")}</p>
+          <h3 className="font-semibold text-type-emphasis">Your media</h3>
+          <p className="mt-3">
+            Playback is provided by your Jellyfin server. Discover and request
+            content through Seerr.
+          </p>
         </div>
         <div className="flex flex-wrap gap-[0.5rem] -ml-3">
           {conf().GITHUB_LINK && (
@@ -80,11 +83,11 @@ export function Footer() {
               {t("footer.links.github")}
             </FooterLink>
           )}
-          <FooterLink icon={Icons.DISCORD} href={conf().DISCORD_LINK}>
-            {t("footer.links.discord")}
+          <FooterLink icon={Icons.SEARCH} to="/">
+            Library
           </FooterLink>
-          <FooterLink href="https://rentry.co/nnqtas3e" icon={Icons.TIP_JAR}>
-            {t("footer.links.funding")}
+          <FooterLink icon={Icons.RISING_STAR} to="/discover">
+            Discover
           </FooterLink>
           <div className="inline md:hidden">
             <Legal />

@@ -1,17 +1,15 @@
 import classNames from "classnames";
 import { useEffect, useState } from "react";
-import { Link, To, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-import { NoUserAvatar, UserAvatar } from "@/components/Avatar";
+import { NoUserAvatar } from "@/components/Avatar";
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Icons } from "@/components/Icon";
 import { LinksDropdown } from "@/components/LinksDropdown";
-import { useNotifications } from "@/components/overlays/notificationsModal";
 import { Lightbar } from "@/components/utils/Lightbar";
-import { useAuth } from "@/hooks/auth/useAuth";
 import { BlurEllipsis } from "@/pages/layouts/SubPageLayout";
-import { conf } from "@/setup/config";
 import { useBannerSize } from "@/stores/banner";
+import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePreferencesStore } from "@/stores/preferences";
 
 import { BrandPill } from "./BrandPill";
@@ -25,10 +23,9 @@ export interface NavigationProps {
 
 export function Navigation(props: NavigationProps) {
   const bannerHeight = useBannerSize();
-  const navigate = useNavigate();
-  const { loggedIn } = useAuth();
+  const location = useLocation();
+  const session = useJellyfinAuth((state) => state.session);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const { openNotifications, getUnreadCount } = useNotifications();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,11 +35,6 @@ export function Navigation(props: NavigationProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleClick = (path: To) => {
-    window.scrollTo(0, 0);
-    navigate(path);
-  };
 
   // Calculate mask length based on scroll position
   const getMaskLength = () => {
@@ -143,24 +135,28 @@ export function Navigation(props: NavigationProps) {
               >
                 <BrandPill clickable header />
               </Link>
-              <a
-                href={conf().DISCORD_LINK}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
-              >
-                <IconPatch
-                  icon={Icons.DISCORD}
-                  clickable
-                  downsized
-                  navigation
-                />
-              </a>
-              {!enableLowPerformanceMode &&
-                (window.location.pathname !== "/discover" ? (
-                  <a
-                    onClick={() => handleClick("/discover")}
-                    rel="noreferrer"
+              {session ? (
+                <>
+                  <Link
+                    to="/"
+                    aria-label="Library"
+                    title="Library"
+                    className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
+                  >
+                    <IconPatch
+                      icon={Icons.SEARCH}
+                      clickable
+                      downsized
+                      navigation
+                    />
+                  </Link>
+                  <Link
+                    to="/discover"
+                    aria-label="Discover"
+                    title="Discover"
+                    aria-current={
+                      location.pathname === "/discover" ? "page" : undefined
+                    }
                     className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
                   >
                     <IconPatch
@@ -169,42 +165,18 @@ export function Navigation(props: NavigationProps) {
                       downsized
                       navigation
                     />
-                  </a>
-                ) : (
-                  <a
-                    onClick={() => handleClick("/")}
-                    rel="noreferrer"
-                    className="text-lg text-white tabbable rounded-full backdrop-blur-lg"
-                  >
-                    <IconPatch
-                      icon={Icons.SEARCH}
-                      clickable
-                      downsized
-                      navigation
-                    />
-                  </a>
-                ))}
-              <a
-                onClick={() => openNotifications()}
-                rel="noreferrer"
-                className="text-xl text-white tabbable rounded-full backdrop-blur-lg relative"
-              >
-                <IconPatch icon={Icons.BELL} clickable downsized navigation />
-                {(() => {
-                  const count = getUnreadCount();
-                  const shouldShow =
-                    typeof count === "number" ? count > 0 : count === "99+";
-                  return shouldShow ? (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">
-                      {count}
-                    </span>
-                  ) : null;
-                })()}
-              </a>
+                  </Link>
+                </>
+              ) : null}
             </div>
             <div className="relative pointer-events-auto">
               <LinksDropdown>
-                {loggedIn ? <UserAvatar withName /> : <NoUserAvatar />}
+                <NoUserAvatar />
+                {session ? (
+                  <span className="hidden md:inline-block">
+                    {session.userName}
+                  </span>
+                ) : null}
               </LinksDropdown>
             </div>
           </div>
