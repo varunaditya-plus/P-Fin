@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { useId } from "react";
 
 import { TextInputControl } from "./TextInputControl";
 
@@ -12,12 +13,16 @@ export function AuthInputBox(props: {
   passwordToggleable?: boolean;
   className?: string;
 }) {
+  const id = useId();
   return (
     <div className={classNames("space-y-3", props.className)}>
       {props.label ? (
-        <p className="font-bold text-white">{props.label}</p>
+        <label htmlFor={id} className="block font-bold text-white">
+          {props.label}
+        </label>
       ) : null}
       <TextInputControl
+        id={id}
         name={props.name}
         value={props.value}
         autoComplete={props.autoComplete}

@@ -6,6 +6,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 
 interface Props {
+  type?: "button" | "submit";
   icon?: Icons;
   onClick?: (
     event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
@@ -117,7 +118,7 @@ export function Button(props: Props) {
 
   return (
     <button
-      type="button"
+      type={props.type === "submit" ? "submit" : "button"}
       onClick={cb}
       className={classes}
       disabled={disabled || loading}

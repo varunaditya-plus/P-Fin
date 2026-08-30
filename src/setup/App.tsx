@@ -2,6 +2,7 @@ import { ReactNode, Suspense, lazy, useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { jellyfinRequest } from "@/backend/jellyfin/client";
+import { logoutSeerr } from "@/backend/seerr/api";
 import { Button } from "@/components/buttons/Button";
 import { Loading } from "@/components/layout/Loading";
 import { KeyboardCommandsEditModal } from "@/components/overlays/KeyboardCommandsEditModal";
@@ -34,16 +35,21 @@ function Authenticated({ children }: { children: ReactNode }) {
     "loading",
   );
   const [attempt, setAttempt] = useState(0);
+  const [connectionError, setConnectionError] = useState("");
   useEffect(() => {
     if (!session) return;
     let current = true;
     setStatus("loading");
+    setConnectionError("");
     jellyfinRequest(`Users/${session.userId}`)
       .then(() => {
         if (current) setStatus("ready");
       })
-      .catch(() => {
-        if (current) setStatus("error");
+      .catch((error: unknown) => {
+        if (current) {
+          setConnectionError(error instanceof Error ? error.message : "");
+          setStatus("error");
+        }
       });
     return () => {
       current = false;
@@ -65,11 +71,28 @@ function Authenticated({ children }: { children: ReactNode }) {
     );
   if (status === "error")
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6">
-        <p role="alert">Unable to connect to Jellyfin.</p>
-        <Button onClick={() => setAttempt((value) => value + 1)}>
-          Try again
-        </Button>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6 text-center">
+        <h1 className="text-2xl font-bold text-type-emphasis">
+          Unable to connect to Jellyfin
+        </h1>
+        <p role="alert" className="max-w-lg text-type-secondary">
+          {connectionError ||
+            "Check your server address and connection, then try again."}
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button onClick={() => setAttempt((value) => value + 1)}>
+            Try again
+          </Button>
+          <Button
+            theme="secondary"
+            onClick={() => {
+              logoutSeerr().catch(() => undefined);
+              useJellyfinAuth.getState().setSession(null);
+            }}
+          >
+            Change server
+          </Button>
+        </div>
       </div>
     );
   return children;

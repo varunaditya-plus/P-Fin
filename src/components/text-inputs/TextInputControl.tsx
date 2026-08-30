@@ -9,6 +9,7 @@ export interface TextInputControlPropsNoLabel {
   onFocus?: () => void;
   value?: string;
   name?: string;
+  id?: string;
   autoComplete?: string;
   placeholder?: string;
   className?: string;
@@ -30,6 +31,7 @@ export const TextInputControl = forwardRef<
       value,
       label,
       name,
+      id,
       autoComplete,
       className,
       placeholder,
@@ -45,6 +47,7 @@ export const TextInputControl = forwardRef<
     const input = (
       <div className="relative">
         <input
+          id={id}
           type={inputType}
           ref={ref}
           className={classNames(className, passwordToggleable && "pr-12")}
@@ -55,13 +58,11 @@ export const TextInputControl = forwardRef<
           autoComplete={autoComplete}
           onBlur={() => onUnFocus && onUnFocus()}
           onFocus={() => onFocus?.()}
-          onKeyDown={(e) =>
-            e.key === "Enter" ? (e.target as HTMLInputElement).blur() : null
-          }
         />
         {passwordToggleable ? (
           <button
             type="button"
+            aria-label={showPassword ? "Show password" : "Hide password"}
             className="absolute top-1/2 -translate-y-1/2 right-1 text-xl p-3"
             onClick={() => setShowPassword(!showPassword)}
           >
