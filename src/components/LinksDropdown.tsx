@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { logoutJellyfin } from "@/backend/jellyfin/client";
@@ -10,24 +10,38 @@ import { useJellyfinAuth } from "@/stores/jellyfin";
 
 export function LinksDropdown({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const session = useJellyfinAuth((state) => state.session);
   const itemClass =
     "tabbable cursor-pointer flex gap-3 items-center m-3 p-1 rounded font-medium transition-colors duration-100 text-dropdown-text hover:text-white";
   useEffect(() => {
-    const close = (event: MouseEvent) => {
-      if (!(event.target as HTMLElement).closest(".is-dropdown"))
-        setOpen(false);
+    const close = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setOpen(false);
     };
-    window.addEventListener("click", close);
-    return () => window.removeEventListener("click", close);
+    window.addEventListener("pointerdown", close);
+    return () => window.removeEventListener("pointerdown", close);
   }, []);
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, [open]);
   async function logout() {
     setOpen(false);
     await Promise.allSettled([logoutSeerr(), logoutJellyfin()]);
   }
   return (
-    <div className="relative is-dropdown">
+    <div ref={containerRef} className="relative is-dropdown">
       <button
+        ref={triggerRef}
         type="button"
         aria-label="Account menu"
         aria-expanded={open}
@@ -63,7 +77,10 @@ export function LinksDropdown({ children }: { children: ReactNode }) {
                   key={item.to}
                   to={item.to}
                   className={itemClass}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <Icon icon={item.icon} className="text-xl" />
                   {item.title}

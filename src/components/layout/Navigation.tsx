@@ -141,6 +141,7 @@ export function Navigation(props: NavigationProps) {
                     to="/"
                     aria-label="Library"
                     title="Library"
+                    onClick={() => window.scrollTo(0, 0)}
                     className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
                   >
                     <IconPatch
@@ -154,6 +155,7 @@ export function Navigation(props: NavigationProps) {
                     to="/discover"
                     aria-label="Discover"
                     title="Discover"
+                    onClick={() => window.scrollTo(0, 0)}
                     aria-current={
                       location.pathname === "/discover" ? "page" : undefined
                     }

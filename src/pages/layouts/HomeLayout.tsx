@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { FooterView } from "@/components/layout/Footer";
 import { Navigation } from "@/components/layout/Navigation";
 import { usePreferencesStore } from "@/stores/preferences";
 
@@ -25,13 +24,13 @@ export function HomeLayout(props: {
   }, [enableFeatured]);
 
   return (
-    <FooterView>
+    <div className="min-h-screen">
       <Navigation
         bg={enableFeatured ? true : props.showBg}
         clearBackground={clearBackground}
         noLightbar={enableFeatured}
       />
       {props.children}
-    </FooterView>
+    </div>
   );
 }
