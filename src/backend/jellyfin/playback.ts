@@ -5,6 +5,7 @@ import {
   jellyfinRequest,
   jellyfinUrl,
 } from "@/backend/jellyfin/client";
+import { JellyfinSession } from "@/stores/jellyfin";
 import { CaptionListItem } from "@/stores/player/slices/source";
 import { SourceSliceSource } from "@/stores/player/utils/qualities";
 
@@ -18,6 +19,7 @@ export interface JellyfinMediaStream {
   IsTextSubtitleStream?: boolean;
   IsDefault?: boolean;
   IsForced?: boolean;
+  IsOriginal?: boolean;
   IsHearingImpaired?: boolean;
   Height?: number;
 }
@@ -35,6 +37,7 @@ export interface JellyfinMediaSource {
 }
 
 export interface JellyfinPlayback {
+  owner?: JellyfinSession;
   itemId: string;
   playSessionId: string;
   mediaSource: JellyfinMediaSource;
@@ -45,9 +48,25 @@ export interface JellyfinPlayback {
   playMethod: "DirectPlay" | "DirectStream" | "Transcode";
 }
 
+function isCurrentSession(owner?: JellyfinSession) {
+  if (!owner) return true;
+  try {
+    const current = getJellyfinSession();
+    return (
+      current.serverUrl === owner.serverUrl &&
+      current.userId === owner.userId &&
+      current.accessToken === owner.accessToken &&
+      current.deviceId === owner.deviceId
+    );
+  } catch {
+    return false;
+  }
+}
+
 export interface PlaybackOptions {
   mediaSourceId?: string;
   audioIndex?: number;
+  defaultAudioIndex?: number;
   subtitleIndex?: number;
   forceTranscode?: boolean;
   maxBitrate?: number;
@@ -130,7 +149,15 @@ export function authenticatedStreamUrl(path: string): string {
       parsed.searchParams.delete(key);
   }
   const query = Object.fromEntries(parsed.searchParams.entries());
-  return jellyfinUrl(parsed.pathname, {
+  const serverBasePath = new URL(
+    session.serverAddress ?? session.serverUrl,
+    window.location.origin,
+  ).pathname.replace(/\/$/, "");
+  const streamPath =
+    serverBasePath && parsed.pathname.startsWith(`${serverBasePath}/`)
+      ? parsed.pathname.slice(serverBasePath.length)
+      : parsed.pathname;
+  return jellyfinUrl(streamPath, {
     ...query,
     ApiKey: session.accessToken,
   });
@@ -195,7 +222,8 @@ export async function getPlayback(
       IsPlayback: true,
       EnableDirectPlay:
         !options.forceTranscode &&
-        options.audioIndex === undefined &&
+        (options.audioIndex === undefined ||
+          options.audioIndex === options.defaultAudioIndex) &&
         subtitleIndex < 0,
       EnableDirectStream: !options.forceTranscode,
       EnableTranscoding: true,
@@ -205,6 +233,10 @@ export async function getPlayback(
       DeviceProfile: browserProfile(maxBitrate, !!options.forceTranscode),
     }),
   });
+  if (!isCurrentSession(session))
+    throw new Error(
+      "Your Jellyfin account or server changed. Open this title from the current library.",
+    );
   if (response.ErrorCode)
     throw new Error(`Jellyfin cannot play this title (${response.ErrorCode}).`);
   const mediaSource =
@@ -266,6 +298,7 @@ export async function getPlayback(
       }),
     );
   return {
+    owner: session,
     itemId,
     playSessionId: response.PlaySessionId,
     mediaSource,
@@ -288,6 +321,7 @@ export function reportPlayback(
     subtitleIndex?: number;
   },
 ) {
+  if (!isCurrentSession(playback.owner)) return Promise.resolve();
   const path =
     event === "Playing" ? "/Sessions/Playing" : `/Sessions/Playing/${event}`;
   return jellyfinRequest<void>(path, {
@@ -312,6 +346,7 @@ export function reportPlayback(
 }
 
 export async function stopTranscode(playback: JellyfinPlayback) {
+  if (!isCurrentSession(playback.owner)) return;
   if (playback.source.type !== "hls") return;
   const session = getJellyfinSession();
   if (!session) return;

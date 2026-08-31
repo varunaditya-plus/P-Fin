@@ -2,22 +2,24 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { jellyfinRequest } from "@/backend/jellyfin/client";
+import { getJellyfinSession, jellyfinRequest } from "@/backend/jellyfin/client";
 
 import {
   authenticatedStreamUrl,
   getPlayback,
   getTranscodingUrl,
   reportPlayback,
+  stopTranscode,
 } from "./playback";
 
 vi.mock("@/backend/jellyfin/client", () => ({
-  getJellyfinSession: () => ({
+  getJellyfinSession: vi.fn(() => ({
     accessToken: "current-test-token",
     userId: "user",
+    userName: "User",
     deviceId: "device",
     serverUrl: "/jellyfin",
-  }),
+  })),
   jellyfinRequest: vi.fn(),
   jellyfinUrl: (path: string, query: Record<string, unknown> = {}) => {
     const url = new URL(
@@ -32,6 +34,13 @@ vi.mock("@/backend/jellyfin/client", () => ({
 }));
 
 beforeEach(() => {
+  vi.mocked(getJellyfinSession).mockReturnValue({
+    accessToken: "current-test-token",
+    userId: "user",
+    userName: "User",
+    deviceId: "device",
+    serverUrl: "/jellyfin",
+  });
   vi.mocked(jellyfinRequest).mockReset();
   vi.spyOn(HTMLMediaElement.prototype, "canPlayType").mockReturnValue("");
 });
@@ -40,6 +49,51 @@ afterEach(() => {
 });
 
 describe("Jellyfin playback", () => {
+  it("drops queued reports and cleanup after the account or server changes", async () => {
+    const playback = {
+      owner: {
+        accessToken: "old-token",
+        userId: "old-user",
+        userName: "Old user",
+        deviceId: "device",
+        serverUrl: "/jellyfin",
+      },
+      itemId: "item",
+      playSessionId: "session",
+      mediaSource: { Id: "source" },
+      source: { type: "hls" as const, url: "https://example.test/video" },
+      captions: [],
+      subtitleIndex: -1,
+      playMethod: "Transcode" as const,
+    };
+    await reportPlayback("Stopped", playback, {
+      time: 120,
+      paused: true,
+      muted: false,
+      volume: 1,
+    });
+    await stopTranscode(playback);
+    expect(jellyfinRequest).not.toHaveBeenCalled();
+  });
+
+  it("rejects a playback response if the session changed while it was loading", async () => {
+    vi.mocked(jellyfinRequest).mockImplementation(async () => {
+      vi.mocked(getJellyfinSession).mockReturnValue({
+        accessToken: "new-token",
+        userId: "new-user",
+        userName: "New user",
+        deviceId: "device",
+        serverUrl: "https://other-server.test",
+      });
+      return {
+        PlaySessionId: "session",
+        MediaSources: [{ Id: "source", SupportsDirectPlay: true }],
+      };
+    });
+    await expect(getPlayback("item")).rejects.toThrow(
+      "account or server changed",
+    );
+  });
   it("keeps media requests on the configured server and uses Jellyfin 12's ApiKey query parameter", () => {
     const url = new URL(
       authenticatedStreamUrl(
@@ -105,6 +159,34 @@ describe("Jellyfin playback", () => {
     expect(url.pathname).toBe("/jellyfin/Videos/item/stream.mp4");
     expect(url.searchParams.get("Static")).toBe("true");
     expect(url.searchParams.get("ApiKey")).toBe("current-test-token");
+  });
+
+  it("allows direct playback for the selected file-default audio track", async () => {
+    vi.mocked(jellyfinRequest).mockResolvedValue({
+      PlaySessionId: "session",
+      MediaSources: [
+        {
+          Id: "source",
+          Container: "mp4",
+          SupportsDirectPlay: true,
+          MediaStreams: [],
+        },
+      ],
+    });
+    await getPlayback("item", {
+      mediaSourceId: "source",
+      audioIndex: 1,
+      defaultAudioIndex: 1,
+    });
+    const [, init] = vi.mocked(jellyfinRequest).mock.calls[0];
+    expect(JSON.parse(init!.body as string).EnableDirectPlay).toBe(true);
+  });
+
+  it("does not duplicate the configured base path in server-returned stream URLs", () => {
+    const url = new URL(
+      authenticatedStreamUrl("/jellyfin/Videos/item/master.m3u8"),
+    );
+    expect(url.pathname).toBe("/jellyfin/Videos/item/master.m3u8");
   });
 
   it("extracts text subtitles locally and leaves image subtitles for burn-in", async () => {
