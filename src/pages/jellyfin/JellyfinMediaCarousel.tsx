@@ -1,10 +1,13 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { JellyfinItem, getImageUrl } from "@/backend/jellyfin/client";
+import { getJellyfinDetailsTarget } from "@/backend/jellyfin/details";
 import { MediaCard, MediaCardSkeleton } from "@/components/media/MediaCard";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { CarouselNavButtons } from "@/pages/discover/components/CarouselNavButtons";
 import { MediaItem } from "@/utils/mediaTypes";
+
+import { JellyfinCardAction, JellyfinCardMenu } from "./JellyfinCardMenu";
 
 export function jellyfinMediaItem(item: JellyfinItem): MediaItem {
   return {
@@ -32,15 +35,27 @@ export function jellyfinMediaItem(item: JellyfinItem): MediaItem {
 export function JellyfinMediaCard({
   item,
   onSelect,
+  onItemChanged,
 }: {
   item: JellyfinItem;
-  onSelect: (item: JellyfinItem) => void;
+  onSelect: (item: JellyfinItem, action?: JellyfinCardAction) => void;
+  onItemChanged?: () => void;
 }) {
-  const position = item.UserData?.PlaybackPositionTicks ?? 0;
+  const [userData, setUserData] = useState(item.UserData);
+  useEffect(() => setUserData(item.UserData), [item.UserData]);
+  const currentItem = { ...item, UserData: userData };
+  const position = userData?.PlaybackPositionTicks ?? 0;
   return (
     <MediaCard
       linkable
       hideBookmark
+      kindLabel={
+        item.Type === "BoxSet"
+          ? "Collection"
+          : item.Type === "Playlist"
+            ? "Playlist"
+            : undefined
+      }
       media={jellyfinMediaItem(item)}
       percentage={
         position && item.RunTimeTicks
@@ -57,7 +72,18 @@ export function JellyfinMediaCard({
             }
           : undefined
       }
-      onShowDetails={() => onSelect(item)}
+      onShowDetails={() => onSelect(getJellyfinDetailsTarget(currentItem))}
+      renderContextMenu={(close) => (
+        <JellyfinCardMenu
+          item={currentItem}
+          onSelect={onSelect}
+          close={close}
+          onChanged={(data) => {
+            setUserData(data);
+            onItemChanged?.();
+          }}
+        />
+      )}
     />
   );
 }
@@ -68,12 +94,14 @@ export function JellyfinMediaCarousel({
   items,
   loading,
   onSelect,
+  onItemChanged,
 }: {
   id: string;
   title: string;
   items: JellyfinItem[];
   loading?: boolean;
-  onSelect: (item: JellyfinItem) => void;
+  onSelect: (item: JellyfinItem, action?: JellyfinCardAction) => void;
+  onItemChanged?: () => void;
 }) {
   const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { isMobile } = useIsMobile();
@@ -105,12 +133,19 @@ export function JellyfinMediaCarousel({
                   <MediaCardSkeleton />
                 </div>
               ))
-            : items.map((item) => (
+            : items.map((item, index) => (
                 <div
-                  key={item.Id}
+                  key={
+                    (item as JellyfinItem & { PlaylistItemId?: string })
+                      .PlaylistItemId ?? `${item.Id}-${index}`
+                  }
                   className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
                 >
-                  <JellyfinMediaCard item={item} onSelect={onSelect} />
+                  <JellyfinMediaCard
+                    item={item}
+                    onSelect={onSelect}
+                    onItemChanged={onItemChanged}
+                  />
                 </div>
               ))}
           <div className="lg:w-12" />
