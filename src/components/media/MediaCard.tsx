@@ -1,11 +1,16 @@
 // I'm sorry this is so confusing 😭
 
 import classNames from "classnames";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { DotList } from "@/components/text/DotList";
+import {
+  ContextMenu,
+  ContextMenuDivider,
+  ContextMenuItem,
+} from "@/components/utils/ContextMenu";
 import { Flare } from "@/components/utils/Flare";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { useOverlayStack } from "@/stores/interface/overlayStack";
@@ -109,6 +114,8 @@ export interface MediaCardProps {
   editable?: boolean;
   onEdit?: () => void;
   hideBookmark?: boolean;
+  kindLabel?: string;
+  renderContextMenu?: (close: () => void) => ReactNode;
 }
 
 function checkReleased(media: MediaItem): boolean {
@@ -132,12 +139,17 @@ function MediaCardContent({
   percentage,
   closable,
   onClose,
-  onShowDetails,
   forceSkeleton,
   editable,
   onEdit,
   hideBookmark,
-}: MediaCardProps) {
+  kindLabel,
+  onOpenMenu,
+  menuOpen,
+}: Omit<MediaCardProps, "onShowDetails" | "renderContextMenu"> & {
+  onOpenMenu?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  menuOpen?: boolean;
+}) {
   const { t } = useTranslation();
   const percentageString = `${Math.round(percentage ?? 0).toFixed(0)}%`;
 
@@ -145,7 +157,7 @@ function MediaCardContent({
 
   const canLink = linkable && !closable;
 
-  const dotListContent = [t(`media.types.${media.type}`)];
+  const dotListContent = [kindLabel ?? t(`media.types.${media.type}`)];
 
   const [searchQuery] = useSearchQuery();
   const enableMinimalCards = usePreferencesStore((s) => s.enableMinimalCards);
@@ -181,7 +193,11 @@ function MediaCardContent({
           canLink ? "hover:bg-mediaCard-hoverBackground tabbable" : ""
         } ${closable ? "jiggle" : ""}`}
         tabIndex={canLink ? 0 : -1}
-        onKeyUp={(e) => e.key === "Enter" && e.currentTarget.click()}
+        onKeyUp={(e) =>
+          e.target === e.currentTarget &&
+          e.key === "Enter" &&
+          e.currentTarget.click()
+        }
       >
         <Flare.Light
           flareSize={300}
@@ -300,10 +316,13 @@ function MediaCardContent({
                   <button
                     className="media-more-button p-2"
                     type="button"
+                    aria-label={`Actions for ${media.title}`}
+                    aria-haspopup="menu"
+                    aria-expanded={menuOpen}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      onShowDetails?.(media);
+                      onOpenMenu?.(e);
                     }}
                   >
                     <Icon
@@ -343,6 +362,26 @@ export function MediaCard(props: MediaCardProps) {
   const { media, onShowDetails, forceSkeleton } = props;
   const { showModal } = useOverlayStack();
   const canLink = props.linkable && !props.closable;
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    anchor: HTMLElement;
+  } | null>(null);
+  const longPress = useRef<ReturnType<typeof setTimeout>>();
+  const touchStart = useRef<{ x: number; y: number }>();
+  const suppressClickUntil = useRef(0);
+  const clearLongPress = () => {
+    clearTimeout(longPress.current);
+    longPress.current = undefined;
+  };
+  useEffect(() => () => clearTimeout(longPress.current), []);
+  const closeMenu = useCallback(() => setContextMenu(null), []);
+  const openMenu = (x: number, y: number, element: HTMLElement) => {
+    const anchor = element.matches("button, [tabindex='0']")
+      ? element
+      : (element.querySelector<HTMLElement>("[tabindex='0']") ?? element);
+    setContextMenu({ x, y, anchor });
+  };
 
   const handleShowDetails = useCallback(async () => {
     if (onShowDetails) {
@@ -358,6 +397,13 @@ export function MediaCard(props: MediaCardProps) {
   }, [media, showModal, onShowDetails]);
 
   const handleCardClick = (e: React.MouseEvent) => {
+    if (e.defaultPrevented) return;
+    if (Date.now() < suppressClickUntil.current) {
+      suppressClickUntil.current = 0;
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     if (canLink) {
       e.preventDefault();
       handleShowDetails();
@@ -366,16 +412,86 @@ export function MediaCard(props: MediaCardProps) {
 
   const handleCardContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleShowDetails();
+    e.stopPropagation();
+    clearLongPress();
+    openMenu(e.clientX, e.clientY, e.currentTarget as HTMLElement);
   };
 
   const content = (
     <MediaCardContent
       {...props}
-      onShowDetails={handleShowDetails}
       forceSkeleton={forceSkeleton}
+      menuOpen={Boolean(contextMenu)}
+      onOpenMenu={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        openMenu(rect.right, rect.bottom, event.currentTarget);
+      }}
     />
   );
+
+  const contextMenuElement = contextMenu ? (
+    <ContextMenu
+      {...contextMenu}
+      label={`Actions for ${media.title}`}
+      onClose={closeMenu}
+    >
+      <div className="px-3 py-1 mb-1 text-xs text-white/50 font-bold uppercase tracking-wider max-w-[260px] truncate">
+        {media.title || "Media"}
+      </div>
+      <ContextMenuDivider />
+      {props.renderContextMenu ? (
+        props.renderContextMenu(closeMenu)
+      ) : (
+        <ContextMenuItem
+          onClick={() => {
+            closeMenu();
+            handleShowDetails();
+          }}
+        >
+          <Icon icon={Icons.CIRCLE_EXCLAMATION} className="text-lg w-5" />
+          <span className="flex-1">More info</span>
+        </ContextMenuItem>
+      )}
+    </ContextMenu>
+  ) : null;
+
+  const interaction = {
+    onContextMenu: handleCardContextMenu,
+    onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+      suppressClickUntil.current = 0;
+      if (
+        event.key !== "ContextMenu" &&
+        !(event.shiftKey && event.key === "F10")
+      )
+        return;
+      event.preventDefault();
+      event.stopPropagation();
+      const rect = event.currentTarget.getBoundingClientRect();
+      openMenu(rect.left + rect.width / 2, rect.top + 24, event.currentTarget);
+    },
+    onPointerDown: (event: React.PointerEvent<HTMLElement>) => {
+      suppressClickUntil.current = 0;
+      if (event.pointerType !== "touch") return;
+      clearLongPress();
+      const { clientX: x, clientY: y, currentTarget: anchor } = event;
+      touchStart.current = { x, y };
+      longPress.current = setTimeout(() => {
+        suppressClickUntil.current = Date.now() + 1200;
+        openMenu(x, y, anchor);
+      }, 500);
+    },
+    onPointerMove: (event: React.PointerEvent<HTMLElement>) => {
+      const start = touchStart.current;
+      if (
+        start &&
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10
+      )
+        clearLongPress();
+    },
+    onPointerUp: clearLongPress,
+    onPointerCancel: clearLongPress,
+    onPointerLeave: clearLongPress,
+  };
 
   if (!canLink) {
     return (
@@ -386,9 +502,10 @@ export function MediaCard(props: MediaCardProps) {
             e.preventDefault();
           }
         }}
-        onContextMenu={handleCardContextMenu}
+        {...interaction}
       >
         {content}
+        {contextMenuElement}
       </span>
     );
   }
@@ -402,9 +519,10 @@ export function MediaCard(props: MediaCardProps) {
         props.closable ? "hover:cursor-default" : "",
       )}
       onClick={handleCardClick}
-      onContextMenu={handleCardContextMenu}
+      {...interaction}
     >
       {content}
+      {contextMenuElement}
     </Link>
   );
 }
