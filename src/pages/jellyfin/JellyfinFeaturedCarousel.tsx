@@ -1,10 +1,11 @@
 import classNames from "classnames";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { useWindowSize } from "react-use";
 
 import { JellyfinItem, getImageUrl } from "@/backend/jellyfin/client";
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
+import { useFeaturedSlideTransition } from "@/hooks/useFeaturedSlideTransition";
 import { usePreferencesStore } from "@/stores/preferences";
 
 export function JellyfinFeaturedCarousel({
@@ -18,26 +19,14 @@ export function JellyfinFeaturedCarousel({
   children: ReactNode;
   searching: boolean;
 }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const touchStart = useRef<number | null>(null);
   const { width, height } = useWindowSize();
   const enableImageLogos = usePreferencesStore((s) => s.enableImageLogos);
+  const { currentIndex, contentOpacity, goTo, move } =
+    useFeaturedSlideTransition(items.length, hovered || focused, !searching);
   const current = items[currentIndex % Math.max(1, items.length)];
-
-  useEffect(() => {
-    if (paused || searching || items.length < 2) return;
-    const interval = window.setInterval(
-      () => setCurrentIndex((index) => (index + 1) % items.length),
-      8000,
-    );
-    return () => window.clearInterval(interval);
-  }, [items.length, paused, searching]);
-
-  const move = (direction: number) =>
-    setCurrentIndex(
-      (index) => (index + direction + items.length) % items.length,
-    );
   const searchClasses = searching
     ? "opacity-0 pointer-events-none transition-opacity duration-300"
     : "opacity-100 transition-opacity duration-300";
@@ -45,13 +34,20 @@ export function JellyfinFeaturedCarousel({
   return (
     <div
       className={classNames(
-        "relative w-full transition-[height] duration-300 ease-in-out",
+        "relative w-full transition-[height] duration-300 ease-in-out motion-reduce:transition-none",
         searching
           ? "h-24"
           : height > 600
             ? "h-[40rem] md:h-[85vh]"
             : "h-[100vh]",
       )}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node))
+          setFocused(false);
+      }}
       onTouchStart={(event) => {
         touchStart.current = event.touches[0].clientX;
       }}
@@ -71,7 +67,7 @@ export function JellyfinFeaturedCarousel({
         {items.map((item, index) => (
           <div
             key={item.Id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex % items.length ? "opacity-100" : "opacity-0"}`}
+            className={`absolute inset-0 transition-opacity duration-1000 motion-reduce:transition-none ${index === currentIndex % items.length ? "opacity-100" : "opacity-0"}`}
             style={{
               backgroundImage: `url(${getImageUrl(item, "Backdrop", 1920)})`,
               backgroundSize: "cover",
@@ -120,7 +116,7 @@ export function JellyfinFeaturedCarousel({
           <button
             key={item.Id}
             type="button"
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => goTo(index)}
             aria-label={`Go to slide ${index + 1}`}
             className={`w-2.5 h-2.5 rounded-full transition-all ${index === currentIndex % items.length ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"}`}
           />
@@ -129,9 +125,10 @@ export function JellyfinFeaturedCarousel({
       {current && (
         <div
           className={classNames(
-            "absolute inset-0 flex items-end pb-20 z-10 transition-opacity duration-150",
-            searchClasses,
+            "absolute inset-0 flex items-end pb-20 z-10 transition-opacity duration-150 motion-reduce:transition-none",
+            searching && "pointer-events-none",
           )}
+          style={{ opacity: searching ? 0 : contentOpacity }}
         >
           <div className="container mx-auto px-8 lg:px-4 flex justify-between items-end w-full">
             <div className="max-w-3xl">
@@ -160,11 +157,7 @@ export function JellyfinFeaturedCarousel({
               <p className="text-lg text-white mb-6 line-clamp-3 md:line-clamp-4">
                 {current.Overview}
               </p>
-              <div
-                className="flex gap-4 justify-center items-center sm:justify-start"
-                onMouseEnter={() => setPaused(true)}
-                onMouseLeave={() => setPaused(false)}
-              >
+              <div className="flex gap-4 justify-center items-center sm:justify-start">
                 <Button
                   onClick={() => onSelect(current)}
                   theme="secondary"
