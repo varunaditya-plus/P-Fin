@@ -16,12 +16,19 @@ import {
   reportPlayback,
   stopTranscode,
 } from "@/backend/jellyfin/playback";
+import { getInitialPlaybackSelection } from "@/backend/jellyfin/playbackSelection";
+import {
+  getPreferredPlaybackOptions,
+  getUserConfiguration,
+  rememberTrackSelection,
+} from "@/backend/jellyfin/preferences";
 import { Button } from "@/components/buttons/Button";
 import { Spinner } from "@/components/layout/Spinner";
 import { JellyfinPlaybackContext } from "@/components/player/jellyfin/JellyfinPlaybackContext";
 import { PlayerPart } from "@/pages/parts/player/PlayerPart";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
+import { usePreferencesStore } from "@/stores/preferences";
 import { useSubtitleStore } from "@/stores/subtitles";
 import { useVolumeStore } from "@/stores/volume";
 
@@ -104,6 +111,10 @@ export function JellyfinPlayerView() {
   const { itemId = "" } = useParams();
   const [search] = useSearchParams();
   const restart = search.get("restart") === "true";
+  const mediaSourceId = search.get("mediaSourceId");
+  const startTicks = search.get("startTicks");
+  const requestedAudio = search.get("audioIndex");
+  const requestedSubtitle = search.get("subtitleIndex");
   const navigate = useNavigate();
   const [item, setItem] = useState<JellyfinItem | null>(null);
   const [episodes, setEpisodes] = useState<JellyfinItem[]>([]);
@@ -112,12 +123,17 @@ export function JellyfinPlayerView() {
   const [busy, setBusy] = useState(true);
   const [subtitleIndex, setSubtitleIndex] = useState(-1);
   const [maxBitrate, setMaxBitrate] = useState(120_000_000);
+  const selectedBitrate = useRef(120_000_000);
   const generation = useRef(0);
   const subtitleGeneration = useRef(0);
   const subtitleSelection = useRef(-1);
   const lastOptions = useRef<PlaybackOptions>({});
   const status = usePlayerStore((state) => state.status);
   const fallbackAttempted = useRef(false);
+  const configuration = useRef<
+    Awaited<ReturnType<typeof getUserConfiguration>>
+  >({});
+  const rememberedTracks = useRef<ReturnType<typeof rememberTrackSelection>>();
 
   const load = useCallback(
     async (
@@ -202,20 +218,92 @@ export function JellyfinPlayerView() {
     store.reset();
     const prepare = async () => {
       try {
-        const target = await getItem(itemId);
+        const [target, userConfiguration] = await Promise.all([
+          getItem(itemId),
+          getUserConfiguration().catch(() => ({})),
+        ]);
         if (cancelled) return;
+        configuration.current = userConfiguration;
+        usePreferencesStore
+          .getState()
+          .setEnableAutoplay(
+            configuration.current.EnableNextEpisodeAutoPlay ?? true,
+          );
         if (
-          target.Type !== "Movie" &&
-          target.Type !== "Episode" &&
-          target.Type !== "Video"
+          !["Movie", "Episode", "Video", "Trailer", "MusicVideo"].includes(
+            target.Type,
+          )
         ) {
           throw new Error(
             "Choose a movie or an episode from your Jellyfin library.",
           );
         }
-        const source = (
-          target.MediaSources as JellyfinMediaSource[] | undefined
-        )?.[0];
+        const selectionQuery = new URLSearchParams();
+        if (mediaSourceId) selectionQuery.set("mediaSourceId", mediaSourceId);
+        if (startTicks !== null) selectionQuery.set("startTicks", startTicks);
+        if (requestedAudio !== null)
+          selectionQuery.set("audioIndex", requestedAudio);
+        if (requestedSubtitle !== null)
+          selectionQuery.set("subtitleIndex", requestedSubtitle);
+        if (restart) selectionQuery.set("restart", "true");
+        const {
+          mediaSource: source,
+          startAt,
+          audioIndex,
+          subtitleIndex: initialSubtitle,
+        } = getInitialPlaybackSelection(target, selectionQuery);
+        // Jellyfin's subtitle default is based on its selected audio. Recompute
+        // language-dependent preferences when the details modal overrides it.
+        const preferenceSource =
+          source &&
+          audioIndex !== undefined &&
+          audioIndex !== source.DefaultAudioStreamIndex
+            ? {
+                ...source,
+                DefaultAudioStreamIndex: audioIndex,
+                DefaultSubtitleStreamIndex: undefined,
+              }
+            : source;
+        const preferredTracks = preferenceSource
+          ? getPreferredPlaybackOptions(
+              preferenceSource,
+              configuration.current,
+              audioIndex !== undefined && rememberedTracks.current
+                ? {
+                    ...rememberedTracks.current,
+                    audioLanguage: undefined,
+                    audioCodec: undefined,
+                  }
+                : rememberedTracks.current,
+              target.OriginalLanguage,
+            )
+          : { subtitleIndex: -1 };
+        const selectedTracks = {
+          ...preferredTracks,
+          ...(audioIndex !== undefined ? { audioIndex } : {}),
+          ...(initialSubtitle !== undefined
+            ? { subtitleIndex: initialSubtitle }
+            : {}),
+        };
+        if (
+          source &&
+          (audioIndex !== undefined || initialSubtitle !== undefined)
+        ) {
+          rememberedTracks.current = rememberTrackSelection(
+            source,
+            selectedTracks.audioIndex,
+            selectedTracks.subtitleIndex,
+          );
+        }
+        const subtitle = (
+          source as JellyfinMediaSource | undefined
+        )?.MediaStreams?.find(
+          (track) =>
+            track.Type === "Subtitle" &&
+            track.Index === selectedTracks.subtitleIndex,
+        );
+        subtitleSelection.current = selectedTracks.subtitleIndex;
+        setSubtitleIndex(selectedTracks.subtitleIndex);
         const seriesId = target.SeriesId;
         const queue = seriesId ? await getEpisodes(seriesId) : [];
         if (cancelled) return;
@@ -257,13 +345,23 @@ export function JellyfinPlayerView() {
                 }
               : undefined,
         });
-        const resume = restart
-          ? 0
-          : (target.UserData?.PlaybackPositionTicks ?? 0) / 10_000_000;
         await load(
           target,
-          { mediaSourceId: source?.Id, subtitleIndex: -1 },
-          resume,
+          {
+            ...selectedTracks,
+            maxBitrate: selectedBitrate.current,
+            forceTranscode: selectedBitrate.current < 120_000_000,
+            mediaSourceId: source?.Id,
+            defaultAudioIndex:
+              source?.MediaStreams?.find(
+                (track) => track.Type === "Audio" && track.IsDefault,
+              )?.Index ??
+              source?.MediaStreams?.find((track) => track.Type === "Audio")
+                ?.Index,
+            subtitleIndex:
+              subtitle && !subtitle.IsTextSubtitleStream ? subtitle.Index : -1,
+          },
+          startAt,
         );
       } catch (cause) {
         if (cancelled) return;
@@ -283,7 +381,15 @@ export function JellyfinPlayerView() {
       store.display?.pause();
       store.reset();
     };
-  }, [itemId, restart, load]);
+  }, [
+    itemId,
+    restart,
+    mediaSourceId,
+    startTicks,
+    requestedAudio,
+    requestedSubtitle,
+    load,
+  ]);
 
   const reload = useCallback(
     (options: PlaybackOptions) => {
@@ -299,6 +405,7 @@ export function JellyfinPlayerView() {
       return;
     if (!lastOptions.current.forceTranscode && !fallbackAttempted.current) {
       fallbackAttempted.current = true;
+      selectedBitrate.current = 20_000_000;
       setMaxBitrate(20_000_000);
       reload({ forceTranscode: true, maxBitrate: 20_000_000 });
     } else
@@ -337,6 +444,11 @@ export function JellyfinPlayerView() {
       usePlayerStore.getState().setCaption(null);
       setSubtitleIndex(index);
       subtitleSelection.current = index;
+      rememberedTracks.current = rememberTrackSelection(
+        playback.mediaSource,
+        playback.audioIndex,
+        index,
+      );
       if (wasBurnedIn || nextBurnedIn) {
         if (!item) return;
         await load(
@@ -380,6 +492,7 @@ export function JellyfinPlayerView() {
   const controls = useMemo(
     () => ({
       playback,
+      mediaSources: item?.MediaSources ?? [],
       episodes,
       itemId,
       busy,
@@ -388,12 +501,58 @@ export function JellyfinPlayerView() {
       playItem: (id: string, fromStart = false) =>
         navigate(`/play/${id}${fromStart ? "?restart=true" : ""}`),
       changeAudio: (index: number) => {
+        if (playback)
+          rememberedTracks.current = rememberTrackSelection(
+            playback.mediaSource,
+            index,
+            subtitleSelection.current,
+          );
         reload({ audioIndex: index });
+      },
+      changeSource: (sourceId: string) => {
+        const source = item?.MediaSources?.find(
+          (entry) => entry.Id === sourceId,
+        );
+        if (!item || !source || source.Id === playback?.mediaSource.Id) return;
+        const selectedTracks = getPreferredPlaybackOptions(
+          source,
+          configuration.current,
+          rememberedTracks.current,
+          item.OriginalLanguage,
+        );
+        const subtitle = (source as JellyfinMediaSource).MediaStreams?.find(
+          (track) =>
+            track.Type === "Subtitle" &&
+            track.Index === selectedTracks.subtitleIndex,
+        );
+        subtitleGeneration.current += 1;
+        subtitleSelection.current = selectedTracks.subtitleIndex;
+        setSubtitleIndex(selectedTracks.subtitleIndex);
+        load(
+          item,
+          {
+            mediaSourceId: source.Id,
+            audioIndex: selectedTracks.audioIndex,
+            defaultAudioIndex:
+              source.MediaStreams?.find(
+                (track) => track.Type === "Audio" && track.IsDefault,
+              )?.Index ??
+              source.MediaStreams?.find((track) => track.Type === "Audio")
+                ?.Index,
+            subtitleIndex:
+              subtitle && !subtitle.IsTextSubtitleStream ? subtitle.Index : -1,
+            maxBitrate,
+            forceTranscode: maxBitrate < 120_000_000,
+          },
+          usePlayerStore.getState().progress.time,
+          true,
+        );
       },
       changeSubtitle: (index: number) => {
         changeSubtitle(index);
       },
       changeQuality: (bitrate: number) => {
+        selectedBitrate.current = bitrate;
         setMaxBitrate(bitrate);
         reload({
           maxBitrate: bitrate,
@@ -403,6 +562,7 @@ export function JellyfinPlayerView() {
     }),
     [
       playback,
+      item,
       episodes,
       itemId,
       busy,
@@ -411,6 +571,7 @@ export function JellyfinPlayerView() {
       navigate,
       reload,
       changeSubtitle,
+      load,
     ],
   );
 
@@ -439,6 +600,7 @@ export function JellyfinPlayerView() {
                     {item ? (
                       <Button
                         onClick={() => {
+                          selectedBitrate.current = 20_000_000;
                           setMaxBitrate(20_000_000);
                           reload({
                             forceTranscode: true,

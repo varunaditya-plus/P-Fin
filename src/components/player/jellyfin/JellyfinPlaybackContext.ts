@@ -1,10 +1,11 @@
 import { createContext, useContext } from "react";
 
-import { JellyfinItem } from "@/backend/jellyfin/client";
+import { JellyfinItem, JellyfinMediaSource } from "@/backend/jellyfin/client";
 import { JellyfinPlayback } from "@/backend/jellyfin/playback";
 
 export interface JellyfinPlaybackControls {
   playback: JellyfinPlayback | null;
+  mediaSources: JellyfinMediaSource[];
   episodes: JellyfinItem[];
   itemId: string;
   busy: boolean;
@@ -12,6 +13,7 @@ export interface JellyfinPlaybackControls {
   maxBitrate: number;
   playItem: (id: string, restart?: boolean) => void;
   changeAudio: (index: number) => void;
+  changeSource: (sourceId: string) => void;
   changeSubtitle: (index: number) => void;
   changeQuality: (bitrate: number) => void;
 }

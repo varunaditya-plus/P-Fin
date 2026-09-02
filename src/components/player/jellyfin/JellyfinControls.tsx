@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getItem, jellyfinUrl, setFavorite } from "@/backend/jellyfin/client";
+import { getJellyfinDetailsId } from "@/backend/jellyfin/details";
+import { updateUserConfiguration } from "@/backend/jellyfin/preferences";
 import { Toggle } from "@/components/buttons/Toggle";
 import { Icon, Icons } from "@/components/Icon";
 import { Overlay } from "@/components/overlays/OverlayDisplay";
@@ -76,6 +78,21 @@ function JellyfinPlaybackSettings() {
   const rate = usePlayerStore((state) => state.mediaPlaying.playbackRate);
   const autoplay = usePreferencesStore((state) => state.enableAutoplay);
   const setAutoplay = usePreferencesStore((state) => state.setEnableAutoplay);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const toggleAutoplay = async () => {
+    if (saving) return;
+    setSaving(true);
+    setError("");
+    try {
+      await updateUserConfiguration({ EnableNextEpisodeAutoPlay: !autoplay });
+      setAutoplay(!autoplay);
+    } catch {
+      setError("Could not save your autoplay preference. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
   return (
     <Menu.Card>
       <Menu.BackLink onClick={() => router.navigate("/")}>
@@ -96,12 +113,15 @@ function JellyfinPlaybackSettings() {
           ))}
         </div>
         <Menu.Link
-          rightSide={
-            <Toggle enabled={autoplay} onClick={() => setAutoplay(!autoplay)} />
-          }
+          rightSide={<Toggle enabled={autoplay} onClick={toggleAutoplay} />}
         >
           Autoplay next episode
         </Menu.Link>
+        {error ? (
+          <p role="alert" className="py-2 text-type-danger">
+            {error}
+          </p>
+        ) : null}
       </Menu.Section>
     </Menu.Card>
   );
@@ -162,7 +182,14 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
 
 export function JellyfinSettingsRouter() {
   const router = useOverlayRouter("settings");
-  const { playback, maxBitrate, changeQuality } = useJellyfinPlayback();
+  const {
+    playback,
+    mediaSources,
+    maxBitrate,
+    changeQuality,
+    changeSource,
+    busy,
+  } = useJellyfinPlayback();
   return (
     <Overlay id="settings">
       <OverlayRouter id="settings">
@@ -194,13 +221,25 @@ export function JellyfinSettingsRouter() {
             </Menu.Section>
           </Menu.Card>
         </OverlayPage>
-        <OverlayPage id="settings" path="/source" width={343} height={330}>
-          <Menu.Card>
+        <OverlayPage id="settings" path="/source" width={443} height={420}>
+          <Menu.CardWithScrollable>
             <Menu.BackLink onClick={() => router.navigate("/")}>
-              Source
+              Version
             </Menu.BackLink>
             <Menu.Section>
-              <SelectableLink selected>Jellyfin</SelectableLink>
+              {mediaSources.map((source) => (
+                <SelectableLink
+                  key={source.Id}
+                  selected={source.Id === playback?.mediaSource.Id}
+                  disabled={busy}
+                  onClick={() => {
+                    changeSource(source.Id);
+                    router.close();
+                  }}
+                >
+                  {source.Name ?? source.Container?.toUpperCase() ?? "Original"}
+                </SelectableLink>
+              ))}
               <p className="py-3 text-type-secondary">
                 {playback?.playMethod === "DirectPlay"
                   ? "Direct playback"
@@ -209,7 +248,7 @@ export function JellyfinSettingsRouter() {
                     : "Transcoding for this browser"}
               </p>
             </Menu.Section>
-          </Menu.Card>
+          </Menu.CardWithScrollable>
         </OverlayPage>
         <OverlayPage id="settings" path="/audio" width={443} height={496}>
           <JellyfinTracks kind="Audio" />
@@ -359,12 +398,19 @@ export function JellyfinInfoButton() {
         className="p-2 !-mr-2 relative z-10"
         onClick={() => setOpen(true)}
       />
-      {open ? (
-        <JellyfinDetailsModal
-          itemId={meta.jellyfinSeriesId ?? meta.jellyfinItemId}
-          onClose={() => setOpen(false)}
-        />
-      ) : null}
+      <JellyfinDetailsModal
+        itemId={
+          open
+            ? getJellyfinDetailsId({
+                Id: meta.jellyfinItemId,
+                Type:
+                  meta.jellyfinSeriesId || meta.episode ? "Episode" : "Movie",
+                SeriesId: meta.jellyfinSeriesId,
+              })
+            : undefined
+        }
+        onClose={() => setOpen(false)}
+      />
     </>
   );
 }
