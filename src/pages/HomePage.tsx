@@ -7,9 +7,17 @@ import {
   getHomeSections,
   getImageUrl,
   getLibraries,
-  getLibraryItems,
   searchItems,
 } from "@/backend/jellyfin/client";
+import { getJellyfinDetailsId } from "@/backend/jellyfin/details";
+import {
+  LibraryFilters,
+  LibrarySortBy,
+  LibrarySortOrder,
+  LibraryStatus,
+  getLibraryFilters,
+  getLibraryPage,
+} from "@/backend/jellyfin/library";
 import { Button } from "@/components/buttons/Button";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaGrid } from "@/components/media/MediaGrid";
@@ -37,11 +45,24 @@ export function HomePage() {
   const [selectedItem, setSelectedItem] = useState<string | null>(
     urlParams.get("item"),
   );
+  const [detailsAction, setDetailsAction] = useState<
+    "collection" | "playlist"
+  >();
   const [sections, setSections] = useState<HomeSection[]>([]);
   const [libraries, setLibraries] = useState<JellyfinItem[]>([]);
   const [activeLibrary, setActiveLibrary] = useState("");
+  const [libraryFilters, setLibraryFilters] = useState<LibraryFilters>({
+    Genres: [],
+    Years: [],
+  });
+  const [sortBy, setSortBy] = useState<LibrarySortBy>("SortName");
+  const [sortOrder, setSortOrder] = useState<LibrarySortOrder>("Ascending");
+  const [statusFilter, setStatusFilter] = useState<LibraryStatus>("all");
+  const [genreFilter, setGenreFilter] = useState("");
+  const [yearFilter, setYearFilter] = useState("");
   const [results, setResults] = useState<JellyfinItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
+  const [nextStartIndex, setNextStartIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingResults, setLoadingResults] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -81,6 +102,28 @@ export function HomePage() {
     };
   }, [revision]);
 
+  const currentLibrary = useMemo(
+    () => libraries.find((item) => item.Id === activeLibrary),
+    [libraries, activeLibrary],
+  );
+
+  useEffect(() => {
+    if (!currentLibrary) {
+      setLibraryFilters({ Genres: [], Years: [] });
+      return undefined;
+    }
+    const controller = new AbortController();
+    getLibraryFilters(currentLibrary, controller.signal)
+      .then((filters) => {
+        if (!controller.signal.aborted) setLibraryFilters(filters);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted)
+          setLibraryFilters({ Genres: [], Years: [] });
+      });
+    return () => controller.abort();
+  }, [currentLibrary]);
+
   useEffect(() => {
     const controller = new AbortController();
     requestGeneration.current += 1;
@@ -88,6 +131,7 @@ export function HomePage() {
     setResultError("");
     setResults([]);
     setTotalResults(0);
+    setNextStartIndex(0);
     if (!debouncedSearch && !activeLibrary) {
       setLoadingResults(false);
       return () => controller.abort();
@@ -97,13 +141,31 @@ export function HomePage() {
       ? searchItems(debouncedSearch, controller.signal).then((items) => ({
           Items: items,
           TotalRecordCount: items.length,
+          FetchedCount: items.length,
         }))
-      : getLibraryItems(activeLibrary, 0, controller.signal);
+      : currentLibrary
+        ? getLibraryPage(
+            currentLibrary,
+            {
+              sortBy,
+              sortOrder,
+              status: statusFilter,
+              genre: genreFilter,
+              year: yearFilter ? Number(yearFilter) : undefined,
+            },
+            controller.signal,
+          )
+        : Promise.resolve({
+            Items: [] as JellyfinItem[],
+            TotalRecordCount: 0,
+            FetchedCount: 0,
+          });
     load
       .then((data) => {
         if (controller.signal.aborted) return;
         setResults(data.Items);
         setTotalResults(data.TotalRecordCount ?? data.Items.length);
+        setNextStartIndex(data.FetchedCount);
       })
       .catch((reason: unknown) => {
         if (!controller.signal.aborted)
@@ -117,18 +179,36 @@ export function HomePage() {
         if (!controller.signal.aborted) setLoadingResults(false);
       });
     return () => controller.abort();
-  }, [debouncedSearch, activeLibrary, revision]);
+  }, [
+    debouncedSearch,
+    activeLibrary,
+    currentLibrary,
+    sortBy,
+    sortOrder,
+    statusFilter,
+    genreFilter,
+    yearFilter,
+    revision,
+  ]);
 
   const loadMore = async () => {
-    if (loadingMore || !activeLibrary) return;
+    if (loadingMore || !currentLibrary) return;
     const generation = requestGeneration.current;
     setLoadingMore(true);
     setResultError("");
     try {
-      const next = await getLibraryItems(activeLibrary, results.length);
+      const next = await getLibraryPage(currentLibrary, {
+        startIndex: nextStartIndex,
+        sortBy,
+        sortOrder,
+        status: statusFilter,
+        genre: genreFilter,
+        year: yearFilter ? Number(yearFilter) : undefined,
+      });
       if (generation !== requestGeneration.current) return;
       setResults((current) => [...current, ...next.Items]);
       setTotalResults(next.TotalRecordCount ?? totalResults);
+      setNextStartIndex((current) => current + next.FetchedCount);
     } catch (reason: unknown) {
       if (generation === requestGeneration.current)
         setResultError(
@@ -158,10 +238,27 @@ export function HomePage() {
       .slice(0, 10);
   }, [sections]);
 
-  const selectItem = (item: JellyfinItem) => setSelectedItem(item.Id);
+  const selectItem = (
+    item: JellyfinItem,
+    action?: "collection" | "playlist",
+  ) => {
+    setDetailsAction(action);
+    setSelectedItem(getJellyfinDetailsId(item));
+  };
   const searching = search.trim().length > 0;
   const showFeatured = enableFeatured && (loading || featured.length > 0);
   const showingGrid = searching || Boolean(activeLibrary);
+  const hasLibraryFilters =
+    statusFilter !== "all" || Boolean(genreFilter) || Boolean(yearFilter);
+  const switchLibrary = (id: string) => {
+    setActiveLibrary(id);
+    setSortBy("SortName");
+    setSortOrder("Ascending");
+    setStatusFilter("all");
+    setGenreFilter("");
+    setYearFilter("");
+    setLibraryFilters({ Genres: [], Years: [] });
+  };
   const closeDetails = () => {
     setSelectedItem(null);
     if (urlParams.has("item")) {
@@ -209,7 +306,7 @@ export function HomePage() {
                   key={library.Id}
                   type="button"
                   className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
-                  onClick={() => setActiveLibrary(library.Id)}
+                  onClick={() => switchLibrary(library.Id)}
                 >
                   {library.Name}
                 </button>
@@ -243,6 +340,115 @@ export function HomePage() {
                 : libraries.find((library) => library.Id === activeLibrary)
                     ?.Name}
             </h2>
+            {!searching && currentLibrary ? (
+              <div
+                className="mb-8 flex flex-wrap items-end gap-3"
+                aria-label="Library controls"
+              >
+                <label className="flex flex-col gap-2 text-sm text-type-secondary">
+                  Sort by
+                  <select
+                    aria-label="Sort library by"
+                    className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
+                    value={sortBy}
+                    onChange={(event) =>
+                      setSortBy(event.target.value as LibrarySortBy)
+                    }
+                  >
+                    <option value="SortName">Title</option>
+                    <option value="DateCreated">Date added</option>
+                    <option value="ProductionYear">Release year</option>
+                    <option value="CommunityRating">Rating</option>
+                    {currentLibrary.CollectionType !== "boxsets" &&
+                    currentLibrary.CollectionType !== "tvshows" ? (
+                      <option value="Runtime">Runtime</option>
+                    ) : null}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-2 text-sm text-type-secondary">
+                  Order
+                  <select
+                    aria-label="Sort order"
+                    className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
+                    value={sortOrder}
+                    onChange={(event) =>
+                      setSortOrder(event.target.value as LibrarySortOrder)
+                    }
+                  >
+                    <option value="Ascending">Ascending</option>
+                    <option value="Descending">Descending</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-2 text-sm text-type-secondary">
+                  Watched status
+                  <select
+                    aria-label="Watched status"
+                    className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
+                    value={statusFilter}
+                    onChange={(event) =>
+                      setStatusFilter(event.target.value as LibraryStatus)
+                    }
+                  >
+                    <option value="all">All titles</option>
+                    <option value="IsUnplayed">Unplayed</option>
+                    <option value="IsPlayed">Played</option>
+                    <option value="IsFavorite">Favourites</option>
+                    {currentLibrary.CollectionType !== "boxsets" &&
+                    currentLibrary.CollectionType !== "playlists" ? (
+                      <option value="IsResumable">Continue watching</option>
+                    ) : null}
+                  </select>
+                </label>
+                {libraryFilters.Genres.length > 0 ? (
+                  <label className="flex flex-col gap-2 text-sm text-type-secondary">
+                    Genre
+                    <select
+                      aria-label="Genre"
+                      className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
+                      value={genreFilter}
+                      onChange={(event) => setGenreFilter(event.target.value)}
+                    >
+                      <option value="">All genres</option>
+                      {libraryFilters.Genres.map((genre) => (
+                        <option key={genre} value={genre}>
+                          {genre}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+                {libraryFilters.Years.length > 0 ? (
+                  <label className="flex flex-col gap-2 text-sm text-type-secondary">
+                    Year
+                    <select
+                      aria-label="Release year"
+                      className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
+                      value={yearFilter}
+                      onChange={(event) => setYearFilter(event.target.value)}
+                    >
+                      <option value="">All years</option>
+                      {libraryFilters.Years.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+                {hasLibraryFilters ? (
+                  <Button
+                    theme="secondary"
+                    onClick={() => {
+                      setStatusFilter("all");
+                      setGenreFilter("");
+                      setYearFilter("");
+                    }}
+                  >
+                    Clear filters
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
             {loadingResults || debouncedSearch !== search.trim() ? (
               <SearchLoadingPart />
             ) : (
@@ -253,6 +459,7 @@ export function HomePage() {
                       key={item.Id}
                       item={item}
                       onSelect={selectItem}
+                      onItemChanged={() => setRevision((value) => value + 1)}
                     />
                   ))}
                 </MediaGrid>
@@ -260,7 +467,11 @@ export function HomePage() {
                   <p className="py-12 text-center">
                     {searching
                       ? "No matching content in your Jellyfin library."
-                      : "This library has no available movies or series."}
+                      : currentLibrary?.CollectionType === "boxsets"
+                        ? "This library has no collections."
+                        : currentLibrary?.CollectionType === "playlists"
+                          ? "This library has no playlists."
+                          : "This library has no available movies or series."}
                   </p>
                 ) : null}
                 {resultError ? (
@@ -274,7 +485,7 @@ export function HomePage() {
                     </Button>
                   </div>
                 ) : null}
-                {!searching && results.length < totalResults ? (
+                {!searching && nextStartIndex < totalResults ? (
                   <div className="flex justify-center py-8">
                     <Button
                       theme="secondary"
@@ -306,6 +517,7 @@ export function HomePage() {
                   key={section.id}
                   {...section}
                   onSelect={selectItem}
+                  onItemChanged={() => setRevision((value) => value + 1)}
                 />
               ))
             )}
@@ -318,13 +530,12 @@ export function HomePage() {
           </div>
         </WideContainer>
       )}
-      {selectedItem ? (
-        <JellyfinDetailsModal
-          itemId={selectedItem}
-          onClose={closeDetails}
-          onItemChanged={() => setRevision((value) => value + 1)}
-        />
-      ) : null}
+      <JellyfinDetailsModal
+        itemId={selectedItem}
+        initialAction={detailsAction}
+        onClose={closeDetails}
+        onItemChanged={() => setRevision((value) => value + 1)}
+      />
     </HomeLayout>
   );
 }

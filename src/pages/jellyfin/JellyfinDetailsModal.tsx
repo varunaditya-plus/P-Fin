@@ -1,29 +1,47 @@
 import classNames from "classnames";
-import { useEffect, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
   JellyfinItem,
   getEpisodes,
   getImageUrl,
-  getItem,
   getSeasons,
   getSimilarItems,
-  setFavorite,
   setPlayed,
 } from "@/backend/jellyfin/client";
+import {
+  ContentItem,
+  ContentPolicy,
+  contentDownloadUrl,
+  contentPermissions,
+  getContentItem,
+  getContentPolicy,
+} from "@/backend/jellyfin/content";
+import { resolveJellyfinDetailsItem } from "@/backend/jellyfin/details";
+import {
+  getCollectionItems,
+  getPlaylistItems,
+} from "@/backend/jellyfin/library";
 import { Button } from "@/components/buttons/Button";
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 import { DetailsSkeleton } from "@/components/overlays/detailsModal/components/layout/DetailsSkeleton";
-import { OverlayPortal } from "@/components/overlays/OverlayDisplay";
+import {
+  DetailsModalFrame,
+  useRetainedModalValue,
+} from "@/components/overlays/DetailsModalFrame";
 import { Flare } from "@/components/utils/Flare";
 import { usePreferencesStore } from "@/stores/preferences";
 
+import { ContentContainerManagement } from "./ContentContainerManagement";
+import { ContentInformation } from "./ContentInformation";
+import { ContentProviderLinks } from "./ContentProviderLinks";
+import { ContentSettingsModal } from "./ContentSettingsModal";
 import { JellyfinMediaCarousel } from "./JellyfinMediaCarousel";
+import { JellyfinTrackChoice } from "./JellyfinTrackSelection";
 
 function runtime(ticks?: number) {
   if (!ticks) return undefined;
@@ -41,18 +59,34 @@ function plainText(value?: string) {
   );
 }
 
-export function JellyfinDetailsModal({
+function JellyfinDetailsContent({
   itemId,
+  open,
+  afterLeave,
   onClose,
   onItemChanged,
+  initialAction,
 }: {
   itemId: string;
+  open: boolean;
+  afterLeave: () => void;
   onClose: () => void;
   onItemChanged?: () => void;
+  initialAction?: "collection" | "playlist";
 }) {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState(itemId);
-  const [item, setItem] = useState<JellyfinItem | null>(null);
+  const [selectedAction, setSelectedAction] = useState(initialAction);
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
+  const [item, setItem] = useState<ContentItem | null>(null);
+  const [sourceId, setSourceId] = useState("");
+  const [tracks, setTracks] = useState<JellyfinTrackChoice>({});
+  const [contents, setContents] = useState<JellyfinItem[]>([]);
+  const [contentsTotal, setContentsTotal] = useState(0);
+  const [contentsOffset, setContentsOffset] = useState(0);
+  const [loadingContents, setLoadingContents] = useState(false);
+  const [contentsError, setContentsError] = useState("");
   const [seasons, setSeasons] = useState<JellyfinItem[]>([]);
   const [episodes, setEpisodes] = useState<JellyfinItem[]>([]);
   const [similar, setSimilar] = useState<JellyfinItem[]>([]);
@@ -63,25 +97,46 @@ export function JellyfinDetailsModal({
   const [loading, setLoading] = useState(true);
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsForEpisode, setSettingsForEpisode] = useState(false);
+  const [playbackOverrideId, setPlaybackOverrideId] = useState<string | null>(
+    null,
+  );
+  const [playbackDetails, setPlaybackDetails] = useState<ContentItem | null>(
+    null,
+  );
+  const [policy, setPolicy] = useState<ContentPolicy | null>(null);
   const episodeCarousel = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
+  const [logoHeight, setLogoHeight] = useState(0);
   const enableImageLogos = usePreferencesStore(
     (state) => state.enableImageLogos,
   );
 
-  useEffect(() => setSelectedId(itemId), [itemId]);
-
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.stopPropagation();
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+    setSelectedId(itemId);
+    setSelectedAction(initialAction);
+  }, [itemId, initialAction]);
+  const selectItem = (id: string, action?: "collection" | "playlist") => {
+    setSelectedId(id);
+    setSelectedAction(action);
+  };
+  useEffect(() => {
+    setSettingsOpen(Boolean(selectedAction));
+    setSettingsForEpisode(false);
+  }, [selectedId, selectedAction]);
+  useEffect(() => {
+    if (!open) setSettingsOpen(false);
+  }, [open]);
+  useEffect(() => {
+    const controller = new AbortController();
+    getContentPolicy(controller.signal)
+      .then(setPolicy)
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
+  useEffect(() => setPlaybackOverrideId(null), [selectedSeason, selectedId]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -89,24 +144,61 @@ export function JellyfinDetailsModal({
     setError("");
     setActionError("");
     setItem(null);
+    setSourceId("");
+    setContents([]);
+    setContentsTotal(0);
+    setContentsOffset(0);
+    setContentsError("");
     setEpisodes([]);
     setSeasons([]);
     setSimilar([]);
     setSelectedSeason("");
     contentRef.current?.parentElement?.scrollTo(0, 0);
-    getItem(selectedId, controller.signal)
+    resolveJellyfinDetailsItem(selectedId, controller.signal)
       .then(async (details) => {
         if (controller.signal.aborted) return;
         setItem(details);
+        getSimilarItems(details.Id, controller.signal)
+          .then((items) => {
+            if (!controller.signal.aborted) setSimilar(items);
+          })
+          .catch(() => undefined);
+        if (["BoxSet", "Playlist"].includes(details.Type)) {
+          setLoadingContents(true);
+          try {
+            const result =
+              details.Type === "Playlist"
+                ? await getPlaylistItems(details.Id, 0, controller.signal)
+                : await getCollectionItems(details.Id, 0, controller.signal);
+            if (!controller.signal.aborted) {
+              setContents(result.Items);
+              setContentsOffset(result.FetchedCount);
+              setContentsTotal(result.TotalRecordCount ?? result.Items.length);
+            }
+          } catch (reason) {
+            if (!controller.signal.aborted)
+              setContentsError(
+                reason instanceof Error
+                  ? reason.message
+                  : "Unable to load the contents.",
+              );
+          } finally {
+            if (!controller.signal.aborted) setLoadingContents(false);
+          }
+        }
         if (details.Type === "Series") {
-          const availableSeasons = await getSeasons(
-            details.Id,
-            controller.signal,
+          const [availableSeasons, availableEpisodes] = await Promise.all([
+            getSeasons(details.Id, controller.signal),
+            getEpisodes(details.Id, undefined, controller.signal),
+          ]);
+          const resumeEpisode = availableEpisodes.find(
+            (episode) => (episode.UserData?.PlaybackPositionTicks ?? 0) > 0,
           );
           if (controller.signal.aborted) return;
           setSeasons(availableSeasons);
           setSelectedSeason(
-            availableSeasons.find((season) => !season.UserData?.Played)?.Id ||
+            resumeEpisode?.SeasonId ||
+              availableSeasons.find((season) => !season.UserData?.Played)?.Id ||
               availableSeasons[0]?.Id ||
               "",
           );
@@ -123,11 +215,6 @@ export function JellyfinDetailsModal({
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
-    getSimilarItems(selectedId, controller.signal)
-      .then((items) => {
-        if (!controller.signal.aborted) setSimilar(items);
-      })
-      .catch(() => undefined);
     return () => controller.abort();
   }, [selectedId]);
 
@@ -157,30 +244,137 @@ export function JellyfinDetailsModal({
 
   const playItem =
     item?.Type === "Series"
-      ? episodes.find(
+      ? episodes.find((episode) => episode.Id === playbackOverrideId) ||
+        episodes.find(
           (episode) => (episode.UserData?.PlaybackPositionTicks ?? 0) > 0,
         ) ||
         episodes.find((episode) => !episode.UserData?.Played) ||
         episodes[0]
       : item;
 
-  const play = (playable: JellyfinItem | null | undefined) => {
+  const playbackItem =
+    playbackDetails?.Id === playItem?.Id ? playbackDetails : playItem;
+  const playbackItemId = playItem?.Id;
+  const playbackTargetRef = useRef(playbackItemId);
+  playbackTargetRef.current = playbackItemId;
+  const playbackSourceId = playbackItem?.MediaSources?.[0]?.Id ?? "";
+  useEffect(() => {
+    setPlaybackDetails(null);
+    if (!playbackItemId || playbackItemId === item?.Id) return;
+    const controller = new AbortController();
+    getContentItem(playbackItemId, controller.signal)
+      .then((details) => {
+        if (!controller.signal.aborted) setPlaybackDetails(details);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [playbackItemId, item?.Id]);
+  useEffect(() => {
+    setSourceId(playbackSourceId);
+    setTracks({});
+  }, [playbackItem?.Id, playbackSourceId]);
+  useEffect(() => setTracks({}), [sourceId]);
+  const downloadAllowed = Boolean(
+    playbackItem && policy && contentPermissions(playbackItem, policy).download,
+  );
+
+  const play = (
+    playable: JellyfinItem | null | undefined,
+    startTicks?: number,
+  ) => {
     if (!playable) return;
+    const query = new URLSearchParams();
+    if (playable.Id === playbackItem?.Id && sourceId)
+      query.set("mediaSourceId", sourceId);
+    if (playable.Id === playbackItem?.Id) {
+      if (tracks.audioIndex !== undefined)
+        query.set("audioIndex", String(tracks.audioIndex));
+      if (tracks.subtitleIndex !== undefined)
+        query.set("subtitleIndex", String(tracks.subtitleIndex));
+    }
+    if (startTicks !== undefined) query.set("startTicks", String(startTicks));
     onClose();
-    navigate(`/play/${encodeURIComponent(playable.Id)}`);
+    navigate(
+      `/play/${encodeURIComponent(playable.Id)}${query.size ? `?${query}` : ""}`,
+    );
+  };
+  const reloadItem = async () => {
+    const updated = await getContentItem(item?.Id ?? selectedId);
+    setItem((current) => (current?.Id === updated.Id ? updated : current));
+    onItemChanged?.();
+  };
+  const reloadContainer = async () => {
+    if (!item || !["BoxSet", "Playlist"].includes(item.Type)) return;
+    const id = item.Id;
+    const desiredCount = Math.max(contentsOffset, 60);
+    const updated: JellyfinItem[] = [];
+    let offset = 0;
+    let total = Infinity;
+    setLoadingContents(true);
+    setContentsError("");
+    try {
+      while (offset < desiredCount && offset < total) {
+        const result =
+          item.Type === "Playlist"
+            ? await getPlaylistItems(id, offset)
+            : await getCollectionItems(id, offset);
+        updated.push(...result.Items);
+        offset += result.FetchedCount;
+        total = result.TotalRecordCount ?? offset;
+        if (!result.FetchedCount) break;
+      }
+      if (selectedIdRef.current === id) {
+        setContents(updated);
+        setContentsOffset(offset);
+        setContentsTotal(total === Infinity ? offset : total);
+      }
+      await reloadItem();
+    } catch (reason) {
+      if (selectedIdRef.current === id)
+        setContentsError(
+          reason instanceof Error
+            ? reason.message
+            : "Unable to refresh these items.",
+        );
+      throw reason;
+    } finally {
+      if (selectedIdRef.current === id) setLoadingContents(false);
+    }
+  };
+  const loadMoreContents = async () => {
+    if (!item || loadingContents) return;
+    const id = item.Id;
+    setLoadingContents(true);
+    setContentsError("");
+    try {
+      const result =
+        item.Type === "Playlist"
+          ? await getPlaylistItems(id, contentsOffset)
+          : await getCollectionItems(id, contentsOffset);
+      if (selectedIdRef.current === id) {
+        setContents((current) => [...current, ...result.Items]);
+        setContentsOffset((offset) => offset + result.FetchedCount);
+        if (!result.FetchedCount) setContentsTotal(contentsOffset);
+      }
+    } catch (reason) {
+      if (selectedIdRef.current === id)
+        setContentsError(
+          reason instanceof Error
+            ? reason.message
+            : "Unable to load more items.",
+        );
+    } finally {
+      if (selectedIdRef.current === id) setLoadingContents(false);
+    }
   };
 
-  const updateUserData = async (
-    target: JellyfinItem,
-    field: "IsFavorite" | "Played",
-  ) => {
+  const updateUserData = async (target: JellyfinItem, field: "Played") => {
     if (updating) return;
     setUpdating(true);
     setActionError("");
     const value = !target.UserData?.[field];
     try {
-      if (field === "IsFavorite") await setFavorite(target.Id, value);
-      else await setPlayed(target.Id, value);
+      await setPlayed(target.Id, value);
       const update = (current: JellyfinItem): JellyfinItem =>
         current.Id === target.Id ||
         (field === "Played" &&
@@ -208,45 +402,36 @@ export function JellyfinDetailsModal({
     }
   };
 
-  const share = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        `${window.location.origin}/?item=${encodeURIComponent(selectedId)}`,
-      );
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setActionError(
-        "Could not copy the link. Clipboard access requires a secure browser connection.",
-      );
-    }
-  };
-
   const scrollEpisodes = (direction: number) =>
     episodeCarousel.current?.scrollBy({
       left: direction * 544,
       behavior: "smooth",
     });
-  const title =
-    item?.Type === "Episode"
-      ? `${item.SeriesName || ""}: ${item.Name}`
-      : item?.Name;
+  useEffect(() => {
+    const element = logoRef.current;
+    if (!element) {
+      setLogoHeight(0);
+      return;
+    }
+    const measure = () => setLogoHeight(element.getBoundingClientRect().height);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [loading, item?.Id, enableImageLogos]);
+  const title = item?.Name;
   const backdrop = item ? getImageUrl(item, "Backdrop", 1600) : undefined;
   const logo = item?.ImageTags?.Logo
     ? getImageUrl(item, "Logo", 800)
     : undefined;
 
   return (
-    <OverlayPortal
-      darken
-      close={onClose}
-      show
-      durationClass="duration-500"
-      zIndex={1000}
+    <DetailsModalFrame
+      open={open}
+      onClose={onClose}
+      afterLeave={afterLeave}
+      label={title || "Content details"}
     >
-      <Helmet>
-        <html data-no-scroll />
-      </Helmet>
       <div className="flex absolute inset-0 items-center justify-center pt-safe">
         <Flare.Base
           className={classNames(
@@ -257,12 +442,7 @@ export function JellyfinDetailsModal({
             "relative",
           )}
         >
-          <div
-            className="transition-transform duration-300 h-full relative"
-            role="dialog"
-            aria-modal="true"
-            aria-label={title || "Content details"}
-          >
+          <div className="transition-transform duration-300 h-full relative">
             <Flare.Light
               flareSize={300}
               cssColorVar="--colors-mediaCard-hoverAccent"
@@ -289,8 +469,14 @@ export function JellyfinDetailsModal({
                   </div>
                 ) : item ? (
                   <div className="relative h-full flex flex-col">
-                    <div className="relative -mt-12 z-20 h-[500px]">
-                      <div className="absolute inset-x-0 bottom-20 z-30 px-6">
+                    <div
+                      className="relative -mt-12 z-20 shrink-0"
+                      style={{ height: Math.max(500, logoHeight + 400) }}
+                    >
+                      <div
+                        ref={logoRef}
+                        className="absolute inset-x-0 bottom-20 z-30 px-6"
+                      >
                         {logo && enableImageLogos ? (
                           <img
                             src={logo}
@@ -330,81 +516,84 @@ export function JellyfinDetailsModal({
                           {seasons.length ? (
                             <span>• {seasons.length} seasons</span>
                           ) : null}
-                          {item.Type === "Episode" ? (
-                            <span>
-                              • S{item.ParentIndexNumber}:E{item.IndexNumber}
-                            </span>
-                          ) : null}
                         </div>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                          <div className="flex items-center gap-4">
-                            <Button
-                              onClick={() => play(playItem)}
-                              theme="purple"
-                              disabled={!playItem || loadingEpisodes}
-                              loading={loadingEpisodes}
-                              className="flex-1 sm:flex-initial sm:w-auto gap-2 h-12 rounded-lg px-4 py-2 my-1 transition-transform hover:scale-105 duration-100 text-md text-white flex items-center justify-center"
-                            >
-                              <Icon icon={Icons.PLAY} className="text-white" />
-                              <span className="text-white text-sm pr-1">
-                                {playItem?.UserData?.PlaybackPositionTicks
-                                  ? "Resume"
-                                  : "Play"}
-                                {item.Type === "Series" && playItem
-                                  ? ` S${playItem.ParentIndexNumber}:E${playItem.IndexNumber}`
-                                  : ""}
-                              </span>
-                            </Button>
+                          <div className="flex flex-wrap items-center gap-4">
+                            {[
+                              "Series",
+                              "Movie",
+                              "Episode",
+                              "Video",
+                              "Trailer",
+                              "MusicVideo",
+                            ].includes(item.Type) ? (
+                              <Button
+                                onClick={() => play(playItem)}
+                                theme="purple"
+                                disabled={!playItem || loadingEpisodes}
+                                loading={loadingEpisodes}
+                                className="flex-1 sm:flex-initial sm:w-auto gap-2 h-12 rounded-lg px-4 py-2 my-1 transition-transform hover:scale-105 duration-100 text-md text-white flex items-center justify-center"
+                              >
+                                <Icon
+                                  icon={Icons.PLAY}
+                                  className="text-white"
+                                />
+                                <span className="text-white text-sm pr-1">
+                                  {playItem?.UserData?.PlaybackPositionTicks
+                                    ? "Resume"
+                                    : "Play"}
+                                  {item.Type === "Series" && playItem
+                                    ? ` S${playItem.ParentIndexNumber}:E${playItem.IndexNumber}`
+                                    : ""}
+                                </span>
+                              </Button>
+                            ) : null}
                             <div className="flex items-center gap-1 flex-shrink-0">
+                              {playbackItem &&
+                              [
+                                "Movie",
+                                "Episode",
+                                "Video",
+                                "Trailer",
+                                "MusicVideo",
+                              ].includes(playbackItem.Type) ? (
+                                <button
+                                  type="button"
+                                  disabled={!downloadAllowed}
+                                  onClick={() =>
+                                    window.open(
+                                      contentDownloadUrl(playbackItem.Id),
+                                      "_blank",
+                                      "noopener,noreferrer",
+                                    )
+                                  }
+                                  title={
+                                    downloadAllowed
+                                      ? item.Type === "Series"
+                                        ? `Download S${playbackItem.ParentIndexNumber}:E${playbackItem.IndexNumber}`
+                                        : "Download"
+                                      : "Downloads are unavailable for this account"
+                                  }
+                                  aria-label="Download"
+                                  className="p-2 opacity-75 transition-all duration-300 hover:scale-110 hover:opacity-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                                >
+                                  <IconPatch icon={Icons.DOWNLOAD} />
+                                </button>
+                              ) : null}
                               <button
                                 type="button"
-                                disabled={updating}
-                                onClick={() =>
-                                  updateUserData(item, "IsFavorite")
-                                }
-                                title={
-                                  item.UserData?.IsFavorite
-                                    ? "Remove from favourites"
-                                    : "Add to favourites"
-                                }
-                                aria-label={
-                                  item.UserData?.IsFavorite
-                                    ? "Remove from favourites"
-                                    : "Add to favourites"
-                                }
-                                className="p-2 opacity-75 transition-opacity duration-300 hover:scale-110 hover:cursor-pointer hover:opacity-95"
+                                onClick={() => {
+                                  setSettingsForEpisode(false);
+                                  setSettingsOpen(true);
+                                }}
+                                title="Content settings"
+                                aria-label="Content settings"
+                                className="p-2 opacity-75 transition-all duration-300 hover:scale-110 hover:opacity-95"
                               >
-                                <IconPatch
-                                  icon={
-                                    item.UserData?.IsFavorite
-                                      ? Icons.BOOKMARK
-                                      : Icons.BOOKMARK_OUTLINE
-                                  }
-                                />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={share}
-                                title="Share"
-                                aria-label="Share"
-                                className="p-2 opacity-75 transition-opacity duration-300 hover:scale-110 hover:cursor-pointer hover:opacity-95"
-                              >
-                                <IconPatch
-                                  icon={
-                                    copied ? Icons.CHECKMARK : Icons.IOS_SHARE
-                                  }
-                                />
+                                <IconPatch icon={Icons.SETTINGS} />
                               </button>
                             </div>
                           </div>
-                          {item.Type === "Episode" && item.SeriesId ? (
-                            <Button
-                              theme="secondary"
-                              onClick={() => setSelectedId(item.SeriesId!)}
-                            >
-                              View series
-                            </Button>
-                          ) : null}
                         </div>
                       </div>
                       {actionError ? (
@@ -484,9 +673,14 @@ export function JellyfinDetailsModal({
                                 <span className="font-medium">
                                   Release date:{" "}
                                 </span>
-                                {new Date(
-                                  item.PremiereDate,
-                                ).toLocaleDateString()}
+                                {new Date(item.PremiereDate).toLocaleDateString(
+                                  undefined,
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  },
+                                )}
                               </p>
                             ) : null}
                             {item.OfficialRating ? (
@@ -495,14 +689,72 @@ export function JellyfinDetailsModal({
                                 {item.OfficialRating}
                               </p>
                             ) : null}
-                            <p>
-                              <span className="font-medium">Source: </span>
-                              Jellyfin
-                            </p>
+                            {item.OriginalLanguage ? (
+                              <p>
+                                <span className="font-medium">Language: </span>
+                                {item.OriginalLanguage.toUpperCase()}
+                              </p>
+                            ) : null}
+                            <ContentProviderLinks item={item} />
                             {item.UserData?.Played ? <p>Watched</p> : null}
                           </div>
                         </div>
                       </div>
+                      <ContentInformation
+                        item={item}
+                        playbackItem={playbackItem}
+                        sourceId={sourceId}
+                        onPlay={play}
+                      />
+                      {["BoxSet", "Playlist"].includes(item.Type) ? (
+                        <section className="my-6">
+                          <h4 className="text-lg font-semibold text-white mb-4">
+                            {item.Type === "Playlist"
+                              ? "Playlist"
+                              : "Collection"}{" "}
+                            · {contentsTotal} items
+                          </h4>
+                          {contents.length ? (
+                            <div className="-mx-6">
+                              <JellyfinMediaCarousel
+                                id={`contents-${item.Id}`}
+                                title=""
+                                items={contents}
+                                onSelect={(
+                                  selected,
+                                  action?: "collection" | "playlist",
+                                ) => selectItem(selected.Id, action)}
+                                onItemChanged={reloadItem}
+                              />
+                            </div>
+                          ) : null}
+                          <ContentContainerManagement
+                            key={item.Id}
+                            item={item}
+                            entries={contents}
+                            onChanged={reloadContainer}
+                          />
+                          {contentsError ? (
+                            <p role="alert" className="text-sm text-red-400">
+                              {contentsError}
+                            </p>
+                          ) : null}
+                          {loadingContents ? (
+                            <Spinner />
+                          ) : contentsOffset < contentsTotal ? (
+                            <Button
+                              theme="secondary"
+                              onClick={loadMoreContents}
+                            >
+                              Load more items
+                            </Button>
+                          ) : !contents.length ? (
+                            <p className="text-sm text-type-secondary">
+                              No items are available.
+                            </p>
+                          ) : null}
+                        </section>
+                      ) : null}
                       {item.Type === "Series" && (
                         <div className="mt-6 md:mt-0">
                           <div className="flex justify-between items-center mb-3">
@@ -569,9 +821,9 @@ export function JellyfinDetailsModal({
                                   >
                                     <button
                                       type="button"
-                                      onClick={() => setSelectedId(episode.Id)}
+                                      onClick={() => play(episode)}
                                       className="w-full text-left"
-                                      aria-label={`Details for episode ${episode.IndexNumber}: ${episode.Name}`}
+                                      aria-label={`Play episode ${episode.IndexNumber}: ${episode.Name}`}
                                     >
                                       <div className="relative h-[158px] w-full bg-video-context-hoverColor">
                                         <img
@@ -627,6 +879,18 @@ export function JellyfinDetailsModal({
                                         {episode.UserData?.PlaybackPositionTicks
                                           ? "Resume"
                                           : "Play"}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setPlaybackOverrideId(episode.Id);
+                                          setSettingsForEpisode(true);
+                                          setSettingsOpen(true);
+                                        }}
+                                        aria-label={`Settings for episode ${episode.IndexNumber}: ${episode.Name}`}
+                                        className="p-1.5 text-white/70 hover:text-white transition-colors"
+                                      >
+                                        <Icon icon={Icons.SETTINGS} />
                                       </button>
                                       <button
                                         type="button"
@@ -732,7 +996,11 @@ export function JellyfinDetailsModal({
                             id="similar-jellyfin"
                             title="More like this"
                             items={similar}
-                            onSelect={(selected) => setSelectedId(selected.Id)}
+                            onSelect={(
+                              selected,
+                              action?: "collection" | "playlist",
+                            ) => selectItem(selected.Id, action)}
+                            onItemChanged={reloadItem}
                           />
                         </div>
                       ) : null}
@@ -744,6 +1012,72 @@ export function JellyfinDetailsModal({
           </div>
         </Flare.Base>
       </div>
-    </OverlayPortal>
+      {item ? (
+        <ContentSettingsModal
+          open={open && settingsOpen}
+          onClose={() => {
+            setSettingsOpen(false);
+            setSelectedAction(undefined);
+          }}
+          item={settingsForEpisode && playbackItem ? playbackItem : item}
+          playbackItem={playbackItem}
+          sourceId={sourceId}
+          onSourceChange={setSourceId}
+          tracks={tracks}
+          onTracksChange={setTracks}
+          initialAction={selectedAction}
+          onPlayFromBeginning={
+            playItem?.UserData?.PlaybackPositionTicks
+              ? () => play(playItem, 0)
+              : undefined
+          }
+          onSaved={async () => {
+            await reloadItem();
+            if (playbackItem && playbackItem.Id !== item.Id) {
+              const updated = await getContentItem(playbackItem.Id);
+              if (playbackTargetRef.current === updated.Id)
+                setPlaybackDetails(updated);
+            }
+          }}
+          onDeleted={() => {
+            onItemChanged?.();
+            onClose();
+          }}
+        />
+      ) : null}
+    </DetailsModalFrame>
   );
+}
+
+export function JellyfinDetailsModal({
+  itemId,
+  onClose,
+  onItemChanged,
+  initialAction,
+  onAfterClose,
+}: {
+  itemId?: string | null;
+  onClose: () => void;
+  onItemChanged?: () => void;
+  initialAction?: "collection" | "playlist";
+  onAfterClose?: () => void;
+}) {
+  const selection = useMemo(
+    () => (itemId ? { itemId, initialAction } : undefined),
+    [itemId, initialAction],
+  );
+  const presence = useRetainedModalValue(selection);
+  return presence.value ? (
+    <JellyfinDetailsContent
+      itemId={presence.value.itemId}
+      open={presence.open}
+      afterLeave={() => {
+        presence.afterLeave();
+        if (!presence.open) onAfterClose?.();
+      }}
+      onClose={onClose}
+      onItemChanged={onItemChanged}
+      initialAction={presence.value.initialAction}
+    />
+  ) : null;
 }
