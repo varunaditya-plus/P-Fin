@@ -75,16 +75,6 @@ export const createDisplaySlice: MakeSlice<DisplaySlice> = (set, get) => ({
         s.currentQuality = quality;
       });
     });
-    newDisplay.on("audiotracks", (audioTracks) => {
-      set((s) => {
-        s.audioTracks = audioTracks;
-      });
-    });
-    newDisplay.on("changedaudiotrack", (audioTrack) => {
-      set((s) => {
-        s.currentAudioTrack = audioTrack;
-      });
-    });
     newDisplay.on("needstrack", (needsTrack) => {
       set((s) => {
         s.caption.asTrack = needsTrack;
@@ -119,13 +109,21 @@ export const createDisplaySlice: MakeSlice<DisplaySlice> = (set, get) => ({
       preferredQuality: null,
     });
     set((s) => {
+      s.source = null;
+      s.caption = { selected: null, asTrack: false };
+      s.captionList = [];
+      s.qualities = [];
+      s.currentQuality = null;
+      s.interface.error = undefined;
+      s.mediaPlaying.isPlaying = false;
+      s.mediaPlaying.isPaused = true;
+      s.mediaPlaying.isLoading = false;
+      s.mediaPlaying.hasPlayedOnce = false;
       s.status = playerStatus.IDLE;
       s.meta = null;
-      s.embedId = null;
-      s.sourceId = null;
-      s.thumbnails.images = [];
       s.progress.time = 0;
       s.progress.duration = 0;
+      s.progress.buffered = 0;
     });
   },
 });

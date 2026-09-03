@@ -48,7 +48,6 @@ export function JellyfinMediaCard({
   return (
     <MediaCard
       linkable
-      hideBookmark
       kindLabel={
         item.Type === "BoxSet"
           ? "Collection"

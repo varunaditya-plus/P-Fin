@@ -55,27 +55,3 @@ export function canPlayHlsNatively(video: HTMLVideoElement): boolean {
   if (Hls.isSupported()) return false; // no need to play natively
   return !!video.canPlayType("application/vnd.apple.mpegurl");
 }
-
-export type ExtensionDetectionResult =
-  | "unknown" // unknown detection or weird browser
-  | "firefox" // firefox extensions
-  | "chrome" // chrome extension (could be chromium, but still works with chrome extensions)
-  | "ios"; // ios, no extensions
-
-export function detectExtensionInstall(): ExtensionDetectionResult {
-  const res = detect();
-
-  // not a browser or failed to detect
-  if (res?.type !== "browser") return "unknown";
-
-  if (res.name === "ios" || res.name === "ios-webview") return "ios";
-  if (
-    res.name === "chrome" ||
-    res.name === "chromium-webview" ||
-    res.name === "edge-chromium" ||
-    res.name === "opera"
-  )
-    return "chrome";
-  if (res.name === "firefox") return "firefox";
-  return "unknown";
-}

@@ -2,9 +2,6 @@ import DOMPurify from "dompurify";
 import { convert, detect, parse } from "subsrt-ts";
 import { ContentCaption } from "subsrt-ts/dist/types/handler";
 
-import { RunOutput } from "@/backend/providers/disabled";
-import { CaptionListItem } from "@/stores/player/slices/source";
-
 export type CaptionCueType = ContentCaption;
 export const sanitize = DOMPurify.sanitize;
 
@@ -50,20 +47,6 @@ export function convertSubtitlesToSrt(text: string): string {
   return srt;
 }
 
-export function filterDuplicateCaptionCues(cues: ContentCaption[]) {
-  return cues.reduce((acc: ContentCaption[], cap: ContentCaption) => {
-    const lastCap = acc[acc.length - 1];
-    const isSameAsLast =
-      lastCap?.start === cap.start &&
-      lastCap?.end === cap.end &&
-      lastCap?.content === cap.content;
-    if (lastCap === undefined || !isSameAsLast) {
-      acc.push(cap);
-    }
-    return acc;
-  }, []);
-}
-
 export function parseVttSubtitles(vtt: string) {
   return parse(vtt).filter((cue) => cue.type === "caption") as CaptionCueType[];
 }
@@ -76,39 +59,10 @@ export function parseSubtitles(
   return parseVttSubtitles(vtt);
 }
 
-function stringToBase64(input: string): string {
-  return btoa(String.fromCodePoint(...new TextEncoder().encode(input)));
-}
-
-export function convertSubtitlesToSrtDataurl(text: string): string {
-  return `data:application/x-subrip;base64,${stringToBase64(
-    convertSubtitlesToSrt(text),
-  )}`;
-}
-
 export function convertSubtitlesToObjectUrl(text: string): string {
   return URL.createObjectURL(
     new Blob([convertSubtitlesToVtt(text)], {
       type: "text/vtt",
     }),
   );
-}
-
-export function convertProviderCaption(
-  captions: RunOutput["stream"]["captions"],
-): CaptionListItem[] {
-  return captions.map((v) => ({
-    id: v.id,
-    language: v.language,
-    url: v.url,
-    type: (v as any).type,
-    needsProxy: v.hasCorsRestrictions,
-    opensubtitles: v.opensubtitles,
-    // subtitle details from wyzie
-    display: (v as any).display,
-    media: (v as any).media,
-    isHearingImpaired: (v as any).isHearingImpaired,
-    source: (v as any).source,
-    encoding: (v as any).encoding,
-  }));
 }

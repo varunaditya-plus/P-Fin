@@ -7,7 +7,7 @@ server {
     location = /server-config.json {
         default_type application/json;
         add_header Cache-Control "no-store";
-        return 200 '{"jellyfinUrl":"${JELLYFIN_URL}"}';
+        return 200 '{"jellyfinUrl":"${JELLYFIN_URL}","seerrUrl":"${SEERR_URL}"}';
     }
 
     # Both services are fixed upstreams; credentials remain scoped to this client.

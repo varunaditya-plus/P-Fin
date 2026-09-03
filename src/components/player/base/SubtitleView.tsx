@@ -153,8 +153,6 @@ export function SubtitleRenderer() {
 export function SubtitleView(props: { controlsShown: boolean }) {
   const caption = usePlayerStore((s) => s.caption.selected);
   const source = usePlayerStore((s) => s.source);
-  const display = usePlayerStore((s) => s.display);
-  const isCasting = display?.getType() === "casting";
   const styling = useSubtitleStore((s) => s.styling);
   const enableNativeSubtitles = usePreferencesStore(
     (s) => s.enableNativeSubtitles,
@@ -162,7 +160,7 @@ export function SubtitleView(props: { controlsShown: boolean }) {
 
   // Hide custom captions when native subtitles are enabled
   const shouldUseNativeTrack = enableNativeSubtitles && source !== null;
-  if (shouldUseNativeTrack || !caption || isCasting) return null;
+  if (shouldUseNativeTrack || !caption) return null;
 
   return (
     <Transition animation="slide-up" show>

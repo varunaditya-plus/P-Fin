@@ -7,20 +7,14 @@ import {
   useState,
 } from "react";
 
-import { getMetaFromId } from "@/backend/metadata/getmeta";
-import { MWMediaType } from "@/backend/metadata/types/mw";
-import { useCaptions } from "@/components/player/hooks/useCaptions";
-import { usePlayerMeta } from "@/components/player/hooks/usePlayerMeta";
 import { useVolume } from "@/components/player/hooks/useVolume";
 import { JellyfinPlaybackContext } from "@/components/player/jellyfin/JellyfinPlaybackContext";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
-import { useProgressStore } from "@/stores/progress";
 import { useSubtitleStore } from "@/stores/subtitles";
 import { useEmpheralVolumeStore } from "@/stores/volume";
-import { useWatchPartyStore } from "@/stores/watchParty";
 import {
   DEFAULT_KEYBOARD_SHORTCUTS,
   LOCKED_SHORTCUTS,
@@ -38,33 +32,17 @@ export function KeyboardEvents() {
   const time = usePlayerStore((s) => s.progress.time);
   const duration = usePlayerStore((s) => s.progress.duration);
   const { setVolume, toggleMute } = useVolume();
-  const isInWatchParty = useWatchPartyStore((s) => s.enabled);
-  const meta = usePlayerStore((s) => s.meta);
-  const { setDirectMeta } = usePlayerMeta();
-  const setShouldStartFromBeginning = usePlayerStore(
-    (s) => s.setShouldStartFromBeginning,
-  );
-  const updateItem = useProgressStore((s) => s.updateItem);
-  const sourceId = usePlayerStore((s) => s.sourceId);
-  const setLastSuccessfulSource = usePreferencesStore(
-    (s) => s.setLastSuccessfulSource,
-  );
-
-  const {
-    toggleLastUsed: toggleLegacyCaptions,
-    selectRandomCaptionFromLastUsedLanguage: randomLegacyCaption,
-  } = useCaptions();
   const toggleLastUsed = useCallback(async () => {
-    if (!jellyfin) return toggleLegacyCaptions();
+    if (!jellyfin) return;
     const first = jellyfin.playback?.mediaSource.MediaStreams?.find(
       (track) => track.Type === "Subtitle",
     );
     jellyfin.changeSubtitle(
       jellyfin.subtitleIndex >= 0 ? -1 : (first?.Index ?? -1),
     );
-  }, [jellyfin, toggleLegacyCaptions]);
+  }, [jellyfin]);
   const selectRandomCaptionFromLastUsedLanguage = useCallback(async () => {
-    if (!jellyfin) return randomLegacyCaption();
+    if (!jellyfin) return;
     const tracks =
       jellyfin.playback?.mediaSource.MediaStreams?.filter(
         (track) => track.Type === "Subtitle",
@@ -76,7 +54,7 @@ export function KeyboardEvents() {
           tracks.length
       ];
     if (next) jellyfin.changeSubtitle(next.Index);
-  }, [jellyfin, randomLegacyCaption]);
+  }, [jellyfin]);
   const setShowVolume = useEmpheralVolumeStore((s) => s.setShowVolume);
   const setDelay = useSubtitleStore((s) => s.setDelay);
   const delay = useSubtitleStore((s) => s.delay);
@@ -122,219 +100,23 @@ export function KeyboardEvents() {
 
   const setCurrentOverlay = useOverlayStack((s) => s.setCurrentOverlay);
 
-  // Episode navigation functions
-  const navigateToNextEpisode = useCallback(async () => {
-    if (jellyfin) {
-      const index = jellyfin.episodes.findIndex(
-        (episode) => episode.Id === jellyfin.itemId,
-      );
-      const next = jellyfin.episodes[index + 1];
-      if (index >= 0 && next) jellyfin.playItem(next.Id, true);
-      return;
-    }
-    if (!meta || meta.type !== "show" || !meta.episode) return;
+  const navigateToNextEpisode = useCallback(() => {
+    if (!jellyfin) return;
+    const index = jellyfin.episodes.findIndex(
+      (episode) => episode.Id === jellyfin.itemId,
+    );
+    const next = jellyfin.episodes[index + 1];
+    if (index >= 0 && next) jellyfin.playItem(next.Id, true);
+  }, [jellyfin]);
 
-    // Check if we're at the last episode of the current season
-    const isLastEpisode =
-      meta.episode.number === meta.episodes?.[meta.episodes.length - 1]?.number;
-
-    if (!isLastEpisode) {
-      // Navigate to next episode in current season
-      const nextEp = meta.episodes?.find(
-        (v) => v.number === meta.episode!.number + 1,
-      );
-      if (nextEp) {
-        if (sourceId) {
-          setLastSuccessfulSource(sourceId);
-        }
-        const metaCopy = { ...meta };
-        metaCopy.episode = nextEp;
-        setShouldStartFromBeginning(true);
-        setDirectMeta(metaCopy);
-        const defaultProgress = { duration: 0, watched: 0 };
-        updateItem({
-          meta: metaCopy,
-          progress: defaultProgress,
-        });
-      }
-    } else {
-      // Navigate to first episode of next season
-      if (!meta.tmdbId) return;
-
-      try {
-        const data = await getMetaFromId(MWMediaType.SERIES, meta.tmdbId);
-        if (data?.meta.type !== MWMediaType.SERIES) return;
-
-        const nextSeason = data.meta.seasons?.find(
-          (season) => season.number === (meta.season?.number ?? 0) + 1,
-        );
-
-        if (nextSeason) {
-          const seasonData = await getMetaFromId(
-            MWMediaType.SERIES,
-            meta.tmdbId,
-            nextSeason.id,
-          );
-
-          if (seasonData?.meta.type === MWMediaType.SERIES) {
-            const nextSeasonEpisodes = seasonData.meta.seasonData.episodes
-              .filter((episode) => {
-                // Simple aired check - episodes without air_date are considered aired
-                return (
-                  !episode.air_date || new Date(episode.air_date) <= new Date()
-                );
-              })
-              .map((episode) => ({
-                number: episode.number,
-                title: episode.title,
-                tmdbId: episode.id,
-                air_date: episode.air_date,
-              }));
-
-            if (nextSeasonEpisodes.length > 0) {
-              const nextEp = nextSeasonEpisodes[0];
-
-              if (sourceId) {
-                setLastSuccessfulSource(sourceId);
-              }
-
-              const metaCopy = { ...meta };
-              metaCopy.episode = nextEp;
-              metaCopy.season = {
-                number: nextSeason.number,
-                title: nextSeason.title,
-                tmdbId: nextSeason.id,
-              };
-              metaCopy.episodes = nextSeasonEpisodes;
-              setShouldStartFromBeginning(true);
-              setDirectMeta(metaCopy);
-              const defaultProgress = { duration: 0, watched: 0 };
-              updateItem({
-                meta: metaCopy,
-                progress: defaultProgress,
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load next season:", error);
-      }
-    }
-  }, [
-    meta,
-    setDirectMeta,
-    setShouldStartFromBeginning,
-    updateItem,
-    sourceId,
-    setLastSuccessfulSource,
-    jellyfin,
-  ]);
-
-  const navigateToPreviousEpisode = useCallback(async () => {
-    if (jellyfin) {
-      const index = jellyfin.episodes.findIndex(
-        (episode) => episode.Id === jellyfin.itemId,
-      );
-      const previous = jellyfin.episodes[index - 1];
-      if (index > 0 && previous) jellyfin.playItem(previous.Id);
-      return;
-    }
-    if (!meta || meta.type !== "show" || !meta.episode) return;
-
-    // Check if we're at the first episode of the current season
-    const isFirstEpisode = meta.episode.number === meta.episodes?.[0]?.number;
-
-    if (!isFirstEpisode) {
-      // Navigate to previous episode in current season
-      const prevEp = meta.episodes?.find(
-        (v) => v.number === meta.episode!.number - 1,
-      );
-      if (prevEp) {
-        if (sourceId) {
-          setLastSuccessfulSource(sourceId);
-        }
-        const metaCopy = { ...meta };
-        metaCopy.episode = prevEp;
-        setShouldStartFromBeginning(true);
-        setDirectMeta(metaCopy);
-        const defaultProgress = { duration: 0, watched: 0 };
-        updateItem({
-          meta: metaCopy,
-          progress: defaultProgress,
-        });
-      }
-    } else {
-      // Navigate to last episode of previous season
-      if (!meta.tmdbId) return;
-
-      try {
-        const data = await getMetaFromId(MWMediaType.SERIES, meta.tmdbId);
-        if (data?.meta.type !== MWMediaType.SERIES) return;
-
-        const prevSeason = data.meta.seasons?.find(
-          (season) => season.number === (meta.season?.number ?? 0) - 1,
-        );
-
-        if (prevSeason) {
-          const seasonData = await getMetaFromId(
-            MWMediaType.SERIES,
-            meta.tmdbId,
-            prevSeason.id,
-          );
-
-          if (seasonData?.meta.type === MWMediaType.SERIES) {
-            const prevSeasonEpisodes = seasonData.meta.seasonData.episodes
-              .filter((episode) => {
-                // Simple aired check - episodes without air_date are considered aired
-                return (
-                  !episode.air_date || new Date(episode.air_date) <= new Date()
-                );
-              })
-              .map((episode) => ({
-                number: episode.number,
-                title: episode.title,
-                tmdbId: episode.id,
-                air_date: episode.air_date,
-              }));
-
-            if (prevSeasonEpisodes.length > 0) {
-              const prevEp = prevSeasonEpisodes[prevSeasonEpisodes.length - 1];
-
-              if (sourceId) {
-                setLastSuccessfulSource(sourceId);
-              }
-
-              const metaCopy = { ...meta };
-              metaCopy.episode = prevEp;
-              metaCopy.season = {
-                number: prevSeason.number,
-                title: prevSeason.title,
-                tmdbId: prevSeason.id,
-              };
-              metaCopy.episodes = prevSeasonEpisodes;
-              setShouldStartFromBeginning(true);
-              setDirectMeta(metaCopy);
-              const defaultProgress = { duration: 0, watched: 0 };
-              updateItem({
-                meta: metaCopy,
-                progress: defaultProgress,
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load previous season:", error);
-      }
-    }
-  }, [
-    meta,
-    setDirectMeta,
-    setShouldStartFromBeginning,
-    updateItem,
-    sourceId,
-    setLastSuccessfulSource,
-    jellyfin,
-  ]);
+  const navigateToPreviousEpisode = useCallback(() => {
+    if (!jellyfin) return;
+    const index = jellyfin.episodes.findIndex(
+      (episode) => episode.Id === jellyfin.itemId,
+    );
+    const previous = jellyfin.episodes[index - 1];
+    if (index > 0 && previous) jellyfin.playItem(previous.Id);
+  }, [jellyfin]);
 
   const dataRef = useRef({
     setShowVolume,
@@ -355,7 +137,6 @@ export function KeyboardEvents() {
     delay,
     setShowDelayIndicator,
     setCurrentOverlay,
-    isInWatchParty,
     previousRateRef,
     isSpaceHeldRef,
     setSpeedBoosted,
@@ -392,7 +173,6 @@ export function KeyboardEvents() {
       delay,
       setShowDelayIndicator,
       setCurrentOverlay,
-      isInWatchParty,
       previousRateRef,
       isSpaceHeldRef,
       setSpeedBoosted,
@@ -427,7 +207,6 @@ export function KeyboardEvents() {
     delay,
     setShowDelayIndicator,
     setCurrentOverlay,
-    isInWatchParty,
     setSpeedBoosted,
     setShowSpeedIndicator,
     enableHoldToBoost,
@@ -473,8 +252,8 @@ export function KeyboardEvents() {
         dataRef.current.toggleMute();
       }
 
-      // Video playback speed - disabled in watch party (hardcoded, not customizable)
-      if ((k === ">" || k === "<") && !dataRef.current.isInWatchParty) {
+      // Video playback speed (hardcoded, not customizable)
+      if (k === ">" || k === "<") {
         const options = [0.25, 0.5, 1, 1.5, 2];
         let idx = options.indexOf(dataRef.current.mediaPlaying?.playbackRate);
         if (idx === -1) idx = options.indexOf(1);
@@ -487,7 +266,6 @@ export function KeyboardEvents() {
       // Space is locked, always check it
       if (
         k === LOCKED_SHORTCUTS.PLAY_PAUSE_SPACE &&
-        !dataRef.current.isInWatchParty &&
         dataRef.current.enableHoldToBoost
       ) {
         // Skip if it's a repeated event
@@ -554,7 +332,7 @@ export function KeyboardEvents() {
       // Space is locked, always check it
       if (
         k === LOCKED_SHORTCUTS.PLAY_PAUSE_SPACE &&
-        (!dataRef.current.enableHoldToBoost || dataRef.current.isInWatchParty)
+        !dataRef.current.enableHoldToBoost
       ) {
         // Skip if it's a repeated event
         if (evt.repeat) {
@@ -826,12 +604,8 @@ export function KeyboardEvents() {
     const keyupEventHandler = (evt: KeyboardEvent) => {
       const k = evt.key;
 
-      // Handle spacebar release - only handle speed boost logic when not in watch party and hold to boost is enabled
-      if (
-        k === " " &&
-        !dataRef.current.isInWatchParty &&
-        dataRef.current.enableHoldToBoost
-      ) {
+      // Handle spacebar release when hold to boost is enabled
+      if (k === " " && dataRef.current.enableHoldToBoost) {
         // If we haven't applied the boost yet but were about to, cancel it
         if (dataRef.current.isPendingBoostRef.current) {
           dataRef.current.isPendingBoostRef.current = false;

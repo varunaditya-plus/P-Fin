@@ -9,17 +9,12 @@ import { MediaCard } from "./MediaCard";
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
-vi.mock("@/hooks/useSearchQuery", () => ({ useSearchQuery: () => [""] }));
-vi.mock("@/stores/interface/overlayStack", () => ({
-  useOverlayStack: () => ({ showModal: vi.fn() }),
-}));
 vi.mock("@/stores/preferences", () => ({
   usePreferencesStore: (selector?: (state: object) => unknown) => {
     const state = { enableMinimalCards: false, enableLowPerformanceMode: true };
     return selector ? selector(state) : state;
   },
 }));
-vi.mock("./MediaBookmark", () => ({ MediaBookmarkButton: () => null }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -56,7 +51,6 @@ beforeEach(() => {
         <MediaCard
           media={{ id: "item", title: "Film", type: "movie", year: 2020 }}
           linkable
-          hideBookmark
           onShowDetails={details}
         />
       </MemoryRouter>,

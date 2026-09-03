@@ -111,5 +111,3 @@ export const locales = {
   umb,
   "ur-PK": urPK,
 };
-
-export type Locales = keyof typeof locales;

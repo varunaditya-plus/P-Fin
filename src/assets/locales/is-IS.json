@@ -1,76 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream er vefforrit sem leitar á netinu að straumum. Markmið liðsins er naumhyggju nálgun á að horfa á efni.",
-    "faqTitle": "Algengar spurningar",
-    "q1": {
-      "body": "P-Stream hýsir ekki neitt efni. Þegar þú ýtir á eitthvað til að horfa á, leitað er á netinu fyrir það efni (Þú getur séð hvaða heimild við erum að nota á hleðslu skjánum og í 'myndbands heimildir' flipanum). Skrár eru aldrei settar in af P-Stream, allt er í gegnum leitarvél.",
-      "title": "Hvaðan kemur efnið?"
-    },
-    "q2": {
-      "body": "Þú getur ekki beðið um þætti eða myndir, P-Stream stýrir ekki neinu efni. Allt efni er skoðað í gegnum heimildir á netinu.",
-      "title": "Hvar get ég beðið um þætti eða myndir?"
-    },
-    "q3": {
-      "body": "Leitarniðurstöður okkar eru knúnar af The Movie Database (TMDB) og eru sýndar þótt að heimildir okkar hafa ekki efnið.",
-      "title": "Leitarniðurstöðurnar sýna þættina eða myndina, af hverju get ég ekki spilað það?"
-    },
-    "title": "Um P-Stream"
-  },
   "actions": {
     "copied": "Afritað",
     "copy": "Afrita"
-  },
-  "auth": {
-    "createAccount": "Hefurðu ekki reikning ennþá? <0>Búðu til reikning.</0>",
-    "deviceNameLabel": "Nafn tækis",
-    "deviceNamePlaceholder": "Einkasími",
-    "generate": {
-      "description": "Þitt lykilorð lætur eins og notandanafn og lykilorð. Vertu viss um að halda því öruggu út að þú munt þurfa að nota það til að komast inn í reikningin þinn",
-      "next": "Ég hef vistað lykilorðið mitt",
-      "passphraseFrameLabel": "Lykilorð",
-      "title": "Þitt lykilorð"
-    },
-    "hasAccount": "Hefurðu reikning nú þegar? <0>Skráðu þig inn hér.</0>",
-    "login": {
-      "description": "Vinsamlegast sláðu inn lykilorðið þitt til þess að skrá þig inn í reikningin þinn",
-      "deviceLengthError": "Vinsamlegast settu inn nafn fyrir tækið þitt",
-      "passphraseLabel": "12-Orða lykilorð",
-      "passphrasePlaceholder": "Lykilorð",
-      "submit": "Skrá inn",
-      "title": "Skráðu þig inn í reikningin þinn",
-      "validationError": "Vitlaust eða óklárað lykilorð"
-    },
-    "register": {
-      "information": {
-        "color1": "Prófíl litur eitt",
-        "color2": "Prófíl litur tvö",
-        "header": "Sláðu inn nafn fyrir tækið þitt og veldu liti og notanda tákn að þínu vali",
-        "icon": "Notanda tákn",
-        "next": "Næst",
-        "title": "Reiknings upplýsingar"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Stilltirðu það rétt?",
-        "title": "Náðist ekki í netþjón"
-      },
-      "host": "Þú ert að tengjast við <0>{{hostname}}</0> - vinsamlegast staðfestu að þú treystir því áður en þú býrð til reikning",
-      "no": "Fara til baka",
-      "noHost": "Netjónninn hefur ekki verið stilltur, þess vegna getur þú ekki búið til reikning",
-      "noHostTitle": "Netþjónn ekki stilltur!",
-      "title": "Treystir þú þessum netþjóni?",
-      "yes": "Ég treysti þessum netþjóni"
-    },
-    "verify": {
-      "description": "Vinsamlegst sláðu inn lykilorðið þitt frá því áðan til þess að staðfesta að þú hefur vistað það og til að stofna nýjan reikning",
-      "invalidData": "Gögn eru ekki gild",
-      "noMatch": "Lykilorð passar ekki saman",
-      "passphraseLabel": "Þitt 12-orða lykilorð",
-      "recaptchaFailed": "ReCaptcha staðfesting mistókst",
-      "register": "Stofna reikning",
-      "title": "Staðfestu þitt lykilorð"
-    }
   },
   "errors": {
     "badge": "Það bilaði",
@@ -78,18 +9,6 @@
     "reloadPage": "Endurhlaðaðu vefsíðuna",
     "showError": "Sýna villu upplýsingar",
     "title": "Við lentum í villu!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Fyrirvari",
-      "disclaimerText": "P-Stream hýsir engar skrár, það tengist eingöngu þjónustu þriðja aðila. Lagleg atriði ættu að vera rædd við skráarhýsinga og veitanda. P-Stream er ekki ábyrg fyrir neinum skrám sýndar af myndbands veitöndum."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub"
-    },
-    "tagline": "Horfðu á uppáhalds þætti og myndirnar þínar með þessu opna hugbúnaða forriti."
   },
   "global": {
     "name": "P-Stream",
@@ -170,69 +89,6 @@
     "goHome": "Aftur heim",
     "message": "Við leituðum alls staðar: undir ruslafötunum, inn í skápnum, á bakvið proxy þjónin en við gátum ekki fundið síðuna sem þú ert að leita af.",
     "title": "Gat ekki fundið síðu"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Hætta við",
-      "confirm": "Nota venjulegu uppsetninguna",
-      "description": "Venjulega uppsetningin hefur ekki bestu streymin og getur verið óþolandi og hæg.",
-      "title": "Ertu viss?"
-    },
-    "extension": {
-      "back": "Til baka",
-      "explainer": "þú getur fengið bestu streymi sem við höfum með því að nota viðbótið. Bara með einfaldri niðurhalningu.",
-      "explainerIos": "Því miður, er viðbótið ekki stytt á iOS, Ýttu á <bold>Til baka</bold> til að velja annan möguleika.",
-      "extensionHelp": "Ef þú hefur hlaðað niður viðbótinu en það er ekki greint, <bold>opnaðu viðbótið í gegnum net viðbóts valmyndina þína</bold> og fylgdu skrefin á skjánum.",
-      "linkChrome": "Sækja Chrome viðbót",
-      "linkFirefox": "Sækja Firefox viðbót",
-      "notDetecting": "Hlaðað niður á Chrome, en síðan er ekki að greina það? Reyndu að endurhlaða síðunna!",
-      "notDetectingAction": "Endurhlaða síðu",
-      "status": {
-        "disallowed": "VIðbót er ekki virkt fyrir þessa síðu",
-        "disallowedAction": "Virkja viðbót",
-        "failed": "Mistókst að biðja um stöðu",
-        "loading": "Bíðandi eftir að þú sækjir viðbótið",
-        "outdated": "Viðbóts útgáfa of gömul",
-        "success": "Viðbót virkar eins og gert ráð fyrir!"
-      },
-      "submit": "Halda áfram",
-      "title": "Byrjum með viðbóti"
-    },
-    "proxy": {
-      "back": "Til baka",
-      "explainer": "Með umboðs aðferðinni, getur þú fengið frábær gæði strauma með því að búa til sjálfsafgreitt umboð.",
-      "input": {
-        "errorConnection": "Gat ekki tengst umboð",
-        "errorInvalidUrl": "Ekki gildur hlekkur",
-        "errorNotProxy": "Bjóst við umboði en fékk heimasíðu",
-        "label": "Umboðs hlekkur",
-        "placeholder": "https://"
-      },
-      "link": "Lærðu hvernig þú býrð til umboð",
-      "submit": "Staðfesta umboð",
-      "title": "Búum til nýtt umboð"
-    },
-    "start": {
-      "explainer": "Til þess að fá bestu möguleg streymi, þú verður að velja hvaða streymis aðferð þér langar að nota.",
-      "options": {
-        "default": {
-          "text": "Mig langar ekki í strymi með góðum gæðum,<0 /> <1>notaðu venjulegu uppsetninguna</1>"
-        },
-        "extension": {
-          "action": "Hlaðaðu niður viðbóti",
-          "description": "Hlaðaðu niður viðbótinu og fáðu aðgang að frábærra heimilda.",
-          "quality": "Bestu gæði",
-          "title": "Viðbót"
-        },
-        "proxy": {
-          "action": "Settu upp umboð",
-          "description": "Settu upp umboð á 5 mínútum og fáðu aðgang til frábærra heimilda.",
-          "quality": "Góð gæði",
-          "title": "Sérsniðið umboð"
-        }
-      },
-      "title": "Komum þér í uppsetningu með P-Stream"
-    }
   },
   "overlays": {
     "close": "Loka"
@@ -397,23 +253,6 @@
       "error": "Mistókst að sannreyna að þú sért manneskja. Vinsamlegast reyndu aftur.",
       "title": "Við þurfum að sannræna að þú ert manneskja.",
       "verifyingHumanity": "Að sannræna að þú sért manneskja..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Hlaðandi forriti",
-    "loadingUser": "Hlaðandi þínum reikningi",
-    "loadingUserError": {
-      "logout": "Skrá út",
-      "reset": "Endurstilla sérsniðin netþjón",
-      "text": "Mistókst að hlaða inn reikningnum þínum",
-      "textWithReset": "Mistókst að hlaða inn reikningnum þínum af sérsniðna netþjóninum þínum, villtu fara aftur á venjulega netþjónin?"
-    },
-    "migration": {
-      "failed": "Mistókst að flytja gögnin þín.",
-      "inProgress": "Vinsamlegast bíddu, við erum að flytja gögnin þín. Þetta ætti ekki að taka langan tíma."
     }
   },
   "settings": {

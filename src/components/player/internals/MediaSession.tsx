@@ -1,15 +1,11 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 
 import { usePlayerStore } from "@/stores/player/store";
 
-import { usePlayerMeta } from "../hooks/usePlayerMeta";
+import { JellyfinPlaybackContext } from "../jellyfin/JellyfinPlaybackContext";
 
 export function MediaSession() {
-  const { setDirectMeta } = usePlayerMeta();
-  const setShouldStartFromBeginning = usePlayerStore(
-    (s) => s.setShouldStartFromBeginning,
-  );
-
+  const jellyfin = useContext(JellyfinPlaybackContext);
   const mediaPlaying = usePlayerStore((s) => s.mediaPlaying);
   const progress = usePlayerStore((s) => s.progress);
   const meta = usePlayerStore((s) => s.meta);
@@ -18,19 +14,16 @@ export function MediaSession() {
   const shouldUpdatePositionState = useRef(false);
   const lastPlaybackPosition = useRef(0);
 
+  const episodeIndex =
+    jellyfin?.episodes.findIndex((episode) => episode.Id === jellyfin.itemId) ??
+    -1;
   const changeEpisode = useCallback(
     (change: number) => {
-      const nextEp = meta?.episodes?.find(
-        (v) => v.number === (meta?.episode?.number ?? 0) + change,
-      );
-
-      if (!meta || !nextEp) return;
-      const metaCopy = { ...meta };
-      metaCopy.episode = nextEp;
-      setShouldStartFromBeginning(true);
-      setDirectMeta(metaCopy);
+      if (!jellyfin || episodeIndex < 0) return;
+      const episode = jellyfin.episodes[episodeIndex + change];
+      if (episode) jellyfin.playItem(episode.Id, change > 0);
     },
-    [meta, setDirectMeta, setShouldStartFromBeginning],
+    [jellyfin, episodeIndex],
   );
 
   const updatePositionState = useCallback(
@@ -178,7 +171,7 @@ export function MediaSession() {
       updatePositionState(e.seekTime);
     });
 
-    if ((meta?.episode?.number ?? 1) > 1) {
+    if (episodeIndex > 0) {
       navigator.mediaSession.setActionHandler("previoustrack", () =>
         changeEpisode(-1),
       );
@@ -186,9 +179,10 @@ export function MediaSession() {
       navigator.mediaSession.setActionHandler("previoustrack", null);
     }
 
-    const totalEpisodes = meta?.episodes?.length ?? 0;
-    const currentEpisodeNumber = meta?.episode?.number ?? 0;
-    if (currentEpisodeNumber > 0 && currentEpisodeNumber < totalEpisodes) {
+    if (
+      episodeIndex >= 0 &&
+      episodeIndex < (jellyfin?.episodes.length ?? 0) - 1
+    ) {
       navigator.mediaSession.setActionHandler("nexttrack", () =>
         changeEpisode(1),
       );
@@ -204,7 +198,8 @@ export function MediaSession() {
     progress.duration,
     progress.time,
     meta?.episode?.number,
-    meta?.episodes?.length,
+    episodeIndex,
+    jellyfin?.episodes.length,
     meta?.episode?.title,
     meta?.title,
     meta?.type,
@@ -212,7 +207,23 @@ export function MediaSession() {
     meta?.season?.number,
   ]);
 
+  useEffect(
+    () => () => {
+      if (!("mediaSession" in navigator)) return;
+      for (const action of [
+        "play",
+        "pause",
+        "seekto",
+        "previoustrack",
+        "nexttrack",
+      ] as const) {
+        navigator.mediaSession.setActionHandler(action, null);
+      }
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.playbackState = "none";
+    },
+    [],
+  );
+
   return null;
 }
-
-// what did we learn today? never use isNaN instead of Number.isNaN !!!

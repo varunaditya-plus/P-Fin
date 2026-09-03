@@ -1,7 +1,6 @@
-import { Qualities, Stream } from "@/backend/providers/disabled";
 import { QualityStore } from "@/stores/quality";
 
-export type SourceQuality = Qualities;
+export type SourceQuality = "unknown" | "360" | "480" | "720" | "1080" | "4k";
 
 export type StreamType = "hls" | "mp4";
 
@@ -13,22 +12,16 @@ export type SourceFileStream = {
 export type LoadableSource = {
   type: StreamType;
   url: string;
-  headers?: Stream["headers"];
-  preferredHeaders?: Stream["preferredHeaders"];
 };
 
 export type SourceSliceSource =
   | {
       type: "file";
       qualities: Partial<Record<SourceQuality, SourceFileStream>>;
-      headers?: Stream["headers"];
-      preferredHeaders?: Stream["preferredHeaders"];
     }
   | {
       type: "hls";
       url: string;
-      headers?: Stream["headers"];
-      preferredHeaders?: Stream["preferredHeaders"];
     };
 
 const qualitySorting: Record<SourceQuality, number> = {
@@ -115,19 +108,4 @@ export function selectQuality(
     }
   }
   throw new Error("couldn't select quality");
-}
-
-const qualityNameMap: Record<SourceQuality, string> = {
-  "4k": "4K",
-  "1080": "1080p",
-  "360": "360p",
-  "480": "480p",
-  "720": "720p",
-  unknown: "unknown",
-};
-
-export const allQualities = Object.keys(qualityNameMap) as SourceQuality[];
-
-export function qualityToString(quality: SourceQuality): string {
-  return qualityNameMap[quality];
 }

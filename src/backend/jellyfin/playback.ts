@@ -292,7 +292,6 @@ export async function getPlayback(
           { ApiKey: session.accessToken },
         ),
         type: "vtt",
-        needsProxy: false,
         source: "Jellyfin",
         isHearingImpaired: stream.IsHearingImpaired,
       }),

@@ -21,9 +21,7 @@ export interface InterfaceSlice {
     hovering: PlayerHoverState;
     lastHoveringState: PlayerHoverState;
     canAirplay: boolean;
-    isCasting: boolean;
     hideNextEpisodeBtn: boolean;
-    shouldStartFromBeginning: boolean;
     error?: DisplayError;
 
     volumeChangedWithKeybind: boolean; // has the volume recently been adjusted with the up/down arrows recently?
@@ -43,14 +41,12 @@ export interface InterfaceSlice {
   setHasOpenOverlay(state: boolean): void;
   setLastVolume(state: number): void;
   hideNextEpisodeButton(): void;
-  setShouldStartFromBeginning(val: boolean): void;
   setSpeedBoosted(state: boolean): void;
   setShowSpeedIndicator(state: boolean): void;
 }
 
 export const createInterfaceSlice: MakeSlice<InterfaceSlice> = (set, get) => ({
   interface: {
-    isCasting: false,
     hasOpenOverlay: false,
     isFullscreen: false,
     isSeeking: false,
@@ -64,16 +60,10 @@ export const createInterfaceSlice: MakeSlice<InterfaceSlice> = (set, get) => ({
     timeFormat: VideoPlayerTimeFormat.REGULAR,
     canAirplay: false,
     hideNextEpisodeBtn: false,
-    shouldStartFromBeginning: false,
     isSpeedBoosted: false,
     showSpeedIndicator: false,
   },
 
-  setShouldStartFromBeginning(val) {
-    set((s) => {
-      s.interface.shouldStartFromBeginning = val;
-    });
-  },
   setLastVolume(state) {
     set((s) => {
       s.interface.lastVolume = state;

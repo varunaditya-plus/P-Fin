@@ -1,12 +1,10 @@
 <!doctype html>
 <html lang="en" dir="ltr">
-  <!--https://www.youtube.com/watch?v=dQw4w9WgXcQ-->
 
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico?v=2" />
     <meta itemprop="image" content="/android-chrome-192x192.png?v=2" />
-    <!-- <meta property="og:image" content="/android-chrome-192x192.png?v=2"> -->
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
@@ -227,10 +225,6 @@
       rel="stylesheet"
     />
 
-    <script src="/config.js"></script>
-
-    {{#if env.VITE_TRACK_SCRIPT }} {{{ env.VITE_TRACK_SCRIPT }}} {{/if}}
-
     <!-- prevent darkreader extension from messing with our already dark site -->
     <meta name="darkreader-lock" />
 
@@ -238,32 +232,6 @@
 
     <title>P-Stream</title>
 
-    {{#if opensearchEnabled }}
-    <!-- OpenSearch -->
-    <link
-      rel="search"
-      type="application/opensearchdescription+xml"
-      title="P-Stream"
-      href="/opensearch.xml"
-    />
-
-    <!-- Google Sitelinks -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "url": "{{ routeDomain }}",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": "{{ routeDomain }}/browse/?q={search_term_string}"
-          },
-          "query-input": "required name=search_term_string"
-        }
-      }
-    </script>
-    {{/if}}
   </head>
 
   <body>

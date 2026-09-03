@@ -1,14 +1,11 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
-import loadVersion from "vite-plugin-package-version";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import path from "path";
 import million from "million/compiler";
-import { handlebars } from "./plugins/handlebars";
-import { PluginOption, loadEnv, splitVendorChunkPlugin } from "vite";
-import { visualizer } from "rollup-plugin-visualizer";
+import { loadEnv, splitVendorChunkPlugin } from "vite";
 
 import tailwind from "tailwindcss";
 import rtl from "postcss-rtlcss";
@@ -19,7 +16,6 @@ const captioningPackages = [
   "subsrt-ts",
   "parse5",
   "entities",
-  "fuse",
 ];
 
 export default defineConfig(({ mode }) => {
@@ -33,6 +29,7 @@ export default defineConfig(({ mode }) => {
     response.end(
       JSON.stringify({
         jellyfinUrl: env.JELLYFIN_URL || "http://100.64.96.96:8096",
+        seerrUrl: env.SEERR_URL || "http://100.64.96.96:5055",
       }),
     );
   };
@@ -52,7 +49,11 @@ export default defineConfig(({ mode }) => {
   };
   return {
     base: env.VITE_BASE_URL || "/",
-    server: { host: "0.0.0.0", proxy, watch: { ignored: ["**/references/**"] } },
+    server: {
+      host: "0.0.0.0",
+      proxy,
+      watch: { ignored: ["**/references/**"] },
+    },
     preview: { host: "0.0.0.0", proxy },
     plugins: [
       {
@@ -65,16 +66,6 @@ export default defineConfig(({ mode }) => {
         },
       },
       million.vite({ auto: true, mute: true }),
-      handlebars({
-        vars: {
-          opensearchEnabled: env.VITE_OPENSEARCH_ENABLED === "true",
-          routeDomain:
-            env.VITE_APP_DOMAIN +
-            (env.VITE_NORMAL_ROUTER !== "true" ? "/#" : ""),
-          domain: env.VITE_APP_DOMAIN,
-          env,
-        },
-      }),
       react({
         babel: {
           presets: [
@@ -103,45 +94,12 @@ export default defineConfig(({ mode }) => {
           "favicon.ico",
           "apple-touch-icon.png",
           "safari-pinned-tab.svg",
+          "manifest.json",
+          "android-chrome-192x192.png",
+          "android-chrome-512x512.png",
         ],
-        manifest: {
-          name: "P-Stream",
-          short_name: "P-Stream",
-          description:
-            "Watch your Jellyfin library and discover content with Seerr.",
-          theme_color: "#000000",
-          background_color: "#000000",
-          display: "standalone",
-          start_url: "/",
-          icons: [
-            {
-              src: "android-chrome-192x192.png",
-              sizes: "192x192",
-              type: "image/png",
-              purpose: "any",
-            },
-            {
-              src: "android-chrome-512x512.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "any",
-            },
-            {
-              src: "android-chrome-192x192.png",
-              sizes: "192x192",
-              type: "image/png",
-              purpose: "maskable",
-            },
-            {
-              src: "android-chrome-512x512.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "maskable",
-            },
-          ],
-        },
+        manifest: false,
       }),
-      loadVersion(),
       checker({
         overlay: {
           position: "tr",
@@ -157,7 +115,6 @@ export default defineConfig(({ mode }) => {
         },
       }),
       splitVendorChunkPlugin(),
-      visualizer() as PluginOption,
     ],
 
     build: {
@@ -173,9 +130,6 @@ export default defineConfig(({ mode }) => {
             }
             if (id.includes("hls.js")) {
               return "hls";
-            }
-            if (id.includes("node-forge") || id.includes("crypto-js")) {
-              return "auth";
             }
             if (id.includes("locales") && !id.includes("en.json")) {
               return "locales";

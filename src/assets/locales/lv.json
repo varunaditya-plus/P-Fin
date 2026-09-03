@@ -1,73 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream ir tīmekļa lietojumprogramma, kas internetā meklē straumes. Komandas mērķis ir galvenokārt minimālistiska pieeja satura patērēšanai.",
-    "faqTitle": "Bieži jautājumi",
-    "q1": {
-      "body": "P-Stream neveic nekādu saturu. Noklikšķinot uz kāda skatāma satura, internetā tiek meklēts atlasītais multivides saturs (ielādes ekrānā un cilnē “video avoti” varat redzēt, kuru avotu izmantojat). Multivide nekad netiek augšupielādēta, izmantojot filmu tīmekli, viss notiek caur šo meklēšanas mehānismu.",
-      "title": "No kurienes nāk saturs?"
-    },
-    "q2": {
-      "body": "Nav iespējams pieprasīt pārraidi vai filmu, filmu tīmeklis nepārvalda saturu. Viss saturs tiek skatīts, izmantojot avotus internetā.",
-      "title": "Kur es varu pieprasīt filmu vai seriālu?"
-    },
-    "q3": {
-      "body": "Mūsu meklēšanas rezultātus nodrošina filmu datu bāze (TMDB), un tie tiek rādīti neatkarīgi no tā, vai mūsu avotos patiešām ir saturs.",
-      "title": "Meklēšanas rezultātos tiek parādīta seriāls vai filma. Kāpēc es nevaru to atskaņot?"
-    },
-    "title": "Par "
-  },
   "actions": {
     "copied": "Nokopēts",
     "copy": "Kopēt"
-  },
-  "auth": {
-    "createAccount": "Nav vēl konts? <0>Taisīt kontu.</0>",
-    "deviceNameLabel": "Ierīces nosaukums",
-    "deviceNamePlaceholder": "Personiskais telefons",
-    "generate": {
-      "description": "Tava paroles frāze ir kā vārds un parole. Esi drošs ka turi to drošibā jo tev vajadzēs to izmantot lai ieietu kontā",
-      "next": "Esmu saglabājis paroles frāzi",
-      "title": "Tava paroles frāze"
-    },
-    "hasAccount": "Tev jau ir konts> <0>Ienāc šeit.</0>",
-    "login": {
-      "description": "Lūdzu ievadi paroles frāzi lai ieietu kontā",
-      "deviceLengthError": "Lūdzu ievadi ierīces nosaukumu",
-      "passphraseLabel": "12-Vārdu paroles frāze",
-      "passphrasePlaceholder": "Paroles frāze",
-      "submit": "Ieiet",
-      "title": "Reģistrējies savā kontā",
-      "validationError": "Nepareizs vai nepabeigts paroles frāze"
-    },
-    "register": {
-      "information": {
-        "color1": "Profila krāsa viens",
-        "color2": "Profila krāsa divi",
-        "header": "Ievadi ierīces vārdu un izvēlies krāsu un profila ikonu kādu gribi",
-        "icon": "Profila ikona",
-        "next": "Nakamais",
-        "title": "Konta informācija"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Vai tu konfigurēji to pareizi?",
-        "title": "Neizdevās savienot serveri"
-      },
-      "host": "Tu piesaisties <0>{{hostname}}</0> - apstiprini ka uzticies pirms taisi kontu",
-      "no": "Atpakaļ",
-      "title": "Vai tu uzticies šim serverim?",
-      "yes": "Es uzticos šim serverim"
-    },
-    "verify": {
-      "description": "Lūdzu ievadi paroles frāzi ko ieguvi iepriekš lai apstiprinātu ka saglabāji un uztaisītu kontu",
-      "invalidData": "Dati nav pieejami",
-      "noMatch": "paroles frāze nesakrīt",
-      "passphraseLabel": "Tava 12-vārdu paroles frāze",
-      "recaptchaFailed": "ReCaptcha apstiprināšana neizdevās",
-      "register": "Izveidot kontu",
-      "title": "Apstiprini paroles frāzi"
-    }
   },
   "errors": {
     "badge": "Saplīsa",
@@ -75,18 +9,6 @@
     "reloadPage": "Atjaunot lapu",
     "showError": "Radīt kļūdas deteļas",
     "title": "Mēs sastapāmies ar kļūdu!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Atruna",
-      "disclaimerText": "P-Stream nemitina nekādus failus, tas tikai veido saites uz trešās puses pakalpojumiem. Juridiskie jautājumi ir jārisina ar failu resursdatoriem un nodrošinātājiem. P-Stream nav atbildīgs par video pakalpojumu sniedzēju parādītajiem multivides failiem."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Autortiesību likums",
-      "github": "GitHub"
-    },
-    "tagline": "Skatieties savas iecienītākās pārraides un filmas, izmantojot šo atvērtā koda straumēšanas lietotni."
   },
   "global": {
     "name": "Filmas-web",
@@ -282,23 +204,6 @@
       "remaining": "{{timeLeft}} beidza • pabeidza {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Autortiesību likums"
-    },
-    "loadingApp": "Notiek aplikācijas ielāde",
-    "loadingUser": "Notiek jūsu profila ielāde",
-    "loadingUserError": {
-      "logout": "iziet",
-      "reset": "Atiestatīt pielāgoto serveri",
-      "text": "Neizdevās ieladēt jūsu profilu",
-      "textWithReset": "Neizdevās ielādēt profilu no pielāgotā servera. Vai vēlaties atiestatīt atpakaļ uz noklusējuma serveri?"
-    },
-    "migration": {
-      "failed": "Neizdevās migrēt jūsu datus.",
-      "inProgress": "Lūdzu, uzgaidiet, mēs migrējam jūsu datus. Tam nevajadzētu ilgt ilgu laiku."
     }
   },
   "settings": {

@@ -5,15 +5,6 @@ import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 import { Title } from "@/components/player/internals/ContextMenu/Misc";
 
-export function Chevron(props: { children?: React.ReactNode }) {
-  return (
-    <span className="text-white flex items-center font-medium">
-      {props.children}
-      <Icon className="text-xl ml-1 -mr-1.5" icon={Icons.CHEVRON_RIGHT} />
-    </span>
-  );
-}
-
 export function LinkTitle(props: {
   children: React.ReactNode;
   textClass?: string;

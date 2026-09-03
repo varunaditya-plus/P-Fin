@@ -1,84 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream este o aplicație web care caută fluxuri pe internet. Echipa urmărește o abordare mai ales minimalistă a consumului de conținut.",
-    "faqTitle": "Întrebări obișnuite",
-    "q1": {
-      "body": "P-Stream nu găzduiește niciun conținut. Când faceți clic pe ceva pentru a viziona, pe Internet este căutat media selectată (Pe ecranul de încărcare și în fila „Surse video”, puteți vedea ce sursă utilizați). Media nu este niciodată încărcată de P-Stream, totul se face prin acest mecanism de căutare.",
-      "title": "De unde vine conținutul?"
-    },
-    "q2": {
-      "body": "Nu este posibil să solicitați o emisiune sau un film, P-Stream nu gestionează niciun conținut. Tot conținutul este vizualizat prin surse de internet.",
-      "title": "Unde pot solicita o emisiune sau un film?"
-    },
-    "q3": {
-      "body": "Rezultatele căutării noastre sunt furnizate de The Movie Database (TMDB) și afișați indiferent dacă sursele noastre au de fapt conținutul.",
-      "title": "Rezultatele căutării afișează emisiunea sau filmul, de ce nu îl pot reda?"
-    },
-    "title": "Despre P-Stream",
-    "q4": {
-      "body": "Toate datele sunt sincronizate cu serverul comunitar, oricine e liber să-l folosească.",
-      "title": "Ce se întâmplă cu datele mele?"
-    },
-    "q5": {
-      "body": "P-Stream are un server de Discord care poate fi găsit în antetul acestei pagini!",
-      "title": "Cum pot afla mai multe?"
-    }
-  },
   "actions": {
     "copied": "Copiat",
     "copy": "Copiați"
-  },
-  "auth": {
-    "createAccount": "Nu aveți încă un cont? <0>Creați un cont.</0>",
-    "deviceNameLabel": "Nume dispozitiv",
-    "deviceNamePlaceholder": "Telefon personal",
-    "generate": {
-      "description": "Fraza de acces acționează ca nume de utilizator și parolă. Asigurați-vă că îl păstrați în siguranță, deoarece va trebui să îl introduceți pentru a vă conecta la contul dvs",
-      "next": "Mi-am salvat fraza de acces",
-      "passphraseFrameLabel": "Frază de acces",
-      "title": "Fraza dvs. de acces"
-    },
-    "hasAccount": "ai deja un cont? <0>Autentificați-vă aici.</0>",
-    "login": {
-      "description": "Vă rugăm să introduceți fraza de acces pentru a vă conecta la contul dvs",
-      "deviceLengthError": "Introduceți un nume de dispozitiv",
-      "passphraseLabel": "Expresie de acces din 12 cuvinte",
-      "passphrasePlaceholder": "Frază de acces",
-      "submit": "Conectează te",
-      "title": "conecteaza-te la contul tau",
-      "validationError": "Fraza de acces este incorectă sau incompletă"
-    },
-    "register": {
-      "information": {
-        "color1": "Culoarea profilului unu",
-        "color2": "Culoarea profilului doi",
-        "header": "Introduceți un nume pentru dispozitivul dvs. și alegeți culorile și o pictogramă de utilizator la alegerea dvs",
-        "icon": "Pictograma utilizatorului",
-        "next": "Următorul",
-        "title": "Informații despre cont"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "L-ai configurat corect?",
-        "title": "Nu s-a putut ajunge la server"
-      },
-      "host": "Vă conectați la <0>{{hostname}}</0> - vă rugăm să confirmați că aveți încredere înainte de a vă crea un cont",
-      "no": "Întoarce-te",
-      "noHost": "Serverul nu a fost configurat, deci nu vă puteți crea un cont",
-      "noHostTitle": "Serverul nu este configurat!",
-      "title": "Ai încredere în acest server?",
-      "yes": "Am încredere în acest server"
-    },
-    "verify": {
-      "description": "Introduceți expresia de acces de mai devreme pentru a confirma că ați salvat-o și pentru a vă crea contul",
-      "invalidData": "Datele nu sunt valide",
-      "noMatch": "Fraza de acces nu se potrivește",
-      "passphraseLabel": "Fraza dvs. de acces de 12 cuvinte",
-      "recaptchaFailed": "Validarea ReCaptcha a eșuat",
-      "register": "Creează cont",
-      "title": "Confirmați-vă fraza de acces"
-    }
   },
   "errors": {
     "badge": "S-a spart",
@@ -86,20 +9,6 @@
     "reloadPage": "Reîncărcați pagina",
     "showError": "Afișați detalii despre eroare",
     "title": "Am intampinat o eroare!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Declinare a răspunderii",
-      "disclaimerText": "P-Stream nu găzduiește niciun fișier, ci doar trimite la servicii terțe. Problemele juridice ar trebui abordate cu gazdele și furnizorii de fișiere. P-Stream nu este responsabil pentru niciun fișier media afișat de furnizorii de video."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub",
-      "funding": "Ajută-ne",
-      "twitter": "Twitter"
-    },
-    "tagline": "Urmăriți emisiunile și filmele preferate cu această aplicație de streaming open source."
   },
   "global": {
     "name": "P-Stream",
@@ -212,69 +121,6 @@
     "goHome": "Înapoi acasă",
     "message": "Ne-am uitat peste tot: sub pubele, în dulap, În spatele proxy-ului dar din păcate nu am găsit pagina pe care dumneavoastră o căutați.",
     "title": "N-am putut găsi pagina"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Anulare",
-      "confirm": "Folosește configurația implicită",
-      "description": "Configurația implicită nu are cele mai bune fluxuri și poate fi insuportabil de înceată.",
-      "title": "Sunteți sigur(ă)?"
-    },
-    "extension": {
-      "back": "Înapoi",
-      "explainer": "Folosind această extensie de browser, puteți obține cele mai bune fluxuri pe care le avem de oferit. Cu doar o simplă instalare.",
-      "explainerIos": "Din păcate, extensia de browser nu e suportată pe iOS, Apăsați <bold>Înapoi</bold> pentru a alege altă opțiune.",
-      "extensionHelp": "Dacă ați instalat extensia dar nu e detectată, <bold>deschideți extensia din meniul extensiilor al browserului dvs.</bold> și urmăriți pașii de pe ecran.",
-      "linkChrome": "Instalare extensie pentru Chrome",
-      "linkFirefox": "Instalare extensie pentru Firefox",
-      "notDetecting": "Instalată pe Chrome dar site-ul nu o detectează? Încerați să reîmprospătați pagina!",
-      "notDetectingAction": "Reîncarcă pagina",
-      "status": {
-        "disallowed": "Extensia nu e activată pentru această pagină",
-        "disallowedAction": "Activare extensie",
-        "failed": "Nu s-a putut obține statusul",
-        "loading": "Așteptăm să vă instalați extensia",
-        "outdated": "Versiunea extensiei este prea veche",
-        "success": "Extensia funcționează conform așteptărilor!"
-      },
-      "submit": "Continuare",
-      "title": "Să începem cu o extensie"
-    },
-    "proxy": {
-      "back": "Înapoi",
-      "explainer": "Cu metoda proxy, puteți obține fluxuri de calitate prin a face un proxy cu autoservire.",
-      "input": {
-        "errorConnection": "Nu s-a putut conecta la proxy",
-        "errorInvalidUrl": "URL invalid",
-        "errorNotProxy": "Am așteptat un proxy dar am primit un site web",
-        "label": "URL-ul proxy-ului",
-        "placeholder": "https://"
-      },
-      "link": "Învață cum se face un proxy",
-      "submit": "Validare proxy",
-      "title": "Să facem un proxy nou"
-    },
-    "start": {
-      "explainer": "Pentru a obține cele mai bune fluxuri posibile, va trebui să alegeți ce metodă de streaming vreți să folosiți.",
-      "options": {
-        "default": {
-          "text": "Nu vreau fluxuri de calitate,<0 /> <1>folosește configurația implicită</1>"
-        },
-        "extension": {
-          "action": "Instalare extensie",
-          "description": "Instalați extensia browser și obțineți acces la cele mai bune surse.",
-          "quality": "Cea mai bună calitate",
-          "title": "Extensie browser"
-        },
-        "proxy": {
-          "action": "Configurare proxy",
-          "description": "Configurați un proxy în doar 5 minute și obținți acces la resurse grozave.",
-          "quality": "Calitate bună",
-          "title": "Proxy personalizat"
-        }
-      },
-      "title": "Hai să configurăm P-Stream"
-    }
   },
   "overlays": {
     "close": "Închide"
@@ -441,23 +287,6 @@
       "verifyingHumanity": "Verificați-vă umanitatea voastră..."
     }
   },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Se încarcă aplicația",
-    "loadingUser": "Se încarcă profilul tău",
-    "loadingUserError": {
-      "logout": "Deconectare",
-      "reset": "Resetare servere personalizate",
-      "text": "Nu s-a încărcat profilul dvs",
-      "textWithReset": "Nu s-a încărcat profilul dvs. de pe serverul personalizat, doriți să reveniți la serverul implicit?"
-    },
-    "migration": {
-      "failed": "Eroare la migrarea datelor voastre.",
-      "inProgress": "Vă rugăm să așteptați, migrăm datele dvs. Acest lucru nu ar trebui să dureze mult."
-    }
-  },
   "settings": {
     "account": {
       "accountDetails": {
@@ -584,9 +413,5 @@
       "title": "Subtitluri"
     },
     "unsaved": "Aveți modificări nesalvate"
-  },
-  "details": {
-    "resume": "Reia",
-    "play": "Redă"
   }
 }

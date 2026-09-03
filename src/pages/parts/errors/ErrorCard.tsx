@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
-import { Modal } from "@/components/overlays/Modal";
 import { DisplayError } from "@/components/player/display/displayInterface";
 import {
   formatErrorDebugInfo,
@@ -102,21 +101,5 @@ export function ErrorCardInPlainModal(props: {
         <ErrorCard error={props.error} onClose={props.onClose} />
       </div>
     </div>
-  );
-}
-
-export function ErrorCardInModal(props: {
-  error?: DisplayError | string;
-  id: string;
-  onClose: () => void;
-}) {
-  if (!props.error) return null;
-
-  return (
-    <Modal id={props.id}>
-      <div className="pointer-events-auto w-11/12 max-w-2xl">
-        <ErrorCard error={props.error} onClose={props.onClose} />
-      </div>
-    </Modal>
   );
 }

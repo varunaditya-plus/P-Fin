@@ -34,20 +34,6 @@ export function Heading2(props: TextProps) {
   );
 }
 
-export function Heading3(props: TextProps) {
-  return (
-    <h2
-      className={[
-        "text-lg lg:text-xl font-bold text-white mb-3",
-        props.border ? borderClass : null,
-        props.className ?? "",
-      ].join(" ")}
-    >
-      {props.children}
-    </h2>
-  );
-}
-
 export function Paragraph(props: TextProps) {
   return (
     <p

@@ -12,13 +12,13 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open `http://localhost:5173`, select the configured server or enter a Jellyfin server address, then sign in. Server addresses are remembered; public users appear when your server exposes them, with manual sign-in available. For the configured server, the same credentials establish a separate Seerr session. If that fails, `/discover` offers Seerr sign-in without blocking access to Jellyfin.
+Open `http://localhost:5173`, select the configured server or enter a Jellyfin server address, then sign in. Server addresses are remembered; public users appear when your server exposes them, with manual sign-in available. After Jellyfin accepts the login, choose whether to enable Seerr before entering the library. Skip it, or enter your Seerr server address and sign in with a Jellyfin account or a local Seerr email/password. The app does not automatically forward Jellyfin credentials or require a Seerr administrator API key. You can also enable Seerr later from `/discover`.
 
 The default upstreams are `http://100.64.96.96:8096` (Jellyfin) and `http://100.64.96.96:5055` (Seerr). Copy `example.env` to `.env` to change them. Use base URLs without a trailing slash. Passwords and administrator API keys do not belong in environment files. Jellyfin user tokens are held in session storage; Seerr uses its HttpOnly session cookie. Sign out ends both sessions.
 
 After changing an upstream address, restart `pnpm dev` or `pnpm preview`. A running preview keeps the proxy targets it loaded at startup. Recreate the Docker container after changing its environment. The machine running the proxy must be connected to the server's Tailscale network.
 
-The configured address uses the same-origin proxy. Other saved servers connect directly from the browser and must allow the client's origin; an HTTPS client requires an HTTPS direct server. Seerr remains associated with the configured server, so discovery is unavailable while signed in to another server.
+The configured address uses the same-origin proxy. Other saved servers connect directly from the browser and must allow the client's origin; an HTTPS client requires an HTTPS direct server. Seerr setup also uses the same-origin proxy when its address matches `SEERR_URL`. Custom Seerr addresses connect directly and require a reverse proxy that allows this client's origin and credentialed requests; Seerr does not enable cross-origin API access by default. HTTPS clients require HTTPS direct connections. For standard Seerr installations, set `SEERR_URL` and restart the client so the supplied address uses its proxy. Seerr connections are bound to the current Jellyfin login and stored for that browser session; passwords are never stored.
 
 ## Features
 
@@ -28,7 +28,7 @@ The configured address uses the same-origin proxy. Other saved servers connect d
 - Collections and playlists: remove entries without deleting media, reorder playlist entries, and update playlist names and public/private settings while retaining shared users.
 - Playback: the existing player uses Jellyfin-negotiated direct streams or HLS, with resume/progress reporting, track and version selection, quality options and an episode queue. Jellyfin audio, subtitle and next-episode preferences are saved on the server and applied during playback.
 - `/discover`: Seerr discovery and search, availability, request permissions/quotas and season-aware requests. Available titles are matched against the current Jellyfin user's accessible library.
-- Existing colours, themes, cards, carousel styles and player controls are retained. Legacy provider routes, account backend syncing and external subtitle scraping are not mounted by this client.
+- Existing colours, themes, cards, carousel styles and player controls are retained. Provider scraping, external subtitle services, legacy accounts and TMDB API calls are removed.
 
 ## Production
 
@@ -51,6 +51,8 @@ pnpm lint
 pnpm build
 ```
 
-The original discontinued provider dependency has been removed. Retained legacy source files compile against a local compatibility module whose provider APIs are disabled. No streaming provider is used by the Jellyfin client.
+Only Jellyfin and Seerr connections are required. The client needs no TMDB API key, streaming-provider account, browser extension, external CORS proxy or separate P-Stream account backend. Seerr supplies discovery metadata; IMDb/TMDB detail links use metadata IDs returned by Jellyfin or Seerr.
+
+`pnpm build:pwa` adds a service worker using the same manifest and icons as the regular build. Optional instance notices use `VITE_BANNER_MESSAGE` and `VITE_BANNER_ID`.
 
 P-Stream remains credited under the existing [MIT licence](LICENSE.md).

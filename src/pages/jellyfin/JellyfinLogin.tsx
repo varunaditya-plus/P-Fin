@@ -11,20 +11,28 @@ import {
   getServerLogin,
   serverEndpoint,
 } from "@/backend/jellyfin/servers";
-import { authenticateSeerr, logoutSeerr } from "@/backend/seerr/api";
+import { logoutSeerr } from "@/backend/seerr/api";
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
 import { LargeCard, LargeCardText } from "@/components/layout/LargeCard";
 import { AuthInputBox } from "@/components/text-inputs/AuthInputBox";
+import { SeerrSetup } from "@/pages/discover/SeerrSetup";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import {
   JellyfinServer,
+  JellyfinSession,
   useJellyfinAuth,
   useJellyfinServers,
 } from "@/stores/jellyfin";
+import { useSeerrConnection } from "@/stores/seerr";
 
 export function JellyfinLogin() {
-  const [stage, setStage] = useState<"server" | "users" | "login">("server");
+  const [stage, setStage] = useState<"server" | "users" | "login" | "seerr">(
+    "server",
+  );
+  const [pendingSession, setPendingSession] = useState<JellyfinSession | null>(
+    null,
+  );
   const [address, setAddress] = useState("");
   const [configuredAddress, setConfiguredAddress] = useState<string | null>(
     null,
@@ -46,6 +54,10 @@ export function JellyfinLogin() {
   const servers = useJellyfinServers((state) => state.servers);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (stage === "seerr") window.scrollTo(0, 0);
+  }, [stage]);
 
   useEffect(() => {
     mounted.current = true;
@@ -117,22 +129,11 @@ export function JellyfinLogin() {
     try {
       useJellyfinServers.getState().selectServer(server);
       const session = await loginJellyfin(name.trim(), secret, false);
-      await logoutSeerr().catch(() => undefined);
-      // The configured Seerr belongs to the configured Jellyfin server. Never
-      // send credentials entered for another server to that unrelated service.
-      if (server.apiUrl === "/jellyfin") {
-        await authenticateSeerr(name.trim(), secret).catch(() => undefined);
-      }
       if (!mounted.current || request !== requestId.current) return;
-      useJellyfinAuth.getState().setSession(session);
+      logoutSeerr().catch(() => undefined);
       setPassword("");
-      const from = (location.state as { from?: string } | null)?.from;
-      navigate(
-        from?.startsWith("/") && !from.startsWith("//") && from !== "/login"
-          ? from
-          : "/",
-        { replace: true },
-      );
+      setPendingSession(session);
+      setStage("seerr");
     } catch (reason) {
       if (mounted.current && request === requestId.current)
         setError(
@@ -159,6 +160,40 @@ export function JellyfinLogin() {
     event?.preventDefault();
     if (stage === "server") connect(address);
     else signIn(username, password);
+  }
+
+  function finishLogin(enableSeerr: boolean) {
+    if (!pendingSession) return;
+    if (!enableSeerr) useSeerrConnection.getState().setConnection(null);
+    useJellyfinAuth.getState().setSession(pendingSession);
+    const from = (location.state as { from?: string } | null)?.from;
+    // Skipping Seerr must still take the user into their Jellyfin library.
+    navigate(
+      from?.startsWith("/") &&
+        !from.startsWith("//") &&
+        from !== "/login" &&
+        (enableSeerr || !from.startsWith("/discover"))
+        ? from
+        : "/",
+      { replace: true },
+    );
+  }
+
+  if (stage === "seerr" && pendingSession) {
+    return (
+      <SubPageLayout>
+        <Helmet>
+          <title>Set up Seerr · P-Stream</title>
+        </Helmet>
+        <div className="px-4 pb-12">
+          <SeerrSetup
+            session={pendingSession}
+            onComplete={() => finishLogin(true)}
+            onSkip={() => finishLogin(false)}
+          />
+        </div>
+      </SubPageLayout>
+    );
   }
 
   return (

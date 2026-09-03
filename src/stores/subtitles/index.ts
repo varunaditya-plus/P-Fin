@@ -54,13 +54,9 @@ export interface SubtitleStyling {
 }
 
 export interface SubtitleStore {
-  lastSync: {
-    lastSelectedLanguage: string | null;
-  };
   enabled: boolean;
   lastSelectedLanguage: string | null;
   lastSelectedSubtitleId: string | null;
-  isOpenSubtitles: boolean;
   styling: SubtitleStyling;
   overrideCasing: boolean;
   delay: number;
@@ -72,11 +68,8 @@ export interface SubtitleStore {
     language?: string | null,
     subtitleId?: string | null,
   ): void;
-  setIsOpenSubtitles(isOpenSubtitles: boolean): void;
   setOverrideCasing(enabled: boolean): void;
   setDelay(delay: number): void;
-  importSubtitleLanguage(lang: string | null): void;
-  resetSubtitleSpecificSettings(): void;
   setShowDelayIndicator: (show: boolean) => void;
 }
 
@@ -84,12 +77,8 @@ export const useSubtitleStore = create(
   persist(
     immer<SubtitleStore>((set) => ({
       enabled: false,
-      lastSync: {
-        lastSelectedLanguage: null,
-      },
       lastSelectedLanguage: null,
       lastSelectedSubtitleId: null,
-      isOpenSubtitles: false,
       overrideCasing: false,
       delay: 0,
       styling: {
@@ -104,17 +93,7 @@ export const useSubtitleStore = create(
         borderThickness: 1,
       },
       showDelayIndicator: false,
-      resetSubtitleSpecificSettings() {
-        set((s) => {
-          s.delay = 0;
-          s.overrideCasing = false;
-        });
-      },
-      setIsOpenSubtitles(isOpenSubtitles) {
-        set((s) => {
-          s.isOpenSubtitles = isOpenSubtitles;
-        });
-      },
+
       updateStyling(newStyling) {
         set((s) => {
           if (newStyling.backgroundOpacity !== undefined)
@@ -185,12 +164,7 @@ export const useSubtitleStore = create(
           s.delay = Math.max(Math.min(500, delay), -500);
         });
       },
-      importSubtitleLanguage(lang) {
-        set((s) => {
-          s.lastSelectedLanguage = lang;
-          s.lastSync.lastSelectedLanguage = lang;
-        });
-      },
+
       setShowDelayIndicator(show: boolean) {
         set((s) => {
           s.showDelayIndicator = show;
@@ -199,7 +173,20 @@ export const useSubtitleStore = create(
     })),
     {
       name: "__MW::subtitles",
-      merge: (persisted, current) => merge({}, current, persisted),
+      version: 1,
+      migrate: (persisted) => persisted as SubtitleStore,
+      merge: (persisted, current) =>
+        merge(
+          {},
+          current,
+          Object.fromEntries(
+            Object.entries((persisted ?? {}) as Partial<SubtitleStore>).filter(
+              ([key]) =>
+                key in current &&
+                typeof current[key as keyof SubtitleStore] !== "function",
+            ),
+          ),
+        ),
     },
   ),
 );

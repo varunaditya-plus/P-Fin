@@ -1,6 +1,13 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
+import {
+  SeerrConnection,
+  matchesSeerrSession,
+  useSeerrConnection,
+} from "@/stores/seerr";
+
 import {
   SeerrError,
   authenticateSeerr,
@@ -14,142 +21,137 @@ import {
 } from "./api";
 import { SeerrDetails } from "./types";
 
-const jellyfin = vi.hoisted(() => ({
-  session: { serverUrl: "/jellyfin", userId: "jellyfin-user" } as {
-    serverUrl: string;
-    userId: string;
-  } | null,
-  selectedServer: { apiUrl: "/jellyfin" },
-}));
-
-vi.mock("@/backend/jellyfin/client", () => ({
-  getJellyfinSession: () => jellyfin.session,
-}));
-vi.mock("@/stores/jellyfin", () => ({
-  useJellyfinAuth: { getState: () => jellyfin },
-  useJellyfinServers: { getState: () => jellyfin },
-}));
+const jellyfinSession = {
+  serverUrl: "/jellyfin",
+  userId: "jellyfin-user",
+  accessToken: "test-token",
+  userName: "Test user",
+  deviceId: "test-device",
+};
+const configuredConnection: SeerrConnection = {
+  url: "http://seerr.example:5055",
+  apiUrl: "/seerr/api/v1",
+  authMethod: "jellyfin",
+  jellyfinServerUrl: jellyfinSession.serverUrl,
+  jellyfinUserId: jellyfinSession.userId,
+  jellyfinAccessToken: jellyfinSession.accessToken,
+  userId: 1,
+};
+const validUser = {
+  id: 1,
+  permissions: 2,
+  jellyfinUserId: jellyfinSession.userId,
+};
 
 beforeEach(() => {
-  jellyfin.session = { serverUrl: "/jellyfin", userId: "jellyfin-user" };
-  jellyfin.selectedServer = { apiUrl: "/jellyfin" };
+  useJellyfinAuth.getState().setSession(jellyfinSession);
+  useJellyfinServers.getState().selectServer({
+    id: "configured",
+    name: "Server",
+    url: "http://jellyfin.example",
+    apiUrl: "/jellyfin",
+  });
+  useSeerrConnection.getState().setConnection({ ...configuredConnection });
 });
 
 afterEach(() => {
+  useSeerrConnection.getState().setConnection(null);
+  useJellyfinAuth.getState().setSession(null);
+  useJellyfinServers.getState().selectServer(null);
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 function mockResponse(body: unknown, status = 200) {
-  const fetch = vi.fn().mockResolvedValue({
-    ok: status < 400,
-    status,
-    json: async () => body,
-  });
+  const fetch = vi
+    .fn()
+    .mockResolvedValue({ ok: status < 400, status, json: async () => body });
   vi.stubGlobal("fetch", fetch);
   return fetch;
 }
 
-describe("Seerr integration", () => {
-  it("rejects credentials and content requests for a custom Jellyfin server before sending them", async () => {
+function deferredResponse(fetch: ReturnType<typeof mockResponse>) {
+  let complete: ((value: Response) => void) | undefined;
+  fetch.mockImplementationOnce(
+    () =>
+      new Promise<Response>((resolve) => {
+        complete = resolve;
+      }),
+  );
+  return (response: Response) => complete?.(response);
+}
+
+const response = (body: unknown) =>
+  new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+
+describe("Seerr opt-in and session boundaries", () => {
+  it("makes no Seerr requests until a connection is explicitly configured", async () => {
     const fetch = mockResponse({});
-    jellyfin.session = {
-      serverUrl: "https://custom.example/jellyfin",
-      userId: "jellyfin-user",
-    };
-    await expect(
-      authenticateSeerr("custom-user", "custom-password"),
-    ).rejects.toMatchObject({ status: 403 });
+    useSeerrConnection.getState().setConnection(null);
+    await expect(authenticateSeerr("test", "password")).rejects.toMatchObject({
+      status: 403,
+    });
     await expect(getSeerrUser()).rejects.toMatchObject({ status: 403 });
     await expect(getSeerrPage("/discover/movies")).rejects.toMatchObject({
       status: 403,
     });
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
-  it("permits configured-server sign-in before publishing a Jellyfin session, but rejects a selected custom server", async () => {
-    const fetch = mockResponse({ id: 1, permissions: 2 });
-    jellyfin.session = null;
-    jellyfin.selectedServer = { apiUrl: "https://custom.example" };
-    await expect(
-      authenticateSeerr("custom-user", "custom-password"),
-    ).rejects.toMatchObject({ status: 403 });
-    expect(fetch).not.toHaveBeenCalled();
-    jellyfin.selectedServer = { apiUrl: "/jellyfin" };
-    await expect(
-      authenticateSeerr("test-user", "test-password"),
-    ).resolves.toMatchObject({ id: 1 });
-    expect(fetch).toHaveBeenCalledTimes(1);
-  });
-
-  it("can clear the old Seerr cookie while connected to a custom server", async () => {
-    const fetch = mockResponse(undefined, 204);
-    jellyfin.session = {
-      serverUrl: "https://custom.example",
-      userId: "custom-user",
-    };
     await logoutSeerr();
-    expect(fetch).toHaveBeenCalledWith(
-      "/seerr/api/v1/auth/logout",
-      expect.objectContaining({ method: "POST", credentials: "include" }),
-    );
+    expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("rechecks the selected server before sending queued sign-in credentials", async () => {
-    let finishLogout: ((value: Response) => void) | undefined;
-    const fetch = mockResponse({ id: 1, permissions: 2 });
-    fetch.mockImplementationOnce(
-      () =>
-        new Promise<Response>((resolve) => {
-          finishLogout = resolve;
-        }),
-    );
-    const logout = logoutSeerr();
-    const login = authenticateSeerr("test-user", "test-password");
-    const rejectedLogin = expect(login).rejects.toMatchObject({ status: 403 });
-    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-    jellyfin.session = {
-      serverUrl: "https://custom.example",
-      userId: "custom-user",
+  it.each([
+    { serverUrl: "https://other.example" },
+    { userId: "other-user" },
+    { accessToken: "other-token" },
+  ])(
+    "rejects a connection bound to a different Jellyfin session: %s",
+    async (change) => {
+      const fetch = mockResponse({});
+      useJellyfinAuth.getState().setSession({ ...jellyfinSession, ...change });
+      expect(
+        matchesSeerrSession(
+          configuredConnection,
+          useJellyfinAuth.getState().session,
+        ),
+      ).toBe(false);
+      await expect(seerrFetch("/discover/movies")).rejects.toMatchObject({
+        status: 401,
+      });
+      expect(fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it("accepts an explicitly chosen custom Seerr server for a custom Jellyfin session", async () => {
+    const session = {
+      ...jellyfinSession,
+      serverUrl: "https://jellyfin.custom.example/base",
     };
-    finishLogout?.(new Response(null, { status: 204 }));
-    await logout;
-    await rejectedLogin;
-    expect(fetch).toHaveBeenCalledTimes(1);
-  });
-
-  it("waits for pending logout before authenticating so old cookies cannot erase the new session", async () => {
-    let finishLogout: ((value: Response) => void) | undefined;
-    const fetch = mockResponse({ id: 1, permissions: 2 });
-    fetch.mockImplementationOnce(
-      () =>
-        new Promise<Response>((resolve) => {
-          finishLogout = resolve;
-        }),
-    );
-    const logout = logoutSeerr();
-    expect(logoutSeerr()).toBe(logout);
-    const login = authenticateSeerr("test-user", "test-password");
-    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
-    expect(fetch.mock.calls[0][0]).toBe("/seerr/api/v1/auth/logout");
-    finishLogout?.(new Response(null, { status: 204 }));
-    await logout;
-    await login;
-    expect(fetch.mock.calls[1][0]).toBe("/seerr/api/v1/auth/jellyfin");
-  });
-
-  it("allows a new sign-in after an older logout fails", async () => {
-    const fetch = mockResponse({ id: 1, permissions: 2 });
-    fetch.mockRejectedValueOnce(new Error("Offline"));
-    await expect(logoutSeerr()).rejects.toThrow("Offline");
-    await expect(
-      authenticateSeerr("test-user", "test-password"),
-    ).resolves.toMatchObject({ id: 1 });
-  });
-
-  it("authenticates with an HttpOnly cookie session without exposing a Jellyfin token", async () => {
-    const fetch = mockResponse({ id: 1, permissions: 2 });
-    await authenticateSeerr("test-user", "test-password", "test-token");
+    const connection = {
+      ...configuredConnection,
+      url: "https://seerr.custom.example/base",
+      apiUrl: "https://seerr.custom.example/base/api/v1",
+      jellyfinServerUrl: session.serverUrl,
+    };
+    useJellyfinAuth.getState().setSession(session);
+    useSeerrConnection.getState().setConnection(connection);
+    const fetch = mockResponse(validUser);
+    await getSeerrUser();
     expect(fetch).toHaveBeenCalledWith(
+      "https://seerr.custom.example/base/api/v1/auth/me",
+      expect.objectContaining({ credentials: "include" }),
+    );
+  });
+
+  it("allows explicit setup before publishing the pending Jellyfin session without persisting credentials", async () => {
+    useJellyfinAuth.getState().setSession(null);
+    useSeerrConnection.getState().setConnection(null);
+    const fetch = mockResponse(validUser);
+    await authenticateSeerr("test-user", "test-password", configuredConnection);
+    await getSeerrUser(configuredConnection);
+    expect(fetch.mock.calls[0]).toEqual([
       "/seerr/api/v1/auth/jellyfin",
       expect.objectContaining({
         credentials: "include",
@@ -157,22 +159,173 @@ describe("Seerr integration", () => {
         body: JSON.stringify({
           username: "test-user",
           password: "test-password",
+          email: "test-user",
         }),
       }),
+    ]);
+    expect(useSeerrConnection.getState().connection).toBeNull();
+    expect(sessionStorage.getItem("seerr-connection")).not.toContain(
+      "test-password",
     );
   });
 
-  it("submits only the selected TV seasons and uses Seerr's configured defaults", async () => {
-    const fetch = mockResponse({ id: 10, status: 1 });
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({
-        id: 1,
-        permissions: 2,
-        jellyfinUserId: "jellyfin-user",
+  it("uses email/password for explicitly selected local Seerr authentication", async () => {
+    const connection: SeerrConnection = {
+      ...configuredConnection,
+      authMethod: "local",
+      userId: undefined,
+    };
+    const fetch = mockResponse({ id: 20, permissions: 32 });
+    await authenticateSeerr("local@example.com", "test-password", connection);
+    await expect(getSeerrUser(connection)).resolves.toMatchObject({ id: 20 });
+    expect(fetch.mock.calls[0]).toEqual([
+      "/seerr/api/v1/auth/local",
+      expect.objectContaining({
+        body: JSON.stringify({
+          email: "local@example.com",
+          password: "test-password",
+        }),
       }),
+    ]);
+  });
+
+  it("checks linked Jellyfin identity only for Jellyfin authentication", async () => {
+    mockResponse({ id: 1, permissions: 2, jellyfinUserId: "other-user" });
+    await expect(getSeerrUser()).rejects.toMatchObject({ status: 401 });
+    useSeerrConnection
+      .getState()
+      .setConnection({ ...configuredConnection, authMethod: "local" });
+    await expect(getSeerrUser()).resolves.toMatchObject({ id: 1 });
+  });
+
+  it("rejects a changed Seerr cookie user even when local login was selected", async () => {
+    useSeerrConnection
+      .getState()
+      .setConnection({ ...configuredConnection, authMethod: "local" });
+    mockResponse({ id: 2, permissions: 2 });
+    await expect(getSeerrUser()).rejects.toMatchObject({ status: 401 });
+  });
+
+  it("clears the connection synchronously and logs out the captured old target", async () => {
+    const fetch = mockResponse(undefined, 204);
+    const finish = deferredResponse(fetch);
+    const logout = logoutSeerr();
+    expect(useSeerrConnection.getState().connection).toBeNull();
+    const replacement = {
+      ...configuredConnection,
+      url: "https://new.example",
+      apiUrl: "https://new.example/api/v1",
+    };
+    useSeerrConnection.getState().setConnection(replacement);
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    expect(fetch.mock.calls[0][0]).toBe("/seerr/api/v1/auth/logout");
+    finish(new Response(null, { status: 204 }));
+    await logout;
+    expect(useSeerrConnection.getState().connection).toEqual(replacement);
+  });
+
+  it("waits for old logout before new login and never redirects queued credentials", async () => {
+    const fetch = mockResponse(validUser);
+    const finish = deferredResponse(fetch);
+    const logout = logoutSeerr();
+    const connection = {
+      ...configuredConnection,
+      url: "https://chosen.example",
+      apiUrl: "https://chosen.example/api/v1",
+    };
+    const login = authenticateSeerr("test-user", "test-password", connection);
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    finish(new Response(null, { status: 204 }));
+    await logout;
+    await login;
+    expect(fetch.mock.calls[1][0]).toBe(
+      "https://chosen.example/api/v1/auth/jellyfin",
+    );
+  });
+
+  it("stops queued authentication when the Jellyfin account changes", async () => {
+    const fetch = mockResponse(validUser);
+    const finish = deferredResponse(fetch);
+    const logout = logoutSeerr();
+    const login = authenticateSeerr(
+      "test-user",
+      "test-password",
+      configuredConnection,
+    );
+    const rejection = expect(login).rejects.toMatchObject({ status: 401 });
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    useJellyfinAuth
+      .getState()
+      .setSession({ ...jellyfinSession, accessToken: "new-token" });
+    finish(new Response(null, { status: 204 }));
+    await logout;
+    await rejection;
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops pending setup credentials when the selected Jellyfin server changes", async () => {
+    const fetch = mockResponse(validUser);
+    const finish = deferredResponse(fetch);
+    const logout = logoutSeerr();
+    useJellyfinAuth.getState().setSession(null);
+    const login = authenticateSeerr(
+      "test-user",
+      "test-password",
+      configuredConnection,
+    );
+    const rejection = expect(login).rejects.toMatchObject({ status: 401 });
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    useJellyfinServers.getState().selectServer({
+      id: "other",
+      name: "Other",
+      url: "https://other.example",
+      apiUrl: "https://other.example",
     });
+    finish(new Response(null, { status: 204 }));
+    await logout;
+    await rejection;
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows explicit login after an older logout fails", async () => {
+    const fetch = mockResponse(validUser);
+    fetch.mockRejectedValueOnce(new Error("Offline"));
+    await expect(logoutSeerr()).rejects.toThrow("Offline");
+    await expect(
+      authenticateSeerr("test-user", "test-password", configuredConnection),
+    ).resolves.toMatchObject({ id: 1 });
+  });
+
+  it("reports actionable CORS and cookie guidance for an unreachable custom server", async () => {
+    const fetch = mockResponse({});
+    fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await expect(seerrFetch("/auth/me")).rejects.toThrow(
+      "CORS with credentials",
+    );
+  });
+
+  it("bounds an unresponsive Seerr request", async () => {
+    vi.useFakeTimers();
+    const fetch = mockResponse({});
+    fetch.mockImplementation(
+      (_url, options) =>
+        new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () =>
+            reject(new DOMException("Aborted", "AbortError")),
+          );
+        }),
+    );
+    const request = seerrFetch("/auth/me");
+    const rejection = expect(request).rejects.toMatchObject({ status: 504 });
+    await vi.advanceTimersByTimeAsync(15000);
+    await rejection;
+  });
+});
+
+describe("Seerr request integration", () => {
+  it("submits selected TV seasons using the verified connection and Seerr defaults", async () => {
+    const fetch = mockResponse({ id: 10, status: 1 });
+    fetch.mockResolvedValueOnce(response(validUser));
     await requestSeerrMedia({ id: 1396, mediaType: "tv" }, [2, 4], 1);
     expect(fetch).toHaveBeenCalledWith(
       "/seerr/api/v1/request",
@@ -197,25 +350,30 @@ describe("Seerr integration", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("rejects a Seerr session belonging to a different Jellyfin user", async () => {
-    mockResponse({ id: 1, permissions: 2, jellyfinUserId: "other-user" });
-    await expect(getSeerrUser()).rejects.toMatchObject({ status: 401 });
-  });
-
   it("rechecks the cookie session before creating a request", async () => {
-    const fetch = mockResponse({
-      id: 2,
-      permissions: 2,
-      jellyfinUserId: "jellyfin-user",
-    });
+    const fetch = mockResponse({ ...validUser, id: 2 });
     await expect(
       requestSeerrMedia({ id: 100, mediaType: "movie" }, undefined, 1),
     ).rejects.toMatchObject({ status: 401 });
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(
-      "/seerr/api/v1/auth/me",
-      expect.objectContaining({ credentials: "include" }),
+  });
+
+  it("never posts to a changed connection after an account-check response", async () => {
+    const fetch = mockResponse(validUser);
+    const finish = deferredResponse(fetch);
+    const request = requestSeerrMedia(
+      { id: 100, mediaType: "movie" },
+      undefined,
+      1,
     );
+    const rejection = expect(request).rejects.toMatchObject({ status: 401 });
+    useSeerrConnection.getState().setConnection({
+      ...configuredConnection,
+      apiUrl: "https://other.example/api/v1",
+    });
+    finish(response(validUser));
+    await rejection;
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("keeps movie and TV permissions separate, while allowing administrators", () => {

@@ -169,7 +169,6 @@ export function JellyfinPlayerView() {
         });
         setPlayback(result);
         store.setSource(result.source, result.captions, startAt, !wasPaused);
-        store.setSourceId("jellyfin");
         store.display?.setVolume(useVolumeStore.getState().volume);
         setBusy(false);
         const caption = result.captions.find(
@@ -316,7 +315,6 @@ export function JellyfinPlayerView() {
         store.setMeta({
           type: target.Type === "Episode" ? "show" : "movie",
           title: target.SeriesName ?? target.Name,
-          tmdbId: target.SeriesId ?? target.Id,
           jellyfinItemId: target.Id,
           jellyfinSeriesId: target.SeriesId,
           jellyfinGenres: target.Genres,
@@ -331,7 +329,6 @@ export function JellyfinPlayerView() {
             target.Type === "Episode"
               ? {
                   number: target.IndexNumber ?? 0,
-                  tmdbId: target.Id,
                   title: target.Name,
                   overview: target.Overview,
                 }
@@ -340,7 +337,6 @@ export function JellyfinPlayerView() {
             target.Type === "Episode"
               ? {
                   number: target.ParentIndexNumber ?? 0,
-                  tmdbId: target.SeasonId ?? "",
                   title: `Season ${target.ParentIndexNumber ?? 0}`,
                 }
               : undefined,
@@ -578,7 +574,7 @@ export function JellyfinPlayerView() {
   return (
     <JellyfinPlaybackContext.Provider value={controls}>
       {playback ? <JellyfinSessionReporter playback={playback} /> : null}
-      <PlayerPart backUrl="/" jellyfin>
+      <PlayerPart backUrl="/">
         {busy || error ? (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-background-main/90 p-8">
             <div className="max-w-lg text-center space-y-5">

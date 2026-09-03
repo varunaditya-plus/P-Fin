@@ -1,15 +1,12 @@
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { updateSettings } from "@/backend/accounts/settings";
 import { Button } from "@/components/buttons/Button";
 import { Toggle } from "@/components/buttons/Toggle";
 import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
 import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
 import { Heading2 } from "@/components/utils/Text";
-import { useBackendUrl } from "@/hooks/auth/useBackendUrl";
-import { useAuthStore } from "@/stores/auth";
 import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePreferencesStore } from "@/stores/preferences";
 import {
@@ -196,8 +193,6 @@ export function KeyboardCommandsEditModal({
   id,
 }: KeyboardCommandsEditModalProps) {
   const { t } = useTranslation();
-  const account = useAuthStore((s) => s.account);
-  const backendUrl = useBackendUrl();
   const { hideModal } = useOverlayStack();
   const modal = useModal(id);
   const keyboardShortcuts = usePreferencesStore((s) => s.keyboardShortcuts);
@@ -347,27 +342,14 @@ export function KeyboardCommandsEditModal({
     setEditingShortcuts(DEFAULT_KEYBOARD_SHORTCUTS);
   }, []);
 
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(() => {
     setKeyboardShortcuts(editingShortcuts);
     setEnableNumberKeySeeking(editingEnableNumberKeySeeking);
-
-    if (account && backendUrl) {
-      try {
-        await updateSettings(backendUrl, account, {
-          keyboardShortcuts: editingShortcuts,
-          enableNumberKeySeeking: editingEnableNumberKeySeeking,
-        });
-      } catch (error) {
-        console.error("Failed to save keyboard shortcuts:", error);
-      }
-    }
 
     hideModal(id);
   }, [
     editingShortcuts,
     editingEnableNumberKeySeeking,
-    account,
-    backendUrl,
     setKeyboardShortcuts,
     setEnableNumberKeySeeking,
     hideModal,

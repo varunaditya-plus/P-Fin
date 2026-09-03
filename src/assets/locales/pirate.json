@@ -1,74 +1,7 @@
 {
-  "about": {
-    "description": "Ahoy there! \"P-Stream\" be a fine vessel on the digital seas, a web application scourin' the vast internet for streams. The crew be settin' their sights on a mostly minimalistic approach to enjoyin' the booty of entertainment. Arrr!",
-    "faqTitle": "Common queries",
-    "q1": {
-      "body": "Arrr! \"P-Stream\" be a noble ship that don't harbor any content itself. When ye click to set yer eyes on a treasure, the application sets sail across the internet, scourin' the vast seas for the chosen media. Check the loading screen and the 'video sources' tab to spy on which source be providin' the entertainment. No media be uploaded by \"P-Stream\" — it be all through this searchin' mechanism, savvy?",
-      "title": "From which cove does the content emerge, me heartie?"
-    },
-    "q2": {
-      "body": "Avast, ye landlubber! Be warned, ye can't be requestin' a show or movie on \"P-Stream,\" for it don't manage any content. All the booty ye set yer eyes on be viewed through sources sailin' the internet. The ship merely be a vessel, not a keeper of the treasures. Navigate wisely, me heartie!",
-      "title": "Where be I able to make a hearty request for a show or movie?"
-    },
-    "q3": {
-      "body": "Arrr, set yer sights on this, me matey! Our search results be fueled by The Movie Database (TMDB), showin' the way regardless of whether our sources in the vast digital seas actually bear the coveted content. It be a guide, not a promise of a sure find. Navigate the waters wisely, for the winds of the internet can be fickle!",
-      "title": "Why be the search results unveilin' the show or movie, yet I can't set sail to watch it?"
-    },
-    "title": "The tales of \"P-Stream\""
-  },
   "actions": {
     "copied": "Copied",
     "copy": "Copy"
-  },
-  "auth": {
-    "createAccount": "Don't have a ship yet? <0>Hoist the sails and make yer own</0>",
-    "deviceNameLabel": "Ship name",
-    "deviceNamePlaceholder": "Muad'Dib's Pirate Ship",
-    "generate": {
-      "description": "If ye lose this, ye be a silly goose and will be posted on the wall of shame™️",
-      "next": "Ahoy! I've stashed me secret code away for safe keepin'.",
-      "passphraseFrameLabel": "Secret Code",
-      "title": "Yer Passphrase"
-    },
-    "hasAccount": "Arrr! Ye already got a ship on the seas? <0>Board here, me heartie!</0>",
-    "login": {
-      "description": "Arr, ye be askin' for the key to me top-secret lair, also known as The Fortress of Wordsmithery, accessed only by recitin' the sacred incantation of the 12-word passphrase!",
-      "deviceLengthError": "Bestow a name upon yer contraption, me heartie!",
-      "passphraseLabel": "12-Word Passphrase",
-      "passphrasePlaceholder": "Passphrase",
-      "submit": "Hoist Anchor",
-      "title": "Hoist the Jolly Roger",
-      "validationError": "Arr, incorrect or incomplete passphrase"
-    },
-    "register": {
-      "information": {
-        "color1": "First Mate color",
-        "color2": "Second Mate color",
-        "header": "Enter a moniker for yer ship and choose a pirate icon and colors, arrr!",
-        "icon": "Pirate icon",
-        "next": "Forward",
-        "title": "Pirate Account information"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Did ye configure it correctly?",
-        "title": "Failed to reach the backend"
-      },
-      "host": "Do ye trust <0>{{hostname}}</0>?",
-      "no": "Abandon Ship",
-      "title": "Do ye trust this ship?",
-      "yes": "Trust"
-    },
-    "verify": {
-      "description": "If ye already lost it, how will ye ever be able to take care of a wee buccaneer?",
-      "invalidData": "Data be not valid",
-      "noMatch": "Passphrase doesn't match",
-      "passphraseLabel": "Yer passphrase",
-      "recaptchaFailed": "ReCaptcha validation failed",
-      "register": "Forge yer account, matey!",
-      "title": "Enter yer passphrase"
-    }
   },
   "errors": {
     "badge": "Shiver me timbers",
@@ -76,18 +9,6 @@
     "reloadPage": "Reload the page",
     "showError": "Reveal the details of the error, me matey",
     "title": "That be an error, Captain"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Disclaimer",
-      "disclaimerText": "P-Stream does not host any files, it merely links to 3rd party services. Legal issues should be taken up with the file hosts and providers. P-Stream be not responsible for any media files shown by the video providers."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub"
-    },
-    "tagline": "Watch yer favorite shows and movies with this open source streaming ship."
   },
   "global": {
     "name": "P-Stream",
@@ -166,69 +87,6 @@
     "goHome": "Back to home port",
     "message": "We looked everywhere: under the bins, in the closet, behind the proxy but ultimately couldn't find the treasure map ye be lookin' for.",
     "title": "Couldn't find that treasure map"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Cancel",
-      "confirm": "Use default setup",
-      "description": "The default setup does nah 'ave the best streams 'n can be unbearably slow.",
-      "title": "Are ye sure?"
-    },
-    "extension": {
-      "back": "Go back",
-      "explainer": "Usin' the browser extension, ye can get the best streams we 'ave t' offer. Wit' jus' a simple install.",
-      "explainerIos": "Unfortunately, the browser extension ain't supported on iOS, Press <bold>Go back</bold> t' choose another option.",
-      "extensionHelp": "If ye've installed the extension but 'tisn't detected, <bold>open the extension through yer browsers extension menu</bold> 'n follow the steps on screen.",
-      "linkChrome": "Install Chrome extension",
-      "linkFirefox": "Install Firefox extension",
-      "notDetecting": "Installed on Chrome, but the site ain't detecting it? Give the page a good reload!",
-      "notDetectingAction": "Reload page",
-      "status": {
-        "disallowed": "Extension ain't enabled fer this page",
-        "disallowedAction": "Enable extension",
-        "failed": "Failed t' request status",
-        "loading": "Waitin' fer ye t' install the extension",
-        "outdated": "Extension version too ole",
-        "success": "Extension be workin' as expected!"
-      },
-      "submit": "Continue",
-      "title": "Let's start wit' an extension"
-    },
-    "proxy": {
-      "back": "Go back",
-      "explainer": "Wit' the proxy method, ye can get great quality streams by makin' a self-service proxy.",
-      "input": {
-        "errorConnection": "Couldn't connect t' proxy",
-        "errorInvalidUrl": "Ain't a valid URL",
-        "errorNotProxy": "Expected a proxy but got a website",
-        "label": "Proxy URL",
-        "placeholder": "https://"
-      },
-      "link": "Learn how t' make a proxy",
-      "submit": "Submit proxy",
-      "title": "Let's make a new proxy"
-    },
-    "start": {
-      "explainer": "T' get the best streams possible, ye will needs t' choose which streamin' method ye wants t' use.",
-      "options": {
-        "default": {
-          "text": "I don't wants good quality streams,<0 /> <1>use the default setup</1>"
-        },
-        "extension": {
-          "action": "Install extension",
-          "description": "Install browser extension 'n gain access t' the best sources.",
-          "quality": "Best quality",
-          "title": "Browser extension"
-        },
-        "proxy": {
-          "action": "Setup proxy",
-          "description": "Setup a proxy in jus' 5 minutes 'n gain access t' great sources.",
-          "quality": "Good quality",
-          "title": "Custom proxy"
-        }
-      },
-      "title": "Let's get ye setup wit' P-Stream"
-    }
   },
   "overlays": {
     "close": "Close"
@@ -392,23 +250,6 @@
       "error": "Failed t' verify yer piracy. Please try again.",
       "title": "We needs t' verify that ye're real pirate.",
       "verifyingHumanity": "Verifyin' yer piracy..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Loadin' application",
-    "loadingUser": "Loadin' yer pirate profile",
-    "loadingUserError": {
-      "logout": "Logout",
-      "reset": "Reset custom ship",
-      "text": "Failed to load yer pirate profile",
-      "textWithReset": "Failed to load yer pirate profile from yer custom ship, want to reset back to default?"
-    },
-    "migration": {
-      "failed": "Failed to migrate yer booty.",
-      "inProgress": "Please hold, we be migratin' yer booty. This shouldn't take long."
     }
   },
   "settings": {

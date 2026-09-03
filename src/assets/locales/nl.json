@@ -1,84 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream is een webapplicatie die het internet afzoekt naar streams. Het team streeft naar een minimalistische benadering van het consumeren van inhoud.",
-    "faqTitle": "Veelgestelde vragen",
-    "q1": {
-      "body": "P-Stream host geen inhoud. Wanneer je op iets klikt om te bekijken, wordt het internet afgezocht naar de geselecteerde media (op het laadscherm en in het tabblad 'videobronnen' kun je zien welke bron je gebruikt). Media wordt nooit geüpload door P-Stream, alles gaat via dit zoekmechanisme.",
-      "title": "Waar komt de content vandaan?"
-    },
-    "q2": {
-      "body": "Het is niet mogelijk om een show of film aan te vragen, P-Stream beheert geen content. Alle inhoud wordt bekeken via bronnen op het internet.",
-      "title": "Waar kan ik een show of film aanvragen?"
-    },
-    "q3": {
-      "body": "Onze zoekresultaten worden aangestuurd door The Movie Database (TMDB) en worden weergegeven ongeacht of onze bronnen de inhoud daadwerkelijk hebben.",
-      "title": "De zoekresultaten tonen de show of film, waarom kan ik hem niet afspelen?"
-    },
-    "title": "Over P-Stream",
-    "q4": {
-      "body": "Alle data worden gesynchroniseerd met de community backend. Iedereen kan deze ook vrij gebruiken.",
-      "title": "Hoe zit het met mijn gegevens en dergelijke?"
-    },
-    "q5": {
-      "body": "P-Stream heeft een Discord server die je bovenaan in deze pagina kunt vinden!",
-      "title": "Hoe kan ik meer te weten komen?"
-    }
-  },
   "actions": {
     "copied": "Gekopieerd",
     "copy": "Kopieer"
-  },
-  "auth": {
-    "createAccount": "Heb je nog geen account? <0>Maak er dan een.</0>",
-    "deviceNameLabel": "Naam toestel",
-    "deviceNamePlaceholder": "Mijn telefoon",
-    "generate": {
-      "description": "Je passphrase werkt als je gebruikersnaam en wachtwoord. Sla je passphrase dus goed op, je hebt hem namelijk nodig om in te loggen. <bold>Verlies hem dus NIET!</bold>",
-      "next": "Ik heb mijn passphrase opgeslagen",
-      "passphraseFrameLabel": "Wachtwoord",
-      "title": "Uw wachtwoord"
-    },
-    "hasAccount": "Heb je al een account? <0>Log hier in.</0>",
-    "login": {
-      "description": "Vul je wachtwoord in",
-      "deviceLengthError": "Vul de naam van je apparaat in",
-      "passphraseLabel": "12-Woordelijke wachtwoord",
-      "passphrasePlaceholder": "Wachtwoord",
-      "submit": "Log in",
-      "title": "Log in bij je account",
-      "validationError": "Incorrecte of incompleet wachtwoord"
-    },
-    "register": {
-      "information": {
-        "color1": "Profielkleur 1",
-        "color2": "Profielkleur 2",
-        "header": "Vul hier het naam van je apparaat. Kies ook je de kleuren die je wil, en een icoontje",
-        "icon": "Icoontje",
-        "next": "Volgende",
-        "title": "Account informatie"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Heb je het goed ingesteld?",
-        "title": "Kon niet met de server verbinden"
-      },
-      "host": "Je gaat zo verbinden met <0>{{hostname}}</0>, check even of je deze link vertrouwt",
-      "no": "Vorige pagina",
-      "noHost": "De server is nog niet geconfigureerd, daarom kunt u geen account aanmaken",
-      "noHostTitle": "Server niet geconfigureerd!",
-      "title": "Vertrouw je deze server?",
-      "yes": "Ik vertrouw deze server"
-    },
-    "verify": {
-      "description": "Vul je wachtwoord in zodat we weten dat je het opgeslagen hebt, dan kunnen we je account maken",
-      "invalidData": "Ongeldige data",
-      "noMatch": "Wachtwoord komt niet overeen",
-      "passphraseLabel": "Jouw wachtwoord",
-      "recaptchaFailed": "ReCatpcha validatie is mislukt",
-      "register": "Maak een account",
-      "title": "Bevestig je wachtwoord"
-    }
   },
   "errors": {
     "badge": "Tis kapot",
@@ -86,19 +9,6 @@
     "reloadPage": "Herlaad de pagina",
     "showError": "Meer informatie over foutmelding",
     "title": "Er is iets fout gegaan!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Disclaimer",
-      "disclaimerText": "P-Stream host geen bestanden, maar linkt alleen naar diensten van derden. Juridische kwesties moeten worden opgenomen met de bestandshosts en providers. P-Stream is niet verantwoordelijk voor mediabestanden die worden getoond door de videoproviders."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "Github",
-      "twitter": "Twitter / X"
-    },
-    "tagline": "Bekijk je favoriete shows en films met deze open source streaming app."
   },
   "global": {
     "name": "P-Stream",
@@ -208,70 +118,6 @@
     "message": "We hebben echt alles geprobeerd, zelfs tijdrijzen; echter hebben we deze pagina helaas niet kunnen vinden.",
     "title": "Pagina niet gevonden",
     "reloadButton": "Probeer opnieuw"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Annuleren",
-      "confirm": "Gebruik standaardinstallatie",
-      "description": "De standaardinstallatie heeft niet de beste streams. Je mist de beste bronnen!",
-      "title": "Weet je het zeker?"
-    },
-    "extension": {
-      "back": "Terug",
-      "explainer": "Door gebruik te maken van de browserextensie kun je de beste streams krijgen. Met slechts een eenvoudige installatie. 👌",
-      "explainerIos": "Helaas, de browserextensie is niet ondersteund op iOS. Druk op <bold>Terug</bold> om een andere optie te kiezen.",
-      "extensionHelp": "Als je de extensie hebt geïnstalleerd maar niet wordt gedetecteerd, <bold>open dan de extensie via het extensies menu in je browser</bold> en volg de stappen op het scherm.",
-      "linkChrome": "Installeer de Chrome-extensie",
-      "linkFirefox": "Installeer de Firefox-extensie",
-      "notDetecting": "Geïnstalleerd op Chrome, maar de site detecteert het niet? Probeer de pagina opnieuw te laden!",
-      "notDetectingAction": "Pagina opnieuw laden",
-      "status": {
-        "disallowed": "Extensie is niet ingeschakeld voor deze pagina",
-        "disallowedAction": "Extensie inschakelen",
-        "failed": "Mislukt om status aan te vragen",
-        "loading": "Aan het wachten tot je de extensie hebt geïnstalleerd",
-        "outdated": "Extensieversie te oud",
-        "success": "Extensie werkt zoals verwacht!"
-      },
-      "submit": "Doorgaan",
-      "title": "Laten we beginnen met de extensie"
-    },
-    "proxy": {
-      "back": "Terug",
-      "explainer": "Met de proxy-methode kun je hoogwaardige streams verkrijgen door zelf een proxy op te zetten.",
-      "input": {
-        "errorConnection": "Kon geen verbinding maken met de proxy",
-        "errorInvalidUrl": "Geen geldige URL",
-        "errorNotProxy": "Verwachtte een proxy maar kreeg een website",
-        "label": "Proxy URL",
-        "placeholder": "https://"
-      },
-      "link": "Leer hoe je de proxy kunt instellen",
-      "submit": "Proxy opslaan",
-      "title": "Laten we een nieuwe proxy instellen"
-    },
-    "start": {
-      "explainer": "Om de beste streams mogelijk te krijgen, moet je kiezen welke streammethode je wilt gebruiken.",
-      "options": {
-        "default": {
-          "text": "Ik wil geen streams van goede kwaliteit, gebruik de standaardinstellingen."
-        },
-        "extension": {
-          "action": "Installeer extensie",
-          "description": "Installeer browserextensie en krijg toegang tot de beste bronnen.",
-          "quality": "Beste kwaliteit",
-          "title": "Browserextensie"
-        },
-        "proxy": {
-          "action": "Proxy instellen",
-          "description": "Proxy instellen in slechts 5 minuten en krijg toegang tot geweldige bronnen.",
-          "quality": "Goede kwaliteit",
-          "title": "Eigen proxy"
-        },
-        "or": "of"
-      },
-      "title": "Laten we beginnen met het instellen van P-Stream"
-    }
   },
   "overlays": {
     "close": "Sluiten"
@@ -458,24 +304,6 @@
       "verifyingHumanity": "Je menselijkheid verifiëren..."
     }
   },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Toepassing laden",
-    "loadingUser": "Je profiel laden",
-    "loadingUserError": {
-      "logout": "Uitloggen",
-      "reset": "Aangepaste server resetten",
-      "text": "Het laden van uw profiel is mislukt",
-      "textWithReset": "Is het laden van je profiel van je aangepaste server mislukt en wil je terug naar de standaardserver?",
-      "reload": "Opnieuw laden"
-    },
-    "migration": {
-      "failed": "Het migreren van uw gegevens is mislukt.",
-      "inProgress": "Even geduld, we zijn je gegevens aan het migreren. Dit zal niet lang duren."
-    }
-  },
   "settings": {
     "account": {
       "accountDetails": {
@@ -639,115 +467,6 @@
     },
     "unsaved": "U heeft niet-opgeslagen wijzigingen"
   },
-  "migration": {
-    "loginRequired": "U moet ingelogd zijn om uw data te migreren! Ga terug en log in om verder te gaan.",
-    "start": {
-      "title": "Migreer uw gegevens",
-      "explainer": "Als je je gegevens wilt migreren of back-uppen, kun je dat doen met de onderstaande opties. Zo kunt u uw gegevens behouden wanneer u van backendserver wisselt.",
-      "options": {
-        "direct": {
-          "description": "Hiermee worden je gegevens direct naar de nieuwe server gemigreerd. Dit is de snelste optie.  <br /><br />Met deze optie kun je je wachtwoordzin hetzelfde houden!",
-          "action": "Gegevens overdragen",
-          "title": "Rechtstreekse migratie",
-          "quality": "Gemakkelijkst en het snelst"
-        },
-        "or": "Of",
-        "download": {
-          "description": "Hierdoor worden je gegevens gedownload naar je apparaat. Je kunt ze dan uploaden naar de nieuwe server of ze gewoon bewaren.",
-          "title": "Download gegevens",
-          "quality": "Meer technisch",
-          "action": "Download data"
-        },
-        "upload": {
-          "title": "Upload data",
-          "description": "Upload uw eerder geëxporteerde gegevensbestand om uw bladwijzers en voortgang op dit account te herstellen.",
-          "quality": "Herstellen vanaf back-up",
-          "action": "Upload Data"
-        }
-      }
-    },
-    "upload": {
-      "exportedOn": "Geëxporteerd op",
-      "button": {
-        "processing": "Bezig met verwerken...",
-        "home": "Ga naar start",
-        "import": "Gegevens importeren",
-        "success": "Importeren voltooid"
-      },
-      "items": {
-        "progress": "Kijkvoortgang",
-        "bookmarks": "Media met bladwijzers"
-      },
-      "file": {
-        "name": "Bestandsnaam",
-        "description": "Selecteer het bestand dat je wilt uploaden",
-        "select": "Selecteer bestand",
-        "change": "Wijzig bestand"
-      },
-      "dataPreview": "Voorbeeld:",
-      "title": "Upload gegevens",
-      "description": "Upload je eerder geëxporteerde gegevensbestand om je bladwijzers en voortgang op dit account te herstellen.",
-      "status": {
-        "processing": "Gegevens worden verwerkt...",
-        "error": "Het is niet gelukt om je gegevens te uploaden. 😿",
-        "success": "Je gegevens zijn succesvol geüpload! 🎉"
-      }
-    },
-    "direct": {
-      "description": "Voer de bestemmingsbackend URL in om je huidige accountgegevens naar een nieuwe backend te migreren. Je wachtwoordzin blijft hetzelfde!",
-      "title": "Rechtstreekse migratie",
-      "backendLabel": "Bestemmingsbackend URL",
-      "recaptchaLabel": "ReCaptcha Sleutel (Optioneel)",
-      "toggleLable": "ReCaptcha nodig?",
-      "status": {
-        "error": "Migratie van je gegevens is mislukt. 😿",
-        "success": "Je gegevens zijn succesvol gemigreerd! 🎉"
-      },
-      "button": {
-        "migrate": "Migreren",
-        "processing": "Bezig met verwerken...",
-        "login": "Ga verder naar inloggen",
-        "home": "Ga naar startpagina"
-      }
-    },
-    "download": {
-      "title": "Gegevens downloaden",
-      "description": "Hiermee download je jouw gegevens naar je apparaat. Je kunt deze daarna uploaden naar de nieuwe server of bewaren voor later gebruik.",
-      "items": {
-        "description": "Download bevat:",
-        "bookmarks": "Media met bladwijzer",
-        "progress": "Voortgang volgen"
-      },
-      "status": {
-        "error": "Het downloaden van je gegevens is mislukt. 😿",
-        "success": "Je gegevens zijn succesvol gedownload! 🎉"
-      },
-      "button": {
-        "download": "Gegevens downloaden",
-        "home": "Ga naar startpagina",
-        "login": "Ga door naar inloggen"
-      }
-    },
-    "back": "Ga terug"
-  },
-  "downtimeNotice": {
-    "badge": "Problemen",
-    "message": "P-Stream ondervindt opnieuw problemen met sommige providers. Als je een show niet kunt vinden of afspelen, probeer dan de bron te wijzigen. Verwacht dat deze fout zich zal blijven voordoen gedurende de onderstaande tijden.",
-    "goHome": "Ga naar startpagina",
-    "title": "Providerproblemen"
-  },
-  "support": {
-    "text": "P-Stream is ontworpen om zo gebruiksvriendelijk mogelijk te zijn. Mensen hebben echter nog steeds vragen en problemen. Deze pagina is hier om deze tekortkomingen op te lossen",
-    "title": "Ondersteuning",
-    "q2": {
-      "body": "We hebben een <0>GitHub</0> waar je een gedetailleerd issue in onze repository kunt aanmaken. Daarnaast kun je, als je dat wilt, een pull request indienen om het probleem zelf op te lossen.",
-      "title": "Hoe kan ik een bug of probleem melden?"
-    },
-    "q1": {
-      "body": "Je kunt lid worden van de officiële <0>P‑Stream Discord</0> en daar vragen stellen, of je kunt een e‑mail sturen naar het adres onderaan deze pagina.",
-      "title": "Waar kan ik hulp krijgen?"
-    }
-  },
   "discover": {
     "randomMovie": {
       "button": "Kijk iets willekeurigs",
@@ -774,17 +493,5 @@
       "subtitle": "Ontdek de nieuwste hits en tijdloze klassiekers."
     },
     "scrollToTop": "Terug naar boven"
-  },
-  "jip": {
-    "q2": {
-      "body": "We hebben een <0>GitHub</0> waar je een gedetailleerd issue in onze repository kunt aanmaken. Daarnaast kun je, als je dat wilt, een pull request indienen om het probleem zelf op te lossen.",
-      "title": "Hoe kan ik een bug of probleem melden?"
-    },
-    "text": "P‑Stream is niet zomaar uit een kokosnootboom gevallen, het is grotendeels door één persoon gemaakt (en niet zomaar één, maar een zeer epische).",
-    "q1": {
-      "body": "Je kunt lid worden van de officiële <0>P‑Stream Discord</0> en daar vragen stellen, of je kunt een e‑mail sturen naar het adres onderaan deze pagina.",
-      "title": "Waar kan ik hulp krijgen?"
-    },
-    "title": "Over de maker"
   }
 }

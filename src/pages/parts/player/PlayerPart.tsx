@@ -1,16 +1,9 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { BrandPill } from "@/components/layout/BrandPill";
 import { Player } from "@/components/player";
-import { SkipSegmentButton } from "@/components/player/atoms/SkipSegmentButton";
-import { ThumbsFeedback } from "@/components/player/atoms/ThumbsFeedback";
-import { WatchPartyStatus } from "@/components/player/atoms/WatchPartyStatus";
 import { useShouldShowControls } from "@/components/player/hooks/useShouldShowControls";
-import {
-  SegmentData,
-  useSkipTime,
-} from "@/components/player/hooks/useSkipTime";
 import {
   JellyfinBookmarkButton,
   JellyfinEpisodesRouter,
@@ -20,34 +13,22 @@ import {
 } from "@/components/player/jellyfin/JellyfinControls";
 import { PauseOverlay } from "@/components/player/overlays/PauseOverlay";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { PlayerMeta, playerStatus } from "@/stores/player/slices/source";
+import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
-import { usePreferencesStore } from "@/stores/preferences";
-import { useWatchPartyStore } from "@/stores/watchParty";
-
-import { ScrapingPartInterruptButton, Tips } from "./ScrapingPart";
 
 export interface PlayerPartProps {
   children?: ReactNode;
-  jellyfin?: boolean;
   backUrl: string;
   onLoad?: () => void;
-  onMetaChange?: (meta: PlayerMeta) => void;
 }
 
 export function PlayerPart(props: PlayerPartProps) {
   const { showTargets, showTouchTargets } = useShouldShowControls();
   const status = usePlayerStore((s) => s.status);
   const { isMobile } = useIsMobile();
-  const manualSourceSelection = usePreferencesStore(
-    (s) => s.manualSourceSelection,
-  );
   const isLoading = usePlayerStore((s) => s.mediaPlaying.isLoading);
-  const { isHost, enabled } = useWatchPartyStore();
   const { t } = useTranslation();
   const meta = usePlayerStore((s) => s.meta);
-
-  const inControl = !enabled || isHost;
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isPWA = window.matchMedia("(display-mode: standalone)").matches;
@@ -90,49 +71,21 @@ export function PlayerPart(props: PlayerPartProps) {
     }, 1000);
   };
 
-  // State for thumbs feedback
-  const [thumbsFeedbackData, setThumbsFeedbackData] = useState<{
-    segment: SegmentData;
-    skipTime: number;
-  } | null>(null);
-
-  const segments = useSkipTime();
-
-  const handleSkipTriggered = useCallback(
-    (segment: SegmentData, skipTime: number) => {
-      setThumbsFeedbackData({ segment, skipTime });
-    },
-    [],
-  );
-
-  const handleThumbsFeedback = useCallback(() => {
-    setThumbsFeedbackData(null);
-  }, []);
-
   return (
-    <Player.Container
-      onLoad={props.onLoad}
-      showingControls={showTargets}
-      jellyfin={props.jellyfin}
-    >
+    <Player.Container onLoad={props.onLoad} showingControls={showTargets}>
       {props.children}
       <PauseOverlay />
       <Player.BlackOverlay
         show={showTargets && status === playerStatus.PLAYING}
       />
-      {props.jellyfin ? (
-        <JellyfinEpisodesRouter />
-      ) : (
-        <Player.EpisodesRouter onChange={props.onMetaChange} />
-      )}
-      {props.jellyfin ? <JellyfinSettingsRouter /> : <Player.SettingsRouter />}
+      <JellyfinEpisodesRouter />
+      <JellyfinSettingsRouter />
       <Player.SubtitleView controlsShown={showTargets} />
 
       {status === playerStatus.PLAYING ? (
         <Player.CenterControls>
           <Player.LoadingSpinner />
           <Player.AutoPlayStart />
-          <Player.CastingNotification />
         </Player.CenterControls>
       ) : null}
 
@@ -140,21 +93,13 @@ export function PlayerPart(props: PlayerPartProps) {
         className="text-white"
         show={showTouchTargets && status === playerStatus.PLAYING}
       >
-        <Player.SkipBackward iconSizeClass="text-3xl" inControl={inControl} />
+        <Player.SkipBackward iconSizeClass="text-3xl" />
         <Player.Pause
           iconSizeClass="text-5xl"
           className={isLoading ? "opacity-0" : "opacity-100"}
         />
-        <Player.SkipForward iconSizeClass="text-3xl" inControl={inControl} />
+        <Player.SkipForward iconSizeClass="text-3xl" />
       </Player.CenterMobileControls>
-
-      <div
-        className={`absolute right-4 z-50 transition-all duration-300 ease-in-out ${
-          showTargets ? "top-16" : "top-1"
-        }`}
-      >
-        {!props.jellyfin ? <WatchPartyStatus /> : null}
-      </div>
 
       <Player.TopControls show={showTargets}>
         <div className="grid grid-cols-[1fr,auto] xl:grid-cols-3 items-center">
@@ -172,13 +117,8 @@ export function PlayerPart(props: PlayerPartProps) {
               </span>
             )}
 
-            {props.jellyfin ? <JellyfinInfoButton /> : <Player.InfoButton />}
-
-            {props.jellyfin ? (
-              <JellyfinBookmarkButton />
-            ) : (
-              <Player.BookmarkButton />
-            )}
+            <JellyfinInfoButton />
+            <JellyfinBookmarkButton />
           </div>
           <div className="text-center hidden xl:flex justify-center items-center">
             <Player.EpisodeTitle />
@@ -187,24 +127,13 @@ export function PlayerPart(props: PlayerPartProps) {
             <BrandPill />
           </div>
           <div className="flex lg:hidden items-center justify-end">
-            {status === playerStatus.PLAYING ? (
-              <>
-                <Player.Airplay />
-                {!props.jellyfin ? <Player.Chromecast /> : null}
-              </>
-            ) : null}
+            {status === playerStatus.PLAYING ? <Player.Airplay /> : null}
           </div>
         </div>
       </Player.TopControls>
 
       <Player.BottomControls show={showTargets}>
-        {!props.jellyfin &&
-          status !== playerStatus.PLAYING &&
-          !manualSourceSelection && <Tips />}
         <div className="flex items-center justify-center space-x-3 h-full">
-          {!props.jellyfin && status === playerStatus.SCRAPING ? (
-            <ScrapingPartInterruptButton />
-          ) : null}
           {status === playerStatus.PLAYING ? (
             <>
               {isMobile ? <Player.Time short /> : null}
@@ -217,28 +146,20 @@ export function PlayerPart(props: PlayerPartProps) {
             {status === playerStatus.PLAYING ? (
               <>
                 <Player.Pause />
-                <Player.SkipBackward inControl={inControl} />
-                <Player.SkipForward inControl={inControl} />
+                <Player.SkipBackward />
+                <Player.SkipForward />
                 <Player.Volume />
                 <Player.Time />
               </>
             ) : null}
           </Player.LeftSideControls>
           <div className="flex items-center space-x-3">
-            <Player.Episodes inControl={inControl} />
-            {props.jellyfin ? (
-              <JellyfinNextEpisode compact controlsShowing={showTargets} />
-            ) : (
-              <Player.SkipEpisodeButton
-                inControl={inControl}
-                onChange={props.onMetaChange}
-              />
-            )}
+            <Player.Episodes />
+            <JellyfinNextEpisode compact controlsShowing={showTargets} />
             {status === playerStatus.PLAYING ? (
               <>
                 <Player.Pip />
                 <Player.Airplay />
-                {!props.jellyfin ? <Player.Chromecast /> : null}
               </>
             ) : null}
             {status === playerStatus.PLAYBACK_ERROR ||
@@ -260,7 +181,7 @@ export function PlayerPart(props: PlayerPartProps) {
             {!(isPWA && isIOS) && status === playerStatus.PLAYING && (
               <Player.Pip />
             )}
-            <Player.Episodes inControl={inControl} />
+            <Player.Episodes />
             {status === playerStatus.PLAYING ? (
               <div className="hidden ssm:block">
                 <Player.Captions />
@@ -290,34 +211,7 @@ export function PlayerPart(props: PlayerPartProps) {
       <Player.VolumeChangedPopout />
       <Player.SubtitleDelayPopout />
       <Player.SpeedChangedPopout />
-      <Player.TIDBSubmissionSuccessPopout />
-      <Player.UnreleasedEpisodeOverlay />
-
-      {props.jellyfin ? (
-        <JellyfinNextEpisode controlsShowing={showTargets} />
-      ) : (
-        <Player.NextEpisodeButton
-          controlsShowing={showTargets}
-          onChange={props.onMetaChange}
-          inControl={inControl}
-        />
-      )}
-
-      {!props.jellyfin ? (
-        <SkipSegmentButton
-          controlsShowing={showTargets}
-          segments={segments}
-          inControl={inControl}
-          onChangeMeta={props.onMetaChange}
-          onSkipTriggered={handleSkipTriggered}
-        />
-      ) : null}
-
-      <ThumbsFeedback
-        controlsShowing={showTargets}
-        feedbackData={thumbsFeedbackData}
-        onAction={handleThumbsFeedback}
-      />
+      <JellyfinNextEpisode controlsShowing={showTargets} />
     </Player.Container>
   );
 }

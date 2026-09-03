@@ -221,7 +221,6 @@ describe("Jellyfin playback", () => {
     expect(result.captions[0]).toMatchObject({
       id: "jellyfin-4",
       language: "en",
-      needsProxy: false,
     });
     expect(new URL(result.captions[0].url).pathname).toBe(
       "/jellyfin/Videos/item/source/Subtitles/4/0/Stream.vtt",

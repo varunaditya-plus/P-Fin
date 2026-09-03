@@ -1,88 +1,7 @@
 {
-  "about": {
-    "description": "Minion-web is a banana application that searches the banana for bananas. The banana aims for a mostly banana approach to consuming banana.",
-    "faqTitle": "Banana questions",
-    "q1": {
-      "body": "Minion-web does not banana any banana. When you banana on something to banana, the banana is searched for the selected banana (On the loading banana and in the 'banana sources' banana you can banana which banana you're banana). Banana never gets banana by Minion-web, everything is banana this banana mechanism.",
-      "title": "Where does the banana come from?"
-    },
-    "q2": {
-      "body": "It's not banana to banana a banana or banana, Minion-web does not banana any banana. All banana is banana through bananas on the banana.",
-      "title": "Banana can I banana a banana or banana?",
-      "section": "banana search"
-    },
-    "q3": {
-      "body": "Our banana results are banana by The Banana Banana (TBMB) and banana regardless of whether our bananas actually have the banana.",
-      "title": "The banana results banana the banana or banana, banana can't I banana it?",
-      "section": "banana search"
-    },
-    "title": "About Minion-web",
-    "q9": {
-      "title": "This banana is missing / Can I request banana?"
-    },
-    "q11": {
-      "title": "Why am i seeing a banana screen?"
-    },
-    "q4": {
-      "title": "What about my banana and stuff?"
-    },
-    "q6": {
-      "title": "Is there a Banana app?"
-    }
-  },
   "actions": {
     "copied": "Banana",
     "copy": "Banana"
-  },
-  "auth": {
-    "createAccount": "Whaaaat? Don't have an account yet? <0>Create an account.</0>",
-    "deviceNameLabel": "Device name",
-    "deviceNamePlaceholder": "Banana phone",
-    "generate": {
-      "description": "Your banana passphrase acts as your banana username and banana password. Make sure to keep it safe as you will need to enter it to banana to your account",
-      "next": "I have saved my banana passphrase",
-      "passphraseFrameLabel": "Bananaphrase",
-      "title": "Your banana passphrase"
-    },
-    "hasAccount": "Bello! Already have an account? <0>Login here.</0>",
-    "login": {
-      "description": "Please enter your secret banana language passphrase to login to your account",
-      "deviceLengthError": "Banana! Please enter a device name",
-      "passphraseLabel": "12-Banana passphrase",
-      "passphrasePlaceholder": "Banana Passphrase",
-      "submit": "Bello! Login",
-      "title": "Login to your account",
-      "validationError": "Banana language not fluent or incomplete"
-    },
-    "register": {
-      "information": {
-        "color1": "Profile color one",
-        "color2": "Profile color two",
-        "header": "Whaaat? Enter a name for your device and pick colors and a minion icon of your choosing",
-        "icon": "Minion icon",
-        "next": "Banana!",
-        "title": "Account information"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Did you configure it correctly?",
-        "title": "Failed to reach server"
-      },
-      "host": "You are connecting to <0>{{hostname}}</0> - please confirm you trust it before making a banana account",
-      "no": "Go back, banana",
-      "title": "Do you trust this server?",
-      "yes": "I trust this server, banana!"
-    },
-    "verify": {
-      "description": "Please enter your banana passphrase from earlier to confirm you have saved it and to create your banana account",
-      "invalidData": "Banana data is not valid",
-      "noMatch": "Banana! Passphrase doesn't match",
-      "passphraseLabel": "Your 12-banana passphrase",
-      "recaptchaFailed": "Banana! ReCaptcha validation failed",
-      "register": "Create banana account",
-      "title": "Confirm your banana passphrase"
-    }
   },
   "errors": {
     "badge": "It broke",
@@ -90,18 +9,6 @@
     "reloadPage": "Reload the banana",
     "showError": "Show banana details",
     "title": "We encountered a banana!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Banana",
-      "disclaimerText": "Minion-web does not banana any bananas, it merely banana to 3rd banana bananas. Banana issues should be banana up with the banana bananas and bananas. Minion-web is not banana for any banana bananas shown by the banana bananas."
-    },
-    "links": {
-      "discord": "Banana",
-      "legal": "Banana",
-      "github": "Banana"
-    },
-    "tagline": "Banana your favourite bananas and bananas with this open source banana app."
   },
   "global": {
     "name": "banana-web",
@@ -327,23 +234,6 @@
       "error": "Failed to verify your banananess. Please try banana.",
       "title": "We banana to verify that you're banana",
       "verifyingHumanity": "Verifying your banana..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Banana"
-    },
-    "loadingApp": "Loading banana",
-    "loadingUser": "Loading your banana",
-    "loadingUserError": {
-      "logout": "Banana",
-      "reset": "Banana banana banana",
-      "text": "Failed to banana your banana",
-      "textWithReset": "Failed to banana your banana from your banana banana, banana to banana back to the banana banana?"
-    },
-    "migration": {
-      "failed": "Banana to banana your banana.",
-      "inProgress": "Please banana, we are banana your banana. This shouldn't banana long."
     }
   },
   "settings": {

@@ -1,5 +1,3 @@
-import classNames from "classnames";
-
 export function LargeCard(props: {
   children: React.ReactNode;
   top?: React.ReactNode;
@@ -33,25 +31,6 @@ export function LargeCardText(props: {
         {props.children ? (
           <div className="text-type-text mt-4">{props.children}</div>
         ) : null}
-      </div>
-    </div>
-  );
-}
-
-export function LargeCardButtons(props: {
-  children: React.ReactNode;
-  splitAlign?: boolean;
-}) {
-  return (
-    <div className="mt-12">
-      <div
-        className={classNames("mx-auto", {
-          "flex flex-row-reverse justify-between items-center":
-            props.splitAlign,
-          "flex max-w-xs flex-col-reverse gap-3": !props.splitAlign,
-        })}
-      >
-        {props.children}
       </div>
     </div>
   );

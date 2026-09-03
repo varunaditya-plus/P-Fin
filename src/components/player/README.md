@@ -15,7 +15,7 @@ These parts are internally used, they aren't exported. Do not use them outside o
 
 ### `/display`
 
-The display interface, abstraction on how to actually play the content (e.g Video element, chrome casting, etc)
+The display interface, abstraction on how to actually play the content using the browser video element and HLS
 
 - It must be completely separate from any react code
 - It must not interact with state, pass async data back with events
@@ -34,10 +34,13 @@ miscellaneous logic, put anything that is unique to the video player internals.
 
 Hooks only used for video player.
 
-- only exception is usePlayer, as its used outside of the player to control the player
 
 ### `~/src/stores/player`
 
 State for the video player.
 
 - Only parts related to the video player may utilize the state
+
+### `/jellyfin`
+
+Jellyfin settings, episode controls, and playback context. The page loads authenticated Jellyfin streams and reports playback sessions; the display only plays the selected source.

@@ -1,97 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream internette akışlar için tarama yapan bir web uygulamasıdır. Ekip, içerik tüketmeye karşı ekseriyetle minimalist bir yaklaşım sergilemektedir.",
-    "faqTitle": "Sıkça sorulan sorular",
-    "q1": {
-      "body": "P-Stream herhangi bir içerik barındırmaz. İzlemek için bir şeye tıkladığınızda, seçilen medya için internette arama yapılır (Yükleme ekranında ve ‘video kaynakları’ sekmesinde hangi kaynağı kullandığınızı görebilirsiniz). Medya asla P-Stream tarafından yüklenmez, her şey bu arama mekanizması aracılığıyla gerçekleşir.",
-      "title": "İçerik nereden geliyor?",
-      "section": "genel"
-    },
-    "q2": {
-      "body": "Bir dizi veya film talep etmek mümkün değildir, P-Stream herhangi bir içeriği yönetmez. Tüm içerikler internet üzerindeki kaynaklar aracılığıyla görüntülenir.",
-      "title": "Bir dizi veya filmi nereden talep edebilirim?",
-      "section": "arama"
-    },
-    "q3": {
-      "body": "Arama sonuçlarımız The Movie Database (TMDB) tarafından desteklenmektedir ve kaynaklarımızın içeriğe gerçekten sahip olup olmadığına bakılmaksızın görüntülenir.",
-      "title": "Arama sonuçları diziyi veya filmi gösteriyor, neden oynatamıyorum?",
-      "section": "arama"
-    },
-    "title": "P-Stream hakkında",
-    "q4": {
-      "body": "Tüm veriler topluluk sunucusuyla senkronize edilir, isteyen herkes bunu kullanmakta özgürdür.",
-      "title": "Peki ya benim verileri ve bilgilerim?",
-      "section": "genel"
-    },
-    "q5": {
-      "body": "P-Stream’in bir Discord sunucusu var, sayfanın en üst kısmına bak!",
-      "title": "Daha fazlasını nasıl bulabilirim?"
-    },
-    "help": "Bir cevap bulamıyor musunuz? <0>Buradan destek alın.</0>",
-    "searchPlaceholder": "SSS'de arama yapın...",
-    "sections": {
-      "general": "Genel",
-      "search": "Arama ve İçerik Kullanılabilirliği",
-      "playback": "Oynatma Sorunları",
-      "connections": "Bağlantılar",
-      "language": "Dil ve Altyazı Ayarları"
-    }
-  },
   "actions": {
     "copied": "Kopyalandı",
     "copy": "Kopyala"
-  },
-  "auth": {
-    "createAccount": "Henüz bir hesabınız yok mu? <0>Hesap oluşturun.</0>",
-    "deviceNameLabel": "Cihaz ismi",
-    "deviceNamePlaceholder": "Kişisel telefon",
-    "generate": {
-      "description": "Şifreleme anahtarınız, kullanıcı adınız ve parolanız olarak işlev görür. Hesabınıza giriş yapmak için bu parolayı girmeniz gerekeceğinden onu güvende tuttuğunuzdan emin olun",
-      "next": "Şifreleme anahtarımı kaydettim",
-      "passphraseFrameLabel": "Şifreleme anahtarı",
-      "title": "Şifreleme anahtarınız"
-    },
-    "hasAccount": "Zaten hesabınız var mı?<0>Giriş yapın.</0>",
-    "login": {
-      "description": "Hesabınıza giriş yapmak için lütfen şifreleme anahtarınızı girin",
-      "deviceLengthError": "Lütfen bir cihaz ismi girin",
-      "passphraseLabel": "12 kelimelik şifreleme anahtarı",
-      "passphrasePlaceholder": "Şifreleme anahtarı",
-      "submit": "Giriş yap",
-      "title": "Hesabınıza giriş yapın",
-      "validationError": "Yanlış veya eksik şifreleme anahtarı"
-    },
-    "register": {
-      "information": {
-        "color1": "Birinci hesap rengi",
-        "color2": "İkinci hesap rengi",
-        "header": "Cihazınız için bir isim girin, zevkinize göre renk ve kullanıcı simgesi seçin",
-        "icon": "Kullanıcı simgesi",
-        "next": "İleri",
-        "title": "Hesap bilgisi"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Doğru şekilde yapılandırdınız mı?",
-        "title": "Sunucuya ulaşılamadı"
-      },
-      "host": "<0>{{hostname}}</0> adlı sunucuya bağlanıyorsunuz - lütfen hesap oluşturmadan önce sunucuya güvendiğinizi onaylayın",
-      "no": "Geri dön",
-      "noHost": "Sunucu henüz yapılandırılmadığı için hesap oluşturamazsınız",
-      "noHostTitle": "Sunucu kullanılamıyor!",
-      "title": "Bu sunucuya güveniyor musunuz?",
-      "yes": "Bu sunucuya güveniyorum"
-    },
-    "verify": {
-      "description": "Kaydettiğinizi doğrulamak ve hesabınızı oluşturmak için önceki aşamada gösterilen şifreleme anahtarınızı girin",
-      "invalidData": "Veri geçersiz",
-      "noMatch": "Şifreleme anahtarı eşleşmiyor",
-      "passphraseLabel": "12 kelimelik şifreleme anahtarınız",
-      "recaptchaFailed": "ReCaptcha doğrulaması başarısız",
-      "register": "Hesap oluştur",
-      "title": "Şifreleme anahtarınızı doğrulayın"
-    }
   },
   "errors": {
     "badge": "Bir şeyler ters gitti",
@@ -99,20 +9,6 @@
     "reloadPage": "Sayfayı yenile",
     "showError": "Hata ayrıntılarını göster",
     "title": "Bir hatayla karşılaştık!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Sorumluluk Reddi",
-      "disclaimerText": "P-Stream herhangi bir dosya barındırmaz, yalnızca 3. parti hizmetlere bağlantı verir. Yasal meseleler, dosya barındırıcıları ve sağlayıcıları ile görüşülmelidir. P-Stream, video sağlayıcıları tarafından gösterilen hiçbir medya dosyasından sorumlu değildir."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub",
-      "twitter": "Twitter",
-      "funding": "Bizi destekleyin"
-    },
-    "tagline": "Bu açık kaynaklı akış uygulamasıyla en sevdiğiniz dizileri ve filmleri izleyin."
   },
   "global": {
     "name": "P-Stream",
@@ -229,69 +125,6 @@
     "goHome": "Ana sayfaya dön",
     "message": "Her yere baktık: bazanın altına, dolabın içine hatta ara sunucuya ama maalesef aradığınız sayfayı bulamadık.",
     "title": "Sayfa bulunamadı"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "İptal Et",
-      "confirm": "Ön Tanımlı Ayarları Kullan",
-      "description": "Varsayılan ayarlar en iyi akış hizmetlerini sunmayabilir ve oldukça yavaş olabilir.",
-      "title": "Emin misiniz?"
-    },
-    "extension": {
-      "back": "Geri Dön",
-      "explainer": "Tarayıcı uzantısını kullanarak, size sunduğumuz en iyi akışlara erişebilirsiniz. Kurulumu ise oldukça basit.",
-      "explainerIos": "Ne yazık ki, tarayıcı uzantısı iOS cihazlarında desteklenmemektedir. <bold>Geri Dön</bold> düğmesine basarak başka bir seçenek seçebilirsiniz.",
-      "extensionHelp": "Eklenti yüklediyseniz ancak algılamıyorsa, <bold>tarayıcınızın uzantı menüsünden eklentiyi açın</bold> ve ekran adımları takip edin.",
-      "linkChrome": "Chrome uzantısını yükleyin",
-      "linkFirefox": "Firefox uzantısını yükleyin",
-      "notDetecting": "Chrome'a yüklendi, ancak site algılamıyor mu? Sayfayı yenileyin!",
-      "notDetectingAction": "Sayfayı yenile",
-      "status": {
-        "disallowed": "Bu sayfa için uzantı etkinleştirilmemiş",
-        "disallowedAction": "Uzantıyı etkinleştir",
-        "failed": "Durum bilgisi alınamadı",
-        "loading": "Uzantıyı yüklemenizi bekliyoruz",
-        "outdated": "Uzantınız çok eski",
-        "success": "Uzantı sorunsuz çalışıyor!"
-      },
-      "submit": "Devam Et",
-      "title": "Hadi bir uzantıyla başlayalım"
-    },
-    "proxy": {
-      "back": "Geri Dön",
-      "explainer": "Ara sunucu yöntemiyle, yüksek kalitede yayınlara kolayca erişin.",
-      "input": {
-        "errorConnection": "Proxy'ye bağlanılamadı",
-        "errorInvalidUrl": "Geçerli bir URL değil",
-        "errorNotProxy": "Proxy bekleniyordu, web sitesine yönlendirildi",
-        "label": "Proxy URL",
-        "placeholder": "https://"
-      },
-      "link": "Proxy oluşturmayı öğrenin",
-      "submit": "Proxy'yi Gönder",
-      "title": "Hadi yeni bir proxy oluşturalım"
-    },
-    "start": {
-      "explainer": "En iyi akış deneyimi için kullanmak istediğiniz akış yöntemini seçmeniz gerekiyor.",
-      "options": {
-        "default": {
-          "text": "Yüksek kaliteli akış istemiyorum,<0 /> <1>varsayılan ayarı kullanın</1>"
-        },
-        "extension": {
-          "action": "Uzantıyı Yükle",
-          "description": "En iyi kaynaklara erişmek için tarayıcı uzantısını yükleyin.",
-          "quality": "En yüksek kalite",
-          "title": "Tarayıcı uzantısı"
-        },
-        "proxy": {
-          "action": "Proxy'yi Kur",
-          "description": "Sadece 5 dakikada proxy kurun ve harika kaynaklara erişin.",
-          "quality": "İyi kalite",
-          "title": "Özel Proxy"
-        }
-      },
-      "title": "P-Stream ile sizi hazır hale getirelim"
-    }
   },
   "overlays": {
     "close": "Kapat"
@@ -467,23 +300,6 @@
       "verifyingHumanity": "İnsan olduğunuz doğrulanıyor..."
     }
   },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Uygulama yükleniyor",
-    "loadingUser": "Profiliniz yükleniyor",
-    "loadingUserError": {
-      "logout": "Çıkış yap",
-      "reset": "Özel sunucuyu sıfırla",
-      "text": "Profiliniz yüklenemedi",
-      "textWithReset": "Profiliniz özel sunucunuzdan yüklenemedi, varsayılan sunucuya sıfırlamak ister misiniz?"
-    },
-    "migration": {
-      "failed": "Verileriniz taşınamadı.",
-      "inProgress": "Lütfen bekleyin, verilerinizi taşıyoruz. Bu çok uzun sürmez."
-    }
-  },
   "settings": {
     "account": {
       "accountDetails": {
@@ -610,67 +426,5 @@
       "title": "Altyazılar"
     },
     "unsaved": "Kaydedilmemiş değişiklikleriniz mevcut"
-  },
-  "migration": {
-    "loginRequired": "Verilerinizi taşıyabilmek için giriş yapmanız gerekmektedir! Devam edebilmek için lütfen geri dönüp giriş yapın.",
-    "start": {
-      "explainer": "Verilerinizi taşımak veya yedeklemek isterseniz, aşağıdaki seçenekleri kullanabilirsiniz. Bu, arka plan sunucularını değiştirdiğinizde verilerinizi korumanızı sağlar.",
-      "title": "Verilerini taşı",
-      "options": {
-        "or": "ya da",
-        "direct": {
-          "description": "Bu, verilerinizi doğrudan yeni sunucuya taşıyacaktır. Bu en hızlı seçenektir. <br /><br />Bu seçenek, şifrenizi aynı tutmanıza olanak tanır!",
-          "title": "Doğrudan taşıma",
-          "quality": "En kolay ve hızlı",
-          "action": "Veri aktar"
-        },
-        "download": {
-          "description": "Bu, veriyi senin cihazına indirecek. Sonra yeni sunucuya yükleyebilir veya saklayabilirsin.",
-          "title": "Veriyi indir",
-          "quality": "Daha teknik",
-          "action": "Veriyi indir"
-        },
-        "upload": {
-          "title": "Veri Yükle",
-          "description": "Bu hesaptaki yer imlerinizi ve ilerlemenizi geri yüklemek için daha önce dışa aktardığınız veri dosyanızı yükleyin.",
-          "quality": "Yedeklemeden geri yükle",
-          "action": "Veri Yükle"
-        }
-      }
-    },
-    "download": {
-      "description": "Bu hesaptaki yer imlerinizi ve ilerlemenizi geri yüklemek için daha önce dışa aktardığınız veri dosyanızı yükleyin.",
-      "title": "Veriyi indir"
-    },
-    "direct": {
-      "description": "Mevcut hesap verilerinizi yeni bir arka uca taşımak için hedef arka uç URL'sini girin. Bu, parolanızı aynı tutar!",
-      "title": "Direkt taşıma",
-      "backendLabel": "Hedef Arka Uç URL'si",
-      "recaptchaLabel": "ReCaptcha Anahtarı (İsteğe bağlı)",
-      "toggleLable": "ReCaptcha Gerekli Mi?",
-      "status": {
-        "error": "Verinizi taşıyamadık. 😿",
-        "success": "Veriniz başarılı bir şekilde taşınmıştır! 🎉"
-      },
-      "button": {
-        "migrate": "Taşı",
-        "processing": "İşleniyor...",
-        "home": "Eve git",
-        "login": "Girişe devam"
-      }
-    }
-  },
-  "details": {
-    "resume": "Devam et",
-    "play": "Oynat",
-    "releaseDate": "Yayın Tarihi:",
-    "votes": "oylar",
-    "tmdb": "TMDB'de görüntüle",
-    "imdb": "TMDb'de görüntüle",
-    "episodes": "Bölümler",
-    "season": "Sezon",
-    "language": "Dil:",
-    "episode": "Bölüm",
-    "endsAt": "{{time}}'de bitiyor"
   }
 }

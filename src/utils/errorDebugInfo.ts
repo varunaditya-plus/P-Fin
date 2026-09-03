@@ -20,14 +20,12 @@ export interface ErrorDebugInfo {
   };
   player: {
     status: string;
-    sourceId: string | null;
-    embedId: string | null;
     currentQuality: string | null;
     meta: {
       title: string;
       type: string;
-      tmdbId: string;
-      imdbId?: string;
+      jellyfinItemId: string;
+      jellyfinSeriesId?: string;
       releaseYear: number;
       season?: number;
       episode?: number;
@@ -120,15 +118,13 @@ export function gatherErrorDebugInfo(error: any): ErrorDebugInfo {
     },
     player: {
       status: playerStore.status,
-      sourceId: playerStore.sourceId,
-      embedId: (playerStore as any).embedId ?? null,
       currentQuality: playerStore.currentQuality,
       meta: playerStore.meta
         ? {
             title: playerStore.meta.title,
             type: playerStore.meta.type,
-            tmdbId: playerStore.meta.tmdbId,
-            imdbId: playerStore.meta.imdbId,
+            jellyfinItemId: playerStore.meta.jellyfinItemId,
+            jellyfinSeriesId: playerStore.meta.jellyfinSeriesId,
             releaseYear: playerStore.meta.releaseYear,
             season: playerStore.meta.season?.number,
             episode: playerStore.meta.episode?.number,
@@ -211,14 +207,14 @@ export function formatErrorDebugInfo(info: ErrorDebugInfo): string {
     ``,
     `=== PLAYER STATE ===`,
     `Status: ${info.player.status}`,
-    `Source ID: ${info.player.sourceId || "null"}`,
-    `Embed ID: ${info.player.embedId || "null"}`,
     `Quality: ${info.player.currentQuality || "null"}`,
     info.player.meta
       ? [
           `Media: ${info.player.meta.title} (${info.player.meta.type})`,
-          `TMDB ID: ${info.player.meta.tmdbId}`,
-          info.player.meta.imdbId ? `IMDB ID: ${info.player.meta.imdbId}` : "",
+          `Jellyfin item: ${info.player.meta.jellyfinItemId}`,
+          info.player.meta.jellyfinSeriesId
+            ? `Jellyfin series: ${info.player.meta.jellyfinSeriesId}`
+            : "",
           `Year: ${info.player.meta.releaseYear}`,
           info.player.meta.season ? `Season: ${info.player.meta.season}` : "",
           info.player.meta.episode

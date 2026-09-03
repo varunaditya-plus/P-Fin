@@ -1,86 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream je webová aplikace, která vyhledává na internetu proudy médií. Cílem týmu je převážně minimalistický přístup ke konzumaci obsahu.",
-    "faqTitle": "Často kladené otázky",
-    "q1": {
-      "body": "P-Stream nehostuje žádný obsah. Když kliknete na něco, co chcete sledovat, na internetu se vyhledá vybrané médium (Na obrazovce načítání a na kartě 'zdroje videa' můžete vidět, který zdroj používáte). Média se nikdy nenahrávají P-Streamem, vše probíhá prostřednictvím tohoto vyhledávacího mechanismu.",
-      "title": "Kde bereme obsah?"
-    },
-    "q2": {
-      "body": "Není možné požádat o pořad nebo film, P-Stream nespravuje žádný obsah. Veškerý obsah je prohlížen prostřednictvím zdrojů na internetu.",
-      "title": "Kde můžu požádat o pořad nebo film?"
-    },
-    "q3": {
-      "body": "Naše výsledky vyhledávání jsou založeny na The Movie Database (TMDB) a zobrazují se bez ohledu na to, zda naše zdroje skutečně obsah mají.",
-      "title": "Ve výsledcích vyhledávání se zobrazuje pořad nebo film, proč jej nemůžu přehrát?"
-    },
-    "title": "O P-Streamu",
-    "sections": {
-      "language": "Jazyk & nastavení titulků"
-    },
-    "searchPlaceholder": "Prohledat FAQ...",
-    "q6": {
-      "title": "Existuje i P-Stream aplikace?"
-    },
-    "q11": {
-      "title": "Proč vidím černou obrazovku?"
-    }
-  },
   "actions": {
     "copied": "Zkopírováno",
     "copy": "Zkopírovat"
-  },
-  "auth": {
-    "createAccount": "Ještě nemáte účet? <0>Vytvořte si účet.</0>",
-    "deviceNameLabel": "Název zařízení",
-    "deviceNamePlaceholder": "Osobní telefon",
-    "generate": {
-      "description": "Vaše přístupová fráze se chová jako vaše přezdívka a heslo. Uchovejte jí v bezpečí, protože jí budete muset zadat, abyste se mohli přihlásit ke svému účtu",
-      "next": "Uložil jsem si moji přístupovou frázi",
-      "passphraseFrameLabel": "Přístupová fráze",
-      "title": "Vaše přístupová fráze"
-    },
-    "hasAccount": "Již máte účet? <0> Přihlaste se zde.</0>",
-    "login": {
-      "description": "Pro přihlášení ke svému účtu zadejte svou přístupovou frázi",
-      "deviceLengthError": "Zadejte název zařízení",
-      "passphraseLabel": "12slovná přístupová fráze",
-      "passphrasePlaceholder": "Přístupová fráze",
-      "submit": "Přihlásit",
-      "title": "Přihlaste se ke svému účtu",
-      "validationError": "Nesprávná nebo neúplná přístupová fráze"
-    },
-    "register": {
-      "information": {
-        "color1": "První barva profilu",
-        "color2": "Druhá barva profilu",
-        "header": "Zadejte název pro vaše zařízení a vyberte barvy a ikonu uživatele podle vašeho výběru",
-        "icon": "Ikona uživatele",
-        "next": "Další",
-        "title": "Informace o účtu"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Nastavili jste to správně?",
-        "title": "Selhalo připojení k serveru"
-      },
-      "host": "Připojujete se k <0>{{hostname}}</0> - potvrďte, že mu věříte před vytvořením účtu",
-      "no": "Zpět",
-      "noHost": "Server nebyl nakonfigurován, tudíž si nemůžete vytvořit účet",
-      "noHostTitle": "Server není nakonfigurován!",
-      "title": "Věříte tomuto serveru?",
-      "yes": "Věřím tomuto serveru"
-    },
-    "verify": {
-      "description": "Zadejte prosím svou přístupovou frázi, abyste potvrdili, že jste si ji uložili, a vytvořte si účet",
-      "invalidData": "Data nejsou platná",
-      "noMatch": "Přístupová fráze neodpovídá",
-      "passphraseLabel": "Vaše 12slovná přístupová fráze",
-      "recaptchaFailed": "ReCaptcha ověření se nezdařilo",
-      "register": "Založit účet",
-      "title": "Potvrďte vaši přístupovou frázi"
-    }
   },
   "errors": {
     "badge": "Rozbilo se to",
@@ -88,18 +9,6 @@
     "reloadPage": "Znovu načíst stránku",
     "showError": "Ukázat detaily chyby",
     "title": "Narazili jsme na chybu!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Zřeknutí odpovědnosti",
-      "disclaimerText": "P-Stream nehostuje žádné soubory, pouze odkazuje na služby třetích stran. Právní záležitosti by měly být řešeny s hostiteli souborů a poskytovateli. P-Stream nenese odpovědnost za žádné mediální soubory zobrazené poskytovateli videa."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub"
-    },
-    "tagline": "Sledujte své oblíbené pořady a filmy s touto aplikací pro streamování s otevřeným zdrojovým kódem."
   },
   "global": {
     "name": "P-Stream",
@@ -178,69 +87,6 @@
     "goHome": "Zpátky domů",
     "message": "Dívali jsme se všude: pod koši, ve skříni, za proxy, ale nakonec jsme nemohli najít stránku, kterou hledáte.",
     "title": "Tuto stránku se nepodařilo najít"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Zrušit",
-      "confirm": "Použít výchozí nastavení",
-      "description": "Výchozí nastavení nemá nejlepší streamy a může být strašně pomalá.",
-      "title": "Jste si jist?"
-    },
-    "extension": {
-      "back": "Zpět",
-      "explainer": "Pomocí rozšíření prohlížeče můžete získat nejlepší streamy, které nabízíme. S pouhou instalací.",
-      "explainerIos": "Bohužel rozšíření není podporováno na iOS. Stiskněte <bold>Zpět</bold> pro výběr jiné možnosti.",
-      "extensionHelp": "Pokud jste rozšíření nainstalovali, ale nebylo zjištěno, <bold>otevřete rozšíření pomocí nabídky rozšíření ve vašem prohlížeči</bold> a postupujte podle pokynů na obrazovce.",
-      "linkChrome": "Instalovat rozšíření pro Chrome",
-      "linkFirefox": "Instalovat rozšíření pro Firefox",
-      "notDetecting": "Nainstalováno na Chromu, ale stránka to nezaznamenala? Skuste přenačíst stránku!",
-      "notDetectingAction": "Obnovit stránku",
-      "status": {
-        "disallowed": "Rozšíření není pro tuto stránku povoleno",
-        "disallowedAction": "Povolit rozšíření",
-        "failed": "Nezdařilo se získávání stavu",
-        "loading": "Čekání na instalaci rozšíření",
-        "outdated": "Verze rozšíření je příliš stará",
-        "success": "Rozšíření funguje podle očekávání!"
-      },
-      "submit": "Pokračovat",
-      "title": "Začněme s rozšířením"
-    },
-    "proxy": {
-      "back": "Zpět",
-      "explainer": "Pomocí metody proxy můžete získat streamy ve skvělé kvalitě vytvořením proxy serveru.",
-      "input": {
-        "errorConnection": "Nelze se připojit k proxy",
-        "errorInvalidUrl": "Adresa URL není platná",
-        "errorNotProxy": "Byla očekávaná proxy, ale byla předána webová stránka",
-        "label": "Proxy URL",
-        "placeholder": "https://"
-      },
-      "link": "Naučit se vytvořit proxy",
-      "submit": "Předložit proxy",
-      "title": "Pojďme uďelat novou proxy"
-    },
-    "start": {
-      "explainer": "Abyste získali co nejlepší streamy, musíte zvolit, kterou streamovací metodu chcete použít.",
-      "options": {
-        "default": {
-          "text": "Nechci zdroje s dobrou kvalitou,<0 /> <1>použít výchozí nastavení</1>"
-        },
-        "extension": {
-          "action": "Nainstalujte si rozšíření",
-          "description": "Nainstalujte si rozšíření prohlížeče a získejte přístup k nejlepším zdrojům.",
-          "quality": "Nejlepší kvalita",
-          "title": "Rozšíření prohlížeče"
-        },
-        "proxy": {
-          "action": "Nastavit proxy",
-          "description": "Nastavte si proxy během 5 minut, pro získání přístupu k skvělým zdrojům.",
-          "quality": "Dobrá kvalita",
-          "title": "Vlastní proxy"
-        }
-      },
-      "title": "Pojďme vám nastavit P-Stream"
-    }
   },
   "overlays": {
     "close": "Zavřít"
@@ -404,23 +250,6 @@
       "error": "Nepodařilo se ověřit vaši lidskost. Zkuste to prosím znovu.",
       "title": "Potřebujeme ověřit, zda jste člověk.",
       "verifyingHumanity": "Ověřování vaši lidskosti..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Načítání aplikace",
-    "loadingUser": "Načítání vášeho profilu",
-    "loadingUserError": {
-      "logout": "Odhlásit se",
-      "reset": "Resetovat vlastní server",
-      "text": "Nezdařilo se načíst váš profil",
-      "textWithReset": "Nezdařilo se načíst váš profil z vašeho serveru, chcete ho přepnout na výchozí server?"
-    },
-    "migration": {
-      "failed": "Migrace dat se nezdařila.",
-      "inProgress": "Počkejte prosím, migrujeme vaše data. Nemělo by to trvat dlouho."
     }
   },
   "settings": {

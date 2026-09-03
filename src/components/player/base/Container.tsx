@@ -1,26 +1,16 @@
 import { ReactNode, RefObject, useEffect, useRef } from "react";
 
 import { OverlayDisplay } from "@/components/overlays/OverlayDisplay";
-import { AutoSkipSegments } from "@/components/player/internals/AutoSkipSegments";
-import { SkipTracker } from "@/components/player/internals/Backend/SkipTracker";
-import { CastingInternal } from "@/components/player/internals/CastingInternal";
 import { HeadUpdater } from "@/components/player/internals/HeadUpdater";
 import { KeyboardEvents } from "@/components/player/internals/KeyboardEvents";
 import { MediaSession } from "@/components/player/internals/MediaSession";
-import { MetaReporter } from "@/components/player/internals/MetaReporter";
-import { ProgressSaver } from "@/components/player/internals/ProgressSaver";
-import { ThumbnailScraper } from "@/components/player/internals/ThumbnailScraper";
 import { VideoClickTarget } from "@/components/player/internals/VideoClickTarget";
 import { VideoContainer } from "@/components/player/internals/VideoContainer";
-import { WatchPartyResetter } from "@/components/player/internals/WatchPartyResetter";
 import { PlayerHoverState } from "@/stores/player/slices/interface";
 import { usePlayerStore } from "@/stores/player/store";
 
-import { WatchPartyReporter } from "../internals/Backend/WatchPartyReporter";
-
 export interface PlayerProps {
   children?: ReactNode;
-  jellyfin?: boolean;
   showingControls: boolean;
   onLoad?: () => void;
 }
@@ -30,7 +20,6 @@ function useHovering(containerEl: RefObject<HTMLDivElement>) {
   const updateInterfaceHovering = usePlayerStore(
     (s) => s.updateInterfaceHovering,
   );
-  const hovering = usePlayerStore((s) => s.interface.hovering);
 
   useEffect(() => {
     if (!containerEl.current) return;
@@ -58,8 +47,9 @@ function useHovering(containerEl: RefObject<HTMLDivElement>) {
     return () => {
       el.removeEventListener("pointermove", pointerMove);
       el.removeEventListener("pointerleave", pointerLeave);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [containerEl, hovering, updateInterfaceHovering]);
+  }, [containerEl, updateInterfaceHovering]);
 }
 
 function BaseContainer(props: { children?: ReactNode }) {
@@ -92,17 +82,9 @@ export function Container(props: PlayerProps) {
   return (
     <div className="relative">
       <BaseContainer>
-        <MetaReporter />
-        {!props.jellyfin ? <ThumbnailScraper /> : null}
-        {!props.jellyfin ? <CastingInternal /> : null}
         <VideoContainer />
-        {!props.jellyfin ? <ProgressSaver /> : null}
         <KeyboardEvents />
         <MediaSession />
-        {!props.jellyfin ? <WatchPartyReporter /> : null}
-        {!props.jellyfin ? <SkipTracker /> : null}
-        <WatchPartyResetter />
-        {!props.jellyfin ? <AutoSkipSegments /> : null}
         <div className="relative h-screen overflow-hidden">
           <VideoClickTarget showingControls={props.showingControls} />
           <HeadUpdater />

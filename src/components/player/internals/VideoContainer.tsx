@@ -6,8 +6,6 @@ import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 
-import { useInitializeSource } from "../hooks/useInitializePlayer";
-
 // initialize display interface
 function useDisplayInterface() {
   const display = usePlayerStore((s) => s.display);
@@ -128,7 +126,6 @@ function VideoElement() {
 export function VideoContainer() {
   const show = useShouldShowVideoElement();
   useDisplayInterface();
-  useInitializeSource();
 
   if (!show) return null;
   return <VideoElement />;

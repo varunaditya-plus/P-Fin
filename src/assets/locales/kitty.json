@@ -1,74 +1,7 @@
 {
-  "about": {
-    "description": "meow-flix is a meow application that searches the meow for meows. The meow aims for a mostly meow approach to consuming meow.",
-    "faqTitle": "Meow questions",
-    "q1": {
-      "body": "meow-flix does not meow any meow. When you meow on something to meow, the meow is searched for the selected meow (On the loading meow and in the 'meow sources' meow you can meow which meow you're meow). Meow never gets meow by meow-flix, everything is meow this meow mechanism.",
-      "title": "Where does the meow come from?"
-    },
-    "q2": {
-      "body": "It's not meow to meow a meow or meow, meow-flix does not meow any meow. All meow is meow through meows on the meow.",
-      "title": "Meow can I meow a meow or meow?"
-    },
-    "q3": {
-      "body": "Our meow results are meow by The Meow Meow (TBMB) and meow regardless of whether our meows actually have the meow.",
-      "title": "The meow results meow the meow or meow, meow can't I meow it?"
-    },
-    "title": "About meow-flix"
-  },
   "actions": {
     "copied": "Meow",
     "copy": "Meow"
-  },
-  "auth": {
-    "createAccount": "Whaaaat? Don't have an account yet? <0>Create an account.</0>",
-    "deviceNameLabel": "Device name",
-    "deviceNamePlaceholder": "Meow phone",
-    "generate": {
-      "description": "Your meow passphrase acts as your meow username and meow password. Make sure to keep it safe as you will need to enter it to meow to your account",
-      "next": "I have saved my meow passphrase",
-      "passphraseFrameLabel": "Meowphrase",
-      "title": "Your meow passphrase"
-    },
-    "hasAccount": "Bello! Already have an account? <0>Login here.</0>",
-    "login": {
-      "description": "Please enter your secret meow language passphrase to login to your account",
-      "deviceLengthError": "Meow! Please enter a device name",
-      "passphraseLabel": "12-Meow passphrase",
-      "passphrasePlaceholder": "Meow Passphrase",
-      "submit": "Bello! Login",
-      "title": "Login to your account",
-      "validationError": "Meow language not fluent or incomplete"
-    },
-    "register": {
-      "information": {
-        "color1": "Profile color one",
-        "color2": "Profile color two",
-        "header": "Whaaat? Enter a name for your device and pick colors and a minion icon of your choosing",
-        "icon": "Minion icon",
-        "next": "Meow!",
-        "title": "Account information"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Did you configure it correctly?",
-        "title": "Failed to reach server"
-      },
-      "host": "You are connecting to <0>{{hostname}}</0> - please confirm you trust it before making a meow account",
-      "no": "Go back, meow",
-      "title": "Do you trust this server?",
-      "yes": "I trust this server, meow!"
-    },
-    "verify": {
-      "description": "Please enter your meow passphrase from earlier to confirm you have saved it and to create your meow account",
-      "invalidData": "Meow data is not valid",
-      "noMatch": "Meow! Passphrase doesn't match",
-      "passphraseLabel": "Your 12-meow passphrase",
-      "recaptchaFailed": "Meow! ReCaptcha validation failed",
-      "register": "Create meow account",
-      "title": "Confirm your meow passphrase"
-    }
   },
   "errors": {
     "badge": "It broke",
@@ -76,18 +9,6 @@
     "reloadPage": "Reload the meow",
     "showError": "Show meow details",
     "title": "We encountered a meow!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Meow",
-      "disclaimerText": "meow-flix does not meow any meows, it merely meow to 3rd meow meows. Meow issues should be meow up with the meow meows and meows. meow-flix is not meow for any meow meows shown by the meow meows."
-    },
-    "links": {
-      "discord": "Meow",
-      "legal": "Meow",
-      "github": "Meow"
-    },
-    "tagline": "Meow your favorite meows and meows with this open source meow app."
   },
   "global": {
     "name": "meow-flix",
@@ -311,23 +232,6 @@
       "error": "Failed to verify your meowness. Please try meow.",
       "title": "We meow to verify that you're meow",
       "verifyingHumanity": "Verifying your meow..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Meow"
-    },
-    "loadingApp": "Loading meow",
-    "loadingUser": "Loading your meow",
-    "loadingUserError": {
-      "logout": "Meow",
-      "reset": "Meow meow meow",
-      "text": "Failed to meow your meow",
-      "textWithReset": "Failed to meow your meow from your meow meow, meow to meow back to the meow meow?"
-    },
-    "migration": {
-      "failed": "Meow to meow your meow.",
-      "inProgress": "Please meow, we are meow your meow. This shouldn't meow long."
     }
   },
   "settings": {

@@ -5,10 +5,7 @@ import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 
-export function SkipForward(props: {
-  iconSizeClass?: string;
-  inControl: boolean;
-}) {
+export function SkipForward(props: { iconSizeClass?: string }) {
   const display = usePlayerStore((s) => s.display);
   const time = usePlayerStore((s) => s.progress.time);
   const enableDoubleClickToSeek = usePreferencesStore(
@@ -17,7 +14,7 @@ export function SkipForward(props: {
   const commit = useCallback(() => {
     display?.setTime(time + 10);
   }, [display, time]);
-  if (!props.inControl || enableDoubleClickToSeek) return null;
+  if (enableDoubleClickToSeek) return null;
   return (
     <VideoPlayerButton
       iconSizeClass={props.iconSizeClass}
@@ -27,10 +24,7 @@ export function SkipForward(props: {
   );
 }
 
-export function SkipBackward(props: {
-  iconSizeClass?: string;
-  inControl: boolean;
-}) {
+export function SkipBackward(props: { iconSizeClass?: string }) {
   const display = usePlayerStore((s) => s.display);
   const time = usePlayerStore((s) => s.progress.time);
   const enableDoubleClickToSeek = usePreferencesStore(
@@ -39,7 +33,7 @@ export function SkipBackward(props: {
   const commit = useCallback(() => {
     display?.setTime(time - 10);
   }, [display, time]);
-  if (!props.inControl || enableDoubleClickToSeek) return null;
+  if (enableDoubleClickToSeek) return null;
   return (
     <VideoPlayerButton
       iconSizeClass={props.iconSizeClass}

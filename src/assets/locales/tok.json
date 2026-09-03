@@ -1,76 +1,7 @@
 {
-  "about": {
-    "description": "ilo Muwi-We li lukin li wile e sitelen. kulupu lawa li lawa pona",
-    "faqTitle": "sona wile",
-    "q1": {
-      "body": "ilo Muwi-We li mama ala e sitelen. sina lukin e sitelen la mi alasa e sitelen lon lipu ale. (sina ken sona e mama sitelen lon tenpo alasa lon poki 'mama'.) sitelen li awen ala lon ilo Muwi-We. ale li lon alasa ni",
-      "title": "sitelen li tan seme?"
-    },
-    "q2": {
-      "body": "sina ken ala wile alasa e sitelen. ilo Muwi-We li lawa ala e sitelen. sitelen li tan lipu mama ante",
-      "title": "mi wile alasa e sitelen lon seme?"
-    },
-    "q3": {
-      "body": "sitelen lon lukin ilo li tan lipu The Movie Database (lipu TMDB). jo li ante ala e ni",
-      "title": "sitelen pi wile mi li lon lukin ilo. seme la mi ken ala lukin e ona?"
-    },
-    "title": "ilo Muwi-We la"
-  },
   "actions": {
     "copied": "sama a",
     "copy": "o sama"
-  },
-  "auth": {
-    "createAccount": "sina jo ala e lipu open la <0>o pali e lipu open</0>",
-    "deviceNameLabel": "nimi ilo",
-    "deviceNamePlaceholder": "ilo mi",
-    "generate": {
-      "description": "nimi open sina li lon nasin open pi lipu open sina. o awen pona e ona. sina open e lipu open sina la sina wile pana e nimi open ale sina",
-      "next": "mi jo e nimi open mi",
-      "passphraseFrameLabel": "nimi open",
-      "title": "nimi open sina"
-    },
-    "hasAccount": "sina jo e lipu open la <0>o pana e nimi sina</0>",
-    "login": {
-      "description": "lipu open sina la o sitelen e nimi ale sina",
-      "deviceLengthError": "o pana e nimi ilo",
-      "passphraseLabel": "nimi open 12",
-      "passphrasePlaceholder": "nimi open",
-      "submit": "o open",
-      "title": "o pana e nimi sina",
-      "validationError": "pakala"
-    },
-    "register": {
-      "information": {
-        "color1": "kule nanpa wan",
-        "color2": "kule nanpa tu",
-        "header": "o pana e nimi pi ilo sina e kule e sitelen",
-        "icon": "sitelen",
-        "next": "o pana",
-        "title": "lipu open"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "nasin ale sina li pona anu seme?",
-        "title": "toki tawa lawa ilo li pakala"
-      },
-      "host": "lawa ilo sina li <0>{{hostname}}</0> - ona li pona tawa sina la sina ken pali e lipu open",
-      "no": "o weka",
-      "noHost": "lawa ilo ni li open ala li nasin ala la, sina ken ala pali e lipu open",
-      "noHostTitle": "lawa ilo li open ala a!",
-      "title": "lawa ilo ni li pona tawa sina anu seme?",
-      "yes": "lawa ilo ni li pona"
-    },
-    "verify": {
-      "description": "sina awen e nimi open sina la o pana e nimi open",
-      "invalidData": "pakala",
-      "noMatch": "nimi li sama ala",
-      "passphraseLabel": "nimi open 12 sina",
-      "recaptchaFailed": "nasin ReCaptcha li pakala",
-      "register": "o pali e lipu open",
-      "title": "nimi open sina"
-    }
   },
   "errors": {
     "badge": "pakala a",
@@ -78,18 +9,6 @@
     "reloadPage": "o sin e lipu",
     "showError": "o pana e sona pakala",
     "title": "mi kama pakala a!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "o sona e ni:",
-      "disclaimerText": "ilo Muwi-We li mama ala e ijo sitelen. ona li toki taso tawa ilo ante. utala nasin li lon la o toki tawa ona pi ilo ante. sitelen ale li tan ala ilo Muwi-We"
-    },
-    "links": {
-      "discord": "kulupu Siko",
-      "legal": "Legal / DMCA",
-      "github": "lipu Kita"
-    },
-    "tagline": "o lukin e sitelen ale pi wile sina kepeken ilo ni"
   },
   "global": {
     "name": "ilo Muwi-We",
@@ -168,14 +87,6 @@
     "goHome": "o tawa weka",
     "message": "mi lukin lon anpa poki, lon insa tomo, lon monsi ilo. taso mi lukin ala e lipu pi wile sina",
     "title": "mi ken ala lukin e lipu ona"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "ala"
-    },
-    "start": {
-      "title": "o open e ilo Muwi-We"
-    }
   },
   "overlays": {
     "close": "o pini"
@@ -332,23 +243,6 @@
       "error": "mi lukin e ni: ken la sina jan ala. o alasa sin",
       "title": "sina o jan",
       "verifyingHumanity": "sina jan ala jan?"
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "mi alasa e ilo",
-    "loadingUser": "mi alasa e lipu sina",
-    "loadingUserError": {
-      "logout": "o weka sona e sina",
-      "reset": "o sin e lawa ilo sina",
-      "text": "alasa li pakala",
-      "textWithReset": "alasa tan lawa ilo sina li pakala. sina wile e lawa ilo mi anu seme?"
-    },
-    "migration": {
-      "failed": "tawa pi sona sina li pakala",
-      "inProgress": "o awen lili. mi alasa tawa e sona sina"
     }
   },
   "settings": {

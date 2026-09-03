@@ -1,76 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream je spletna aplikacija, ki omogoča enostavno iskanje filmov in serij. Ekipa si prizadeva za minimalističen pristop pri ogledu vsebin.",
-    "faqTitle": "Pogosto zastavljena vprašanja",
-    "q1": {
-      "body": "P-Stream ne hrani nobene vsebine. Ko si želite film ali serijo ogledati, se izvede iskanje vsebine na internetu (na zaslonu za nalaganje in v zavihku \"viri videa\" lahko vidite, kateri vir uporabljate). Vsebina medija se nikoli ne naloži na strežnike P-Streama, ker vse poteka iskalnega mehanizma.",
-      "title": "Od kod prihaja vsebina?"
-    },
-    "q2": {
-      "body": "Serije in filmov ni mogoče zahtevati, ker P-Stream ne upravlja z nobeno vsebino. Vse vsebine si lahko ogledate prek virov na internetu.",
-      "title": "Kje lahko oddam predlog za serijo ali film?"
-    },
-    "q3": {
-      "body": "Rezultati iskanja so privzeti iz podatkovne baze \"The Movie Database\" (TMDB) in se prikazujejo ne glede na to, ali je vsebina dejansko na voljo.",
-      "title": "Rezultati iskanja prikazujejo serijo oz. film, zakaj ga potem ne morem predvajati?"
-    },
-    "title": "O P-Streambu"
-  },
   "actions": {
     "copied": "Kopirano",
     "copy": "Kopiraj"
-  },
-  "auth": {
-    "createAccount": "Še nimate računa? <0>Ustvari račun.</0>",
-    "deviceNameLabel": "Ime naprave",
-    "deviceNamePlaceholder": "Mobilni telefon",
-    "generate": {
-      "description": "Vaša fraza deluje kot vaše uporabniško ime in geslo. Shranite ga na varnem mestu, saj ga boste morali vnesti za prijavo v svoj račun",
-      "next": "Frazo sem shranil na varno mesto",
-      "passphraseFrameLabel": "Varnostna fraza",
-      "title": "Varnostna Fraza"
-    },
-    "hasAccount": "Že imate račun?<0>Prijavi se tukaj.</0>",
-    "login": {
-      "description": "Vnesite frazo za prijavo v račun",
-      "deviceLengthError": "Vnesi ime naprave",
-      "passphraseLabel": "12-besedna varnostna fraza",
-      "passphrasePlaceholder": "Varnostna fraza",
-      "submit": "Prijava",
-      "title": "Prijava v račun",
-      "validationError": "Nepravilna ali nepopolna varnostna fraza"
-    },
-    "register": {
-      "information": {
-        "color1": "Barva prvega profila",
-        "color2": "Barva drugega profila",
-        "header": "Vnesite ime za napravo ter izberi barvo in ikono uporabnika",
-        "icon": "Ikona uporabnika",
-        "next": "Naprej",
-        "title": "Informacije o profilu"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Ali ste pravilno konfigurirali nastavitve?",
-        "title": "Neuspešen dostop do strežnika"
-      },
-      "host": "Povezujete se z <0>{{hostname}}</0> - pred ustvarjanjem računa potrdite, da mu zaupate",
-      "no": "Nazaj",
-      "noHost": "Strežnik ni nastavljen, zato ustvarjanje profila ni mogoče",
-      "noHostTitle": "Strežnik ni nastavljen!",
-      "title": "Ali zaupate temu strežniku?",
-      "yes": "Zaupam strežniku"
-    },
-    "verify": {
-      "description": "Vnesite varnostno frazo, ki ste ga uporabili prej, da potrdite varno hrambo, in ustvarite svoj račun",
-      "invalidData": "Vnešeni podatki niso pravilni",
-      "noMatch": "Varnostna fraza se ne ujema",
-      "passphraseLabel": "Vaša 12-besedna varnostna fraza",
-      "recaptchaFailed": "Preizkus ReCaptcha ni uspel",
-      "register": "Ustvari Račun",
-      "title": "Potrdite varnostno frazo"
-    }
   },
   "errors": {
     "badge": "Nekaj se je pokvarilo",
@@ -78,18 +9,6 @@
     "reloadPage": "Osveži stran",
     "showError": "Pokaži informacije o napaki",
     "title": "Prišlo je do napake!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Opozorilo",
-      "disclaimerText": "P-Stream ne gosti nobenih medijev ali datotek, temveč le povezave do storitev tretjih oseb. Pravna vprašanja je potrebno posredovati gostiteljem in ponudnikom datotek. P-Stream ni odgovoren za medijske datoteke, ki jih prikazujejo ponudniki."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub"
-    },
-    "tagline": "Z odprtokodno aplikacijo P-Stream si oglejte najljubše oddaje in filme."
   },
   "global": {
     "name": "P-Stream",
@@ -173,69 +92,6 @@
     "goHome": "Nazaj domov",
     "message": "Iskali smo povsod: pod preprogo, v omari, za \"proxyjem\", vendar na koncu nismo našli strani, ki jo iščete.",
     "title": "Ni bilo mogoče najti te strani"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Prekliči",
-      "confirm": "Upoeabi privzete nastavitve",
-      "description": "Privzeta nastavitev nima najboljših pretokov in je lahko neznosno počasna.",
-      "title": "Si prepričan?"
-    },
-    "extension": {
-      "back": "Nazaj",
-      "explainer": "Z razširitvijo brskalnika lahko dobite najboljše tokove, ki jih ponujamo. Namestitev je zelo preprosta!",
-      "explainerIos": "Na žalost razširitev brskalnika ni podprta v sistemu iOS, Pritisnite <bold>Najdi nazaj</bold> in izberite drugo možnost.",
-      "extensionHelp": "Če ste namestili razširitev, vendar ni zaznana, <bold>odprite razširitev v meniju razširitev brskalnika</bold> in sledite navodilom na zaslonu.",
-      "linkChrome": "Naloži Chrome razširitev",
-      "linkFirefox": "Naloži Firefox razširitev",
-      "notDetecting": "Nameščen v brskalniku Chrome, vendar ga spletno mesto ne zazna? Poskusite znova naložiti stran!",
-      "notDetectingAction": "Osveži stran",
-      "status": {
-        "disallowed": "Razširitev ni omogočena na tej strani",
-        "disallowedAction": "Omogoči razširitev",
-        "failed": "Ni uspelo zahtevati statusa",
-        "loading": "Čakamo, da namestite razširitev",
-        "outdated": "Verzija razširitve je prestara",
-        "success": "Razširitev deluje pravilno!"
-      },
-      "submit": "Nadaljuj",
-      "title": "Začnimo z razširitvijo"
-    },
-    "proxy": {
-      "back": "Nazaj",
-      "explainer": "Z metodo proxy lahko s samopostrežnim proxyjem pridobite zelo kakovostne prenose.",
-      "input": {
-        "errorConnection": "Povezava s proxyjem ni uspela",
-        "errorInvalidUrl": "Ni validen URL",
-        "errorNotProxy": "Pričakoval proxy, a dobil spletno stran",
-        "label": "URL proxyja",
-        "placeholder": "https://"
-      },
-      "link": "Kako postavim proxy",
-      "submit": "Oddaj proxy",
-      "title": "Naredimo nov proxy"
-    },
-    "start": {
-      "explainer": "Da bi dobili najboljše možne prenose, morate izbrati metodo pretakanja, ki jo želite uporabiti.",
-      "options": {
-        "default": {
-          "text": "Ne želim dobre kakovosti tokov,<0 /> <1>uporabite privzeto nastavitev</1>"
-        },
-        "extension": {
-          "action": "Naloži razširitev",
-          "description": "Namestite razširitev brskalnika in pridobite dostop do najboljših virov.",
-          "quality": "Najboljša kvaliteta",
-          "title": "Razširitev brskalnika"
-        },
-        "proxy": {
-          "action": "Nastavi proxy",
-          "description": "V samo 5 minutah nastavite proxy in pridobite dostop do odličnih virov.",
-          "quality": "Dobra kvaliteta",
-          "title": "Proxy po meri"
-        }
-      },
-      "title": "Pripravimo vas na namestitev s filmskim spletom"
-    }
   },
   "overlays": {
     "close": "Zapri"
@@ -409,23 +265,6 @@
       "error": "Ni uspelo preveriti vaše človeškosti. Poskusite znova.",
       "title": "Preveriti moramo, ali ste človek.",
       "verifyingHumanity": "Preverjanje vaše človeškosti..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Nalagam aplikacijo",
-    "loadingUser": "Nalagam profil",
-    "loadingUserError": {
-      "logout": "Odjava",
-      "reset": "Ponastavitev strežnika po meri",
-      "text": "Neuspešno nalaganje vašega profila",
-      "textWithReset": "Neuspešno nalaganje vašega profila iz strežnika po meri. Želite ponastaviti nastavitve nazaj na privzeti strežnik?"
-    },
-    "migration": {
-      "failed": "Podatkov ni uspelo preseliti.",
-      "inProgress": "Prosimo počakajte, saj vaše podatke prenašamo. To ne bi smelo trajati dolgo."
     }
   },
   "settings": {

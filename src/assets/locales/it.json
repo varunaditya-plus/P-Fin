@@ -1,84 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream è un fork di movie-web che garantisce di rimanere attivo anche dopo la chiusura di movie-web.app. P-Stream.lol funziona su un VPS privato e ospitato autonomamente. Gestisco questo sito in perdita; non ci sono annunci a causa della mia fede nei media liberi.",
-    "faqTitle": "Domande comuni",
-    "q1": {
-      "body": "P-Stream non ospita alcun contento. Quando clicci su qualcosa da guardare, P-Stream cerca l'internet per media di vostra scelta (Sull schermata di caricamento e nell tab 'sorgenti video' si può vedere quale sorgente si sta utilizzando). I media non sono mai caricati da P-Stream, tutto è attraverso questo meccanismo di ricerca.",
-      "title": "Da dove arriva il contenuto?"
-    },
-    "q2": {
-      "body": "Non è possibile richiedere uno show o un film, P-Stream non gestisce alcun contenuto. Tutti i contenuti sono visualizzati da sorgenti online.",
-      "title": "Dove posso richiedere una serie o un film?"
-    },
-    "q3": {
-      "body": "I nostri risultati sono alimentati da «The Movie Database (TMDB)» e visualizzare indipendentemente dal fatto che nostri sorgenti hanno effettivamente il contenuto.",
-      "title": "I risultati di ricerca mostrano la serie o il film, perché non posso riprodurlo?"
-    },
-    "title": "Su di P-Stream (^▽^)",
-    "q4": {
-      "title": "E i miei dati?",
-      "body": "Tutti i dati vengono sincronizzati con il back-end sudo che è diverso dal back-end della community ed è ospitato in modo indipendente da me, chiunque è libero di utilizzare anche questo."
-    },
-    "q5": {
-      "body": "be', P-Stream ha un account Twitter che può essere trovato nel fondo della pagina insieme ad un link al codice sorgente su Github.",
-      "title": "Come posso sapere di più?"
-    }
-  },
   "actions": {
     "copied": "Copiato",
     "copy": "Copia"
-  },
-  "auth": {
-    "createAccount": "Non hai ancora un account 😬 <0>Crea un account.</0>",
-    "deviceNameLabel": "Nome del dispositivo",
-    "deviceNamePlaceholder": "Telefono personale",
-    "generate": {
-      "description": "La tua frase d'accesso funziona come nome utente e password. Assicurati di tenerla al sicuro poiché dovrai inserirla per accedere al tuo account. <bold>NON perdere la tua frase d'accesso!</bold>",
-      "next": "Ho salvato la mia frase d'accesso",
-      "passphraseFrameLabel": "Frase d'accesso",
-      "title": "La tua frase d'accesso"
-    },
-    "hasAccount": "Hai già un account? <0>Accedi qua.</0>",
-    "login": {
-      "description": "Inserisci la tua frase d'accesso per accedere al tuo account",
-      "deviceLengthError": "Inserisci un nome al dispositivo",
-      "passphraseLabel": "Frase d'accesso di 12 parole",
-      "passphrasePlaceholder": "Frase d'accesso",
-      "submit": "Accedi",
-      "title": "Accedi al tuo account",
-      "validationError": "Frase d'accesso incompleta o sbagliata /ᐠ. .ᐟ\\"
-    },
-    "register": {
-      "information": {
-        "color1": "Colore profilo uno",
-        "color2": "Colore profilo due",
-        "header": "Inserisci un nome per il tuo dispositivo poi seleziona un colore e un'icona utente a tua scelta!",
-        "icon": "Icona utente",
-        "next": "Prossimo",
-        "title": "Informazioni sull'account"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "L'hai configurata correttamente?",
-        "title": "Impossibile raggiungere il server"
-      },
-      "host": "Ti stai collegando a <0>{{hostname}}</0> - conferma la tua fiducia prima di creare un account...",
-      "no": "Indietro",
-      "noHost": "Questo server non è configurato, quindi non puoi creare un account",
-      "noHostTitle": "Server non è configurato!",
-      "title": "Ti fidi di questo server?",
-      "yes": "Mi fido di questo server 🤞"
-    },
-    "verify": {
-      "description": "Inserisci la tua frase d'accesso di prima per confermare che l'hai salvata e per creare il tuo account",
-      "invalidData": "I dati non sono validi",
-      "noMatch": "Frase d'accesso non corrisponde 😭",
-      "passphraseLabel": "La tua frase d'accesso di 12 parole",
-      "recaptchaFailed": "Validazione ReCaptcha fallita",
-      "register": "Crea account",
-      "title": "Conferma la tua frase d'accesso"
-    }
   },
   "errors": {
     "badge": "Si è rotto 💀",
@@ -86,20 +9,6 @@
     "reloadPage": "Ricarica la pagina",
     "showError": "Mostra dettagli dell'errore",
     "title": "Si è verificato un errore!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Disclaimer ◝(ᵔᵕᵔ)◜",
-      "disclaimerText": "Nota: P-Stream non ospita alcun file ma visualizza solo il contenuto di fornitori di terze parti. Le questioni legali dovrebbero essere affrontate con loro."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub",
-      "twitter": "Twitter",
-      "funding": "Supportaci"
-    },
-    "tagline": "Guarda i tuoi preferiti programmi televisivi e film gratis senza publicità! (っ'ヮ'c)"
   },
   "global": {
     "name": "P-Stream",
@@ -215,69 +124,6 @@
     "message": "Abbiamo cercato ovunque: sotto i bidoni, nell'armadio, dietro il proxy, ma alla fine non siamo riusciti a trovare la pagina che stai cercando. (ಥ﹏ಥ)",
     "title": "Impossibile trovare quella pagina",
     "reloadButton": "Riprova"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Annulla",
-      "confirm": "Utilizza impostazione predefinita",
-      "description": "La impostazione predefinita non offre i migliori stream e può essere incredibilmente lenta. ( ͠° ͟ʖ ͡°)",
-      "title": "Sei sicuro?"
-    },
-    "extension": {
-      "back": "Torna indietro",
-      "explainer": "Utilizzando l'estensione del browser, puoi ottenere le migliori stream che abbiamo da offrire. Con solo una semplice installazione. 👌",
-      "explainerIos": "Purtroppo, l'estensione del browser non è supportata su iOS, premere <bold>Torna indietro</bold> per scegliere un'altra opzione.",
-      "extensionHelp": "Se avete installato l'estensione ma non viene rilevata, <bold>Apri l'estensione attraverso il menu delle estensioni del browser</bold> e seguire i passaggi sullo schermo.",
-      "linkChrome": "Installa l'estensione su Chrome",
-      "linkFirefox": "Installa l'estensione su Firefox",
-      "notDetecting": "Installato su Chrome, ma il sito non lo rileva? Prova a ricaricare la pagina!",
-      "notDetectingAction": "Ricarica pagina",
-      "status": {
-        "disallowed": "L'estensione non è attivata per questa pagina (,,>﹏<,,)",
-        "disallowedAction": "Attiva l'estensione",
-        "failed": "Impossibile richiedere lo stato",
-        "loading": "In attesa di installare l'estensione",
-        "outdated": "Versione dell'estensione troppo vecchia",
-        "success": "L'estensione funziona come previsto!"
-      },
-      "submit": "Continua",
-      "title": "Iniziamo con un'estensione"
-    },
-    "proxy": {
-      "back": "Torna indietro",
-      "explainer": "Con il metodo proxy, è possibile ottenere stream di qualità ottima creando un proxy self-service.",
-      "input": {
-        "errorConnection": "Impossibile connettere al proxy",
-        "errorInvalidUrl": "URL non valido",
-        "errorNotProxy": "Avevamo previsto un proxy, ma abbiamo ottenuto un sito web",
-        "label": "URL proxy",
-        "placeholder": "https://"
-      },
-      "link": "Impara a creare un proxy",
-      "submit": "Invia proxy",
-      "title": "Creiamo un nuovo proxy"
-    },
-    "start": {
-      "explainer": "Per ottenere le migliori stream possibili, è necessario scegliere il metodo di streaming da utilizzare.",
-      "options": {
-        "default": {
-          "text": "Non voglio stream di buona qualità, <0 /> <1>usa impostazione predefinita ▄︻デ══━一 ʕ•͡-•ʔ</1>"
-        },
-        "extension": {
-          "action": "Installa l'estensione",
-          "description": "Installa l'estensione del browser e ottieni accesso alle migliori sorgenti, ma ricordati di abilitarla per questo sito.",
-          "quality": "Qualiotà migliore",
-          "title": "Estensione del browser"
-        },
-        "proxy": {
-          "action": "Imposta proxy",
-          "description": "Imposta un proxy gratis in soli 5 minuti e ottieni accesso a ottimi fonti...",
-          "quality": "Qualità buona",
-          "title": "Proxy personalizzato"
-        }
-      },
-      "title": "Configuriamo P-Stream 🥳"
-    }
   },
   "overlays": {
     "close": "Chiudi"
@@ -460,24 +306,6 @@
       "verifyingHumanity": "Verificando la tua umanità... (^▽^)👍"
     }
   },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA :("
-    },
-    "loadingApp": "Caricamento dell'applicazione",
-    "loadingUser": "Caricamento del tuo profilo",
-    "loadingUserError": {
-      "logout": "Esci",
-      "reset": "Ripristino del server personalizzato",
-      "text": "Impossibile caricare il tuo profilo",
-      "textWithReset": "Impossibile caricare il tuo profilo dal tuo server personalizzato, vorresti ripristinare al server predefinito?",
-      "reload": "Ricarica"
-    },
-    "migration": {
-      "failed": "Impossibile eseguire la migrazione dei dati. 😿",
-      "inProgress": "Per favore aspetta, stiamo migrando i tuoi dati. Non dovrebbe volerci molto tempo..."
-    }
-  },
   "settings": {
     "account": {
       "accountDetails": {
@@ -615,65 +443,5 @@
       "textBoldLabel": "Testo in grassetto"
     },
     "unsaved": "Hai modifiche non salvate... ฅ^•ﻌ•^ฅ"
-  },
-  "support": {
-    "q2": {
-      "body": "Abbiamo un <0>GitHub</0> in cui puoi creare un problema dettagliato nel nostro repository. Inoltre, se lo desideri, puoi creare una richiesta pull per risolvere tu stesso il problema.",
-      "title": "Come posso segnalare un bug o un problema?"
-    },
-    "title": "Supporto",
-    "text": "P-Stream è progettato per essere il più intuitivo possibile. Tuttavia, le persone hanno ancora domande e problemi. Questa pagina è qui per aiutare a risolvere queste carenze",
-    "q1": {
-      "body": "Be', puoi unirti al <0>Discord di P-Stream</0> ufficiale e porre domande lì oppure puoi inviare un'e-mail a quella fornita in fondo a questa pagina.",
-      "title": "Dove posso ottenere aiuto?"
-    }
-  },
-  "downtimeNotice": {
-    "message": "P-Stream.lol sta riscontrando problemi con alcuni provider, se non riesci a trovare o riprodurre uno show, cambia la fonte. È previsto che questo errore persista durante i tempi indicati di seguito.",
-    "badge": "Problemi",
-    "goHome": "Vai alla pagina iniziale",
-    "title": "Problemi col fornitore"
-  },
-  "details": {
-    "resume": "Riprendere",
-    "play": "Guardare",
-    "releaseDate": "Data di rilascio:",
-    "imdb": "Guarda su IMDb",
-    "episodes": "Episodi",
-    "endsAt": "Termina a {{time}}",
-    "language": "Lingua:",
-    "episode": "Episodio",
-    "runtime": "Dura:",
-    "tmdb": "Guarda su TMDB",
-    "season": "Stagione",
-    "airs": "In onda"
-  },
-  "migration": {
-    "start": {
-      "options": {
-        "direct": {
-          "quality": "Più Semplice e veloce"
-        },
-        "download": {
-          "title": "Scaricare data"
-        },
-        "upload": {
-          "title": "Caricare dati",
-          "action": "Carica dati"
-        }
-      },
-      "title": "Migrare i dati"
-    },
-    "direct": {
-      "toggleLable": "Ti serve il ReCaptcha?",
-      "button": {
-        "home": "Vai a casa",
-        "login": "Continua ad accedere"
-      }
-    },
-    "download": {
-      "title": "Caricare il data"
-    },
-    "loginRequired": "Dovete essere loggato per migrare i dati! Per favore torna indietro e accedi per continuare."
   }
 }

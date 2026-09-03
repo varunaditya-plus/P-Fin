@@ -13,7 +13,6 @@ import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JellyfinLogin } from "@/pages/jellyfin/JellyfinLogin";
 import { Layout } from "@/setup/Layout";
-import { useHistoryListener } from "@/stores/history";
 import { useClearModalsOnNavigation } from "@/stores/interface/overlayStack";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { LanguageProvider } from "@/stores/language";
@@ -98,10 +97,7 @@ function Authenticated({ children }: { children: ReactNode }) {
   return children;
 }
 
-export const maintenanceTime = "";
-
 export default function App() {
-  useHistoryListener();
   useOnlineListener();
   useGlobalKeyboardEvents();
   useClearModalsOnNavigation();

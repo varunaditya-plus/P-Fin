@@ -1,76 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream on veebirakendus, mis otsib internetti striimide jaoks. Meie eesmärk on enamasti minimalistlik lähenemine sisu tarbimisele.",
-    "faqTitle": "Tihti küsitud küsimused",
-    "q1": {
-      "body": "P-Stream ei hoiusta enda sisu. Kui klõpsate, et midagi vaadata, otsitakse valitud meediat internetist (laadimisekraanil ja vahekaardil \"videoallikad\" näete, millist allikat te kasutate). Meediat ei lae P-Stream kunagi üles, kõik toimub selle otsingumehhanismi kaudu.",
-      "title": "Kust tuleb meie sisu?"
-    },
-    "q2": {
-      "body": "Saadet või filmi ei ole võimalik taotelda, P-Stream ei halda mingit sisu. Kogu sisu vaadatakse interneti allikate kaudu.",
-      "title": "Kust ma saan kindlat saadet või filmi paluda?"
-    },
-    "q3": {
-      "body": "Meie otsingutulemusi toetab The Movie Database (TMDB) ja need kuvatakse sõltumata sellest, kas meie allikates on sisu tegelikult olemas.",
-      "title": "Otsingutulemustes kuvatakse saade või film. Miks ma ei saa seda esitada?"
-    },
-    "title": "P-Stream'i kohta"
-  },
   "actions": {
     "copied": "Kopeeritud",
     "copy": "Kopeeri"
-  },
-  "auth": {
-    "createAccount": "Ei ole kontot veel?<0>Loo konto.</0>",
-    "deviceNameLabel": "Seadme nimi",
-    "deviceNamePlaceholder": "Isiklik telefon",
-    "generate": {
-      "description": "Teie paroolifraas toimib teie kasutajanime ja paroolina. Veenduge, et see oleks ohutus kohas, kuna peate kasutama seda, et logida oma kontosse sisse",
-      "next": "Olen salvestanud oma paroolifraasi",
-      "passphraseFrameLabel": "Paroolifraas",
-      "title": "Sinu paroolifraas"
-    },
-    "hasAccount": "On juba konto? <0>Logi sisse.</0>",
-    "login": {
-      "description": "Palun sisestage paroolifraas, et logida kontosse sisse",
-      "deviceLengthError": "Palun sisesta seadme nimi",
-      "passphraseLabel": "12-Sõnaline paroolifraas",
-      "passphrasePlaceholder": "Paroolifraas",
-      "submit": "Logi sisse",
-      "title": "Logi sisse oma kontosse",
-      "validationError": "Vale vōi mittetäielik paroolifraas"
-    },
-    "register": {
-      "information": {
-        "color1": "Profiili värv üks",
-        "color2": "Profiili värv kaks",
-        "header": "Sisestage oma seadme nimi ja valige värvid ning kasutajaikoon",
-        "icon": "Kasutaja ikoon",
-        "next": "Järgmine",
-        "title": "Kontoteave"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "Kas sa seadistasid selle õigesti?",
-        "title": "Serveriga ühenduse loomine ebaõnnestus"
-      },
-      "host": "Ühendate <0>{{hostname}}</0> - enne konto tegemist kinnitage, et usaldate seda",
-      "no": "Tagasi",
-      "noHost": "Server ei ole konfigureeritud, seega ei saa kontot luua",
-      "noHostTitle": "Server ei ole konfigureeritud!",
-      "title": "Kas usaldate seda serverit?",
-      "yes": "Usaldan seda serverit"
-    },
-    "verify": {
-      "description": "Palun sisestage oma paroolifraas, et kinnitada, et olete selle salvestanud ja luua oma konto",
-      "invalidData": "Andmed ei kehti",
-      "noMatch": "Paroolifraas ei klapi",
-      "passphraseLabel": "Sinu 12-sõnaline paroolifraas",
-      "recaptchaFailed": "ReCaptcha valideerimine ebaõnnestua",
-      "register": "Loo konto",
-      "title": "Kinnita oma paroolifraas"
-    }
   },
   "errors": {
     "badge": "Läks katki",
@@ -78,18 +9,6 @@
     "reloadPage": "Värskenda leht",
     "showError": "Näita vea üksikasju",
     "title": "Tekkis viga!"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "Lahtiütlemine",
-      "disclaimerText": "P-Stream ei hoiusta ühtegi faili, vaid ainult lingib kolmandate osapoolte teenustele. Juriidilised küsimused tuleks lahendada failihostide ja teenusepakkujatega. P-Stream ei vastuta videopakkujate poolt näidatud meediafailide eest."
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub"
-    },
-    "tagline": "Vaadake selle avatud lähtekoodiga striimimis rakendusega oma lemmiksaateid ja -filme."
   },
   "global": {
     "name": "P-Stream",
@@ -171,69 +90,6 @@
     "goHome": "Tagasi koju",
     "message": "Otsisime kõikjalt: prügikastide alt, kapist, proksi tagant, kuid lõpuks ei leidnud otsitud lehte.",
     "title": "Ei leidnud seda lehekülge"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "Tühista",
-      "confirm": "Kasuta tavalist seadistust",
-      "description": "Tavalises seadistuses ei ole parimad striimid ja see võib olla talumatult aeglane.",
-      "title": "Oled kindel?"
-    },
-    "extension": {
-      "back": "Mine tagasi",
-      "explainer": "Kasutades brauserilaiendust, saate parimaid striime, mida meil on pakkuda. Seda saab paigaldada vaid paari hetkega.",
-      "explainerIos": "Kahjuks ei toeta iOS meie brauserilaiendust, Vajutage <bold>Minge tagasi</bold>, et valida teine valik.",
-      "extensionHelp": "Kui olete laienduse paigaldanud, kuid seda ei tuvastata, <bold> avage laiendus oma brauseri laienduste menüüst</bold> ja järgige ekraanil olevaid juhendeid.",
-      "linkChrome": "Paigalda Chrome laiendus",
-      "linkFirefox": "Paigalda Firefox'i laiendus",
-      "notDetecting": "Paigaldasite laienduse Chrome'ile, kuid sait ei tuvasta seda? Proovige lehte värskendada!",
-      "notDetectingAction": "Värskenda leht",
-      "status": {
-        "disallowed": "Laiendus ei ole lubatud sellel lehel",
-        "disallowedAction": "Laienduse lubamine",
-        "failed": "Päring staatuse saamiseks ei õnnestunud",
-        "loading": "Ootame, et paigaldaksite laienduse",
-        "outdated": "Laienduse versioon liiga vana",
-        "success": "Laiendus töötab ootuspäraselt!"
-      },
-      "submit": "Jätka",
-      "title": "Alustame laiendusega"
-    },
-    "proxy": {
-      "back": "Mine tagasi",
-      "explainer": "Proksi abiga saate suurepärase kvaliteediga striime.",
-      "input": {
-        "errorConnection": "Ei saanud proksiga ühendatud",
-        "errorInvalidUrl": "Ei ole kehtiv URL",
-        "errorNotProxy": "Oodati proksit, kuid saadi veebileht",
-        "label": "Proksi URL",
-        "placeholder": "https://"
-      },
-      "link": "Õpi kuidas teha proksi",
-      "submit": "Esita proksi",
-      "title": "Teeme uue proksi"
-    },
-    "start": {
-      "explainer": "Parimate võimalike striimide saamiseks peate valima, millist striimimismeetodit soovite kasutada.",
-      "options": {
-        "default": {
-          "text": "Ma ei taha hea kvaliteediga striimi, <0 /> <1>kasuta tavalist seadistust</1>"
-        },
-        "extension": {
-          "action": "Paigalda laiendus",
-          "description": "Paigaldage brauseri laiendus ja saage ligi parimatele allikatele.",
-          "quality": "Parim kvaliteet",
-          "title": "Brauseri laiendus"
-        },
-        "proxy": {
-          "action": "Proxy seadistamine",
-          "description": "Seadistage proksi kõigest 5 minutiga ja pääsete ligi suurepärastele allikatele.",
-          "quality": "Hea kvaliteet",
-          "title": "Kohandatud proxy"
-        }
-      },
-      "title": "Teeme algust P-Streami kasutamisega"
-    }
   },
   "overlays": {
     "close": "Sulge"
@@ -407,23 +263,6 @@
       "error": "Ei õnnestunud kontrollida teie inimlikkust. Palun proovige uuesti.",
       "title": "Me peame kontrollima, et te olete inimene.",
       "verifyingHumanity": "Kontrollime kas olete robot..."
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "Rakenduse laadimine",
-    "loadingUser": "Teie profiili laadimine",
-    "loadingUserError": {
-      "logout": "Logi välja",
-      "reset": "Lähtestage kohandatud server",
-      "text": "Profiili laadimine ebaōnnestus",
-      "textWithReset": "Profiili laadimine kohandatud serverist ebaõnnestus. Kas soovite lähtestada vaikeserverile?"
-    },
-    "migration": {
-      "failed": "Teie andmete üleviimine ebaõnnestus.",
-      "inProgress": "Palun oodake, me viime teie andmeid üle. See ei tohiks kaua aega võtta."
     }
   },
   "settings": {

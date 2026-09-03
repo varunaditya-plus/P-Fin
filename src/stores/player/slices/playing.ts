@@ -11,11 +11,9 @@ export interface PlayingSlice {
     volume: number;
     playbackRate: number;
   };
-  play(): void;
-  pause(): void;
 }
 
-export const createPlayingSlice: MakeSlice<PlayingSlice> = (set) => ({
+export const createPlayingSlice: MakeSlice<PlayingSlice> = () => ({
   mediaPlaying: {
     isPlaying: false,
     isPaused: true,
@@ -25,17 +23,5 @@ export const createPlayingSlice: MakeSlice<PlayingSlice> = (set) => ({
     hasPlayedOnce: false,
     volume: 1,
     playbackRate: 1,
-  },
-  play() {
-    set((state) => {
-      state.mediaPlaying.isPlaying = true;
-      state.mediaPlaying.isPaused = false;
-    });
-  },
-  pause() {
-    set((state) => {
-      state.mediaPlaying.isPlaying = false;
-      state.mediaPlaying.isPaused = false;
-    });
   },
 });

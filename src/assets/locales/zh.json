@@ -1,84 +1,7 @@
 {
-  "about": {
-    "description": "P-Stream 是 movie-web 的一个分叉，可确保在 movie-web.app 关闭后仍能正常运行。P-Stream 运行在一个私有的、自我托管的 VPS 上。我在亏损的情况下运营这个网站，但这里没有广告，因为我对免费媒体的信仰。",
-    "faqTitle": "常见问题",
-    "q1": {
-      "body": "P-Stream 不托管任何内容。当您点击要观看的内容时，会在互联网上搜索所选媒体（在加载屏幕和“片源”选项卡中，您可以看到您正在使用的视频源）。P-Stream 不上传媒体，所有内容都是通过这种搜索机制获取的。",
-      "title": "这些内容来自哪里？"
-    },
-    "q2": {
-      "body": "无法主动请求增加节目或电影，P-Stream 不托管任何内容。所有内容均通过网络上的片源服务器获取并供您观看。",
-      "title": "我可以从哪里请求增加节目或电影？"
-    },
-    "q3": {
-      "body": "我们的搜索结果由 The Movie Database (TMDB) 提供，无论我们的片源服务器是否实际拥有该内容，都会显示搜索结果。",
-      "title": "搜索结果中已显示了节目或电影，为何我无法播放？"
-    },
-    "title": "关于 P-Stream",
-    "q4": {
-      "body": "所有数据都同步到社区后台，任何人都可以免费使用。",
-      "title": "那我的数据呢？"
-    },
-    "q5": {
-      "body": "P-Stream 有一个 Discord 服务器，可在本页上方找到！",
-      "title": "如何了解更多信息？"
-    }
-  },
   "actions": {
     "copied": "已复制",
     "copy": "复制"
-  },
-  "auth": {
-    "createAccount": "还没有账户？ <0>创建一个</0>",
-    "deviceNameLabel": "设备名称",
-    "deviceNamePlaceholder": "我的手机",
-    "generate": {
-      "description": "助记词相当于您的用户名和密码。请务必妥善保管，因为登录账户时需要输入该密码。<bold>切勿遗失你的助记词！</bold>",
-      "next": "我已妥善保管助记词",
-      "passphraseFrameLabel": "助记词",
-      "title": "您的助记词"
-    },
-    "hasAccount": "已经拥有账户？<0>点击此处登录</0>",
-    "login": {
-      "description": "请输入助记词以登录您的账户",
-      "deviceLengthError": "请输入设备名称",
-      "passphraseLabel": "12 词助记词",
-      "passphrasePlaceholder": "助记词",
-      "submit": "登录",
-      "title": "登录您的账户",
-      "validationError": "助记词不正确或不完整"
-    },
-    "register": {
-      "information": {
-        "color1": "头像配色 1",
-        "color2": "头像配色 2",
-        "header": "输入设备名称，然后选择颜色和用户图标！",
-        "icon": "用户图标",
-        "next": "下一步",
-        "title": "账户信息"
-      }
-    },
-    "trust": {
-      "failed": {
-        "text": "您的配置是否正确？",
-        "title": "无法连接服务器"
-      },
-      "host": "您正在连接到 <0>{{hostname}}</0> - 在创建账户前，确保您信任它…",
-      "no": "返回",
-      "noHost": "服务器尚未配置，因此您无法创建账户",
-      "noHostTitle": "未配置服务器！",
-      "title": "您是否信任这个服务器？",
-      "yes": "我信任这个服务器"
-    },
-    "verify": {
-      "description": "请输入您之前得到的助记词，以确认您已保存密码并继续创建账户",
-      "invalidData": "数据无效",
-      "noMatch": "助记词不匹配",
-      "passphraseLabel": "您的 12 词助记词",
-      "recaptchaFailed": "ReCaptcha 验证失败",
-      "register": "创建账户",
-      "title": "确认您的助记词"
-    }
   },
   "errors": {
     "badge": "出现错误",
@@ -86,19 +9,6 @@
     "reloadPage": "刷新页面",
     "showError": "显示错误详情",
     "title": "我们遇到了一个错误！"
-  },
-  "footer": {
-    "legal": {
-      "disclaimer": "免责声明",
-      "disclaimerText": "请注意：P-Stream 本身不托管任何文件，只提供第三方提供商的内容。如有法律问题，请与它们联系。"
-    },
-    "links": {
-      "discord": "Discord",
-      "legal": "Legal / DMCA",
-      "github": "GitHub",
-      "twitter": "X (Formerly Twitter)"
-    },
-    "tagline": "免费观看您喜爱的节目和电影，绝无任何广告！"
   },
   "global": {
     "name": "P-Stream",
@@ -203,70 +113,6 @@
     "message": "我们找遍了所有地方：不管是废纸篓、衣柜里还是代理服务器后，但最终还是没有找到你要找的那一页。",
     "title": "无法找到此页面",
     "reloadButton": "重试"
-  },
-  "onboarding": {
-    "defaultConfirm": {
-      "cancel": "取消",
-      "confirm": "使用默认设定",
-      "description": "默认设置没有最好的视频串流，您将错过最好的片源！",
-      "title": "您确定吗？"
-    },
-    "extension": {
-      "back": "返回",
-      "explainer": "使用浏览器扩展，您可以获得我们提供的最佳串流。只需简单几步来安装即可。",
-      "explainerIos": "很遗憾，浏览器扩展不支持 iOS，单击<bold>返回</bold>以选择其他选项。",
-      "extensionHelp": "如您已安装扩展程序但未被检测到，<bold>请从浏览器的扩展菜单打开扩展</bold> 并按屏幕上的指示操作。",
-      "linkChrome": "安装 Chrome 扩展程序",
-      "linkFirefox": "安装 Firefox 扩展程序",
-      "notDetecting": "已在 Chrome 上安装，但网站未能检测到？尝试刷新页面！",
-      "notDetectingAction": "刷新页面",
-      "status": {
-        "disallowed": "扩展程序未对本页面启用",
-        "disallowedAction": "启用扩展程序",
-        "failed": "请求状态失败",
-        "loading": "正等待您安装扩展程序",
-        "outdated": "扩展版本过旧",
-        "success": "扩展程序工作正常！"
-      },
-      "submit": "继续",
-      "title": "让我们从扩展程序开始"
-    },
-    "proxy": {
-      "back": "返回",
-      "explainer": "使用代理方法，您可以通过自己搭建的代理获得高质量的串流。",
-      "input": {
-        "errorConnection": "无法连接到代理",
-        "errorInvalidUrl": "URL 无效",
-        "errorNotProxy": "检测到常规网站，链接应指向代理",
-        "label": "代理 URL",
-        "placeholder": "https://"
-      },
-      "link": "了解如何设置代理",
-      "submit": "提交代理",
-      "title": "让我们设置新的代理"
-    },
-    "start": {
-      "explainer": "为了尽可能获得最佳串流，您将要选择使用何种串流方法。",
-      "options": {
-        "default": {
-          "text": "我不想要高质量的串流，使用默认设置。"
-        },
-        "extension": {
-          "action": "安装扩展程序",
-          "description": "安装浏览器扩展并获取最佳片源。",
-          "quality": "最佳质量 + 更多片源",
-          "title": "浏览器扩展"
-        },
-        "proxy": {
-          "action": "设定代理",
-          "description": "在 5 分钟内设定好代理并获取优质资源。",
-          "quality": "高质量",
-          "title": "自定义代理"
-        },
-        "or": "或"
-      },
-      "title": "让我们为您设定 P-Stream"
-    }
   },
   "overlays": {
     "close": "关闭"
@@ -451,24 +297,6 @@
       "error": "人类验证失败 - 流媒体加载失败。清除缓存后重试，或切换到其他片源。",
       "title": "您是机器人吗？",
       "verifyingHumanity": "正在验证您是否为人类…"
-    }
-  },
-  "screens": {
-    "legal": {
-      "title": "Legal / DMCA"
-    },
-    "loadingApp": "正在载入应用程序",
-    "loadingUser": "正在载入您的个人资料",
-    "loadingUserError": {
-      "logout": "登出",
-      "reset": "重设自定义服务器",
-      "text": "个人资料载入失败",
-      "textWithReset": "从您的自定义服务器载入个人资料失败，您想重设到默认服务器吗？",
-      "reload": "重新加载"
-    },
-    "migration": {
-      "failed": "数据迁移失败",
-      "inProgress": "请稍候，我们正在迁移您的数据。这不会花很多时间。"
     }
   },
   "settings": {
@@ -660,126 +488,5 @@
       "subtitle": "探索最新热门和永恒经典。"
     },
     "scrollToTop": "返回顶部"
-  },
-  "migration": {
-    "start": {
-      "options": {
-        "upload": {
-          "action": "上传数据",
-          "description": "上传您之前导出的数据文件，以恢复您在此账户上的书签和进度。",
-          "title": "上传数据",
-          "quality": "从备份恢复"
-        },
-        "or": "或",
-        "direct": {
-          "description": "这将直接将您的数据迁移到新服务器。这是最快的选项。<br /><br />该选项允许你保持助记词不变！",
-          "title": "直接迁移",
-          "quality": "最简单快捷",
-          "action": "传输数据"
-        },
-        "download": {
-          "description": "这将把您的数据下载到您的设备上。然后您可以将其上传到新的服务器，或将其妥善保存。",
-          "title": "下载数据",
-          "quality": "更高级",
-          "action": "下载数据"
-        }
-      },
-      "explainer": "如果您希望迁移或备份数据，可以使用以下选项。这样当您切换后端服务器时就可以保留您的数据。",
-      "title": "迁移你的数据"
-    },
-    "direct": {
-      "description": "输入目标后端服务器 URL 以将当前账户数据迁移到新的后端服务器。这样可以保持助记词不变！",
-      "title": "直接迁移",
-      "backendLabel": "目标后端服务器 URL",
-      "recaptchaLabel": "ReCaptcha 密钥（可选）",
-      "toggleLable": "需要 ReCaptcha？",
-      "status": {
-        "error": "数据迁移失败",
-        "success": "你的数据已被成功迁移！"
-      },
-      "button": {
-        "migrate": "迁移",
-        "processing": "处理中…",
-        "home": "返回首页",
-        "login": "继续登录"
-      }
-    },
-    "upload": {
-      "status": {
-        "success": "你的数据已被成功上传！",
-        "processing": "处理数据中…",
-        "error": "上传数据失败"
-      },
-      "title": "上传数据",
-      "description": "上传您之前导出的数据文件，以恢复您在此账户上的书签和进度。",
-      "file": {
-        "description": "选择你想上传的文件",
-        "select": "选择文件",
-        "change": "更改文件",
-        "name": "文件名称"
-      },
-      "dataPreview": "预览：",
-      "items": {
-        "bookmarks": "收藏的媒体",
-        "progress": "观看进度"
-      },
-      "exportedOn": "被导出的账户",
-      "button": {
-        "import": "导入数据",
-        "processing": "处理中…",
-        "success": "导入完成",
-        "home": "返回主页"
-      }
-    },
-    "loginRequired": "您必须登录后才能迁移数据！请返回并登录以继续。",
-    "download": {
-      "description": "这将把您的数据下载到您的设备上。然后您可以将其上传到新的服务器，或将其妥善保存。",
-      "title": "下载数据",
-      "items": {
-        "description": "下载将包括：",
-        "bookmarks": "收藏的媒体",
-        "progress": "观看进度"
-      },
-      "status": {
-        "error": "数据下载失败",
-        "success": "你的数据已被成功下载！"
-      },
-      "button": {
-        "download": "下载数据",
-        "home": "返回首页",
-        "login": "继续登录"
-      }
-    },
-    "back": "返回"
-  },
-  "support": {
-    "q2": {
-      "body": "我们有一个 <0>GitHub</0> 仓库，您可以在我们的仓库中创建一个详细的问题。此外如果您愿意，还可以创建一个拉取请求来自行修复问题。",
-      "title": "如何报告错误或问题？"
-    },
-    "title": "支持",
-    "text": "P-Stream 的设计尽可能方便用户使用。但是人们仍然会有疑问和问题，本页将帮助解决这些问题",
-    "q1": {
-      "title": "我可以在哪获取帮助？",
-      "body": "您可以加入 <0>P-Stream 官方 Discord</0> 并在那里提问，也可以向本页底部的电子邮件地址发送邮件。"
-    }
-  },
-  "jip": {
-    "q2": {
-      "body": "我们有一个 <0>GitHub</0> 仓库，您可以在我们的仓库中创建一个详细的问题。此外如果您愿意，还可以创建一个拉取请求来自行修复问题。",
-      "title": "如何报告错误或问题？"
-    },
-    "title": "Jip",
-    "text": "P-Stream 并不是大风刮来的，它主要是由一个人（一个非常史诗般的人）创造的。",
-    "q1": {
-      "body": "您可以加入 <0>P-Stream 官方 Discord</0> 并在那里提问，也可以向本页底部的电子邮件地址发送邮件。",
-      "title": "我可以在哪获取帮助？"
-    }
-  },
-  "downtimeNotice": {
-    "badge": "问题",
-    "goHome": "返回首页",
-    "message": "P-Stream 在某些片源提供商处遇到问题，如果您无法找到或播放节目，请更换片源。预计该错误将在一段时间内持续存在。",
-    "title": "片源提供商问题"
   }
 }

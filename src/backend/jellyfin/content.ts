@@ -374,22 +374,6 @@ export async function getContentContainers(
   );
   return permissions.filter((item): item is ContentItem => item !== null);
 }
-export function getPlaylistContents(
-  id: string,
-  startIndex?: number,
-  signal?: AbortSignal,
-) {
-  return jellyfinRequest<{ Items: ContentItem[]; TotalRecordCount?: number }>(
-    `Playlists/${encodeURIComponent(id)}/Items`,
-    { signal },
-    {
-      UserId: getJellyfinSession().userId,
-      StartIndex: startIndex,
-      Limit: 60,
-      Fields: "Overview,PrimaryImageAspectRatio,MediaSources",
-    },
-  );
-}
 export function addContentToContainer(
   type: "BoxSet" | "Playlist",
   containerId: string,

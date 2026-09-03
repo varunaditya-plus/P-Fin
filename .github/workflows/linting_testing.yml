@@ -3,7 +3,7 @@ name: Linting and Testing
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
@@ -15,9 +15,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9.14.4
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -26,7 +26,13 @@ jobs:
           cache: "pnpm"
 
       - name: Install pnpm packages
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Check TypeScript
+        run: pnpm typecheck
+
+      - name: Run tests
+        run: pnpm test
 
       - name: Run ESLint
         run: pnpm run lint

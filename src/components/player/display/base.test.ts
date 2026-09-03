@@ -4,17 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { makeVideoElementDisplayInterface } from "./base";
 
-vi.mock("@/backend/extension/messaging", () => ({
-  RULE_IDS: {},
-  isExtensionActiveCached: () => false,
-  setDomainRule: vi.fn(),
-}));
-vi.mock("@/utils/cdn", () => ({ processCdnLink: (url: string) => url }));
-vi.mock("@/components/player/utils/proxy", () => ({
-  createM3U8ProxyUrl: (url: string) => url,
-  createMP4ProxyUrl: (url: string) => url,
-  isUrlAlreadyProxied: () => false,
-}));
 vi.mock("@/utils/detectFeatures", () => ({
   canChangeVolume: async () => true,
   canFullscreen: () => false,
@@ -98,5 +87,25 @@ describe("player source lifecycle", () => {
     display.destroy();
     video.dispatchEvent(new Event("timeupdate"));
     expect(onTime).toHaveBeenCalledOnce();
+  });
+  it("passes the Jellyfin source directly to the native AirPlay picker", () => {
+    const display = makeVideoElementDisplayInterface();
+    const video = document.createElement("video");
+    const picker = vi.fn();
+    Object.assign(video, { webkitShowPlaybackTargetPicker: picker });
+    display.processVideoElement(video);
+    display.load({
+      source: file,
+      startAt: 42,
+      autoplay: false,
+      automaticQuality: false,
+      preferredQuality: null,
+    });
+    const originalSource = video.src;
+    display.startAirplay();
+    expect(picker).toHaveBeenCalledOnce();
+    expect(video.src).toBe(originalSource);
+    expect(video.src).toBe(file.url);
+    display.destroy();
   });
 });

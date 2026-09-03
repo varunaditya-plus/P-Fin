@@ -1,14 +1,11 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { logoutJellyfin } from "@/backend/jellyfin/client";
 import {
   SeerrError,
-  authenticateSeerr,
   getSeerrPage,
   getSeerrUser,
-  logoutSeerr,
   seerrImage,
   seerrStatusLabel,
   seerrToMediaItem,
@@ -28,88 +25,14 @@ import { MediaCard, MediaCardSkeleton } from "@/components/media/MediaCard";
 import { useFeaturedSlideTransition } from "@/hooks/useFeaturedSlideTransition";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
-import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
+import { useJellyfinAuth } from "@/stores/jellyfin";
+import { matchesSeerrSession, useSeerrConnection } from "@/stores/seerr";
 
 import { CarouselNavButtons } from "./components/CarouselNavButtons";
 import { ScrollToTopButton } from "./components/ScrollToTopButton";
 import { SeerrCardMenu } from "./SeerrCardMenu";
 import { SeerrDetailsModal } from "./SeerrDetailsModal";
-
-function SeerrSignIn({
-  onSignedIn,
-}: {
-  onSignedIn: (user: SeerrUser) => void;
-}) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    if (loading) return;
-    setLoading(true);
-    setError("");
-    try {
-      await authenticateSeerr(username, password);
-      const user = await getSeerrUser();
-      setPassword("");
-      onSignedIn(user);
-    } catch (reason) {
-      setError(
-        reason instanceof Error
-          ? reason.message
-          : "Could not sign in to Seerr.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="mx-auto max-w-md px-6 py-12">
-      <h1 className="text-3xl font-bold text-white mb-4">Discover</h1>
-      <p className="text-type-secondary mb-8">
-        Sign in with your Jellyfin account to discover and request content
-        through Seerr.
-      </p>
-      <form onSubmit={submit} className="space-y-4">
-        <label className="block text-sm">
-          Username
-          <input
-            required
-            autoComplete="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            className="block w-full mt-2 rounded-lg bg-dropdown-background p-4 text-white outline-none focus:ring-2 focus:ring-buttons-purple"
-          />
-        </label>
-        <label className="block text-sm">
-          Password
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="block w-full mt-2 rounded-lg bg-dropdown-background p-4 text-white outline-none focus:ring-2 focus:ring-buttons-purple"
-          />
-        </label>
-        {error && (
-          <p role="alert" className="text-red-400 text-sm">
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          disabled={loading || !username.trim()}
-          className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-3 bg-buttons-purple hover:bg-buttons-purpleHover text-white font-medium disabled:opacity-60"
-        >
-          {loading && <Spinner />}Sign in to Seerr
-        </button>
-      </form>
-    </div>
-  );
-}
+import { SeerrSetup } from "./SeerrSetup";
 
 function SeerrFeatured({
   media,
@@ -258,7 +181,6 @@ function SeerrCard({
       <MediaCard
         media={seerrToMediaItem(media)}
         linkable
-        hideBookmark
         onShowDetails={() => onShowDetails(media)}
         renderContextMenu={(close) => (
           <SeerrCardMenu
@@ -426,6 +348,8 @@ function SeerrCarousel({
 }
 
 function SeerrLibraryDiscover() {
+  const session = useJellyfinAuth((state) => state.session);
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<SeerrUser>();
   const [authLoading, setAuthLoading] = useState(true);
@@ -533,7 +457,19 @@ function SeerrLibraryDiscover() {
           </Button>
         </div>
       ) : !user ? (
-        <SeerrSignIn onSignedIn={setUser} />
+        <div className="px-4 pb-12">
+          {session ? (
+            <SeerrSetup
+              session={session}
+              initiallyEnabled
+              onComplete={setUser}
+              onSkip={() => {
+                useSeerrConnection.getState().setConnection(null);
+                navigate("/");
+              }}
+            />
+          ) : null}
+        </div>
       ) : (
         <>
           {!debouncedQuery && (
@@ -642,36 +578,22 @@ function SeerrLibraryDiscover() {
 
 export function SeerrDiscover() {
   const session = useJellyfinAuth((state) => state.session);
-  const [changingServer, setChangingServer] = useState(false);
+  const connection = useSeerrConnection((state) => state.connection);
   const navigate = useNavigate();
-  const changeServer = async () => {
-    if (changingServer) return;
-    setChangingServer(true);
-    await Promise.allSettled([logoutSeerr(), logoutJellyfin()]);
-    useJellyfinServers.getState().selectServer(null);
-    navigate("/login", { replace: true });
-  };
-
-  if (session?.serverUrl === "/jellyfin") return <SeerrLibraryDiscover />;
+  if (!session) return null;
+  if (connection && matchesSeerrSession(connection, session))
+    return (
+      <SeerrLibraryDiscover key={`${connection.apiUrl}:${connection.userId}`} />
+    );
   return (
     <SubPageLayout>
       <PageTitle subpage k="global.pages.discover" />
-      <div className="mx-auto max-w-lg px-6 py-12 text-center">
-        <Icon
-          icon={Icons.SEARCH}
-          className="mx-auto mb-6 text-4xl text-type-secondary"
+      <div className="px-4 pb-12">
+        <SeerrSetup
+          session={session}
+          onComplete={() => undefined}
+          onSkip={() => navigate("/")}
         />
-        <h1 className="mb-4 text-3xl font-bold text-white">
-          Discover with Seerr
-        </h1>
-        <p className="mb-8 text-type-secondary">
-          Seerr belongs to this app&apos;s configured Jellyfin server. You are
-          connected to {session?.serverName ?? "another server"}. Change to the
-          configured server to discover and request content.
-        </p>
-        <Button theme="purple" loading={changingServer} onClick={changeServer}>
-          Change server
-        </Button>
       </div>
     </SubPageLayout>
   );
