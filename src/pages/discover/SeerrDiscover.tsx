@@ -1,12 +1,14 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
+import { logoutJellyfin } from "@/backend/jellyfin/client";
 import {
   SeerrError,
   authenticateSeerr,
   getSeerrPage,
   getSeerrUser,
+  logoutSeerr,
   seerrImage,
   seerrStatusLabel,
   seerrToMediaItem,
@@ -23,11 +25,14 @@ import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaCard, MediaCardSkeleton } from "@/components/media/MediaCard";
+import { useFeaturedSlideTransition } from "@/hooks/useFeaturedSlideTransition";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
+import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
 
 import { CarouselNavButtons } from "./components/CarouselNavButtons";
 import { ScrollToTopButton } from "./components/ScrollToTopButton";
+import { SeerrCardMenu } from "./SeerrCardMenu";
 import { SeerrDetailsModal } from "./SeerrDetailsModal";
 
 function SeerrSignIn({
@@ -113,47 +118,37 @@ function SeerrFeatured({
   media: SeerrMedia[];
   onShowDetails: (item: SeerrMedia) => void;
 }) {
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const startX = useRef<number>();
   const items = media.filter((item) => item.backdropPath).slice(0, 10);
+  const {
+    currentIndex: index,
+    contentOpacity,
+    goTo,
+    move,
+  } = useFeaturedSlideTransition(items.length, hovered || focused);
   const current = items[index % Math.max(items.length, 1)];
-
-  useEffect(() => {
-    if (
-      paused ||
-      items.length < 2 ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return undefined;
-    const timer = window.setInterval(
-      () => setIndex((value) => (value + 1) % items.length),
-      8000,
-    );
-    return () => window.clearInterval(timer);
-  }, [paused, items.length]);
 
   if (!current) return <div className="h-20" />;
 
   return (
     <div
-      className="relative w-full transition-[height] duration-300 ease-in-out h-[40rem] min-h-[40rem] md:h-[100vh]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
+      className="relative w-full transition-[height] duration-300 ease-in-out motion-reduce:transition-none h-[40rem] min-h-[40rem] md:h-[100vh]"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node))
+          setFocused(false);
+      }}
       onTouchStart={(event) => {
         startX.current = event.touches[0].clientX;
       }}
       onTouchEnd={(event) => {
         if (startX.current !== undefined) {
           const difference = startX.current - event.changedTouches[0].clientX;
-          if (Math.abs(difference) > 50)
-            setIndex(
-              (value) =>
-                (value + (difference > 0 ? 1 : -1) + items.length) %
-                items.length,
-            );
+          if (Math.abs(difference) > 50) move(difference > 0 ? 1 : -1);
         }
         startX.current = undefined;
       }}
@@ -162,7 +157,7 @@ function SeerrFeatured({
         {items.map((item, itemIndex) => (
           <div
             key={`${item.mediaType}-${item.id}`}
-            className={`absolute inset-0 transition-opacity duration-1000 ${itemIndex === index % items.length ? "opacity-100" : "opacity-0"}`}
+            className={`absolute inset-0 transition-opacity duration-1000 motion-reduce:transition-none ${itemIndex === index % items.length ? "opacity-100" : "opacity-0"}`}
             style={{
               backgroundImage: `url(${seerrImage(item.backdropPath, "original")})`,
               backgroundSize: "cover",
@@ -177,9 +172,7 @@ function SeerrFeatured({
       </div>
       <button
         type="button"
-        onClick={() =>
-          setIndex((value) => (value - 1 + items.length) % items.length)
-        }
+        onClick={() => move(-1)}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
         aria-label="Previous slide"
       >
@@ -187,7 +180,7 @@ function SeerrFeatured({
       </button>
       <button
         type="button"
-        onClick={() => setIndex((value) => (value + 1) % items.length)}
+        onClick={() => move(1)}
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
         aria-label="Next slide"
       >
@@ -198,13 +191,16 @@ function SeerrFeatured({
           <button
             key={`${item.mediaType}-${item.id}`}
             type="button"
-            onClick={() => setIndex(itemIndex)}
+            onClick={() => goTo(itemIndex)}
             aria-label={`Go to slide ${itemIndex + 1}`}
             className={`w-2.5 h-2.5 rounded-full transition-all ${itemIndex === index % items.length ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"}`}
           />
         ))}
       </div>
-      <div className="absolute inset-0 flex items-end pb-20 z-10">
+      <div
+        className="absolute inset-0 flex items-end pb-20 z-10 transition-opacity duration-150 motion-reduce:transition-none"
+        style={{ opacity: contentOpacity }}
+      >
         <div className="container mx-auto px-8 lg:px-4 flex justify-between items-end w-full">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
@@ -264,6 +260,13 @@ function SeerrCard({
         linkable
         hideBookmark
         onShowDetails={() => onShowDetails(media)}
+        renderContextMenu={(close) => (
+          <SeerrCardMenu
+            media={media}
+            onShowDetails={onShowDetails}
+            close={close}
+          />
+        )}
       />
       {media.mediaInfo && media.mediaInfo.status > 1 && (
         <span className="pointer-events-none absolute top-2 left-2 rounded-md bg-mediaCard-badge px-2 py-1 text-[10px] text-mediaCard-badgeText">
@@ -422,7 +425,7 @@ function SeerrCarousel({
   );
 }
 
-export function SeerrDiscover() {
+function SeerrLibraryDiscover() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<SeerrUser>();
   const [authLoading, setAuthLoading] = useState(true);
@@ -434,6 +437,7 @@ export function SeerrDiscover() {
   const [selected, setSelected] = useState<SeerrMedia>();
   const [refresh, setRefresh] = useState(0);
   const [authRetry, setAuthRetry] = useState(0);
+  const featuredGeneration = useRef(0);
   const unauthorized = useRef(() => setUser(undefined)).current;
 
   useEffect(() => {
@@ -476,11 +480,18 @@ export function SeerrDiscover() {
   useEffect(() => {
     if (!user) return undefined;
     const controller = new AbortController();
+    const generation = featuredGeneration.current;
     getSeerrPage(
       category === "movie" ? "/discover/movies" : "/discover/tv",
       controller.signal,
     )
-      .then((page) => setFeatured(page.results))
+      .then((page) => {
+        if (
+          !controller.signal.aborted &&
+          generation === featuredGeneration.current
+        )
+          setFeatured(page.results);
+      })
       .catch((reason) => {
         if (
           !controller.signal.aborted &&
@@ -561,7 +572,12 @@ export function SeerrDiscover() {
                           key={value}
                           type="button"
                           className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center transition-transform duration-200 ${category === value ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
-                          onClick={() => setCategory(value)}
+                          onClick={() => {
+                            if (category === value) return;
+                            featuredGeneration.current += 1;
+                            setFeatured([]);
+                            setCategory(value);
+                          }}
                         >
                           {value === "movie" ? "Movies" : "TV shows"}
                         </button>
@@ -612,17 +628,51 @@ export function SeerrDiscover() {
             )}
             <ScrollToTopButton />
           </div>
-          {selected && (
-            <SeerrDetailsModal
-              key={`${selected.mediaType}-${selected.id}`}
-              media={selected}
-              user={user}
-              onClose={() => setSelected(undefined)}
-              onRequested={requested}
-            />
-          )}
+          <SeerrDetailsModal
+            media={selected}
+            user={user}
+            onClose={() => setSelected(undefined)}
+            onRequested={requested}
+          />
         </>
       )}
+    </SubPageLayout>
+  );
+}
+
+export function SeerrDiscover() {
+  const session = useJellyfinAuth((state) => state.session);
+  const [changingServer, setChangingServer] = useState(false);
+  const navigate = useNavigate();
+  const changeServer = async () => {
+    if (changingServer) return;
+    setChangingServer(true);
+    await Promise.allSettled([logoutSeerr(), logoutJellyfin()]);
+    useJellyfinServers.getState().selectServer(null);
+    navigate("/login", { replace: true });
+  };
+
+  if (session?.serverUrl === "/jellyfin") return <SeerrLibraryDiscover />;
+  return (
+    <SubPageLayout>
+      <PageTitle subpage k="global.pages.discover" />
+      <div className="mx-auto max-w-lg px-6 py-12 text-center">
+        <Icon
+          icon={Icons.SEARCH}
+          className="mx-auto mb-6 text-4xl text-type-secondary"
+        />
+        <h1 className="mb-4 text-3xl font-bold text-white">
+          Discover with Seerr
+        </h1>
+        <p className="mb-8 text-type-secondary">
+          Seerr belongs to this app&apos;s configured Jellyfin server. You are
+          connected to {session?.serverName ?? "another server"}. Change to the
+          configured server to discover and request content.
+        </p>
+        <Button theme="purple" loading={changingServer} onClick={changeServer}>
+          Change server
+        </Button>
+      </div>
     </SubPageLayout>
   );
 }

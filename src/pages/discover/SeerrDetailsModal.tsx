@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
 
 import { findItemByProviderId } from "@/backend/jellyfin/client";
 import {
@@ -23,18 +22,26 @@ import { Button } from "@/components/buttons/Button";
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Icon, Icons } from "@/components/Icon";
 import { DetailsSkeleton } from "@/components/overlays/detailsModal/components/layout/DetailsSkeleton";
-import { OverlayPortal } from "@/components/overlays/OverlayDisplay";
+import {
+  DetailsModalFrame,
+  useRetainedModalValue,
+} from "@/components/overlays/DetailsModalFrame";
 import { Flare } from "@/components/utils/Flare";
+import { ContentProviderLinks } from "@/pages/jellyfin/ContentProviderLinks";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 
-export function SeerrDetailsModal({
+function SeerrDetailsContent({
   media,
   user,
+  open,
+  afterLeave,
   onClose,
   onRequested,
 }: {
   media: SeerrMedia;
   user: SeerrUser;
+  open: boolean;
+  afterLeave: () => void;
   onClose: () => void;
   onRequested: (details: SeerrDetails) => void;
 }) {
@@ -113,14 +120,6 @@ export function SeerrDetailsModal({
       cancelled = true;
     };
   }, [media.id, media.mediaType]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !showLibrary) onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose, showLibrary]);
 
   const availableSeasons = (details?.seasons || []).filter(
     (season) =>
@@ -212,325 +211,383 @@ export function SeerrDetailsModal({
     }
   };
 
-  if (showLibrary && libraryId)
-    return (
-      <JellyfinDetailsModal
-        itemId={libraryId}
-        onClose={() => setShowLibrary(false)}
-      />
-    );
-
   const title = details?.title || details?.name || media.title || media.name;
   const release = details?.releaseDate || details?.firstAirDate;
   const runtime = details?.runtime || details?.episodeRunTime?.[0];
 
   return (
-    <OverlayPortal
-      darken
-      show
-      close={onClose}
-      durationClass="duration-500"
-      zIndex={1000}
-    >
-      <Helmet>
-        <html data-no-scroll />
-      </Helmet>
-      <div className="flex absolute inset-0 items-center justify-center pt-safe">
-        <Flare.Base className="group -m-[0.705em] rounded-3xl bg-background-main max-h-[900px] max-w-[1200px] bg-mediaCard-hoverBackground/60 backdrop-filter backdrop-blur-lg shadow-lg overflow-hidden h-[97%] w-[95%] relative">
-          <div
-            className="transition-transform duration-300 h-full relative"
-            role="dialog"
-            aria-modal="true"
-            aria-label={title}
-          >
-            <Flare.Light
-              flareSize={300}
-              cssColorVar="--colors-mediaCard-hoverAccent"
-              backgroundClass="bg-modal-background duration-100"
-              className="rounded-3xl bg-background-main group-hover:opacity-100 transition-opacity duration-300"
-            />
-            <div className="absolute right-4 top-4 z-50 pointer-events-auto">
-              <button
-                type="button"
-                aria-label="Close details"
-                className="text-s font-semibold text-type-secondary hover:text-white transition-transform hover:scale-95 select-none"
-                onClick={onClose}
-              >
-                <IconPatch icon={Icons.X} />
-              </button>
-            </div>
-            <Flare.Child className="pointer-events-auto relative h-full overflow-y-auto scrollbar-none select-text">
-              {!details && !error ? (
-                <DetailsSkeleton />
-              ) : !details ? (
-                <div className="p-12">
-                  <p role="alert" className="mb-6">
-                    {error}
-                  </p>
-                  <Button
-                    theme="purple"
-                    onClick={() => setRetry((value) => value + 1)}
-                  >
-                    Try again
-                  </Button>
-                </div>
-              ) : (
-                <div className="relative h-full flex flex-col">
-                  <div className="relative -mt-12 z-20 h-[500px] shrink-0">
-                    <div className="absolute inset-x-0 bottom-20 z-30 px-6">
-                      <h3 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                        {title}
-                      </h3>
-                    </div>
-                    <div
-                      className="absolute inset-0 bg-cover bg-top before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"
-                      style={{
-                        backgroundImage: `url(${seerrImage(details.backdropPath, "original") || seerrImage(details.posterPath) || "/placeholder.png"})`,
-                        maskImage:
-                          "linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 150px)",
-                        WebkitMaskImage:
-                          "linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 150px)",
-                        zIndex: -1,
-                      }}
-                    />
+    <>
+      <DetailsModalFrame
+        open={open && !showLibrary}
+        onClose={onClose}
+        afterLeave={() => {
+          if (!open) afterLeave();
+        }}
+        label={title || "Content details"}
+      >
+        <div className="flex absolute inset-0 items-center justify-center pt-safe">
+          <Flare.Base className="group -m-[0.705em] rounded-3xl bg-background-main max-h-[900px] max-w-[1200px] bg-mediaCard-hoverBackground/60 backdrop-filter backdrop-blur-lg shadow-lg overflow-hidden h-[97%] w-[95%] relative">
+            <div className="transition-transform duration-300 h-full relative">
+              <Flare.Light
+                flareSize={300}
+                cssColorVar="--colors-mediaCard-hoverAccent"
+                backgroundClass="bg-modal-background duration-100"
+                className="rounded-3xl bg-background-main group-hover:opacity-100 transition-opacity duration-300"
+              />
+              <div className="absolute right-4 top-4 z-50 pointer-events-auto">
+                <button
+                  type="button"
+                  aria-label="Close details"
+                  className="text-s font-semibold text-type-secondary hover:text-white transition-transform hover:scale-95 select-none"
+                  onClick={onClose}
+                >
+                  <IconPatch icon={Icons.X} />
+                </button>
+              </div>
+              <Flare.Child className="pointer-events-auto relative h-full overflow-y-auto scrollbar-none select-text">
+                {!details && !error ? (
+                  <DetailsSkeleton />
+                ) : !details ? (
+                  <div className="p-12">
+                    <p role="alert" className="mb-6">
+                      {error}
+                    </p>
+                    <Button
+                      theme="purple"
+                      onClick={() => setRetry((value) => value + 1)}
+                    >
+                      Try again
+                    </Button>
                   </div>
-                  <div className="px-6 pb-6 mt-[-70px] flex-grow relative z-30">
-                    <div className="flex flex-wrap items-center gap-4 mb-6">
-                      {libraryId ? (
-                        <Button
-                          theme="purple"
-                          onClick={() => setShowLibrary(true)}
-                        >
-                          <Icon icon={Icons.PLAY} /> Open in library
-                        </Button>
-                      ) : null}
-                      {(
-                        media.mediaType === "movie"
-                          ? movieUnavailable
-                          : requestableSeasons.length > 0
-                      ) ? (
-                        <Button
-                          theme="purple"
-                          disabled={!canRequest || requesting}
-                          loading={requesting}
-                          onClick={sendRequest}
-                        >
-                          {media.mediaType === "tv"
-                            ? `Request ${seasons.length || ""} season${seasons.length === 1 ? "" : "s"}`
-                            : "Request movie"}
-                        </Button>
-                      ) : null}
-                      <span className="text-sm text-white/80">
-                        {libraryId
-                          ? "Available in your library"
-                          : seerrStatusLabel(details.mediaInfo?.status)}
-                      </span>
-                      <div className="flex-1" />
-                      {!!details.voteAverage && (
-                        <span className="flex items-center gap-1 text-white/80">
-                          <Icon icon={Icons.TMDB} />
-                          {details.voteAverage.toFixed(1)}
-                        </span>
-                      )}
-                      {release && (
-                        <span className="text-white/80">
-                          {new Date(release).getFullYear()}
-                        </span>
-                      )}
+                ) : (
+                  <div className="relative h-full flex flex-col">
+                    <div className="relative -mt-12 z-20 h-[500px] shrink-0">
+                      <div className="absolute inset-x-0 bottom-20 z-30 px-6">
+                        <h3 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+                          {title}
+                        </h3>
+                      </div>
+                      <div
+                        className="absolute inset-0 bg-cover bg-top before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"
+                        style={{
+                          backgroundImage: `url(${seerrImage(details.backdropPath, "original") || seerrImage(details.posterPath) || "/placeholder.png"})`,
+                          maskImage:
+                            "linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 150px)",
+                          WebkitMaskImage:
+                            "linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 150px)",
+                          zIndex: -1,
+                        }}
+                      />
                     </div>
-                    {error && (
-                      <p role="alert" className="mb-4 text-red-400">
-                        {error}
-                      </p>
-                    )}
-                    {success && (
-                      <p role="status" className="mb-4 text-green-400">
-                        {success}
-                      </p>
-                    )}
-                    {!permission && (
-                      <p className="mb-4 text-type-secondary">
-                        Your Seerr account does not have permission to request
-                        this content.
-                      </p>
-                    )}
-                    {requestQuota?.restricted && (
-                      <p className="mb-4 text-type-secondary">
-                        Your Seerr request limit has been reached.
-                      </p>
-                    )}
-                    {!libraryLoading &&
-                      !libraryId &&
-                      details.mediaInfo?.status === 5 && (
+                    <div className="px-6 pb-6 mt-[-70px] flex-grow relative z-30">
+                      <div className="flex flex-wrap items-center gap-2 text-sm text-white/80 mb-4">
+                        {!!details.voteAverage && (
+                          <span className="flex items-center gap-1 text-white/80">
+                            <Icon icon={Icons.TMDB} />
+                            {details.voteAverage.toFixed(1)}
+                          </span>
+                        )}
+                        {release && (
+                          <span className="text-white/80">
+                            {new Date(release).getFullYear()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-4 mb-4">
+                        {libraryId ? (
+                          <Button
+                            theme="purple"
+                            onClick={() => setShowLibrary(true)}
+                          >
+                            <Icon icon={Icons.PLAY} /> Open in library
+                          </Button>
+                        ) : null}
+                        {(
+                          media.mediaType === "movie"
+                            ? movieUnavailable
+                            : requestableSeasons.length > 0
+                        ) ? (
+                          <Button
+                            theme="purple"
+                            disabled={!canRequest || requesting}
+                            loading={requesting}
+                            onClick={sendRequest}
+                          >
+                            {media.mediaType === "tv"
+                              ? `Request ${seasons.length || ""} season${seasons.length === 1 ? "" : "s"}`
+                              : "Request movie"}
+                          </Button>
+                        ) : null}
+                        <span className="text-sm text-white/80">
+                          {libraryId
+                            ? "Available in your library"
+                            : seerrStatusLabel(details.mediaInfo?.status)}
+                        </span>
+                      </div>
+                      {error && (
+                        <p role="alert" className="mb-4 text-red-400">
+                          {error}
+                        </p>
+                      )}
+                      {success && (
+                        <p role="status" className="mb-4 text-green-400">
+                          {success}
+                        </p>
+                      )}
+                      {!permission && (
                         <p className="mb-4 text-type-secondary">
-                          Seerr marks this title as available, but it is not
-                          accessible in your Jellyfin library.
+                          Your Seerr account does not have permission to request
+                          this content.
                         </p>
                       )}
-                    <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 pt-4">
-                      <div className="md:col-span-2">
-                        <p className="text-sm text-white/90 mb-6">
-                          {details.overview}
+                      {requestQuota?.restricted && (
+                        <p className="mb-4 text-type-secondary">
+                          Your Seerr request limit has been reached.
                         </p>
-                        <div className="flex flex-wrap gap-2 items-center mb-6">
-                          {details.genres?.map((genre) => (
-                            <span
-                              key={genre.id}
-                              className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white/80"
-                            >
-                              {genre.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="md:col-span-1">
-                        <div className="bg-video-context-border p-4 rounded-lg border-buttons-primary bg-opacity-80 space-y-3 text-sm">
-                          {runtime ? (
-                            <p>
-                              Runtime:{" "}
-                              <span className="text-white/80">
-                                {runtime} minutes
-                              </span>
-                            </p>
-                          ) : null}
-                          {release ? (
-                            <p>
-                              Release date:{" "}
-                              <span className="text-white/80">{release}</span>
-                            </p>
-                          ) : null}
-                          {details.originalLanguage ? (
-                            <p>
-                              Language:{" "}
-                              <span className="text-white/80">
-                                {details.originalLanguage.toUpperCase()}
-                              </span>
-                            </p>
-                          ) : null}
-                          <p>
-                            Status:{" "}
-                            <span className="text-white/80">
-                              {seerrStatusLabel(details.mediaInfo?.status)}
-                            </span>
+                      )}
+                      {!libraryLoading &&
+                        !libraryId &&
+                        details.mediaInfo?.status === 5 && (
+                          <p className="mb-4 text-type-secondary">
+                            Seerr marks this title as available, but it is not
+                            accessible in your Jellyfin library.
                           </p>
-                        </div>
-                      </div>
-                    </div>
-                    {media.mediaType === "tv" &&
-                      availableSeasons.length > 0 && (
-                        <div className="mt-8">
-                          <div className="flex items-center justify-between gap-4 mb-4">
-                            <h4 className="text-xl font-bold text-white">
-                              Seasons
-                            </h4>
-                            {settings?.partialRequestsEnabled &&
-                            requestableSeasons.length > 0 ? (
-                              <button
-                                type="button"
-                                className="text-sm text-type-link"
-                                onClick={() =>
-                                  setSeasons(
-                                    seasons.length === requestableSeasons.length
-                                      ? []
-                                      : requestableSeasons.map(
-                                          (season) => season.seasonNumber,
-                                        ),
-                                  )
-                                }
+                        )}
+                      <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 pt-4">
+                        <div className="md:col-span-2">
+                          <p className="text-sm text-white/90 mb-6">
+                            {details.overview}
+                          </p>
+                          <div className="flex flex-wrap gap-2 items-center mb-6">
+                            {details.genres?.map((genre) => (
+                              <span
+                                key={genre.id}
+                                className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white/80"
                               >
-                                {seasons.length === requestableSeasons.length
-                                  ? "Clear selection"
-                                  : "Select all"}
-                              </button>
-                            ) : null}
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {availableSeasons.map((season) => {
-                              const status = seasonRequestStatus(
-                                details,
-                                season.seasonNumber,
-                              );
-                              return (
-                                <label
-                                  key={season.id}
-                                  className={`flex items-center gap-3 p-4 rounded-lg bg-dropdown-background ${status > 1 ? "opacity-60" : "cursor-pointer hover:bg-dropdown-hoverBackground"}`}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    className="accent-purple-500 h-4 w-4"
-                                    checked={
-                                      status > 1 ||
-                                      seasons.includes(season.seasonNumber)
-                                    }
-                                    disabled={
-                                      status > 1 ||
-                                      !settings?.partialRequestsEnabled ||
-                                      !permission ||
-                                      requesting
-                                    }
-                                    onChange={(event) =>
-                                      setSeasons((current) =>
-                                        event.target.checked
-                                          ? [...current, season.seasonNumber]
-                                          : current.filter(
-                                              (number) =>
-                                                number !== season.seasonNumber,
-                                            ),
-                                      )
-                                    }
-                                  />
-                                  <div>
-                                    <p className="text-white text-sm font-medium">
-                                      {season.name}
-                                    </p>
-                                    <p className="text-xs text-type-secondary">
-                                      {season.episodeCount} episodes
-                                      {status > 1
-                                        ? ` · ${seerrStatusLabel(status)}`
-                                        : ""}
-                                    </p>
-                                  </div>
-                                </label>
-                              );
-                            })}
+                                {genre.name}
+                              </span>
+                            ))}
                           </div>
                         </div>
-                      )}
-                    {details.credits?.cast?.length ? (
-                      <div className="mt-8">
-                        <h4 className="text-xl font-bold text-white mb-4">
-                          Cast
-                        </h4>
-                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
-                          {details.credits.cast.slice(0, 20).map((person) => (
-                            <div key={person.id} className="flex-shrink-0 w-28">
-                              <img
-                                src={
-                                  seerrImage(person.profilePath, "w185") ||
-                                  "/placeholder.png"
-                                }
-                                alt={person.name}
-                                loading="lazy"
-                                className="aspect-[2/3] w-full object-cover rounded-lg mb-2"
-                              />
-                              <p className="text-sm text-white">
-                                {person.name}
+                        <div className="md:col-span-1">
+                          <div className="bg-background-secondary/50 group-hover:bg-background-secondary/80 p-4 rounded-lg border-buttons-primary transition-colors duration-300 space-y-3 text-xs text-white/80">
+                            {runtime ? (
+                              <p>
+                                Runtime:{" "}
+                                <span className="text-white/80">
+                                  {Math.floor(runtime / 60)
+                                    ? `${Math.floor(runtime / 60)}h `
+                                    : ""}
+                                  {runtime % 60}m
+                                </span>
                               </p>
-                              <p className="text-xs text-type-secondary">
-                                {person.character}
+                            ) : null}
+                            {release ? (
+                              <p>
+                                Release date:{" "}
+                                <span className="text-white/80">
+                                  {new Date(release).toLocaleDateString(
+                                    undefined,
+                                    {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                    },
+                                  )}
+                                </span>
                               </p>
-                            </div>
-                          ))}
+                            ) : null}
+                            {details.originalLanguage ? (
+                              <p>
+                                Language:{" "}
+                                <span className="text-white/80">
+                                  {details.originalLanguage.toUpperCase()}
+                                </span>
+                              </p>
+                            ) : null}
+                            <p>
+                              Status:{" "}
+                              <span className="text-white/80">
+                                {seerrStatusLabel(details.mediaInfo?.status)}
+                              </span>
+                            </p>
+                            <ContentProviderLinks
+                              item={{
+                                Id: String(media.id),
+                                Name: title || "",
+                                Type:
+                                  media.mediaType === "movie"
+                                    ? "Movie"
+                                    : "Series",
+                                ProviderIds: {
+                                  Tmdb: String(media.id),
+                                  ...(details.externalIds?.imdbId ||
+                                  details.imdbId
+                                    ? {
+                                        Imdb:
+                                          details.externalIds?.imdbId ||
+                                          details.imdbId!,
+                                      }
+                                    : {}),
+                                },
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                    ) : null}
+                      {media.mediaType === "tv" &&
+                        availableSeasons.length > 0 && (
+                          <div className="mt-8">
+                            <div className="flex items-center justify-between gap-4 mb-4">
+                              <h4 className="text-xl font-bold text-white">
+                                Seasons
+                              </h4>
+                              {settings?.partialRequestsEnabled &&
+                              requestableSeasons.length > 0 ? (
+                                <button
+                                  type="button"
+                                  className="text-sm text-type-link"
+                                  onClick={() =>
+                                    setSeasons(
+                                      seasons.length ===
+                                        requestableSeasons.length
+                                        ? []
+                                        : requestableSeasons.map(
+                                            (season) => season.seasonNumber,
+                                          ),
+                                    )
+                                  }
+                                >
+                                  {seasons.length === requestableSeasons.length
+                                    ? "Clear selection"
+                                    : "Select all"}
+                                </button>
+                              ) : null}
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                              {availableSeasons.map((season) => {
+                                const status = seasonRequestStatus(
+                                  details,
+                                  season.seasonNumber,
+                                );
+                                return (
+                                  <label
+                                    key={season.id}
+                                    className={`flex items-center gap-3 p-4 rounded-lg bg-dropdown-background ${status > 1 ? "opacity-60" : "cursor-pointer hover:bg-dropdown-hoverBackground"}`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      className="accent-purple-500 h-4 w-4"
+                                      checked={
+                                        status > 1 ||
+                                        seasons.includes(season.seasonNumber)
+                                      }
+                                      disabled={
+                                        status > 1 ||
+                                        !settings?.partialRequestsEnabled ||
+                                        !permission ||
+                                        requesting
+                                      }
+                                      onChange={(event) =>
+                                        setSeasons((current) =>
+                                          event.target.checked
+                                            ? [...current, season.seasonNumber]
+                                            : current.filter(
+                                                (number) =>
+                                                  number !==
+                                                  season.seasonNumber,
+                                              ),
+                                        )
+                                      }
+                                    />
+                                    <div>
+                                      <p className="text-white text-sm font-medium">
+                                        {season.name}
+                                      </p>
+                                      <p className="text-xs text-type-secondary">
+                                        {season.episodeCount} episodes
+                                        {status > 1
+                                          ? ` · ${seerrStatusLabel(status)}`
+                                          : ""}
+                                      </p>
+                                    </div>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      {details.credits?.cast?.length ? (
+                        <div className="mt-8">
+                          <h4 className="text-xl font-bold text-white mb-4">
+                            Cast
+                          </h4>
+                          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
+                            {details.credits.cast.slice(0, 20).map((person) => (
+                              <div
+                                key={person.id}
+                                className="flex-shrink-0 w-28"
+                              >
+                                <img
+                                  src={
+                                    seerrImage(person.profilePath, "w185") ||
+                                    "/placeholder.png"
+                                  }
+                                  alt={person.name}
+                                  loading="lazy"
+                                  className="aspect-[2/3] w-full object-cover rounded-lg mb-2"
+                                />
+                                <p className="text-sm text-white">
+                                  {person.name}
+                                </p>
+                                <p className="text-xs text-type-secondary">
+                                  {person.character}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              )}
-            </Flare.Child>
-          </div>
-        </Flare.Base>
-      </div>
-    </OverlayPortal>
+                )}
+              </Flare.Child>
+            </div>
+          </Flare.Base>
+        </div>
+      </DetailsModalFrame>
+      <JellyfinDetailsModal
+        itemId={open && showLibrary ? libraryId : undefined}
+        onClose={() => setShowLibrary(false)}
+        onAfterClose={() => {
+          if (!open) afterLeave();
+        }}
+      />
+    </>
   );
+}
+
+export function SeerrDetailsModal({
+  media,
+  user,
+  onClose,
+  onRequested,
+}: {
+  media?: SeerrMedia;
+  user: SeerrUser;
+  onClose: () => void;
+  onRequested: (details: SeerrDetails) => void;
+}) {
+  const presence = useRetainedModalValue(media);
+  return presence.value ? (
+    <SeerrDetailsContent
+      key={`${presence.value.mediaType}-${presence.value.id}`}
+      media={presence.value}
+      user={user}
+      open={presence.open}
+      afterLeave={presence.afterLeave}
+      onClose={onClose}
+      onRequested={onRequested}
+    />
+  ) : null;
 }

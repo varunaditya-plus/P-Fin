@@ -39,6 +39,8 @@ export interface SeerrMedia {
 }
 
 export interface SeerrDetails extends SeerrMedia {
+  imdbId?: string;
+  externalIds?: { imdbId?: string };
   runtime?: number;
   episodeRunTime?: number[];
   originalLanguage?: string;
