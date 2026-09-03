@@ -841,11 +841,6 @@ function JellyfinDetailsContent({
                                         <span className="absolute top-2 left-2 p-0.5 px-2 rounded inline bg-video-context-hoverColor bg-opacity-80 text-video-context-type-main text-sm">
                                           E{episode.IndexNumber}
                                         </span>
-                                        {episode.UserData?.Played ? (
-                                          <span className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-full">
-                                            <Icon icon={Icons.CHECKMARK} />
-                                          </span>
-                                        ) : null}
                                         {episode.UserData
                                           ?.PlaybackPositionTicks &&
                                         episode.RunTimeTicks ? (
@@ -869,29 +864,7 @@ function JellyfinDetailsContent({
                                         </p>
                                       </div>
                                     </button>
-                                    <div className="flex justify-between items-center px-3 pb-3">
-                                      <button
-                                        type="button"
-                                        onClick={() => play(episode)}
-                                        className="flex gap-2 items-center text-sm text-white hover:text-type-link"
-                                      >
-                                        <Icon icon={Icons.PLAY} />
-                                        {episode.UserData?.PlaybackPositionTicks
-                                          ? "Resume"
-                                          : "Play"}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setPlaybackOverrideId(episode.Id);
-                                          setSettingsForEpisode(true);
-                                          setSettingsOpen(true);
-                                        }}
-                                        aria-label={`Settings for episode ${episode.IndexNumber}: ${episode.Name}`}
-                                        className="p-1.5 text-white/70 hover:text-white transition-colors"
-                                      >
-                                        <Icon icon={Icons.SETTINGS} />
-                                      </button>
+                                    <div className="absolute top-2 right-2 flex gap-1">
                                       <button
                                         type="button"
                                         disabled={updating}
@@ -903,7 +876,12 @@ function JellyfinDetailsContent({
                                             ? `Mark ${episode.Name} as unwatched`
                                             : `Mark ${episode.Name} as watched`
                                         }
-                                        className="p-1.5 bg-dropdown-background hover:bg-dropdown-hoverBackground transition-colors rounded-full"
+                                        title={
+                                          episode.UserData?.Played
+                                            ? "Mark as unwatched"
+                                            : "Mark as watched"
+                                        }
+                                        className="tabbable p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors disabled:opacity-50"
                                       >
                                         <Icon
                                           icon={
@@ -911,6 +889,23 @@ function JellyfinDetailsContent({
                                               ? Icons.EYE_SLASH
                                               : Icons.EYE
                                           }
+                                          className="h-4 w-4 text-white/80"
+                                        />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setPlaybackOverrideId(episode.Id);
+                                          setSettingsForEpisode(true);
+                                          setSettingsOpen(true);
+                                        }}
+                                        aria-label={`Settings for episode ${episode.IndexNumber}: ${episode.Name}`}
+                                        title="Episode settings"
+                                        className="tabbable p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors"
+                                      >
+                                        <Icon
+                                          icon={Icons.SETTINGS}
+                                          className="h-4 w-4 text-white/80"
                                         />
                                       </button>
                                     </div>
