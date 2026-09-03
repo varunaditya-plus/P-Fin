@@ -12,15 +12,21 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open `http://localhost:5173` and sign in with your Jellyfin account. The same credentials are used to establish a separate Seerr session. If that fails, `/discover` offers Seerr sign-in without blocking access to Jellyfin.
+Open `http://localhost:5173`, select the configured server or enter a Jellyfin server address, then sign in. Server addresses are remembered; public users appear when your server exposes them, with manual sign-in available. For the configured server, the same credentials establish a separate Seerr session. If that fails, `/discover` offers Seerr sign-in without blocking access to Jellyfin.
 
-The default upstreams are `http://192.168.1.170:8096` (Jellyfin) and `http://192.168.1.170:5055` (Seerr). Copy `example.env` to `.env` to change them. Use base URLs without a trailing slash. Passwords and administrator API keys do not belong in environment files. Jellyfin user tokens are held in session storage; Seerr uses its HttpOnly session cookie. Sign out ends both sessions.
+The default upstreams are `http://100.64.96.96:8096` (Jellyfin) and `http://100.64.96.96:5055` (Seerr). Copy `example.env` to `.env` to change them. Use base URLs without a trailing slash. Passwords and administrator API keys do not belong in environment files. Jellyfin user tokens are held in session storage; Seerr uses its HttpOnly session cookie. Sign out ends both sessions.
+
+After changing an upstream address, restart `pnpm dev` or `pnpm preview`. A running preview keeps the proxy targets it loaded at startup. Recreate the Docker container after changing its environment. The machine running the proxy must be connected to the server's Tailscale network.
+
+The configured address uses the same-origin proxy. Other saved servers connect directly from the browser and must allow the client's origin; an HTTPS client requires an HTTPS direct server. Seerr remains associated with the configured server, so discovery is unavailable while signed in to another server.
 
 ## Features
 
-- Home: continue watching, next up, latest items per library and favourites, plus paginated library browsing and Jellyfin-only search.
-- Cards: open details in the original modal style, with Jellyfin seasons, episodes, favourite and watched state.
-- Playback: the existing P-Stream player uses Jellyfin-negotiated direct streams or HLS, with resume/progress reporting, audio and subtitle selection, quality options and an episode queue.
+- Home: continue watching, next up, latest items and favourites; paginated libraries, collections and playlists; sorting and status, genre and year filters; Jellyfin-only search.
+- Cards: open details in the original modal style, with seasons, episodes, favourite and watched state, complete media information, chapters, extras and external metadata links.
+- Content controls: choose versions, audio and subtitles before playback; manage metadata, images, subtitles and identification; refresh, download, add to collections/playlists, or delete where Jellyfin permissions allow. Destructive actions require confirmation in the app.
+- Collections and playlists: remove entries without deleting media, reorder playlist entries, and update playlist names and public/private settings while retaining shared users.
+- Playback: the existing player uses Jellyfin-negotiated direct streams or HLS, with resume/progress reporting, track and version selection, quality options and an episode queue. Jellyfin audio, subtitle and next-episode preferences are saved on the server and applied during playback.
 - `/discover`: Seerr discovery and search, availability, request permissions/quotas and season-aware requests. Available titles are matched against the current Jellyfin user's accessible library.
 - Existing colours, themes, cards, carousel styles and player controls are retained. Legacy provider routes, account backend syncing and external subtitle scraping are not mounted by this client.
 

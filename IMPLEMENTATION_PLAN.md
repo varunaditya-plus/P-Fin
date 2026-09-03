@@ -26,3 +26,23 @@ Preserve p-stream's React, Zustand, player, theme, card, carousel, and modal arc
 - Slow 4K software transcoding was observed on the supplied server. Compatibility conversions are bounded to 1080p (720p at 2 Mbps), with original resolution retained for supported streams and an explicit startup timeout/retry.
 - Seerr request payloads, permissions, quota and duplicate-request handling are tested without submitting a new live request.
 - Docker deployment is configured but not runtime-tested because the local Docker daemon is unavailable.
+
+## Tailscale, server selection and content controls
+
+1. [x] Diagnose the upstream address change and restore both proxies. Add a runtime-configured server choice, saved servers, public-user selection and manual login without changing P-Stream styling.
+2. [x] Remove the app footer and retain the existing navigation and page layouts.
+3. [x] Compare the local Jellyfin Vue, Web and server references. Add content information, versions, track selection, chapters, extras and permission-aware metadata, image, subtitle, identification, refresh, download and deletion controls.
+4. [x] Add library filters, collections/playlists and server-backed audio, subtitle and next-episode preferences.
+5. [x] Finish collection/playlist item management and verify updated preference-selection rules against Jellyfin.
+6. [x] Complete regression checks and rebuild the production preview after the final edits.
+
+### Validation in this update
+
+- Both Tailscale upstreams respond. The old preview process retained the original LAN proxy targets; restarting it restored access to Jellyfin and Seerr.
+- Production browser checks pass for server connection, Enter-key sign-in, library filters, card-to-modal behaviour and Seerr discovery/request controls.
+- Actual episode playback through the new proxy reaches 1920 × 1080, readyState 4 and advancing playback, with no browser errors.
+- Real metadata, images, subtitles, chapters and stream information load. Identify search returns Jellyfin provider results. No media deletions, metadata writes, uploads or new Seerr requests were submitted during these checks.
+- Server playback preferences load and the save flow succeeds. Login, home and content details fit a 390-pixel viewport without horizontal overflow.
+- Local reference repositories are excluded from the app test suite, Vite watcher and Docker build context; their source remains untouched.
+- 95 tests pass, including server selection, permission-aware requests, metadata preservation, playlist entry operations, pagination, playback defaults, version/chapter selection and stale-session protection. TypeScript, ESLint and whitespace checks pass.
+- The final production build passes and the rebuilt preview restores its session and library. Chapter selection carries the selected version, subtitle choice and exact start ticks into the player.
