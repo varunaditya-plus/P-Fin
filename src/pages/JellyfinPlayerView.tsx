@@ -5,6 +5,7 @@ import { downloadCaption } from "@/backend/helpers/subs";
 import {
   JellyfinItem,
   getEpisodes,
+  getImageUrl,
   getItem,
   jellyfinUrl,
 } from "@/backend/jellyfin/client";
@@ -321,6 +322,7 @@ export function JellyfinPlayerView() {
           jellyfinRating: target.CommunityRating,
           releaseYear: target.ProductionYear ?? 0,
           overview: target.Overview,
+          logo: getImageUrl(target, "Logo", 800),
           poster: jellyfinUrl(
             `/Items/${seriesId ?? target.Id}/Images/Primary`,
             { maxWidth: 400 },
@@ -331,6 +333,7 @@ export function JellyfinPlayerView() {
                   number: target.IndexNumber ?? 0,
                   title: target.Name,
                   overview: target.Overview,
+          logo: getImageUrl(target, "Logo", 800),
                 }
               : undefined,
           season:

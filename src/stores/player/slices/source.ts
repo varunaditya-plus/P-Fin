@@ -29,6 +29,7 @@ export interface PlayerMeta {
   title: string;
   releaseYear: number;
   poster?: string;
+  logo?: string;
   overview?: string;
   episode?: PlayerMetaEpisode;
   season?: { number: number; title: string };

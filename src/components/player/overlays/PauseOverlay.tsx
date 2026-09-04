@@ -1,142 +1,165 @@
+import { CSSProperties, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useIdle } from "react-use";
 
+import { Icon, Icons } from "@/components/Icon";
 import { useShouldShowControls } from "@/components/player/hooks/useShouldShowControls";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 import { durationExceedsHour, formatSeconds } from "@/utils/formatSeconds";
-import { uses12HourClock } from "@/utils/uses12HourClock";
 
 export function PauseOverlay() {
-  const isIdle = useIdle(5e3); // 5 seconds
   const isPaused = usePlayerStore((s) => s.mediaPlaying.isPaused);
+  const hasPlayed = usePlayerStore((s) => s.mediaPlaying.hasPlayedOnce);
+  const isLoading = usePlayerStore((s) => s.mediaPlaying.isLoading);
+  const status = usePlayerStore((s) => s.status);
   const meta = usePlayerStore((s) => s.meta);
-  const { time, duration, draggingTime } = usePlayerStore((s) => s.progress);
-  const { isSeeking } = usePlayerStore((s) => s.interface);
-  const playbackRate = usePlayerStore((s) => s.mediaPlaying.playbackRate);
+  const { time, duration } = usePlayerStore((s) => s.progress);
   const enablePauseOverlay = usePreferencesStore((s) => s.enablePauseOverlay);
   const { isMobile } = useIsMobile();
   const { showTargets } = useShouldShowControls();
   const { t } = useTranslation();
-  const details = {
-    voteAverage: meta?.jellyfinRating ?? null,
-    genres: meta?.jellyfinGenres ?? [],
-  };
-  const shouldShow =
-    isPaused && isIdle && enablePauseOverlay && !(isMobile && showTargets);
+  const [visibleItem, setVisibleItem] = useState<string | null>(null);
+  const [failedLogo, setFailedLogo] = useState<string | null>(null);
+  const itemId = meta?.jellyfinItemId;
+  const canShow =
+    enablePauseOverlay &&
+    hasPlayed &&
+    isPaused &&
+    !isLoading &&
+    status === playerStatus.PLAYING;
+
+  useEffect(() => {
+    setVisibleItem(null);
+    if (!canShow || !itemId) return;
+    const timer = setTimeout(() => setVisibleItem(itemId), 2000);
+    return () => clearTimeout(timer);
+  }, [canShow, itemId]);
 
   if (!meta) return null;
-
+  const shouldShow =
+    canShow && visibleItem === itemId && !(isMobile && showTargets);
   const overview =
     meta.type === "show" ? meta.episode?.overview : meta.overview;
-
-  const hasHours = durationExceedsHour(duration);
-  const currentTime = Math.min(
-    Math.max(isSeeking ? draggingTime : time, 0),
-    duration,
-  );
-  const secondsRemaining = Math.abs(currentTime - duration);
-  const secondsRemainingAdjusted =
-    playbackRate > 0 ? secondsRemaining / playbackRate : secondsRemaining;
-
-  const timeLeft = formatSeconds(
-    secondsRemaining,
-    durationExceedsHour(secondsRemaining),
-  );
-  const timeWatched = formatSeconds(currentTime, hasHours);
-  const timeFinished = new Date(Date.now() + secondsRemainingAdjusted * 1e3);
-  const durationFormatted = formatSeconds(duration, hasHours);
-
-  const localizationKey = "remaining";
-
-  // Don't render anything if we don't have content, but keep structure for fade if valid
-  const hasDetails = details.voteAverage !== null || details.genres.length > 0;
-  const hasContent = overview || meta.title || hasDetails;
-  if (!hasContent) return null;
+  const rating = meta.jellyfinRating;
+  const genres = meta.jellyfinGenres ?? [];
+  const runtime = Number.isFinite(duration) && duration > 0 ? duration : 0;
+  const remaining = Math.max(0, runtime - Math.max(0, time));
+  const logo = meta.logo && failedLogo !== meta.logo ? meta.logo : null;
+  const stagger = `transition-[transform,opacity] duration-700 ease-out motion-reduce:transition-none motion-reduce:transform-none ${shouldShow ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`;
+  const delay = (index: number): CSSProperties => ({
+    transitionDelay: shouldShow ? `${index * 80}ms` : "0ms",
+  });
 
   return (
     <div
-      className={`absolute inset-0 z-[60] flex items-center bg-black/60 transition-opacity duration-500 pointer-events-none ${
-        shouldShow ? "opacity-100" : "opacity-0"
-      }`}
+      aria-hidden={!shouldShow}
+      data-pause-overlay
+      className={`absolute inset-0 z-[60] flex flex-col justify-between transition-opacity duration-700 motion-reduce:transition-none pointer-events-none ${shouldShow ? "opacity-100" : "opacity-0"}`}
     >
-      <div className="md:ml-16 max-w-md lg:max-w-2xl p-8">
-        <h1 className="mb-4 text-4xl font-bold text-white drop-shadow-lg">
-          {meta.title}
-        </h1>
-
-        {meta.type === "show" && meta.episode && (
-          <h2 className="mb-2 text-2xl font-semibold text-white/90 drop-shadow-md">
-            {meta.episode.title}
-          </h2>
-        )}
-
-        {(details.voteAverage !== null ||
-          details.genres.length > 0 ||
-          duration > 0) && (
-          <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-white/80 drop-shadow-md">
-            {details.voteAverage !== null && (
-              <span>
-                {details.voteAverage.toFixed(1)}
-                <span className="text-white/60 ml-0.5">/10</span>
-              </span>
-            )}
-            {details.genres.length > 0 && (
-              <>
-                {details.voteAverage !== null && (
-                  <span className="text-white/60">•</span>
-                )}
-                <span>{details.genres.slice(0, 4).join(", ")}</span>
-              </>
-            )}
-            {duration > 0 && (
-              <>
-                {(details.voteAverage !== null ||
-                  details.genres.length > 0) && (
-                  <span className="text-white/60">•</span>
-                )}
-                <span>
-                  {(() => {
-                    const text = t(`player.time.${localizationKey}`, {
-                      timeFinished,
-                      timeWatched,
-                      timeLeft,
-                      duration: durationFormatted,
-                      formatParams: {
-                        timeFinished: {
-                          hour: "numeric",
-                          minute: "numeric",
-                          hour12: uses12HourClock(),
-                        },
-                      },
-                    });
-                    if (
-                      localizationKey === "remaining" &&
-                      text.includes(" • ")
-                    ) {
-                      const [left, right] = text.split(" • ");
-                      return (
-                        <>
-                          {left}
-                          <span className="text-white/60 mx-1">•</span>
-                          {right}
-                        </>
-                      );
-                    }
-                    return text;
-                  })()}
-                </span>
-              </>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/20" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 30% 70%, transparent 30%, rgba(0,0,0,0.6) 100%)",
+        }}
+      />
+      <div className="relative flex-1 flex items-end pb-32 md:pb-44 px-8 md:px-20 lg:px-32">
+        <div className="max-w-xl lg:max-w-2xl min-w-0">
+          <div
+            className={`flex items-center gap-3 mb-5 ${stagger}`}
+            style={delay(0)}
+          >
+            <span className="h-2 w-2 rounded-full bg-video-context-type-accent" />
+            <span className="text-[11px] font-semibold tracking-[0.3em] uppercase text-white/80">
+              {t("player.pauseOverlay.youAreWatching", "Now playing")}
+            </span>
+          </div>
+          <div className={`mb-4 ${stagger}`} style={delay(1)}>
+            {logo ? (
+              <img
+                src={logo}
+                alt={meta.title}
+                className="max-h-28 lg:max-h-36 max-w-full object-contain object-left drop-shadow-lg"
+                onError={() => setFailedLogo(logo)}
+              />
+            ) : (
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white leading-tight drop-shadow-lg [text-wrap:balance]">
+                {meta.title}
+              </h1>
             )}
           </div>
-        )}
-
-        {overview && (
-          <p className="text-lg text-white/80 drop-shadow-md line-clamp-6">
-            {overview}
-          </p>
-        )}
+          {meta.type === "show" && meta.season && meta.episode ? (
+            <div className={`mb-3 ${stagger}`} style={delay(2)}>
+              <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold text-white/90 bg-white/10 ring-1 ring-white/15">
+                {t("media.episodeDisplay", {
+                  season: meta.season.number,
+                  episode: meta.episode.number,
+                })}
+              </span>
+            </div>
+          ) : null}
+          {meta.type === "show" && meta.episode?.title ? (
+            <h2
+              className={`mb-4 text-xl lg:text-3xl font-semibold text-white/95 drop-shadow-md ${stagger}`}
+              style={delay(3)}
+            >
+              {meta.episode.title}
+            </h2>
+          ) : null}
+          {overview ? (
+            <p
+              className={`text-sm lg:text-base text-white/70 leading-relaxed line-clamp-3 mb-5 max-w-xl drop-shadow-md ${stagger}`}
+              style={delay(4)}
+            >
+              {overview}
+            </p>
+          ) : null}
+          <div
+            className={`flex flex-wrap items-center gap-2 ${stagger}`}
+            style={delay(5)}
+          >
+            {rating !== undefined && Number.isFinite(rating) && rating > 0 ? (
+              <span className="px-2.5 py-1 rounded-full text-xs text-white/90 bg-white/10 ring-1 ring-white/15">
+                {rating.toFixed(1)} / 10
+              </span>
+            ) : null}
+            {runtime > 0 ? (
+              <span className="px-2.5 py-1 rounded-full text-xs text-white/90 bg-white/10 ring-1 ring-white/15">
+                {formatSeconds(runtime, durationExceedsHour(runtime))}
+              </span>
+            ) : null}
+            {genres.slice(0, 2).map((genre) => (
+              <span
+                key={genre}
+                className="px-2.5 py-1 rounded-full text-xs text-white/85 bg-white/5 ring-1 ring-white/10"
+              >
+                {genre}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div
+        className={`absolute bottom-20 right-8 md:right-14 flex flex-col items-end gap-2 ${stagger}`}
+        style={delay(6)}
+      >
+        <div className="flex items-center gap-3 text-white/70">
+          <Icon icon={Icons.PAUSE} className="text-xl" />
+          <span className="text-xl md:text-3xl font-light tracking-[0.25em] uppercase">
+            {t("player.pauseOverlay.paused", "Paused")}
+          </span>
+        </div>
+        {runtime > 0 ? (
+          <span className="text-xs text-white/60">
+            {t("player.pauseOverlay.remaining", {
+              defaultValue: "{{time}} remaining",
+              time: formatSeconds(remaining, durationExceedsHour(remaining)),
+            })}
+          </span>
+        ) : null}
       </div>
     </div>
   );
