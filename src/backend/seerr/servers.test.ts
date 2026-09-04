@@ -40,7 +40,7 @@ describe("Seerr server setup", () => {
     });
   });
 
-  it("preserves an explicitly selected custom server and base path", () => {
+  it("keeps a custom server on the same-origin proxy, including its base path", () => {
     expect(
       createSeerrConnection(
         "https://other.example/requests/api/v1",
@@ -50,9 +50,20 @@ describe("Seerr server setup", () => {
       ),
     ).toMatchObject({
       url: "https://other.example/requests",
-      apiUrl: "https://other.example/requests/api/v1",
+      apiUrl: "/seerr/api/v1",
       authMethod: "local",
     });
+  });
+
+  it("proxies even when the runtime server address is unavailable", () => {
+    expect(
+      createSeerrConnection(
+        "http://192.168.1.170:5055",
+        null,
+        "jellyfin",
+        session,
+      ).apiUrl,
+    ).toBe("/seerr/api/v1");
   });
 
   it.each([

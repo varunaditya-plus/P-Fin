@@ -140,8 +140,13 @@ describe("Seerr opt-in and session boundaries", () => {
     const fetch = mockResponse(validUser);
     await getSeerrUser();
     expect(fetch).toHaveBeenCalledWith(
-      "https://seerr.custom.example/base/api/v1/auth/me",
-      expect.objectContaining({ credentials: "include" }),
+      "/seerr/api/v1/auth/me",
+      expect.objectContaining({
+        credentials: "include",
+        headers: expect.objectContaining({
+          "X-Seerr-Upstream": "https://seerr.custom.example/base",
+        }),
+      }),
     );
   });
 
@@ -238,8 +243,12 @@ describe("Seerr opt-in and session boundaries", () => {
     finish(new Response(null, { status: 204 }));
     await logout;
     await login;
-    expect(fetch.mock.calls[1][0]).toBe(
-      "https://chosen.example/api/v1/auth/jellyfin",
+    expect(fetch.mock.calls[1][0]).toBe("/seerr/api/v1/auth/jellyfin");
+    expect(fetch.mock.calls[0][1].headers["X-Seerr-Upstream"]).toBe(
+      "http://seerr.example:5055",
+    );
+    expect(fetch.mock.calls[1][1].headers["X-Seerr-Upstream"]).toBe(
+      "https://chosen.example",
     );
   });
 
@@ -296,12 +305,10 @@ describe("Seerr opt-in and session boundaries", () => {
     ).resolves.toMatchObject({ id: 1 });
   });
 
-  it("reports actionable CORS and cookie guidance for an unreachable custom server", async () => {
+  it("reports when the same-origin Seerr proxy cannot be reached", async () => {
     const fetch = mockResponse({});
     fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
-    await expect(seerrFetch("/auth/me")).rejects.toThrow(
-      "CORS with credentials",
-    );
+    await expect(seerrFetch("/auth/me")).rejects.toThrow("Seerr proxy");
   });
 
   it("bounds an unresponsive Seerr request", async () => {

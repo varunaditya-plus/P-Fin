@@ -45,25 +45,16 @@ export async function getConfiguredSeerrServer(): Promise<string | null> {
 
 export function createSeerrConnection(
   address: string,
-  configuredAddress: string | null,
+  _configuredAddress: string | null,
   authMethod: SeerrConnection["authMethod"],
   session: JellyfinSession,
 ): SeerrConnection {
   const url = normalizeSeerrUrl(address);
-  const useProxy = Boolean(
-    configuredAddress && url === normalizeSeerrUrl(configuredAddress),
-  );
-  if (
-    !useProxy &&
-    window.location.protocol === "https:" &&
-    new URL(url).protocol === "http:"
-  )
-    throw new Error(
-      "This page uses HTTPS. Use the configured Seerr server or an HTTPS Seerr address.",
-    );
+  // Seerr does not allow credentialed cross-origin API calls. The app proxy
+  // forwards this address from the X-Seerr-Upstream header.
   return {
     url,
-    apiUrl: useProxy ? "/seerr/api/v1" : `${url}/api/v1`,
+    apiUrl: "/seerr/api/v1",
     authMethod,
     jellyfinServerUrl: session.serverUrl,
     jellyfinUserId: session.userId,

@@ -177,7 +177,7 @@ describe("optional Seerr setup", () => {
       "local-seerr-password",
       expect.objectContaining({
         url: "https://new-seerr.test/requests",
-        apiUrl: "https://new-seerr.test/requests/api/v1",
+        apiUrl: "/seerr/api/v1",
         authMethod: "local",
       }),
     );

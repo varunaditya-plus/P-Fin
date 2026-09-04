@@ -93,24 +93,27 @@ function captureConnection(explicit?: SeerrConnection): ConnectionContext {
 }
 
 function seerrApiBase(connection: SeerrConnection) {
-  let url: URL;
+  let upstream: URL;
   try {
-    url = new URL(connection.apiUrl, window.location.origin);
+    upstream = new URL(connection.url);
   } catch {
     throw new SeerrError("Enter a valid Seerr server address.", 400);
   }
   if (
-    !["http:", "https:"].includes(url.protocol) ||
-    url.username ||
-    url.password ||
-    url.search ||
-    url.hash
+    !["http:", "https:"].includes(upstream.protocol) ||
+    !upstream.hostname ||
+    upstream.username ||
+    upstream.password ||
+    upstream.search ||
+    upstream.hash
   )
     throw new SeerrError(
       "Use an HTTP or HTTPS Seerr address without credentials, a query, or a fragment.",
       400,
     );
-  return connection.apiUrl.replace(/\/+$/, "");
+  // Always same-origin. A direct browser call to Seerr is blocked by CORS and
+  // cannot include Seerr's SameSite session cookie.
+  return "/seerr/api/v1";
 }
 
 async function fetchFromSeerr<T>(
@@ -137,6 +140,7 @@ async function fetchFromSeerr<T>(
       credentials: "include",
       headers: {
         Accept: "application/json",
+        "X-Seerr-Upstream": connection.url,
         ...(options.body ? { "Content-Type": "application/json" } : {}),
         ...options.headers,
       },
@@ -148,7 +152,7 @@ async function fetchFromSeerr<T>(
         data?.message ||
           data?.error ||
           (response.status === 401
-            ? "Sign in to Seerr again. If this is a custom server, its cookie and CORS settings must allow this app."
+            ? "Sign in to Seerr again."
             : "Seerr could not complete this request. Please try again."),
         response.status,
       );
@@ -165,7 +169,7 @@ async function fetchFromSeerr<T>(
       );
     if (error instanceof TypeError)
       throw new SeerrError(
-        "Cannot reach Seerr. Check the server address. For a custom server, allow this app's origin in CORS with credentials and permit its session cookie, or use a same-origin reverse proxy. HTTPS apps require an HTTPS Seerr connection.",
+        "Cannot reach Seerr through this app. Check the server address and that this app's Seerr proxy is running.",
         0,
       );
     if (error instanceof SyntaxError)

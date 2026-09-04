@@ -18,7 +18,7 @@ The default upstreams are `http://100.64.96.96:8096` (Jellyfin) and `http://100.
 
 After changing an upstream address, restart `pnpm dev` or `pnpm preview`. A running preview keeps the proxy targets it loaded at startup. Recreate the Docker container after changing its environment. The machine running the proxy must be connected to the server's Tailscale network.
 
-The configured address uses the same-origin proxy. Other saved servers connect directly from the browser and must allow the client's origin; an HTTPS client requires an HTTPS direct server. Seerr setup also uses the same-origin proxy when its address matches `SEERR_URL`. Custom Seerr addresses connect directly and require a reverse proxy that allows this client's origin and credentialed requests; Seerr does not enable cross-origin API access by default. HTTPS clients require HTTPS direct connections. For standard Seerr installations, set `SEERR_URL` and restart the client so the supplied address uses its proxy. Seerr connections are bound to the current Jellyfin login and stored for that browser session; passwords are never stored.
+Every Seerr address, including one you type in, is called through the same-origin `/seerr` proxy. The browser sends `X-Seerr-Upstream` and never talks to Seerr directly, so Seerr's missing CORS headers and `SameSite` session cookie do not block requests. `SEERR_URL` is the fallback when that header is absent. Seerr connections are bound to the current Jellyfin login and stored for that browser session; passwords are never stored.
 
 ## Features
 

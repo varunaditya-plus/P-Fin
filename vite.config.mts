@@ -6,6 +6,7 @@ import checker from "vite-plugin-checker";
 import path from "path";
 import million from "million/compiler";
 import { loadEnv, splitVendorChunkPlugin } from "vite";
+import { seerrProxyMiddleware } from "./deploy/seerr-proxy.mjs";
 
 import tailwind from "tailwindcss";
 import rtl from "postcss-rtlcss";
@@ -39,14 +40,10 @@ export default defineConfig(({ mode }) => {
       changeOrigin: true,
       rewrite: (url: string) => url.replace(/^\/jellyfin/, ""),
     },
-    "/seerr": {
-      target: env.SEERR_URL || "http://100.64.96.96:5055",
-      changeOrigin: true,
-      cookieDomainRewrite: "",
-      cookiePathRewrite: "/seerr",
-      rewrite: (url: string) => url.replace(/^\/seerr/, ""),
-    },
   };
+  const proxySeerr = seerrProxyMiddleware(
+    env.SEERR_URL || "http://100.64.96.96:5055",
+  );
   return {
     base: env.VITE_BASE_URL || "/",
     server: {
@@ -59,9 +56,11 @@ export default defineConfig(({ mode }) => {
       {
         name: "jellyfin-server-config",
         configureServer(server) {
+          server.middlewares.use(proxySeerr);
           server.middlewares.use("/server-config.json", sendServerConfig);
         },
         configurePreviewServer(server) {
+          server.middlewares.use(proxySeerr);
           server.middlewares.use("/server-config.json", sendServerConfig);
         },
       },
