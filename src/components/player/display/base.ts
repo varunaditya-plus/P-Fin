@@ -1,5 +1,5 @@
 import fscreen from "fscreen";
-import Hls, { Level } from "hls.js";
+import Hls from "hls.js";
 
 import {
   DisplayInterface,
@@ -7,11 +7,7 @@ import {
 } from "@/components/player/display/displayInterface";
 import { handleBuffered } from "@/components/player/utils/handleBuffered";
 import { getMediaErrorDetails } from "@/components/player/utils/mediaErrorDetails";
-import {
-  LoadableSource,
-  SourceQuality,
-  getPreferredQuality,
-} from "@/stores/player/utils/qualities";
+import { LoadableSource, SourceQuality } from "@/stores/player/utils/qualities";
 import {
   canChangeVolume,
   canFullscreen,
@@ -23,50 +19,12 @@ import {
 } from "@/utils/detectFeatures";
 import { makeEmitter } from "@/utils/events";
 
-const levelConversionMap: Record<number, SourceQuality> = {
-  360: "360",
-  1080: "1080",
-  720: "720",
-  480: "480",
-  2160: "4k",
-};
-
-// Define quality thresholds for mapping non-standard resolutions
-const qualityThresholds = [
-  { minHeight: 1800, quality: "4k" as SourceQuality },
-  { minHeight: 800, quality: "1080" as SourceQuality },
-  { minHeight: 600, quality: "720" as SourceQuality },
-  { minHeight: 420, quality: "480" as SourceQuality },
-  { minHeight: 0, quality: "360" as SourceQuality },
-];
-
-function hlsLevelToQuality(level?: Level): SourceQuality | null {
-  if (!level?.height) return null;
-
-  // First check for exact matches
-  const exactMatch = levelConversionMap[level.height];
-  if (exactMatch) return exactMatch;
-
-  // For non-standard resolutions, map to closest standard quality
-  for (const threshold of qualityThresholds) {
-    if (level.height >= threshold.minHeight) {
-      return threshold.quality;
-    }
-  }
-
-  return "unknown"; // fallback to unknown quality
-}
-
-function hlsLevelsToQualities(levels: Level[]): SourceQuality[] {
-  return levels
-    .map((v) => hlsLevelToQuality(v))
-    .filter((v): v is SourceQuality => !!v);
-}
-
-// Sort levels by quality (height) to ensure we can select the best one
-function sortLevelsByQuality(levels: Level[]): Level[] {
-  return [...levels].sort((a, b) => (b.height || 0) - (a.height || 0));
-}
+import {
+  highestHlsLevel,
+  hlsLevelToQuality,
+  hlsLevelsToQualities,
+  manualHlsLevel,
+} from "./hlsQuality";
 
 export function makeVideoElementDisplayInterface(): DisplayInterface {
   const { emit, on, off } = makeEmitter<DisplayInterfaceEvents>();
@@ -89,48 +47,30 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
 
   function reportLevels() {
     if (!hls) return;
-    const levels = hls.levels;
-    const convertedLevels = levels
-      .map((v) => hlsLevelToQuality(v))
-      .filter((v): v is SourceQuality => !!v);
-    emit("qualities", convertedLevels);
+    emit("qualities", hlsLevelsToQualities(hls.levels));
   }
 
   function setupQualityForHls() {
-    if (videoElement && canPlayHlsNatively(videoElement)) {
-      return; // nothing to change
-    }
-
     if (!hls) return;
-    if (!automaticQuality) {
-      const sortedLevels = sortLevelsByQuality(hls.levels);
-      const qualities = hlsLevelsToQualities(sortedLevels);
-      const availableQuality = getPreferredQuality(qualities, {
-        lastChosenQuality: preferenceQuality,
-        automaticQuality,
-      });
-      if (availableQuality) {
-        // Find the best level that matches our preferred quality
-        const matchingLevels = hls.levels.filter(
-          (level) => hlsLevelToQuality(level) === availableQuality,
-        );
-        if (matchingLevels.length > 0) {
-          // Pick the highest resolution level for this quality
-          const bestLevel = sortLevelsByQuality(matchingLevels)[0];
-          const levelIndex = hls.levels.indexOf(bestLevel);
-          if (levelIndex !== -1) {
-            hls.currentLevel = levelIndex;
-            hls.loadLevel = levelIndex;
-          }
-        }
-      }
-    } else {
+    if (automaticQuality) {
       hls.currentLevel = -1;
       hls.loadLevel = -1;
+      // Some manifests omit resolution entirely. Seed a concrete usable level
+      // while keeping subsequent bandwidth adaptation enabled.
+      if (hls.levels.every((level) => hlsLevelToQuality(level) === "unknown")) {
+        hls.startLevel = highestHlsLevel(hls.levels);
+      }
+      return;
     }
-    // For manual quality selection, wait for LEVEL_SWITCHED to emit quality
-    // to avoid showing intermediate states when HLS switches away from unplayable levels
-    // For automatic quality, currentLevel is -1, so we wait for LEVEL_SWITCHED event
+    const level = manualHlsLevel(
+      hls.levels,
+      preferenceQuality,
+      hls.currentLevel,
+    );
+    if (level >= 0) {
+      hls.currentLevel = level;
+      hls.loadLevel = level;
+    }
   }
 
   function setupSource(vid: HTMLVideoElement, src: LoadableSource) {
@@ -236,16 +176,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
           if (!hls) return;
 
           const currentLevel = hls.levels[hls.currentLevel];
-          const currentQuality = hlsLevelToQuality(currentLevel);
-
-          if (automaticQuality) {
-            // Only emit quality changes when automatic quality is enabled
-            emit("changedquality", currentQuality);
-          } else {
-            // For manual quality selection, emit the user's preferred quality
-            // This ensures the UI shows the selected quality, not the actual playing quality
-            emit("changedquality", preferenceQuality);
-          }
+          emit("changedquality", hlsLevelToQuality(currentLevel));
         });
       }
 
