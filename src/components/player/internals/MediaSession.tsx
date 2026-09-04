@@ -127,6 +127,25 @@ export function MediaSession() {
     lastPlaybackPosition.current = time;
   }, [mediaPlaying, progress, updatePositionState]);
 
+  const title =
+    meta?.type === "show"
+      ? `S${meta.season?.number} E${meta.episode?.number}: ${meta.episode?.title}`
+      : meta?.title;
+  const artist = meta?.type === "show" ? meta.title : undefined;
+  const poster = meta?.poster;
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator) || typeof MediaMetadata === "undefined")
+      return;
+    navigator.mediaSession.metadata = title
+      ? new MediaMetadata({
+          title,
+          artist,
+          artwork: poster ? [{ src: poster }] : [],
+        })
+      : null;
+  }, [title, artist, poster]);
+
   useEffect(() => {
     if (
       !("mediaSession" in navigator) ||
@@ -134,24 +153,6 @@ export function MediaSession() {
     ) {
       return;
     }
-
-    let title: string | undefined;
-    let artist: string | undefined;
-
-    if (meta?.type === "movie") {
-      title = meta.title;
-    } else if (meta?.type === "show") {
-      artist = meta.title;
-      title = `S${meta.season?.number} E${meta.episode?.number}: ${meta.episode?.title}`;
-    }
-
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title,
-      artist,
-      artwork: [
-        { src: meta?.poster ?? "", sizes: "342x513", type: "image/png" },
-      ],
-    });
 
     navigator.mediaSession.setActionHandler("play", () => {
       if (mediaPlaying.isLoading) return;
@@ -197,14 +198,8 @@ export function MediaSession() {
     display,
     progress.duration,
     progress.time,
-    meta?.episode?.number,
     episodeIndex,
     jellyfin?.episodes.length,
-    meta?.episode?.title,
-    meta?.title,
-    meta?.type,
-    meta?.poster,
-    meta?.season?.number,
   ]);
 
   useEffect(

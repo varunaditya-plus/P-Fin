@@ -19,6 +19,7 @@ import { MediaSession } from "./MediaSession";
 let root: ReturnType<typeof createRoot>;
 let container: HTMLDivElement;
 let controls: JellyfinPlaybackControls;
+const metadataCreated = vi.fn();
 const play = vi.fn();
 const pause = vi.fn();
 const setTime = vi.fn();
@@ -35,7 +36,14 @@ const mediaSession = {
 
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
-  vi.stubGlobal("MediaMetadata", class {});
+  vi.stubGlobal(
+    "MediaMetadata",
+    class {
+      constructor(data: MediaMetadataInit) {
+        metadataCreated(data);
+      }
+    },
+  );
   Object.defineProperty(navigator, "mediaSession", {
     configurable: true,
     value: mediaSession,
@@ -164,5 +172,37 @@ describe("Jellyfin player input", () => {
     );
     key("p");
     expect(controls.playItem).not.toHaveBeenCalled();
+  });
+  it("updates OS metadata only when title, artist or artwork changes", () => {
+    render();
+    const initialMetadata = navigator.mediaSession.metadata;
+    expect(metadataCreated).toHaveBeenCalledOnce();
+    expect(metadataCreated).toHaveBeenLastCalledWith({
+      title: "S1 E8: Episode",
+      artist: "Series",
+      artwork: [],
+    });
+    act(() => {
+      usePlayerStore.setState((state) => {
+        state.progress.time = 120;
+        state.progress.buffered = 140;
+        state.mediaPlaying.isPaused = false;
+        state.mediaPlaying.isPlaying = true;
+      });
+    });
+    expect(navigator.mediaSession.metadata).toBe(initialMetadata);
+    expect(metadataCreated).toHaveBeenCalledOnce();
+    expect(mediaSession.setPositionState).toHaveBeenLastCalledWith({
+      duration: 1000,
+      playbackRate: 1,
+      position: 120,
+    });
+    act(() => {
+      usePlayerStore.setState((state) => {
+        state.meta!.episode!.title = "New episode";
+      });
+    });
+    expect(metadataCreated).toHaveBeenCalledTimes(2);
+    expect(navigator.mediaSession.metadata).not.toBe(initialMetadata);
   });
 });
