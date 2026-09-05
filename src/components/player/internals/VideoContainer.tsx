@@ -67,6 +67,7 @@ function VideoElement() {
   const srtData = usePlayerStore((s) => s.caption.selected?.srtData);
   const language = usePlayerStore((s) => s.caption.selected?.language);
   const source = usePlayerStore((s) => s.source);
+  const needsNativeTrack = usePlayerStore((s) => s.caption.asTrack);
   const enableNativeSubtitles = usePreferencesStore(
     (s) => s.enableNativeSubtitles,
   );
@@ -76,7 +77,8 @@ function VideoElement() {
   );
 
   // Use native tracks when the setting is enabled
-  const shouldUseNativeTrack = enableNativeSubtitles && source !== null;
+  const shouldUseNativeTrack =
+    (enableNativeSubtitles || needsNativeTrack) && source !== null;
 
   // report video element to display interface
   useEffect(() => {
