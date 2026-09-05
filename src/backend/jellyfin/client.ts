@@ -20,6 +20,8 @@ export interface JellyfinMediaStream {
   Height?: number;
   Channels?: number;
   BitRate?: number;
+  VideoRange?: string;
+  VideoRangeType?: string;
 }
 
 export interface JellyfinMediaSource {
@@ -30,6 +32,7 @@ export interface JellyfinMediaSource {
   Path?: string;
   RunTimeTicks?: number;
   Bitrate?: number;
+  Size?: number;
   SupportsDirectPlay?: boolean;
   SupportsDirectStream?: boolean;
   SupportsTranscoding?: boolean;

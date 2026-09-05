@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { getItem, jellyfinUrl, setFavorite } from "@/backend/jellyfin/client";
 import { getJellyfinDetailsId } from "@/backend/jellyfin/details";
+import { mediaSourceLabel } from "@/backend/jellyfin/mediaSourceLabel";
 import { updateUserConfiguration } from "@/backend/jellyfin/preferences";
 import { Toggle } from "@/components/buttons/Toggle";
 import { Icon, Icons } from "@/components/Icon";
@@ -241,7 +242,7 @@ export function JellyfinSettingsRouter() {
                     router.close();
                   }}
                 >
-                  {source.Name ?? source.Container?.toUpperCase() ?? "Original"}
+                  {mediaSourceLabel(source)}
                 </SelectableLink>
               ))}
               <p className="py-3 text-type-secondary">

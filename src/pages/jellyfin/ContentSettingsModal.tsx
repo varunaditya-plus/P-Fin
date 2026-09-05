@@ -2,6 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 
 import { ContentItem } from "@/backend/jellyfin/content";
+import { mediaSourceLabel } from "@/backend/jellyfin/mediaSourceLabel";
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
 import { useRetainedModalValue } from "@/components/overlays/DetailsModalFrame";
@@ -73,9 +74,7 @@ function ContentSettingsPanel({
                 >
                   {sources.map((entry) => (
                     <option key={entry.Id} value={entry.Id}>
-                      {entry.Name ||
-                        entry.Container?.toUpperCase() ||
-                        "Original"}
+                      {mediaSourceLabel(entry)}
                     </option>
                   ))}
                 </select>
