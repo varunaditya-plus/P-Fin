@@ -11,6 +11,7 @@ import { Overlay } from "@/components/overlays/OverlayDisplay";
 import { OverlayPage } from "@/components/overlays/OverlayPage";
 import { OverlayRouter } from "@/components/overlays/OverlayRouter";
 import { CaptionSettingsView } from "@/components/player/atoms/settings/CaptionSettingsView";
+import { PictureSettingsView } from "@/components/player/enhancements/PictureSettingsView";
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
@@ -122,6 +123,9 @@ function JellyfinPlaybackSettings() {
         >
           Autoplay next episode
         </Menu.Link>
+        <Menu.ChevronLink onClick={() => router.navigate("/picture")}>
+          Picture
+        </Menu.ChevronLink>
         {error ? (
           <p role="alert" className="py-2 text-type-danger">
             {error}
@@ -281,6 +285,9 @@ export function JellyfinSettingsRouter() {
         </OverlayPage>
         <OverlayPage id="settings" path="/playback" width={343} height={330}>
           <JellyfinPlaybackSettings />
+        </OverlayPage>
+        <OverlayPage id="settings" path="/picture" width={343} height={496}>
+          <PictureSettingsView />
         </OverlayPage>
         <OverlayPage id="settings" path="/controller" width={443} height={496}>
           <Menu.CardWithScrollable>

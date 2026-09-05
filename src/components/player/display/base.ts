@@ -25,6 +25,12 @@ import {
   hlsLevelsToQualities,
   manualHlsLevel,
 } from "./hlsQuality";
+import {
+  DEFAULT_VIDEO_APPEARANCE,
+  VideoAppearance,
+  normalizeVideoAppearance,
+  videoAppearanceFilter,
+} from "./videoAppearance";
 
 export function makeVideoElementDisplayInterface(): DisplayInterface {
   const { emit, on, off } = makeEmitter<DisplayInterfaceEvents>();
@@ -41,6 +47,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
   let automaticQuality = false;
   let preferenceQuality: SourceQuality | null = null;
   let lastVolume = 1;
+  let videoAppearance: VideoAppearance = { ...DEFAULT_VIDEO_APPEARANCE };
   let lastValidDuration = 0; // Store the last valid duration to prevent reset during source switches
   let lastValidTime = 0; // Store the last valid time to prevent reset during source switches
   let shouldAutoplayAfterLoad = false; // Flag to track if we should autoplay after loading completes
@@ -491,6 +498,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     processVideoElement(video) {
       destroyVideoElement();
       videoElement = video;
+      videoElement.style.filter = videoAppearanceFilter(videoAppearance);
       setSource();
       this.setVolume(lastVolume);
     },
@@ -594,6 +602,11 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         webkitShowPlaybackTargetPicker?: () => void;
       };
       videoPlayer?.webkitShowPlaybackTargetPicker?.();
+    },
+    setVideoAppearance(appearance) {
+      videoAppearance = normalizeVideoAppearance(appearance);
+      if (videoElement)
+        videoElement.style.filter = videoAppearanceFilter(videoAppearance);
     },
     setPlaybackRate(rate) {
       if (videoElement) videoElement.playbackRate = rate;

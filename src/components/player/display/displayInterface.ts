@@ -1,3 +1,4 @@
+import { VideoAppearance } from "@/components/player/display/videoAppearance";
 import { LoadableSource, SourceQuality } from "@/stores/player/utils/qualities";
 import { Listener } from "@/utils/events";
 
@@ -65,6 +66,7 @@ export interface DisplayInterface extends Listener<DisplayInterfaceEvents> {
   togglePictureInPicture(): void;
   setSeeking(active: boolean): void;
   setVolume(vol: number): void;
+  setVideoAppearance(appearance: VideoAppearance): void;
   setTime(t: number): void;
   destroy(): void;
   startAirplay(): void;

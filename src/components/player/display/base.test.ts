@@ -108,4 +108,34 @@ describe("player source lifecycle", () => {
     expect(video.src).toBe(file.url);
     display.destroy();
   });
+  it("applies picture settings only to the video and carries them across source changes", () => {
+    const display = makeVideoElementDisplayInterface();
+    const video = document.createElement("video");
+    display.setVideoAppearance({
+      brightness: 130,
+      contrast: 110,
+      saturation: 90,
+      hue: 10,
+    });
+    display.processVideoElement(video);
+    expect(video.style.filter).toBe(
+      "brightness(130%) contrast(110%) saturate(90%) hue-rotate(10deg)",
+    );
+    display.load({
+      source: file,
+      startAt: 0,
+      autoplay: false,
+      automaticQuality: true,
+      preferredQuality: null,
+    });
+    expect(video.style.filter).toContain("brightness(130%)");
+    display.setVideoAppearance({
+      brightness: 100,
+      contrast: 100,
+      saturation: 100,
+      hue: 0,
+    });
+    expect(video.style.filter).toBe("none");
+    display.destroy();
+  });
 });
