@@ -19,6 +19,7 @@ import {
   getContentPolicy,
 } from "@/backend/jellyfin/content";
 import { resolveJellyfinDetailsItem } from "@/backend/jellyfin/details";
+import { episodeQueue, matchesEpisode } from "@/backend/jellyfin/episodeQueue";
 import {
   getCollectionItems,
   getPlaylistItems,
@@ -91,6 +92,9 @@ function JellyfinDetailsContent({
   const [episodes, setEpisodes] = useState<JellyfinItem[]>([]);
   const [similar, setSimilar] = useState<JellyfinItem[]>([]);
   const [selectedSeason, setSelectedSeason] = useState("");
+  const [episodeQuery, setEpisodeQuery] = useState("");
+  const [shuffling, setShuffling] = useState(false);
+  const shuffleRequest = useRef<AbortController>();
   const [error, setError] = useState("");
   const [episodeError, setEpisodeError] = useState("");
   const [actionError, setActionError] = useState("");
@@ -127,8 +131,13 @@ function JellyfinDetailsContent({
     setSettingsForEpisode(false);
   }, [selectedId, selectedAction]);
   useEffect(() => {
-    if (!open) setSettingsOpen(false);
+    if (!open) {
+      setSettingsOpen(false);
+      shuffleRequest.current?.abort();
+    }
   }, [open]);
+  useEffect(() => () => shuffleRequest.current?.abort(), []);
+  useEffect(() => setEpisodeQuery(""), [selectedId]);
   useEffect(() => {
     const controller = new AbortController();
     getContentPolicy(controller.signal)
@@ -302,6 +311,39 @@ function JellyfinDetailsContent({
     const updated = await getContentItem(item?.Id ?? selectedId);
     setItem((current) => (current?.Id === updated.Id ? updated : current));
     onItemChanged?.();
+  };
+  const shuffleEpisodes = async (seasonOnly: boolean) => {
+    if (!item || shuffling) return;
+    const controller = new AbortController();
+    shuffleRequest.current?.abort();
+    shuffleRequest.current = controller;
+    setShuffling(true);
+    setActionError("");
+    try {
+      const seed = crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+      const available = await getEpisodes(
+        item.Id,
+        seasonOnly ? selectedSeason : undefined,
+        controller.signal,
+      );
+      if (controller.signal.aborted || selectedIdRef.current !== selectedId)
+        return;
+      const first = episodeQueue(available, seed)[0];
+      if (!first) throw new Error("No playable episodes are available.");
+      const query = new URLSearchParams({ restart: "true", shuffle: seed });
+      if (seasonOnly) query.set("shuffleSeason", selectedSeason);
+      onClose();
+      navigate(`/play/${encodeURIComponent(first.Id)}?${query}`);
+    } catch (cause) {
+      if (!controller.signal.aborted)
+        setActionError(
+          cause instanceof Error
+            ? cause.message
+            : "Unable to shuffle this series.",
+        );
+    } finally {
+      setShuffling(false);
+    }
   };
   const reloadContainer = async () => {
     if (!item || !["BoxSet", "Playlist"].includes(item.Type)) return;
@@ -780,6 +822,45 @@ function JellyfinDetailsContent({
                               />
                             ) : null}
                           </div>
+                          <div className="mb-4 flex flex-wrap items-center gap-2">
+                            <input
+                              aria-label="Find episode by title, number or S2E3"
+                              placeholder="Find episode by title, number or S2E3"
+                              className="min-w-0 flex-1 rounded-xl bg-dropdown-background px-3 py-2 text-sm text-white tabbable"
+                              value={episodeQuery}
+                              onChange={(event) => {
+                                setEpisodeQuery(event.target.value);
+                                const reference =
+                                  event.target.value.match(/^s(\d+)e/i);
+                                const season =
+                                  reference &&
+                                  seasons.find(
+                                    (entry) =>
+                                      entry.IndexNumber ===
+                                      Number(reference[1]),
+                                  );
+                                if (season) setSelectedSeason(season.Id);
+                              }}
+                            />
+                            <Button
+                              theme="secondary"
+                              padding="px-3 py-2"
+                              disabled={
+                                shuffling || loadingEpisodes || !episodes.length
+                              }
+                              onClick={() => shuffleEpisodes(true)}
+                            >
+                              Shuffle season
+                            </Button>
+                            <Button
+                              theme="secondary"
+                              padding="px-3 py-2"
+                              disabled={shuffling}
+                              onClick={() => shuffleEpisodes(false)}
+                            >
+                              Shuffle series
+                            </Button>
+                          </div>
                           {loadingEpisodes ? (
                             <div className="py-12 flex justify-center">
                               <Spinner />
@@ -814,103 +895,107 @@ function JellyfinDetailsContent({
                                 ref={episodeCarousel}
                                 className="flex overflow-x-auto space-x-4 pb-4 pt-2 lg:px-12 scrollbar-none carousel-container"
                               >
-                                {episodes.map((episode) => (
-                                  <div
-                                    key={episode.Id}
-                                    className="flex-shrink-0 transition-all duration-200 relative hover:scale-95 rounded-lg overflow-hidden hover:bg-white/5 w-52 md:w-64"
-                                  >
-                                    <button
-                                      type="button"
-                                      onClick={() => play(episode)}
-                                      className="w-full text-left"
-                                      aria-label={`Play episode ${episode.IndexNumber}: ${episode.Name}`}
+                                {episodes
+                                  .filter((episode) =>
+                                    matchesEpisode(episode, episodeQuery),
+                                  )
+                                  .map((episode) => (
+                                    <div
+                                      key={episode.Id}
+                                      className="flex-shrink-0 transition-all duration-200 relative hover:scale-95 rounded-lg overflow-hidden hover:bg-white/5 w-52 md:w-64"
                                     >
-                                      <div className="relative h-[158px] w-full bg-video-context-hoverColor">
-                                        <img
-                                          loading="lazy"
-                                          src={
-                                            getImageUrl(
-                                              episode,
-                                              "Primary",
-                                              400,
-                                            ) || "/placeholder.png"
-                                          }
-                                          alt={episode.Name}
-                                          className="w-full h-full object-cover"
-                                        />
-                                        <span className="absolute top-2 left-2 p-0.5 px-2 rounded inline bg-video-context-hoverColor bg-opacity-80 text-video-context-type-main text-sm">
-                                          E{episode.IndexNumber}
-                                        </span>
-                                        {episode.UserData
-                                          ?.PlaybackPositionTicks &&
-                                        episode.RunTimeTicks ? (
-                                          <div
-                                            className="absolute bottom-0 h-1 bg-mediaCard-barFillColor"
-                                            style={{
-                                              width: `${Math.min(100, (episode.UserData.PlaybackPositionTicks / episode.RunTimeTicks) * 100)}%`,
-                                            }}
+                                      <button
+                                        type="button"
+                                        onClick={() => play(episode)}
+                                        className="w-full text-left"
+                                        aria-label={`Play episode ${episode.IndexNumber}: ${episode.Name}`}
+                                      >
+                                        <div className="relative h-[158px] w-full bg-video-context-hoverColor">
+                                          <img
+                                            loading="lazy"
+                                            src={
+                                              getImageUrl(
+                                                episode,
+                                                "Primary",
+                                                400,
+                                              ) || "/placeholder.png"
+                                            }
+                                            alt={episode.Name}
+                                            className="w-full h-full object-cover"
                                           />
-                                        ) : null}
-                                      </div>
-                                      <div className="p-3">
-                                        <h3 className="font-bold text-white line-clamp-1">
-                                          {episode.Name}
-                                        </h3>
-                                        <p className="text-xs text-white/60 mt-1">
-                                          {runtime(episode.RunTimeTicks)}
-                                        </p>
-                                        <p className="text-xs text-white/70 line-clamp-3 mt-2">
-                                          {plainText(episode.Overview)}
-                                        </p>
-                                      </div>
-                                    </button>
-                                    <div className="absolute top-2 right-2 flex gap-1">
-                                      <button
-                                        type="button"
-                                        disabled={updating}
-                                        onClick={() =>
-                                          updateUserData(episode, "Played")
-                                        }
-                                        aria-label={
-                                          episode.UserData?.Played
-                                            ? `Mark ${episode.Name} as unwatched`
-                                            : `Mark ${episode.Name} as watched`
-                                        }
-                                        title={
-                                          episode.UserData?.Played
-                                            ? "Mark as unwatched"
-                                            : "Mark as watched"
-                                        }
-                                        className="tabbable p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors disabled:opacity-50"
-                                      >
-                                        <Icon
-                                          icon={
-                                            episode.UserData?.Played
-                                              ? Icons.EYE_SLASH
-                                              : Icons.EYE
+                                          <span className="absolute top-2 left-2 p-0.5 px-2 rounded inline bg-video-context-hoverColor bg-opacity-80 text-video-context-type-main text-sm">
+                                            E{episode.IndexNumber}
+                                          </span>
+                                          {episode.UserData
+                                            ?.PlaybackPositionTicks &&
+                                          episode.RunTimeTicks ? (
+                                            <div
+                                              className="absolute bottom-0 h-1 bg-mediaCard-barFillColor"
+                                              style={{
+                                                width: `${Math.min(100, (episode.UserData.PlaybackPositionTicks / episode.RunTimeTicks) * 100)}%`,
+                                              }}
+                                            />
+                                          ) : null}
+                                        </div>
+                                        <div className="p-3">
+                                          <h3 className="font-bold text-white line-clamp-1">
+                                            {episode.Name}
+                                          </h3>
+                                          <p className="text-xs text-white/60 mt-1">
+                                            {runtime(episode.RunTimeTicks)}
+                                          </p>
+                                          <p className="text-xs text-white/70 line-clamp-3 mt-2">
+                                            {plainText(episode.Overview)}
+                                          </p>
+                                        </div>
+                                      </button>
+                                      <div className="absolute top-2 right-2 flex gap-1">
+                                        <button
+                                          type="button"
+                                          disabled={updating}
+                                          onClick={() =>
+                                            updateUserData(episode, "Played")
                                           }
-                                          className="h-4 w-4 text-white/80"
-                                        />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setPlaybackOverrideId(episode.Id);
-                                          setSettingsForEpisode(true);
-                                          setSettingsOpen(true);
-                                        }}
-                                        aria-label={`Settings for episode ${episode.IndexNumber}: ${episode.Name}`}
-                                        title="Episode settings"
-                                        className="tabbable p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors"
-                                      >
-                                        <Icon
-                                          icon={Icons.SETTINGS}
-                                          className="h-4 w-4 text-white/80"
-                                        />
-                                      </button>
+                                          aria-label={
+                                            episode.UserData?.Played
+                                              ? `Mark ${episode.Name} as unwatched`
+                                              : `Mark ${episode.Name} as watched`
+                                          }
+                                          title={
+                                            episode.UserData?.Played
+                                              ? "Mark as unwatched"
+                                              : "Mark as watched"
+                                          }
+                                          className="tabbable p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors disabled:opacity-50"
+                                        >
+                                          <Icon
+                                            icon={
+                                              episode.UserData?.Played
+                                                ? Icons.EYE_SLASH
+                                                : Icons.EYE
+                                            }
+                                            className="h-4 w-4 text-white/80"
+                                          />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setPlaybackOverrideId(episode.Id);
+                                            setSettingsForEpisode(true);
+                                            setSettingsOpen(true);
+                                          }}
+                                          aria-label={`Settings for episode ${episode.IndexNumber}: ${episode.Name}`}
+                                          title="Episode settings"
+                                          className="tabbable p-1.5 bg-black/50 rounded-full hover:bg-black/80 transition-colors"
+                                        >
+                                          <Icon
+                                            icon={Icons.SETTINGS}
+                                            className="h-4 w-4 text-white/80"
+                                          />
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
                               </div>
                               <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 px-4 hidden lg:block">
                                 <button

@@ -9,6 +9,7 @@ import {
   getItem,
   jellyfinUrl,
 } from "@/backend/jellyfin/client";
+import { episodeQueue } from "@/backend/jellyfin/episodeQueue";
 import {
   JellyfinMediaSource,
   JellyfinPlayback,
@@ -116,6 +117,8 @@ export function JellyfinPlayerView() {
   const startTicks = search.get("startTicks");
   const requestedAudio = search.get("audioIndex");
   const requestedSubtitle = search.get("subtitleIndex");
+  const shuffle = search.get("shuffle");
+  const shuffleSeason = search.get("shuffleSeason");
   const navigate = useNavigate();
   const [item, setItem] = useState<JellyfinItem | null>(null);
   const [episodes, setEpisodes] = useState<JellyfinItem[]>([]);
@@ -305,14 +308,15 @@ export function JellyfinPlayerView() {
         subtitleSelection.current = selectedTracks.subtitleIndex;
         setSubtitleIndex(selectedTracks.subtitleIndex);
         const seriesId = target.SeriesId;
-        const queue = seriesId ? await getEpisodes(seriesId) : [];
+        const queue = seriesId
+          ? await getEpisodes(
+              seriesId,
+              shuffle && shuffleSeason ? shuffleSeason : undefined,
+            )
+          : [];
         if (cancelled) return;
         setItem(target);
-        setEpisodes(
-          queue.filter(
-            (episode) => !episode.IsMissing && !episode.IsVirtualItem,
-          ),
-        );
+        setEpisodes(episodeQueue(queue, shuffle));
         store.setMeta({
           type: target.Type === "Episode" ? "show" : "movie",
           title: target.SeriesName ?? target.Name,
@@ -386,6 +390,8 @@ export function JellyfinPlayerView() {
     startTicks,
     requestedAudio,
     requestedSubtitle,
+    shuffle,
+    shuffleSeason,
     load,
   ]);
 
@@ -497,8 +503,15 @@ export function JellyfinPlayerView() {
       busy,
       subtitleIndex,
       maxBitrate,
-      playItem: (id: string, fromStart = false) =>
-        navigate(`/play/${id}${fromStart ? "?restart=true" : ""}`),
+      playItem: (id: string, fromStart = false) => {
+        const query = new URLSearchParams();
+        if (fromStart) query.set("restart", "true");
+        if (shuffle) query.set("shuffle", shuffle);
+        if (shuffle && shuffleSeason) query.set("shuffleSeason", shuffleSeason);
+        navigate(
+          `/play/${encodeURIComponent(id)}${query.size ? `?${query}` : ""}`,
+        );
+      },
       changeAudio: (index: number) => {
         if (playback)
           rememberedTracks.current = rememberTrackSelection(
@@ -568,6 +581,8 @@ export function JellyfinPlayerView() {
       subtitleIndex,
       maxBitrate,
       navigate,
+      shuffle,
+      shuffleSeason,
       reload,
       changeSubtitle,
       load,
