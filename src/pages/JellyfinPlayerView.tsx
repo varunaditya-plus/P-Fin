@@ -333,7 +333,6 @@ export function JellyfinPlayerView() {
                   number: target.IndexNumber ?? 0,
                   title: target.Name,
                   overview: target.Overview,
-          logo: getImageUrl(target, "Logo", 800),
                 }
               : undefined,
           season:
@@ -492,6 +491,7 @@ export function JellyfinPlayerView() {
     () => ({
       playback,
       mediaSources: item?.MediaSources ?? [],
+      trickplay: item?.Trickplay,
       episodes,
       itemId,
       busy,

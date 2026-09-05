@@ -6,6 +6,7 @@ import { JellyfinPlayback } from "@/backend/jellyfin/playback";
 export interface JellyfinPlaybackControls {
   playback: JellyfinPlayback | null;
   mediaSources: JellyfinMediaSource[];
+  trickplay?: JellyfinItem["Trickplay"];
   episodes: JellyfinItem[];
   itemId: string;
   busy: boolean;

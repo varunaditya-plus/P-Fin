@@ -84,6 +84,20 @@ export interface JellyfinItem {
   RecursiveItemCount?: number;
   MediaSources?: JellyfinMediaSource[];
   MediaStreams?: JellyfinMediaStream[];
+  Trickplay?: Record<
+    string,
+    Record<
+      string,
+      {
+        Width: number;
+        Height: number;
+        TileWidth: number;
+        TileHeight: number;
+        ThumbnailCount: number;
+        Interval: number;
+      }
+    >
+  >;
   UserData?: {
     PlaybackPositionTicks?: number;
     Played?: boolean;

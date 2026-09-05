@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 
+import { JellyfinTrickplay } from "@/components/player/jellyfin/JellyfinTrickplay";
 import { useProgressBar } from "@/hooks/useProgressBar";
 import { usePlayerStore } from "@/stores/player/store";
 import { durationExceedsHour, formatSeconds } from "@/utils/formatSeconds";
@@ -54,6 +55,7 @@ function TimePreview(props: { at: number; show: boolean }) {
             <p className="mt-1 mx-auto text-center border rounded-xl border-gray-800 px-3 py-1 backdrop-blur-lg bg-black bg-opacity-20 w-max">
               {formattedTime}
             </p>
+            <JellyfinTrickplay time={Math.max(props.at, 0)} />
           </div>
         </div>
       </div>
