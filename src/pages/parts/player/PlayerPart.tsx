@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { BrandPill } from "@/components/layout/BrandPill";
 import { Player } from "@/components/player";
 import { useShouldShowControls } from "@/components/player/hooks/useShouldShowControls";
+import { GamepadEvents } from "@/components/player/jellyfin/GamepadEvents";
 import {
   JellyfinBookmarkButton,
   JellyfinEpisodesRouter,
@@ -74,6 +75,7 @@ export function PlayerPart(props: PlayerPartProps) {
   return (
     <Player.Container onLoad={props.onLoad} showingControls={showTargets}>
       {props.children}
+      <GamepadEvents />
       <PauseOverlay />
       <Player.BlackOverlay
         show={showTargets && status === playerStatus.PLAYING}

@@ -19,6 +19,7 @@ import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 
+import { GamepadSettings } from "./GamepadSettings";
 import { useJellyfinPlayback } from "./JellyfinPlaybackContext";
 
 function JellyfinSettingsMenu() {
@@ -66,6 +67,9 @@ function JellyfinSettingsMenu() {
         </Menu.ChevronLink>
         <Menu.ChevronLink onClick={() => router.navigate("/captions/settings")}>
           Subtitle appearance
+        </Menu.ChevronLink>
+        <Menu.ChevronLink onClick={() => router.navigate("/controller")}>
+          Controller
         </Menu.ChevronLink>
       </Menu.Section>
     </Menu.Card>
@@ -276,6 +280,16 @@ export function JellyfinSettingsRouter() {
         </OverlayPage>
         <OverlayPage id="settings" path="/playback" width={343} height={330}>
           <JellyfinPlaybackSettings />
+        </OverlayPage>
+        <OverlayPage id="settings" path="/controller" width={443} height={496}>
+          <Menu.CardWithScrollable>
+            <Menu.BackLink onClick={() => router.navigate("/")}>
+              Controller
+            </Menu.BackLink>
+            <Menu.Section>
+              <GamepadSettings />
+            </Menu.Section>
+          </Menu.CardWithScrollable>
         </OverlayPage>
       </OverlayRouter>
     </Overlay>
