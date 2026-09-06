@@ -11,6 +11,7 @@ import { Overlay } from "@/components/overlays/OverlayDisplay";
 import { OverlayPage } from "@/components/overlays/OverlayPage";
 import { OverlayRouter } from "@/components/overlays/OverlayRouter";
 import { CaptionSettingsView } from "@/components/player/atoms/settings/CaptionSettingsView";
+import { AudioBoostSettingsView } from "@/components/player/enhancements/AudioBoostSettingsView";
 import { PictureSettingsView } from "@/components/player/enhancements/PictureSettingsView";
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
@@ -125,6 +126,9 @@ function JellyfinPlaybackSettings() {
         </Menu.Link>
         <Menu.ChevronLink onClick={() => router.navigate("/picture")}>
           Picture
+        </Menu.ChevronLink>
+        <Menu.ChevronLink onClick={() => router.navigate("/audio-boost")}>
+          Volume boost
         </Menu.ChevronLink>
         {error ? (
           <p role="alert" className="py-2 text-type-danger">
@@ -288,6 +292,9 @@ export function JellyfinSettingsRouter() {
         </OverlayPage>
         <OverlayPage id="settings" path="/picture" width={343} height={496}>
           <PictureSettingsView />
+        </OverlayPage>
+        <OverlayPage id="settings" path="/audio-boost" width={343} height={496}>
+          <AudioBoostSettingsView />
         </OverlayPage>
         <OverlayPage id="settings" path="/controller" width={443} height={496}>
           <Menu.CardWithScrollable>

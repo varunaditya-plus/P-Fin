@@ -19,6 +19,7 @@ import {
 } from "@/utils/detectFeatures";
 import { makeEmitter } from "@/utils/events";
 
+import { createAudioBoost } from "./audioBoost";
 import {
   highestHlsLevel,
   hlsLevelToQuality,
@@ -34,6 +35,7 @@ import {
 
 export function makeVideoElementDisplayInterface(): DisplayInterface {
   const { emit, on, off } = makeEmitter<DisplayInterfaceEvents>();
+  const audioBoost = createAudioBoost();
   let source: LoadableSource | null = null;
   let hls: Hls | null = null;
   let videoSourceEvents: AbortController | null = null;
@@ -417,6 +419,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
 
   function destroyVideoElement() {
     unloadSource();
+    audioBoost.destroy();
     if (videoElement) {
       videoElement = null;
     }
@@ -498,6 +501,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     processVideoElement(video) {
       destroyVideoElement();
       videoElement = video;
+      audioBoost.attach(video);
       videoElement.style.filter = videoAppearanceFilter(videoAppearance);
       setSource();
       this.setVolume(lastVolume);
@@ -602,6 +606,9 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         webkitShowPlaybackTargetPicker?: () => void;
       };
       videoPlayer?.webkitShowPlaybackTargetPicker?.();
+    },
+    setVolumeBoost(multiplier) {
+      return audioBoost.setBoost(multiplier);
     },
     setVideoAppearance(appearance) {
       videoAppearance = normalizeVideoAppearance(appearance);

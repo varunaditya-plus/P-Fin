@@ -67,6 +67,7 @@ export interface DisplayInterface extends Listener<DisplayInterfaceEvents> {
   setSeeking(active: boolean): void;
   setVolume(vol: number): void;
   setVideoAppearance(appearance: VideoAppearance): void;
+  setVolumeBoost(multiplier: number): Promise<void>;
   setTime(t: number): void;
   destroy(): void;
   startAirplay(): void;
