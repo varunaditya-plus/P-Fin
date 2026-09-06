@@ -1,120 +1,153 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
 
 import {
-  primaryOptions,
-  secondaryOptions,
-  tertiaryOptions,
-} from "@themes/custom";
+  MAX_CUSTOM_THEMES,
+  SavedCustomTheme,
+  ThemePalette,
+  ThemeSettings,
+  defaultThemeSettings,
+  themeVariables,
+  validateCustomTheme,
+  validatePalette,
+  validateThemeSettings,
+} from "./customThemes";
 
-export interface ThemeStore {
-  theme: string | null;
-  customTheme: {
-    primary: string;
-    secondary: string;
-    tertiary: string;
-  };
-  setTheme(v: string | null): void;
-  setCustomTheme(v: {
-    primary: string;
-    secondary: string;
-    tertiary: string;
-  }): void;
+export type { SavedCustomTheme, ThemePalette } from "./customThemes";
+export interface ThemeStore extends ThemeSettings {
+  setTheme(value: string | null): void;
+  setCustomTheme(value: ThemePalette): void;
+  saveCustomTheme(value: SavedCustomTheme): void;
+  deleteCustomTheme(id: string): void;
+  hideDefaultTheme(id: string): void;
+  resetThemes(): void;
 }
-
-const currentDate = new Date();
-const is420 = currentDate.getMonth() + 1 === 4 && currentDate.getDate() === 20;
-const isHalloween =
-  currentDate.getMonth() + 1 === 10 && currentDate.getDate() === 31;
-// Make default theme green if its 4/20 (bc the marijauna plant is green :3)
-// Make default theme autumn if its Halloween (spooky autumn vibes 🎃)
+const date = new Date();
+const initialTheme =
+  date.getMonth() === 3 && date.getDate() === 20
+    ? "green"
+    : date.getMonth() === 9 && date.getDate() === 31
+      ? "autumn"
+      : null;
 export const useThemeStore = create(
-  persist(
-    immer<ThemeStore>((set) => ({
-      theme: is420 ? "green" : isHalloween ? "autumn" : null,
-      customTheme: {
-        primary: "classic",
-        secondary: "classic",
-        tertiary: "classic",
-      },
-      setTheme(v) {
-        set((s) => {
-          s.theme = v;
-        });
-      },
-      setCustomTheme(v) {
-        set((s) => {
-          s.customTheme = v;
-        });
-      },
-    })),
+  persist<ThemeStore>(
+    (set) => ({
+      ...defaultThemeSettings,
+      theme: initialTheme,
+      setTheme: (theme) =>
+        set((state) => validateThemeSettings({ ...state, theme })),
+      setCustomTheme: (customTheme) =>
+        set({ customTheme: validatePalette(customTheme) }),
+      saveCustomTheme: (value) =>
+        set((state) => {
+          const theme = validateCustomTheme(value);
+          const existing = state.savedCustomThemes.some(
+            (entry) => entry.id === theme.id,
+          );
+          if (!existing && state.savedCustomThemes.length >= MAX_CUSTOM_THEMES)
+            throw new Error(
+              `You can save up to ${MAX_CUSTOM_THEMES} custom themes.`,
+            );
+          return {
+            savedCustomThemes: existing
+              ? state.savedCustomThemes.map((entry) =>
+                  entry.id === theme.id ? theme : entry,
+                )
+              : [...state.savedCustomThemes, theme],
+          };
+        }),
+      deleteCustomTheme: (id) =>
+        set((state) =>
+          validateThemeSettings({
+            ...state,
+            savedCustomThemes: state.savedCustomThemes.filter(
+              (entry) => entry.id !== id,
+            ),
+          }),
+        ),
+      hideDefaultTheme: (id) =>
+        set((state) =>
+          validateThemeSettings({
+            ...state,
+            hiddenDefaultThemes: [...state.hiddenDefaultThemes, id],
+          }),
+        ),
+      resetThemes: () => set(defaultThemeSettings),
+    }),
     {
       name: "__MW::theme",
+      merge: (persisted, current) => {
+        try {
+          return { ...current, ...validateThemeSettings(persisted) };
+        } catch {
+          return current;
+        }
+      },
     },
   ),
 );
 
-export interface PreviewThemeStore {
+export const usePreviewThemeStore = create<{
   previewTheme: string | null;
-  setPreviewTheme(v: string | null): void;
-}
+  setPreviewTheme(value: string | null): void;
+}>((set) => ({
+  previewTheme: null,
+  setPreviewTheme: (previewTheme) => set({ previewTheme }),
+}));
 
-export const usePreviewThemeStore = create(
-  immer<PreviewThemeStore>((set) => ({
-    previewTheme: null,
-    setPreviewTheme(v) {
-      set((s) => {
-        s.previewTheme = v;
-      });
-    },
-  })),
-);
-
-export function ThemeProvider(props: {
+export function ThemeProvider({
+  children,
+  applyGlobal,
+}: {
   children?: ReactNode;
   applyGlobal?: boolean;
 }) {
-  const previewTheme = usePreviewThemeStore((s) => s.previewTheme);
-  const theme = useThemeStore((s) => s.theme);
-  const customTheme = useThemeStore((s) => s.customTheme);
-
-  const themeToDisplay = previewTheme ?? theme;
-  const themeSelector = themeToDisplay ? `theme-${themeToDisplay}` : undefined;
-
-  let styleContent = "";
-  if (themeToDisplay === "custom" && customTheme) {
-    const primary =
-      primaryOptions.find((o) => o.id === customTheme.primary)?.colors || {};
-    const secondary =
-      secondaryOptions.find((o) => o.id === customTheme.secondary)?.colors ||
-      {};
-    const tertiary =
-      tertiaryOptions.find((o) => o.id === customTheme.tertiary)?.colors || {};
-
-    const vars = { ...primary, ...secondary, ...tertiary };
-    const cssVars = Object.entries(vars)
-      .map(([k, v]) => `${k}: ${v};`)
-      .join(" ");
-
-    styleContent = `.theme-custom { ${cssVars} }`;
-  }
-
+  const preview = usePreviewThemeStore((state) => state.previewTheme);
+  const settings = useThemeStore();
+  const selected = preview ?? settings.theme ?? "default";
+  const custom = settings.savedCustomThemes.find(
+    (theme) => theme.id === selected,
+  );
+  const palette =
+    custom ?? (selected === "custom" ? settings.customTheme : undefined);
+  const selector = palette ? "theme-custom" : `theme-${selected}`;
+  const signature = JSON.stringify([selected, palette]);
+  const previous = useRef(signature);
+  const [transitioning, setTransitioning] = useState(false);
+  useEffect(() => {
+    if (!applyGlobal || previous.current === signature) return;
+    previous.current = signature;
+    setTransitioning(true);
+    const timeout = setTimeout(() => setTransitioning(false), 240);
+    return () => clearTimeout(timeout);
+  }, [applyGlobal, signature]);
+  const css = palette
+    ? `.theme-custom { ${Object.entries(themeVariables(palette))
+        .map(([key, value]) => `${key}: ${value};`)
+        .join(" ")} }`
+    : "";
+  const changing =
+    applyGlobal && (transitioning || previous.current !== signature);
+  const className = `${selector}${changing ? " movie-fin-theme-transition" : ""}`;
   return (
-    <div className={themeSelector}>
-      {styleContent ? (
+    <div className={className}>
+      <Helmet>
+        <style>{`${css}
+        @media (prefers-reduced-motion: no-preference) {
+          .movie-fin-theme-transition, .movie-fin-theme-transition :where(button, a, section, [data-theme-surface]) {
+            transition-property: background-color, color, border-color;
+            transition-duration: 220ms;
+          }
+        }`}</style>
+      </Helmet>
+      {applyGlobal ? (
         <Helmet>
-          <style>{styleContent}</style>
+          <body className={className} />
         </Helmet>
       ) : null}
-      {props.applyGlobal ? (
-        <Helmet>
-          <body className={themeSelector} />
-        </Helmet>
-      ) : null}
-      {props.children}
+      {children}
     </div>
   );
 }
