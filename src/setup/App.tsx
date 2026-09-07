@@ -13,6 +13,7 @@ import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JellyfinLogin } from "@/pages/jellyfin/JellyfinLogin";
 import { Layout } from "@/setup/Layout";
+import { AccountPreferencesSync } from "@/stores/appPreferences/AccountPreferencesSync";
 import { useClearModalsOnNavigation } from "@/stores/interface/overlayStack";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { LanguageProvider } from "@/stores/language";
@@ -110,6 +111,7 @@ export default function App() {
       : "/";
   return (
     <Layout>
+      <AccountPreferencesSync />
       <LanguageProvider />
       <KeyboardCommandsModal id="keyboard-commands" />
       <KeyboardCommandsEditModal id="keyboard-commands-edit" />
