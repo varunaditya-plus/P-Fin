@@ -3,11 +3,18 @@ import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 
 import {
+  cachedHomeSnapshot,
+  getHomeFeedPage,
+  getHomeGenres,
+  getHomeSnapshot,
+  getRandomMovie,
+  searchLibrary,
+  uniqueLibraryItems,
+} from "@/backend/jellyfin/browse";
+import {
   JellyfinItem,
   getHomeSections,
   getImageUrl,
-  getLibraries,
-  searchItems,
 } from "@/backend/jellyfin/client";
 import { getJellyfinDetailsId } from "@/backend/jellyfin/details";
 import {
@@ -20,11 +27,12 @@ import {
 } from "@/backend/jellyfin/library";
 import { Button } from "@/components/buttons/Button";
 import { WideContainer } from "@/components/layout/WideContainer";
-import { MediaGrid } from "@/components/media/MediaGrid";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
+import { HomeLayoutControls } from "@/pages/jellyfin/HomeLayoutControls";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { JellyfinFeaturedCarousel } from "@/pages/jellyfin/JellyfinFeaturedCarousel";
+import { JellyfinHomeSection } from "@/pages/jellyfin/JellyfinHomeSection";
 import {
   JellyfinMediaCard,
   JellyfinMediaCarousel,
@@ -32,6 +40,13 @@ import {
 import { HomeLayout } from "@/pages/layouts/HomeLayout";
 import { HeroPart } from "@/pages/parts/home/HeroPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
+import { useJellyfinAuth } from "@/stores/jellyfin";
+import {
+  defaultHomePreferences,
+  homePreferenceScope,
+  orderedHomeSections,
+  useHomePreferences,
+} from "@/stores/jellyfin/home";
 import { usePreferencesStore } from "@/stores/preferences";
 
 type HomeSection = Awaited<ReturnType<typeof getHomeSections>>[number];
@@ -48,8 +63,34 @@ export function HomePage() {
   const [detailsAction, setDetailsAction] = useState<
     "collection" | "playlist"
   >();
-  const [sections, setSections] = useState<HomeSection[]>([]);
-  const [libraries, setLibraries] = useState<JellyfinItem[]>([]);
+  const [snapshot] = useState(cachedHomeSnapshot);
+  const [sections, setSections] = useState<HomeSection[]>(
+    snapshot?.sections ?? [],
+  );
+  const [libraries, setLibraries] = useState<JellyfinItem[]>(
+    snapshot?.libraries ?? [],
+  );
+  const [activeFeed, setActiveFeed] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
+  const [allGenres, setAllGenres] = useState(false);
+  const [randomLoading, setRandomLoading] = useState(false);
+  const [randomError, setRandomError] = useState("");
+  const randomController = useRef<AbortController>();
+  useEffect(() => () => randomController.current?.abort(), []);
+  const session = useJellyfinAuth((state) => state.session);
+  const scope = homePreferenceScope(session);
+  const preferences = useHomePreferences(
+    (state) => state.profiles[scope] ?? defaultHomePreferences,
+  );
+  const updatePreferences = useHomePreferences((state) => state.update);
+  const resetPreferences = useHomePreferences((state) => state.reset);
+  const orderedSections = useMemo(
+    () => orderedHomeSections(sections, preferences),
+    [sections, preferences],
+  );
   const [activeLibrary, setActiveLibrary] = useState("");
   const [libraryFilters, setLibraryFilters] = useState<LibraryFilters>({
     Genres: [],
@@ -63,7 +104,7 @@ export function HomePage() {
   const [results, setResults] = useState<JellyfinItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [nextStartIndex, setNextStartIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!snapshot);
   const [loadingResults, setLoadingResults] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
@@ -80,8 +121,8 @@ export function HomePage() {
   useEffect(() => {
     let active = true;
     setError("");
-    Promise.all([getHomeSections(), getLibraries()])
-      .then(([homeSections, views]) => {
+    getHomeSnapshot(revision > 0)
+      .then(({ sections: homeSections, libraries: views }) => {
         if (!active) return;
         setSections(homeSections);
         setLibraries(views);
@@ -100,7 +141,17 @@ export function HomePage() {
     return () => {
       active = false;
     };
-  }, [revision]);
+  }, [revision, scope]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getHomeGenres(controller.signal)
+      .then((values) => {
+        if (!controller.signal.aborted) setGenres(values);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [scope]);
 
   const currentLibrary = useMemo(
     () => libraries.find((item) => item.Id === activeLibrary),
@@ -129,37 +180,39 @@ export function HomePage() {
     requestGeneration.current += 1;
     setLoadingMore(false);
     setResultError("");
-    setResults([]);
-    setTotalResults(0);
-    setNextStartIndex(0);
-    if (!debouncedSearch && !activeLibrary) {
+    if (!debouncedSearch && !activeLibrary && !activeFeed) {
+      setResults([]);
+      setTotalResults(0);
+      setNextStartIndex(0);
       setLoadingResults(false);
       return () => controller.abort();
     }
     setLoadingResults(true);
     const load = debouncedSearch
-      ? searchItems(debouncedSearch, controller.signal).then((items) => ({
+      ? searchLibrary(debouncedSearch, controller.signal).then((items) => ({
           Items: items,
           TotalRecordCount: items.length,
           FetchedCount: items.length,
         }))
-      : currentLibrary
-        ? getLibraryPage(
-            currentLibrary,
-            {
-              sortBy,
-              sortOrder,
-              status: statusFilter,
-              genre: genreFilter,
-              year: yearFilter ? Number(yearFilter) : undefined,
-            },
-            controller.signal,
-          )
-        : Promise.resolve({
-            Items: [] as JellyfinItem[],
-            TotalRecordCount: 0,
-            FetchedCount: 0,
-          });
+      : activeFeed
+        ? getHomeFeedPage(activeFeed.id, 0, genreFilter, controller.signal)
+        : currentLibrary
+          ? getLibraryPage(
+              currentLibrary,
+              {
+                sortBy,
+                sortOrder,
+                status: statusFilter,
+                genre: genreFilter,
+                year: yearFilter ? Number(yearFilter) : undefined,
+              },
+              controller.signal,
+            )
+          : Promise.resolve({
+              Items: [] as JellyfinItem[],
+              TotalRecordCount: 0,
+              FetchedCount: 0,
+            });
     load
       .then((data) => {
         if (controller.signal.aborted) return;
@@ -182,6 +235,7 @@ export function HomePage() {
   }, [
     debouncedSearch,
     activeLibrary,
+    activeFeed,
     currentLibrary,
     sortBy,
     sortOrder,
@@ -189,24 +243,28 @@ export function HomePage() {
     genreFilter,
     yearFilter,
     revision,
+    scope,
   ]);
 
   const loadMore = async () => {
-    if (loadingMore || !currentLibrary) return;
+    if (loadingMore || loadingResults || (!currentLibrary && !activeFeed))
+      return;
     const generation = requestGeneration.current;
     setLoadingMore(true);
     setResultError("");
     try {
-      const next = await getLibraryPage(currentLibrary, {
-        startIndex: nextStartIndex,
-        sortBy,
-        sortOrder,
-        status: statusFilter,
-        genre: genreFilter,
-        year: yearFilter ? Number(yearFilter) : undefined,
-      });
+      const next = activeFeed
+        ? await getHomeFeedPage(activeFeed.id, nextStartIndex, genreFilter)
+        : await getLibraryPage(currentLibrary!, {
+            startIndex: nextStartIndex,
+            sortBy,
+            sortOrder,
+            status: statusFilter,
+            genre: genreFilter,
+            year: yearFilter ? Number(yearFilter) : undefined,
+          });
       if (generation !== requestGeneration.current) return;
-      setResults((current) => [...current, ...next.Items]);
+      setResults((current) => uniqueLibraryItems([...current, ...next.Items]));
       setTotalResults(next.TotalRecordCount ?? totalResults);
       setNextStartIndex((current) => current + next.FetchedCount);
     } catch (reason: unknown) {
@@ -247,17 +305,48 @@ export function HomePage() {
   };
   const searching = search.trim().length > 0;
   const showFeatured = enableFeatured && (loading || featured.length > 0);
-  const showingGrid = searching || Boolean(activeLibrary);
+  const showingGrid =
+    searching || Boolean(activeLibrary) || Boolean(activeFeed);
   const hasLibraryFilters =
     statusFilter !== "all" || Boolean(genreFilter) || Boolean(yearFilter);
   const switchLibrary = (id: string) => {
     setActiveLibrary(id);
+    setActiveFeed(null);
     setSortBy("SortName");
     setSortOrder("Ascending");
     setStatusFilter("all");
     setGenreFilter("");
     setYearFilter("");
     setLibraryFilters({ Genres: [], Years: [] });
+  };
+  const seeAll = (section: { id: string; title: string }) => {
+    switchLibrary("");
+    setActiveFeed(section);
+  };
+  const randomMovie = async () => {
+    if (randomLoading) return;
+    const controller = new AbortController();
+    randomController.current = controller;
+    setRandomLoading(true);
+    setRandomError("");
+    try {
+      const item = await getRandomMovie(controller.signal);
+      if (controller.signal.aborted) return;
+      if (item) selectItem(item);
+      else
+        setRandomError(
+          "There are no available movies in your Jellyfin library.",
+        );
+    } catch (reason) {
+      if (!controller.signal.aborted)
+        setRandomError(
+          reason instanceof Error
+            ? reason.message
+            : "Unable to choose a movie.",
+        );
+    } finally {
+      if (!controller.signal.aborted) setRandomLoading(false);
+    }
   };
   const closeDetails = () => {
     setSelectedItem(null);
@@ -305,7 +394,7 @@ export function HomePage() {
                 <button
                   key={library.Id}
                   type="button"
-                  className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
+                  className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id && !activeFeed ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
                   onClick={() => switchLibrary(library.Id)}
                 >
                   {library.Name}
@@ -315,6 +404,72 @@ export function HomePage() {
           </div>
         </div>
       ) : null}
+      <WideContainer>
+        <div className="flex flex-wrap items-center justify-center gap-3 py-4">
+          <Button
+            theme="secondary"
+            href={`/discover${searching ? `?q=${encodeURIComponent(search.trim())}` : ""}`}
+          >
+            Discover & request
+          </Button>
+          <Button
+            theme="secondary"
+            loading={randomLoading}
+            onClick={randomMovie}
+          >
+            Random movie
+          </Button>
+          {activeFeed ? (
+            <Button theme="secondary" onClick={() => switchLibrary("")}>
+              Back to home
+            </Button>
+          ) : null}
+        </div>
+        {randomError ? (
+          <p role="alert" className="pb-4 text-center">
+            {randomError}
+          </p>
+        ) : null}
+        {!showingGrid ? (
+          <div className="mb-6 space-y-4">
+            {genres.length ? (
+              <div
+                className="flex flex-wrap justify-center gap-2"
+                aria-label="Browse genres"
+              >
+                {(allGenres ? genres : genres.slice(0, 8)).map((genre) => (
+                  <button
+                    type="button"
+                    key={genre}
+                    className="rounded-full bg-buttons-cancel px-4 py-2 text-sm text-white hover:bg-buttons-cancelHover"
+                    onClick={() => {
+                      seeAll({ id: "all", title: genre });
+                      setGenreFilter(genre);
+                    }}
+                  >
+                    {genre}
+                  </button>
+                ))}
+                {genres.length > 8 ? (
+                  <button
+                    type="button"
+                    className="rounded-full px-4 py-2 text-sm text-type-link"
+                    onClick={() => setAllGenres((value) => !value)}
+                  >
+                    {allGenres ? "Fewer genres" : "More genres"}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            <HomeLayoutControls
+              sections={orderedSections}
+              preferences={preferences}
+              onChange={(changes) => updatePreferences(scope, changes)}
+              onReset={() => resetPreferences(scope)}
+            />
+          </div>
+        ) : null}
+      </WideContainer>
       {error ? (
         <WideContainer>
           <div role="alert" className="py-12 text-center space-y-4">
@@ -337,8 +492,9 @@ export function HomePage() {
             <h2 className="text-2xl font-bold text-white mb-8">
               {searching
                 ? "Search your library"
-                : libraries.find((library) => library.Id === activeLibrary)
-                    ?.Name}
+                : (activeFeed?.title ??
+                  libraries.find((library) => library.Id === activeLibrary)
+                    ?.Name)}
             </h2>
             {!searching && currentLibrary ? (
               <div
@@ -449,11 +605,28 @@ export function HomePage() {
                 ) : null}
               </div>
             ) : null}
-            {loadingResults || debouncedSearch !== search.trim() ? (
+            {(loadingResults || debouncedSearch !== search.trim()) &&
+            !results.length ? (
               <SearchLoadingPart />
             ) : (
               <>
-                <MediaGrid>
+                {loadingResults || debouncedSearch !== search.trim() ? (
+                  <p role="status" className="mb-4 text-sm text-type-secondary">
+                    Updating titles…
+                  </p>
+                ) : (
+                  <p className="mb-4 text-sm text-type-secondary">
+                    {totalResults} {searching ? "matches" : "titles"}
+                  </p>
+                )}
+                <div
+                  aria-busy={loadingResults}
+                  className={
+                    preferences.density === "compact"
+                      ? "grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8"
+                      : "grid grid-cols-2 gap-7 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 3xl:grid-cols-8"
+                  }
+                >
                   {results.map((item) => (
                     <JellyfinMediaCard
                       key={item.Id}
@@ -462,7 +635,7 @@ export function HomePage() {
                       onItemChanged={() => setRevision((value) => value + 1)}
                     />
                   ))}
-                </MediaGrid>
+                </div>
                 {!results.length && !resultError ? (
                   <p className="py-12 text-center">
                     {searching
@@ -490,6 +663,7 @@ export function HomePage() {
                     <Button
                       theme="secondary"
                       loading={loadingMore}
+                      disabled={loadingResults}
                       onClick={loadMore}
                     >
                       Load more
@@ -503,7 +677,7 @@ export function HomePage() {
       ) : (
         <WideContainer ultraWide classNames="!px-3 md:!px-9">
           <div className="space-y-4 pb-12">
-            {loading ? (
+            {loading && !sections.length ? (
               <JellyfinMediaCarousel
                 id="loading-library"
                 title="Your library"
@@ -512,15 +686,29 @@ export function HomePage() {
                 onSelect={selectItem}
               />
             ) : (
-              sections.map((section) => (
-                <JellyfinMediaCarousel
-                  key={section.id}
-                  {...section}
-                  onSelect={selectItem}
-                  onItemChanged={() => setRevision((value) => value + 1)}
-                />
-              ))
+              orderedSections
+                .filter((section) => !preferences.hidden.includes(section.id))
+                .map((section) => (
+                  <JellyfinHomeSection
+                    key={section.id}
+                    {...section}
+                    preferences={preferences}
+                    onSeeAll={() => seeAll(section)}
+                    onSelect={selectItem}
+                    onItemChanged={() => setRevision((value) => value + 1)}
+                  />
+                ))
             )}
+            {!loading &&
+            sections.length > 0 &&
+            sections.every((section) =>
+              preferences.hidden.includes(section.id),
+            ) ? (
+              <p className="py-12 text-center">
+                All home sections are hidden. Use Edit layout to show them
+                again.
+              </p>
+            ) : null}
             {!loading && !error && !sections.length ? (
               <p className="py-20 text-center">
                 There are no movies or series available to your Jellyfin

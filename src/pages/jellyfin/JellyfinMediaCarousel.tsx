@@ -50,9 +50,9 @@ export function JellyfinMediaCard({
       linkable
       kindLabel={
         item.Type === "BoxSet"
-          ? "Collection"
+          ? `Collection${item.ChildCount !== undefined ? ` · ${item.ChildCount} titles` : ""}`
           : item.Type === "Playlist"
-            ? "Playlist"
+            ? `Playlist${item.ChildCount !== undefined ? ` · ${item.ChildCount} items` : ""}`
             : undefined
       }
       media={jellyfinMediaItem(item)}
@@ -94,6 +94,8 @@ export function JellyfinMediaCarousel({
   loading,
   onSelect,
   onItemChanged,
+  onSeeAll,
+  compact,
 }: {
   id: string;
   title: string;
@@ -101,6 +103,8 @@ export function JellyfinMediaCarousel({
   loading?: boolean;
   onSelect: (item: JellyfinItem, action?: JellyfinCardAction) => void;
   onItemChanged?: () => void;
+  onSeeAll?: () => void;
+  compact?: boolean;
 }) {
   const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { isMobile } = useIsMobile();
@@ -114,6 +118,15 @@ export function JellyfinMediaCarousel({
             {title}
           </h2>
         </div>
+        {onSeeAll ? (
+          <button
+            type="button"
+            className="mr-4 lg:mr-[100px] rounded-lg p-2 text-type-link tabbable whitespace-nowrap"
+            onClick={onSeeAll}
+          >
+            See all
+          </button>
+        ) : null}
       </div>
       <div className="relative overflow-hidden carousel-container md:pb-4">
         <div
@@ -138,7 +151,7 @@ export function JellyfinMediaCarousel({
                     (item as JellyfinItem & { PlaylistItemId?: string })
                       .PlaylistItemId ?? `${item.Id}-${index}`
                   }
-                  className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
+                  className={`relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 ${compact ? "w-[8rem] md:w-[9rem]" : "w-[10rem] md:w-[11.5rem]"} h-auto`}
                 >
                   <JellyfinMediaCard
                     item={item}
