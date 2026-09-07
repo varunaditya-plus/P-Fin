@@ -11,6 +11,27 @@ afterEach(() => {
 });
 
 describe("Jellyfin subtitle preference migration", () => {
+  it("bounds numeric subtitle layout values and resets the shared appearance defaults", () => {
+    useSubtitleStore
+      .getState()
+      .updateStyling({ lineHeight: 5, verticalPosition: -2 });
+    expect(useSubtitleStore.getState().styling).toMatchObject({
+      lineHeight: 3,
+      verticalPosition: 0,
+    });
+    useSubtitleStore
+      .getState()
+      .updateStyling({ lineHeight: NaN, verticalPosition: Infinity });
+    expect(useSubtitleStore.getState().styling).toMatchObject({
+      lineHeight: 3,
+      verticalPosition: 0,
+    });
+    useSubtitleStore.getState().resetStyling();
+    expect(useSubtitleStore.getState().styling).toMatchObject({
+      lineHeight: 1.5,
+      verticalPosition: 1,
+    });
+  });
   it("preserves saved appearance and timing while dropping legacy subtitle-service state", async () => {
     localStorage.setItem(
       "__MW::subtitles",

@@ -10,6 +10,7 @@ import { Icon, Icons } from "@/components/Icon";
 import {
   CaptionSetting,
   ColorOption,
+  SubtitleLayoutControls,
   colors,
 } from "@/components/player/atoms/settings/CaptionSettingsView";
 import { Menu } from "@/components/player/internals/ContextMenu";
@@ -19,7 +20,6 @@ import { Transition } from "@/components/utils/Transition";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 import { SubtitleStyling, useSubtitleStore } from "@/stores/subtitles";
-import { isFirefox } from "@/utils/detectFeatures";
 
 export function CaptionPreview(props: {
   fullscreen?: boolean;
@@ -77,7 +77,7 @@ export function CaptionPreview(props: {
           <div
             className="text-white pointer-events-none absolute flex w-full flex-col items-center transition-[bottom] p-4"
             style={{
-              bottom: `${props.styling.verticalPosition * 4}px`,
+              bottom: `${props.styling.verticalPosition * (props.fullscreen ? 16 : 4)}px`,
             }}
           >
             <div
@@ -126,17 +126,7 @@ export function CaptionsPart(props: {
 
   const resetSubStyling = () => {
     subtitleStore.resetStyling();
-    props.setStyling({
-      color: "#ffffff",
-      backgroundOpacity: 0.5,
-      size: 1,
-      backgroundBlur: 0.5,
-      backgroundBlurEnabled: !isFirefox,
-      bold: false,
-      verticalPosition: 1,
-      fontStyle: "default",
-      borderThickness: 1,
-    });
+    props.setStyling(useSubtitleStore.getState().styling);
   };
 
   return (
@@ -339,47 +329,10 @@ export function CaptionsPart(props: {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-between items-center">
-                <Menu.FieldTitle>
-                  {t("settings.subtitles.verticalPositionLabel")}
-                </Menu.FieldTitle>
-                <div className="flex justify-center items-center space-x-2">
-                  <button
-                    type="button"
-                    className={classNames(
-                      "px-3 py-1 rounded transition-colors duration-100",
-                      props.styling.verticalPosition === 1
-                        ? "bg-video-context-buttonFocus"
-                        : "bg-video-context-buttonFocus bg-opacity-0 hover:bg-opacity-50",
-                    )}
-                    onClick={() =>
-                      handleStylingChange({
-                        ...props.styling,
-                        verticalPosition: 1,
-                      })
-                    }
-                  >
-                    {t("settings.subtitles.low")}
-                  </button>
-                  <button
-                    type="button"
-                    className={classNames(
-                      "px-3 py-1 rounded transition-colors duration-100",
-                      props.styling.verticalPosition === 3
-                        ? "bg-video-context-buttonFocus"
-                        : "bg-video-context-buttonFocus bg-opacity-0 hover:bg-opacity-50",
-                    )}
-                    onClick={() =>
-                      handleStylingChange({
-                        ...props.styling,
-                        verticalPosition: 3,
-                      })
-                    }
-                  >
-                    {t("settings.subtitles.high")}
-                  </button>
-                </div>
-              </div>
+              <SubtitleLayoutControls
+                styling={props.styling}
+                onChange={handleStylingChange}
+              />
               <Button
                 className="w-full md:w-auto"
                 theme="secondary"

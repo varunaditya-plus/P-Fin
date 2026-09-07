@@ -93,6 +93,7 @@ export function CaptionCue({
       className="mb-1 rounded px-4 py-1 text-center leading-normal"
       style={{
         color: styling.color,
+        lineHeight: styling.lineHeight,
         fontSize: `${(1.5 * styling.size).toFixed(2)}em`,
         backgroundColor: `rgba(0,0,0,${styling.backgroundOpacity.toFixed(2)})`,
         backdropFilter:

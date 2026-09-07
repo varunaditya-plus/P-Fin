@@ -12,7 +12,6 @@ import { useProgressBar } from "@/hooks/useProgressBar";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 import { SubtitleStyling, useSubtitleStore } from "@/stores/subtitles";
-import { isFirefox } from "@/utils/detectFeatures";
 
 export function ColorOption(props: {
   color: string;
@@ -390,6 +389,39 @@ export function CaptionSetting(props: {
   );
 }
 
+export function SubtitleLayoutControls({
+  styling,
+  onChange,
+}: {
+  styling: SubtitleStyling;
+  onChange: (styling: SubtitleStyling) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <CaptionSetting
+        label="Line height"
+        min={0.8}
+        max={3}
+        decimalsAllowed={1}
+        value={styling.lineHeight}
+        onChange={(lineHeight) => onChange({ ...styling, lineHeight })}
+        textTransformer={(value) => `${value}×`}
+      />
+      <CaptionSetting
+        label="Vertical position"
+        min={0}
+        max={20}
+        decimalsAllowed={1}
+        value={styling.verticalPosition}
+        onChange={(verticalPosition) =>
+          onChange({ ...styling, verticalPosition })
+        }
+        textTransformer={(value) => `${value} rem`}
+      />
+    </div>
+  );
+}
+
 export const colors = ["#ffffff", "#80b1fa", "#e2e535", "#10B239FF"];
 
 export function CaptionSettingsView({
@@ -426,17 +458,7 @@ export function CaptionSettingsView({
   };
 
   const resetSubStyling = () => {
-    subtitleStore.updateStyling({
-      color: "#ffffff",
-      backgroundOpacity: 0.25,
-      size: 0.75,
-      backgroundBlur: 0.25,
-      backgroundBlurEnabled: !isFirefox,
-      bold: false,
-      verticalPosition: 1,
-      fontStyle: "default",
-      borderThickness: 1,
-    });
+    subtitleStore.resetStyling();
   };
 
   return (
@@ -637,47 +659,10 @@ export function CaptionSettingsView({
                 </div>
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <Menu.FieldTitle>
-                {t("settings.subtitles.verticalPositionLabel")}
-              </Menu.FieldTitle>
-              <div className="flex justify-center items-center space-x-2">
-                <button
-                  type="button"
-                  className={classNames(
-                    "px-3 py-1 rounded transition-colors duration-100",
-                    styling.verticalPosition === 1
-                      ? "bg-video-context-buttonFocus"
-                      : "bg-video-context-buttonFocus bg-opacity-0 hover:bg-opacity-50",
-                  )}
-                  onClick={() =>
-                    handleStylingChange({
-                      ...styling,
-                      verticalPosition: 1,
-                    })
-                  }
-                >
-                  {t("settings.subtitles.low")}
-                </button>
-                <button
-                  type="button"
-                  className={classNames(
-                    "px-3 py-1 rounded transition-colors duration-100",
-                    styling.verticalPosition === 3
-                      ? "bg-video-context-buttonFocus"
-                      : "bg-video-context-buttonFocus bg-opacity-0 hover:bg-opacity-50",
-                  )}
-                  onClick={() =>
-                    handleStylingChange({
-                      ...styling,
-                      verticalPosition: 3,
-                    })
-                  }
-                >
-                  {t("settings.subtitles.high")}
-                </button>
-              </div>
-            </div>
+            <SubtitleLayoutControls
+              styling={styling}
+              onChange={handleStylingChange}
+            />
             <Button
               className="w-full md:w-auto"
               theme="secondary"

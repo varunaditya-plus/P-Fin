@@ -51,6 +51,9 @@ export interface SubtitleStyling {
    * border thickness for Border font style, ranges between 0 and 10
    */
   borderThickness: number;
+
+  /** Multiplier applied to each subtitle line. */
+  lineHeight: number;
 }
 
 export interface SubtitleStore {
@@ -91,6 +94,7 @@ export const useSubtitleStore = create(
         verticalPosition: 1,
         fontStyle: "default",
         borderThickness: 1,
+        lineHeight: 1.5,
       },
       showDelayIndicator: false,
 
@@ -113,9 +117,20 @@ export const useSubtitleStore = create(
           if (newStyling.size !== undefined)
             s.styling.size = Math.min(10, Math.max(0.01, newStyling.size));
           if (newStyling.bold !== undefined) s.styling.bold = newStyling.bold;
-          if (newStyling.verticalPosition !== undefined)
+          if (
+            newStyling.lineHeight !== undefined &&
+            Number.isFinite(newStyling.lineHeight)
+          )
+            s.styling.lineHeight = Math.min(
+              3,
+              Math.max(0.8, newStyling.lineHeight),
+            );
+          if (
+            newStyling.verticalPosition !== undefined &&
+            Number.isFinite(newStyling.verticalPosition)
+          )
             s.styling.verticalPosition = Math.min(
-              100,
+              20,
               Math.max(0, newStyling.verticalPosition),
             );
           if (newStyling.fontStyle !== undefined)
@@ -139,6 +154,7 @@ export const useSubtitleStore = create(
             verticalPosition: 1,
             fontStyle: "default",
             borderThickness: 1,
+            lineHeight: 1.5,
           };
         });
       },
