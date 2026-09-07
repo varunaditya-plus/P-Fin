@@ -29,6 +29,7 @@ import {
 import { Flare } from "@/components/utils/Flare";
 import { ContentProviderLinks } from "@/pages/jellyfin/ContentProviderLinks";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
+import { PersonModal, PersonSelection } from "@/pages/jellyfin/PersonModal";
 
 function SeerrDetailsContent({
   media,
@@ -37,6 +38,7 @@ function SeerrDetailsContent({
   afterLeave,
   onClose,
   onRequested,
+  onSelectMedia,
 }: {
   media: SeerrMedia;
   user: SeerrUser;
@@ -44,7 +46,9 @@ function SeerrDetailsContent({
   afterLeave: () => void;
   onClose: () => void;
   onRequested: (details: SeerrDetails) => void;
+  onSelectMedia?: (media: SeerrMedia) => void;
 }) {
+  const [selectedPerson, setPerson] = useState<PersonSelection>();
   const [details, setDetails] = useState<SeerrDetails>();
   const [settings, setSettings] = useState<SeerrSettings>();
   const [quota, setQuota] = useState<SeerrQuota>();
@@ -524,9 +528,16 @@ function SeerrDetailsContent({
                           </h4>
                           <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
                             {details.credits.cast.slice(0, 20).map((person) => (
-                              <div
+                              <button
+                                type="button"
                                 key={person.id}
-                                className="flex-shrink-0 w-28"
+                                className="flex-shrink-0 w-28 text-left tabbable rounded-lg"
+                                onClick={() =>
+                                  setPerson({
+                                    name: person.name,
+                                    tmdbId: person.id,
+                                  })
+                                }
                               >
                                 <img
                                   src={
@@ -543,7 +554,7 @@ function SeerrDetailsContent({
                                 <p className="text-xs text-type-secondary">
                                   {person.character}
                                 </p>
-                              </div>
+                              </button>
                             ))}
                           </div>
                         </div>
@@ -556,6 +567,15 @@ function SeerrDetailsContent({
           </Flare.Base>
         </div>
       </DetailsModalFrame>
+      <PersonModal
+        person={open ? selectedPerson : undefined}
+        onClose={() => setPerson(undefined)}
+        onSelectJellyfin={(id) => {
+          setLibraryId(id);
+          setShowLibrary(true);
+        }}
+        onSelectSeerr={(selected) => onSelectMedia?.(selected)}
+      />
       <JellyfinDetailsModal
         itemId={open && showLibrary ? libraryId : undefined}
         onClose={() => setShowLibrary(false)}
@@ -572,11 +592,13 @@ export function SeerrDetailsModal({
   user,
   onClose,
   onRequested,
+  onSelectMedia,
 }: {
   media?: SeerrMedia;
   user: SeerrUser;
   onClose: () => void;
   onRequested: (details: SeerrDetails) => void;
+  onSelectMedia?: (media: SeerrMedia) => void;
 }) {
   const presence = useRetainedModalValue(media);
   return presence.value ? (
@@ -588,6 +610,7 @@ export function SeerrDetailsModal({
       afterLeave={presence.afterLeave}
       onClose={onClose}
       onRequested={onRequested}
+      onSelectMedia={onSelectMedia}
     />
   ) : null;
 }

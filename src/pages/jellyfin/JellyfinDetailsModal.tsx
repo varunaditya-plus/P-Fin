@@ -43,6 +43,7 @@ import { ContentProviderLinks } from "./ContentProviderLinks";
 import { ContentSettingsModal } from "./ContentSettingsModal";
 import { JellyfinMediaCarousel } from "./JellyfinMediaCarousel";
 import { JellyfinTrackChoice } from "./JellyfinTrackSelection";
+import { PersonModal, PersonSelection } from "./PersonModal";
 
 function runtime(ticks?: number) {
   if (!ticks) return undefined;
@@ -76,6 +77,7 @@ function JellyfinDetailsContent({
   initialAction?: "collection" | "playlist";
 }) {
   const navigate = useNavigate();
+  const [selectedPerson, setSelectedPerson] = useState<PersonSelection>();
   const [selectedId, setSelectedId] = useState(itemId);
   const [selectedAction, setSelectedAction] = useState(initialAction);
   const selectedIdRef = useRef(selectedId);
@@ -1027,9 +1029,16 @@ function JellyfinDetailsContent({
                             )
                               .slice(0, 30)
                               .map((person) => (
-                                <div
+                                <button
+                                  type="button"
                                   key={person.Id || person.Name}
-                                  className="flex-shrink-0 w-28 text-center"
+                                  className="flex-shrink-0 w-28 text-center tabbable rounded-lg"
+                                  onClick={() =>
+                                    setSelectedPerson({
+                                      name: person.Name,
+                                      jellyfinId: person.Id,
+                                    })
+                                  }
                                 >
                                   <div className="w-24 h-24 mx-auto rounded-full bg-white/5 overflow-hidden">
                                     {person.PrimaryImageTag && person.Id ? (
@@ -1065,7 +1074,7 @@ function JellyfinDetailsContent({
                                   <p className="text-xs text-white/60 line-clamp-2">
                                     {person.Role}
                                   </p>
-                                </div>
+                                </button>
                               ))}
                           </div>
                         </div>
@@ -1092,6 +1101,15 @@ function JellyfinDetailsContent({
           </div>
         </Flare.Base>
       </div>
+      <PersonModal
+        person={open ? selectedPerson : undefined}
+        onClose={() => setSelectedPerson(undefined)}
+        onSelectJellyfin={(id) => selectItem(id)}
+        onSelectSeerr={(media) => {
+          onClose();
+          navigate(`/discover?media=${media.id}&type=${media.mediaType}`);
+        }}
+      />
       {item ? (
         <ContentSettingsModal
           open={open && settingsOpen}

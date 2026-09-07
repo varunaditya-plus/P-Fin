@@ -13,6 +13,7 @@ import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePreferencesStore } from "@/stores/preferences";
 
 import { BrandPill } from "./BrandPill";
+import { MobileNavigation } from "./MobileNavigation";
 
 export interface NavigationProps {
   bg?: boolean;
@@ -184,6 +185,7 @@ export function Navigation(props: NavigationProps) {
           </div>
         </div>
       </div>
+      {session ? <MobileNavigation /> : null}
     </>
   );
 }

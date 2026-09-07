@@ -4,12 +4,17 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   SeerrError,
-  getSeerrPage,
   getSeerrUser,
   seerrImage,
   seerrStatusLabel,
   seerrToMediaItem,
 } from "@/backend/seerr/api";
+import {
+  cachedSeerrPage,
+  getCachedSeerrPage,
+  randomSeerrMedia,
+  uniqueSeerrMedia,
+} from "@/backend/seerr/browse";
 import {
   SeerrDetails,
   SeerrMedia,
@@ -212,18 +217,26 @@ function SeerrCarousel({
   onUnauthorized: () => void;
   refresh: number;
 }) {
-  const [page, setPage] = useState<SeerrPage>();
+  const [page, setPage] = useState<SeerrPage | undefined>(() =>
+    cachedSeerrPage(endpoint),
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+  const generation = useRef(0);
+  const moreController = useRef<AbortController>();
   const carouselRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     const controller = new AbortController();
+    generation.current += 1;
+    moreController.current?.abort();
     setLoading(true);
     setError("");
-    getSeerrPage(endpoint, controller.signal)
-      .then(setPage)
+    getCachedSeerrPage(endpoint, controller.signal, refresh > 0 || retry > 0)
+      .then((value) => {
+        if (!controller.signal.aborted) setPage(value);
+      })
       .catch((reason) => {
         if (controller.signal.aborted) return;
         if (reason instanceof SeerrError && reason.status === 401)
@@ -238,32 +251,34 @@ function SeerrCarousel({
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      moreController.current?.abort();
+      generation.current += 1;
+    };
   }, [endpoint, onUnauthorized, refresh, retry]);
 
   const loadMore = async () => {
     if (!page || loading || page.page >= page.totalPages) return;
     setLoading(true);
     setError("");
+    const currentGeneration = generation.current;
+    const controller = new AbortController();
+    moreController.current = controller;
     try {
-      const next = await getSeerrPage(
+      const next = await getCachedSeerrPage(
         `${endpoint}${endpoint.includes("?") ? "&" : "?"}page=${page.page + 1}`,
+        controller.signal,
       );
+      if (controller.signal.aborted || currentGeneration !== generation.current)
+        return;
       setPage({
         ...next,
-        results: [
-          ...page.results,
-          ...next.results.filter(
-            (item) =>
-              !page.results.some(
-                (existing) =>
-                  existing.id === item.id &&
-                  existing.mediaType === item.mediaType,
-              ),
-          ),
-        ],
+        results: uniqueSeerrMedia([...page.results, ...next.results]),
       });
     } catch (reason) {
+      if (controller.signal.aborted || currentGeneration !== generation.current)
+        return;
       if (reason instanceof SeerrError && reason.status === 401)
         onUnauthorized();
       else
@@ -273,7 +288,11 @@ function SeerrCarousel({
             : "Could not load more titles.",
         );
     } finally {
-      setLoading(false);
+      if (
+        !controller.signal.aborted &&
+        currentGeneration === generation.current
+      )
+        setLoading(false);
     }
   };
 
@@ -359,6 +378,55 @@ function SeerrLibraryDiscover() {
   const [category, setCategory] = useState<"movie" | "tv">("movie");
   const [featured, setFeatured] = useState<SeerrMedia[]>([]);
   const [selected, setSelected] = useState<SeerrMedia>();
+  const [randomLoading, setRandomLoading] = useState(false);
+  const [randomError, setRandomError] = useState("");
+  const randomController = useRef<AbortController>();
+  useEffect(() => () => randomController.current?.abort(), []);
+  useEffect(() => {
+    const id = Number(searchParams.get("media"));
+    const mediaType = searchParams.get("type");
+    if (
+      id > 0 &&
+      Number.isInteger(id) &&
+      (mediaType === "movie" || mediaType === "tv")
+    )
+      setSelected({ id, mediaType });
+  }, [searchParams]);
+  const closeDetails = () => {
+    setSelected(undefined);
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.delete("media");
+        next.delete("type");
+        return next;
+      },
+      { replace: true },
+    );
+  };
+  const pickRandom = async () => {
+    if (randomLoading) return;
+    const controller = new AbortController();
+    randomController.current = controller;
+    setRandomLoading(true);
+    setRandomError("");
+    try {
+      const item = await randomSeerrMedia(category, controller.signal);
+      if (!controller.signal.aborted) {
+        if (item) setSelected(item);
+        else setRandomError("Seerr has no titles to choose from.");
+      }
+    } catch (reason) {
+      if (!controller.signal.aborted)
+        setRandomError(
+          reason instanceof Error
+            ? reason.message
+            : "Unable to choose a title.",
+        );
+    } finally {
+      if (!controller.signal.aborted) setRandomLoading(false);
+    }
+  };
   const [refresh, setRefresh] = useState(0);
   const [authRetry, setAuthRetry] = useState(0);
   const featuredGeneration = useRef(0);
@@ -394,9 +462,15 @@ function SeerrLibraryDiscover() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setDebouncedQuery(query.trim());
-      setSearchParams(query.trim() ? { q: query.trim() } : {}, {
-        replace: true,
-      });
+      setSearchParams(
+        (previous) => {
+          const next = new URLSearchParams(previous);
+          if (query.trim()) next.set("q", query.trim());
+          else next.delete("q");
+          return next;
+        },
+        { replace: true },
+      );
     }, 350);
     return () => window.clearTimeout(timer);
   }, [query, setSearchParams]);
@@ -405,7 +479,7 @@ function SeerrLibraryDiscover() {
     if (!user) return undefined;
     const controller = new AbortController();
     const generation = featuredGeneration.current;
-    getSeerrPage(
+    getCachedSeerrPage(
       category === "movie" ? "/discover/movies" : "/discover/tv",
       controller.signal,
     )
@@ -487,6 +561,30 @@ function SeerrLibraryDiscover() {
                 hideTooltip
               />
             </div>
+            <div className="flex justify-center gap-3 pb-6">
+              <Button
+                theme="secondary"
+                loading={randomLoading}
+                onClick={pickRandom}
+              >
+                Random {category === "movie" ? "movie" : "TV show"}
+              </Button>
+              <Button
+                theme="secondary"
+                href={
+                  query.trim()
+                    ? `/browse/${encodeURIComponent(query.trim())}`
+                    : "/"
+                }
+              >
+                Search my library
+              </Button>
+            </div>
+            {randomError ? (
+              <p role="alert" className="pb-4 text-center">
+                {randomError}
+              </p>
+            ) : null}
             {debouncedQuery ? (
               <WideContainer ultraWide classNames="!px-0">
                 <SeerrCarousel
@@ -567,8 +665,9 @@ function SeerrLibraryDiscover() {
           <SeerrDetailsModal
             media={selected}
             user={user}
-            onClose={() => setSelected(undefined)}
+            onClose={closeDetails}
             onRequested={requested}
+            onSelectMedia={setSelected}
           />
         </>
       )}

@@ -33,7 +33,7 @@ export function SubPageLayout(props: { children: React.ReactNode }) {
     >
       <BlurEllipsis />
       {/* Main page */}
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-24 md:pb-0">
         <Navigation doBackground noLightbar />
         <div className="mt-40 relative">{props.children}</div>
       </div>
