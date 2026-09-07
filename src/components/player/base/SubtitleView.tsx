@@ -6,6 +6,7 @@ import {
   parseSubtitles,
   sanitize,
 } from "@/components/player/utils/captions";
+import { TimedTextCue, isTTML } from "@/components/player/utils/ttml";
 import { Transition } from "@/components/utils/Transition";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
@@ -19,10 +20,12 @@ export function CaptionCue({
   text,
   styling,
   overrideCasing,
+  timedTextStyle,
 }: {
   text?: string;
   styling: SubtitleStyling;
   overrideCasing: boolean;
+  timedTextStyle?: TimedTextCue["style"];
 }) {
   const parsedHtml = useMemo(() => {
     let textToUse = text;
@@ -42,11 +45,13 @@ export function CaptionCue({
     const html = sanitize(textWithNewlines, {
       ALLOWED_TAGS: ["c", "b", "i", "u", "span", "ruby", "rt", "br"],
       ADD_TAGS: ["v", "lang"],
-      ALLOWED_ATTR: ["title", "lang"],
+      ALLOWED_ATTR: timedTextStyle
+        ? ["title", "lang", "style"]
+        : ["title", "lang"],
     });
 
     return html;
-  }, [text, overrideCasing]);
+  }, [text, overrideCasing, timedTextStyle]);
 
   const getTextEffectStyles = () => {
     switch (styling.fontStyle) {
@@ -102,6 +107,7 @@ export function CaptionCue({
             : "none",
         fontWeight: styling.bold ? "bold" : "normal",
         ...textEffectStyles,
+        ...timedTextStyle,
       }}
     >
       <span
@@ -139,14 +145,33 @@ export function SubtitleRenderer() {
 
   return (
     <div>
-      {visibleCaptions.map(({ start, end, content }, i) => (
-        <CaptionCue
-          key={makeQueId(i, start, end)}
-          text={content}
-          styling={styling}
-          overrideCasing={overrideCasing}
-        />
-      ))}
+      {visibleCaptions.map(({ start, end, content, region, style }, i) => {
+        const cue = (
+          <CaptionCue
+            text={content}
+            styling={styling}
+            overrideCasing={overrideCasing}
+            timedTextStyle={style}
+          />
+        );
+        return style ? (
+          <div
+            key={makeQueId(i, start, end)}
+            className="absolute flex flex-col"
+            style={{
+              left: `${region?.x ?? 10}%`,
+              top: `${region?.y ?? 75}%`,
+              width: `${region?.width ?? 80}%`,
+              height: `${region?.height ?? 20}%`,
+              justifyContent: region?.align ?? "end",
+            }}
+          >
+            {cue}
+          </div>
+        ) : (
+          <div key={makeQueId(i, start, end)}>{cue}</div>
+        );
+      })}
     </div>
   );
 }
@@ -164,6 +189,13 @@ export function SubtitleView(props: { controlsShown: boolean }) {
   const shouldUseNativeTrack =
     (enableNativeSubtitles || needsNativeTrack) && source !== null;
   if (shouldUseNativeTrack || !caption) return null;
+
+  if (isTTML(caption.srtData))
+    return (
+      <div className="pointer-events-none z-50 text-white absolute inset-0">
+        <SubtitleRenderer />
+      </div>
+    );
 
   return (
     <Transition animation="slide-up" show>

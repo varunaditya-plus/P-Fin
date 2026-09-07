@@ -130,6 +130,7 @@ export function JellyfinPlayerView() {
   const selectedBitrate = useRef(120_000_000);
   const generation = useRef(0);
   const subtitleGeneration = useRef(0);
+  const subtitleDownload = useRef<AbortController>();
   const subtitleSelection = useRef(-1);
   const lastOptions = useRef<PlaybackOptions>({});
   const status = usePlayerStore((state) => state.status);
@@ -147,6 +148,7 @@ export function JellyfinPlayerView() {
       preservePause = false,
     ) => {
       generation.current += 1;
+      subtitleDownload.current?.abort();
       const request = generation.current;
       const selection = subtitleSelection.current;
       const subtitleRequest = subtitleGeneration.current;
@@ -179,7 +181,9 @@ export function JellyfinPlayerView() {
           (entry) => entry.id === `jellyfin-${selection}`,
         );
         if (caption && result.subtitleIndex < 0) {
-          const srtData = await downloadCaption(caption);
+          const controller = new AbortController();
+          subtitleDownload.current = controller;
+          const srtData = await downloadCaption(caption, controller.signal);
           if (
             request !== generation.current ||
             subtitleRequest !== subtitleGeneration.current
@@ -191,6 +195,8 @@ export function JellyfinPlayerView() {
             .setSubtitle(true, caption.language, caption.id);
         }
       } catch (cause) {
+        if (cause instanceof DOMException && cause.name === "AbortError")
+          return;
         if (request !== generation.current) return;
         setError(
           cause instanceof Error
@@ -380,6 +386,7 @@ export function JellyfinPlayerView() {
       cancelled = true;
       generation.current += 1;
       subtitleGeneration.current += 1;
+      subtitleDownload.current?.abort();
       store.display?.pause();
       store.reset();
     };
@@ -439,6 +446,7 @@ export function JellyfinPlayerView() {
     async (index: number) => {
       if (!playback) return;
       subtitleGeneration.current += 1;
+      subtitleDownload.current?.abort();
       const request = subtitleGeneration.current;
       const track = playback.mediaSource.MediaStreams?.find(
         (stream) => stream.Type === "Subtitle" && stream.Index === index,
@@ -474,7 +482,9 @@ export function JellyfinPlayerView() {
       );
       if (!caption) return;
       try {
-        const srtData = await downloadCaption(caption);
+        const controller = new AbortController();
+        subtitleDownload.current = controller;
+        const srtData = await downloadCaption(caption, controller.signal);
         if (request !== subtitleGeneration.current) return;
         usePlayerStore.getState().setCaption({ ...caption, srtData });
         useSubtitleStore

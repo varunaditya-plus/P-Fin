@@ -1,8 +1,9 @@
 import DOMPurify from "dompurify";
 import { convert, detect, parse } from "subsrt-ts";
-import { ContentCaption } from "subsrt-ts/dist/types/handler";
 
-export type CaptionCueType = ContentCaption;
+import { TimedTextCue, isTTML, parseTTML, timedTextToSrt } from "./ttml";
+
+export type CaptionCueType = TimedTextCue;
 export const sanitize = DOMPurify.sanitize;
 
 export function captionIsVisible(
@@ -24,6 +25,7 @@ export function makeQueId(index: number, start: number, end: number): string {
 }
 
 export function convertSubtitlesToVtt(text: string): string {
+  if (isTTML(text)) return convert(timedTextToSrt(parseTTML(text)), "vtt");
   const textTrimmed = text.trim();
   if (textTrimmed === "") {
     throw new Error("Given text is empty");
@@ -36,6 +38,7 @@ export function convertSubtitlesToVtt(text: string): string {
 }
 
 export function convertSubtitlesToSrt(text: string): string {
+  if (isTTML(text)) return timedTextToSrt(parseTTML(text));
   const textTrimmed = text.trim();
   if (textTrimmed === "") {
     throw new Error("Given text is empty");
@@ -51,12 +54,20 @@ export function parseVttSubtitles(vtt: string) {
   return parse(vtt).filter((cue) => cue.type === "caption") as CaptionCueType[];
 }
 
+const parsedCache = new Map<string, CaptionCueType[]>();
 export function parseSubtitles(
   text: string,
   _language?: string,
 ): CaptionCueType[] {
-  const vtt = convertSubtitlesToVtt(text);
-  return parseVttSubtitles(vtt);
+  const cached = parsedCache.get(text);
+  if (cached) return cached;
+  const cues = isTTML(text)
+    ? parseTTML(text)
+    : parseVttSubtitles(convertSubtitlesToVtt(text));
+  if (parsedCache.size >= 8)
+    parsedCache.delete(parsedCache.keys().next().value!);
+  parsedCache.set(text, cues);
+  return cues;
 }
 
 export function convertSubtitlesToObjectUrl(text: string): string {
