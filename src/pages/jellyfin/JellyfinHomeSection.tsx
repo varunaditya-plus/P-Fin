@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { getHomeFeedPage } from "@/backend/jellyfin/browse";
 import { JellyfinItem } from "@/backend/jellyfin/client";
+import { HomeSectionSort } from "@/stores/jellyfin/browse";
 import { HomePreferences } from "@/stores/jellyfin/home";
 
 import { JellyfinCardAction } from "./JellyfinCardMenu";
@@ -18,6 +19,7 @@ export function JellyfinHomeSection({
   onSeeAll,
   onSelect,
   onItemChanged,
+  sort = "default",
 }: {
   id: string;
   title: string;
@@ -26,10 +28,11 @@ export function JellyfinHomeSection({
   onSeeAll: () => void;
   onSelect: (item: JellyfinItem, action?: JellyfinCardAction) => void;
   onItemChanged: () => void;
+  sort?: HomeSectionSort;
 }) {
   const holder = useRef<HTMLDivElement>(null);
   const [columns, setColumns] = useState(2);
-  const [expanded, setExpanded] = useState<JellyfinItem[]>([]);
+  const [expanded, setExpanded] = useState<JellyfinItem[]>();
   const compact = preferences.density === "compact";
   const limit = columns * preferences.rows;
   useEffect(() => {
@@ -46,30 +49,40 @@ export function JellyfinHomeSection({
     return () => observer.disconnect();
   }, [compact, preferences.layout]);
   useEffect(() => {
-    setExpanded([]);
-    if (preferences.layout !== "grid" || limit <= items.length)
+    setExpanded(undefined);
+    if (
+      sort === "default" &&
+      (preferences.layout !== "grid" || limit <= items.length)
+    )
       return undefined;
     const controller = new AbortController();
-    getHomeFeedPage(id, 0, undefined, controller.signal, limit)
+    getHomeFeedPage(
+      id,
+      0,
+      undefined,
+      controller.signal,
+      preferences.layout === "carousel" ? 20 : limit,
+      sort,
+    )
       .then((page) => {
         if (!controller.signal.aborted) setExpanded(page.Items);
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [id, items, limit, preferences.layout]);
+  }, [id, items, limit, preferences.layout, sort]);
+  const visible = expanded ?? items;
   if (preferences.layout === "carousel")
     return (
       <JellyfinMediaCarousel
         id={id}
         title={title}
-        items={items}
+        items={visible}
         onSelect={onSelect}
         onItemChanged={onItemChanged}
         onSeeAll={onSeeAll}
         compact={compact}
       />
     );
-  const visible = expanded.length > items.length ? expanded : items;
   return (
     <section className="px-4 lg:px-[100px] py-4" aria-label={title}>
       <div className="mb-6 flex items-center justify-between gap-4">

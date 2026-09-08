@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/buttons/Button";
 import { Icon, Icons } from "@/components/Icon";
+import { HomeSectionSort } from "@/stores/jellyfin/browse";
 import { HomePreferences, orderedHomeSections } from "@/stores/jellyfin/home";
 
 export function HomeLayoutControls({
@@ -9,11 +10,15 @@ export function HomeLayoutControls({
   preferences,
   onChange,
   onReset,
+  sectionSort,
+  onSort,
 }: {
   sections: { id: string; title: string }[];
   preferences: HomePreferences;
   onChange: (changes: Partial<HomePreferences>) => void;
   onReset: () => void;
+  sectionSort?: Record<string, HomeSectionSort>;
+  onSort: (id: string, sort: HomeSectionSort) => void;
 }) {
   const [open, setOpen] = useState(false);
   const ordered = orderedHomeSections(sections, preferences);
@@ -84,8 +89,11 @@ export function HomeLayoutControls({
           </div>
           <div className="space-y-2">
             {ordered.map((section, index) => (
-              <div key={section.id} className="flex items-center gap-3">
-                <label className="flex flex-1 items-center gap-3 text-white">
+              <div
+                key={section.id}
+                className="flex flex-wrap items-center gap-3"
+              >
+                <label className="flex w-full items-center gap-3 text-white sm:w-auto sm:flex-1">
                   <input
                     type="checkbox"
                     checked={!preferences.hidden.includes(section.id)}
@@ -99,6 +107,21 @@ export function HomeLayoutControls({
                   />
                   {section.title}
                 </label>
+                {section.id !== "resume" && section.id !== "next-up" ? (
+                  <select
+                    aria-label={`Sort ${section.title}`}
+                    className="max-w-[8rem] rounded-lg bg-dropdown-background p-2 text-sm text-white"
+                    value={sectionSort?.[section.id] ?? "default"}
+                    onChange={(event) =>
+                      onSort(section.id, event.target.value as HomeSectionSort)
+                    }
+                  >
+                    <option value="default">Default order</option>
+                    <option value="title">Title</option>
+                    <option value="year">Newest release</option>
+                    <option value="rating">Highest rated</option>
+                  </select>
+                ) : null}
                 <button
                   className="rounded-lg px-3 py-2 text-white hover:bg-button-secondaryHover disabled:opacity-30"
                   type="button"

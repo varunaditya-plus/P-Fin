@@ -104,6 +104,7 @@ export interface MediaCardProps {
   onShowDetails: (media: MediaItem) => void;
   forceSkeleton?: boolean;
   kindLabel?: string;
+  posterContent?: ReactNode;
   renderContextMenu?: (close: () => void) => ReactNode;
 }
 
@@ -128,6 +129,7 @@ function MediaCardContent({
   percentage,
   forceSkeleton,
   kindLabel,
+  posterContent,
   onOpenMenu,
   menuOpen,
 }: Omit<MediaCardProps, "onShowDetails" | "renderContextMenu"> & {
@@ -211,6 +213,9 @@ function MediaCardContent({
                 : "",
             }}
           >
+            {isIntersecting && posterContent ? (
+              <div className="absolute inset-0">{posterContent}</div>
+            ) : null}
             {series ? (
               <div
                 className={[

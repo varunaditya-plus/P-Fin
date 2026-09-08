@@ -18,6 +18,7 @@ import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 
+import { CollectionMembershipEditor } from "./CollectionMembershipEditor";
 import {
   ContentImageEditor,
   ContentSubtitleEditor,
@@ -500,10 +501,10 @@ export function ContentActions({
             <DeleteEditor key={item.Id} item={item} onDeleted={onDeleted} />
           ) : null}
           {action === "collection" && permissions?.collections ? (
-            <ContainerEditor
+            <CollectionMembershipEditor
               key={`collection-${item.Id}`}
               item={item}
-              type="BoxSet"
+              onSaved={onSaved}
             />
           ) : null}
           {action === "playlist" ? (

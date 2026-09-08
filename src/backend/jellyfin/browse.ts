@@ -6,6 +6,7 @@ import {
   getLibraries,
   jellyfinRequest,
 } from "@/backend/jellyfin/client";
+import { HomeSectionSort } from "@/stores/jellyfin/browse";
 
 const fields =
   "Overview,Genres,People,ProviderIds,PrimaryImageAspectRatio,ChildCount,DateCreated";
@@ -225,6 +226,7 @@ export async function getHomeFeedPage(
   genre?: string,
   signal?: AbortSignal,
   limit = 60,
+  sort: HomeSectionSort = "default",
 ) {
   const { userId } = getJellyfinSession();
   const path =
@@ -238,17 +240,43 @@ export async function getHomeFeedPage(
     { signal },
     {
       UserId: userId,
-      ParentId: ["next-up", "resume", "favorites", "all"].includes(id)
+      ParentId: [
+        "next-up",
+        "resume",
+        "favorites",
+        "all",
+        "recent",
+        "completed",
+      ].includes(id)
         ? undefined
         : id,
       Recursive: true,
       IncludeItemTypes:
         id === "resume" || id === "next-up" ? undefined : "Movie,Series",
       MediaTypes: "Video",
-      Filters: id === "favorites" ? "IsFavorite" : undefined,
-      SortBy: id === "all" || id === "favorites" ? "SortName" : "DateCreated",
+      Filters:
+        id === "favorites"
+          ? "IsFavorite"
+          : id === "completed"
+            ? "IsPlayed"
+            : undefined,
+      SortBy:
+        sort === "title"
+          ? "SortName"
+          : sort === "year"
+            ? "ProductionYear"
+            : sort === "rating"
+              ? "CommunityRating"
+              : id === "all" || id === "favorites"
+                ? "SortName"
+                : id === "completed"
+                  ? "DatePlayed"
+                  : "DateCreated",
       SortOrder:
-        id === "all" || id === "favorites" ? "Ascending" : "Descending",
+        sort === "title" ||
+        (sort === "default" && (id === "all" || id === "favorites"))
+          ? "Ascending"
+          : "Descending",
       Genres: genre || undefined,
       Fields: fields,
       StartIndex: startIndex ?? 0,

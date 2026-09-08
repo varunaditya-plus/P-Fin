@@ -19,12 +19,12 @@ import {
 import { getJellyfinDetailsId } from "@/backend/jellyfin/details";
 import {
   LibraryFilters,
-  LibrarySortBy,
   LibrarySortOrder,
   LibraryStatus,
   getLibraryFilters,
   getLibraryPage,
 } from "@/backend/jellyfin/library";
+import { getSeriesLengthPage } from "@/backend/jellyfin/seriesLength";
 import { Button } from "@/components/buttons/Button";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -37,10 +37,18 @@ import {
   JellyfinMediaCard,
   JellyfinMediaCarousel,
 } from "@/pages/jellyfin/JellyfinMediaCarousel";
+import { LibraryCollections } from "@/pages/jellyfin/LibraryCollections";
 import { HomeLayout } from "@/pages/layouts/HomeLayout";
 import { HeroPart } from "@/pages/parts/home/HeroPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
 import { useJellyfinAuth } from "@/stores/jellyfin";
+import {
+  LibraryBrowseSort,
+  defaultLibraryBrowse,
+  readBrowseSession,
+  saveBrowseSession,
+  useBrowsePreferences,
+} from "@/stores/jellyfin/browse";
 import {
   defaultHomePreferences,
   homePreferenceScope,
@@ -53,6 +61,24 @@ type HomeSection = Awaited<ReturnType<typeof getHomeSections>>[number];
 
 export function HomePage() {
   const [showBg, setShowBg] = useState(false);
+  const session = useJellyfinAuth((state) => state.session);
+  const scope = homePreferenceScope(session);
+  const [restored] = useState(() =>
+    readBrowseSession(scope, window.location.pathname),
+  );
+  const savedFilters = restored?.library
+    ? useBrowsePreferences.getState().profiles[scope]?.libraries[
+        restored.library
+      ]
+    : undefined;
+  const restoreScroll = useRef(restored?.scroll);
+  const sectionSort = useBrowsePreferences(
+    (state) => state.profiles[scope]?.sectionSort,
+  );
+  const updateLibraryPreferences = useBrowsePreferences(
+    (state) => state.updateLibrary,
+  );
+  const sortSection = useBrowsePreferences((state) => state.sortSection);
   const searchParams = useSearchQuery();
   const [search] = searchParams;
   const debouncedSearch = useDebounce(search.trim(), 300);
@@ -73,15 +99,14 @@ export function HomePage() {
   const [activeFeed, setActiveFeed] = useState<{
     id: string;
     title: string;
-  } | null>(null);
+  } | null>(restored?.feed ?? null);
+  const activeFeedSort = activeFeed ? sectionSort?.[activeFeed.id] : undefined;
   const [genres, setGenres] = useState<string[]>([]);
   const [allGenres, setAllGenres] = useState(false);
   const [randomLoading, setRandomLoading] = useState(false);
   const [randomError, setRandomError] = useState("");
   const randomController = useRef<AbortController>();
   useEffect(() => () => randomController.current?.abort(), []);
-  const session = useJellyfinAuth((state) => state.session);
-  const scope = homePreferenceScope(session);
   const preferences = useHomePreferences(
     (state) => state.profiles[scope] ?? defaultHomePreferences,
   );
@@ -91,16 +116,24 @@ export function HomePage() {
     () => orderedHomeSections(sections, preferences),
     [sections, preferences],
   );
-  const [activeLibrary, setActiveLibrary] = useState("");
+  const [activeLibrary, setActiveLibrary] = useState(restored?.library ?? "");
   const [libraryFilters, setLibraryFilters] = useState<LibraryFilters>({
     Genres: [],
     Years: [],
   });
-  const [sortBy, setSortBy] = useState<LibrarySortBy>("SortName");
-  const [sortOrder, setSortOrder] = useState<LibrarySortOrder>("Ascending");
-  const [statusFilter, setStatusFilter] = useState<LibraryStatus>("all");
-  const [genreFilter, setGenreFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
+  const [sortBy, setSortBy] = useState<LibraryBrowseSort>(
+    savedFilters?.sortBy ?? "SortName",
+  );
+  const [sortOrder, setSortOrder] = useState<LibrarySortOrder>(
+    savedFilters?.sortOrder ?? "Ascending",
+  );
+  const [statusFilter, setStatusFilter] = useState<LibraryStatus>(
+    savedFilters?.status ?? "all",
+  );
+  const [genreFilter, setGenreFilter] = useState(
+    savedFilters?.genre ?? restored?.genre ?? "",
+  );
+  const [yearFilter, setYearFilter] = useState(savedFilters?.year ?? "");
   const [results, setResults] = useState<JellyfinItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [nextStartIndex, setNextStartIndex] = useState(0);
@@ -111,6 +144,68 @@ export function HomePage() {
   const [resultError, setResultError] = useState("");
   const [revision, setRevision] = useState(0);
   const requestGeneration = useRef(0);
+  const [resultsLoaded, setResultsLoaded] = useState(false);
+  const sessionView = useRef({
+    library: activeLibrary,
+    feed: activeFeed,
+    genre: genreFilter,
+  });
+  sessionView.current = {
+    library: activeLibrary,
+    feed: activeFeed,
+    genre: genreFilter,
+  };
+  useEffect(() => {
+    const path = window.location.pathname;
+    let timer: ReturnType<typeof setTimeout>;
+    const save = () =>
+      saveBrowseSession(scope, path, {
+        ...sessionView.current,
+        scroll: window.scrollY,
+      });
+    const scrolled = () => {
+      clearTimeout(timer);
+      timer = setTimeout(save, 300);
+    };
+    window.addEventListener("scroll", scrolled, { passive: true });
+    window.addEventListener("pagehide", save);
+    return () => {
+      clearTimeout(timer);
+      save();
+      window.removeEventListener("scroll", scrolled);
+      window.removeEventListener("pagehide", save);
+    };
+  }, [scope]);
+  useEffect(() => {
+    if (!activeLibrary) return;
+    updateLibraryPreferences(scope, activeLibrary, {
+      sortBy,
+      sortOrder,
+      status: statusFilter,
+      genre: genreFilter,
+      year: yearFilter,
+    });
+  }, [
+    scope,
+    activeLibrary,
+    sortBy,
+    sortOrder,
+    statusFilter,
+    genreFilter,
+    yearFilter,
+    updateLibraryPreferences,
+  ]);
+  useEffect(() => {
+    if (
+      restoreScroll.current === undefined ||
+      loading ||
+      ((activeLibrary || activeFeed) && !resultsLoaded)
+    )
+      return;
+    const value = restoreScroll.current;
+    restoreScroll.current = undefined;
+    requestAnimationFrame(() => window.scrollTo(0, value));
+  }, [loading, activeLibrary, activeFeed, resultsLoaded]);
   const enableFeatured = usePreferencesStore((state) => state.enableFeatured);
 
   useEffect(() => {
@@ -195,19 +290,37 @@ export function HomePage() {
           FetchedCount: items.length,
         }))
       : activeFeed
-        ? getHomeFeedPage(activeFeed.id, 0, genreFilter, controller.signal)
+        ? getHomeFeedPage(
+            activeFeed.id,
+            0,
+            genreFilter,
+            controller.signal,
+            60,
+            activeFeedSort,
+          )
         : currentLibrary
-          ? getLibraryPage(
-              currentLibrary,
-              {
-                sortBy,
-                sortOrder,
-                status: statusFilter,
-                genre: genreFilter,
-                year: yearFilter ? Number(yearFilter) : undefined,
-              },
-              controller.signal,
-            )
+          ? sortBy === "SeriesLength"
+            ? getSeriesLengthPage(
+                currentLibrary.Id,
+                {
+                  sortOrder,
+                  status: statusFilter,
+                  genre: genreFilter,
+                  year: yearFilter ? Number(yearFilter) : undefined,
+                },
+                controller.signal,
+              )
+            : getLibraryPage(
+                currentLibrary,
+                {
+                  sortBy,
+                  sortOrder,
+                  status: statusFilter,
+                  genre: genreFilter,
+                  year: yearFilter ? Number(yearFilter) : undefined,
+                },
+                controller.signal,
+              )
           : Promise.resolve({
               Items: [] as JellyfinItem[],
               TotalRecordCount: 0,
@@ -229,13 +342,17 @@ export function HomePage() {
           );
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoadingResults(false);
+        if (!controller.signal.aborted) {
+          setLoadingResults(false);
+          setResultsLoaded(true);
+        }
       });
     return () => controller.abort();
   }, [
     debouncedSearch,
     activeLibrary,
     activeFeed,
+    activeFeedSort,
     currentLibrary,
     sortBy,
     sortOrder,
@@ -254,15 +371,30 @@ export function HomePage() {
     setResultError("");
     try {
       const next = activeFeed
-        ? await getHomeFeedPage(activeFeed.id, nextStartIndex, genreFilter)
-        : await getLibraryPage(currentLibrary!, {
-            startIndex: nextStartIndex,
-            sortBy,
-            sortOrder,
-            status: statusFilter,
-            genre: genreFilter,
-            year: yearFilter ? Number(yearFilter) : undefined,
-          });
+        ? await getHomeFeedPage(
+            activeFeed.id,
+            nextStartIndex,
+            genreFilter,
+            undefined,
+            60,
+            activeFeedSort,
+          )
+        : sortBy === "SeriesLength"
+          ? await getSeriesLengthPage(currentLibrary!.Id, {
+              startIndex: nextStartIndex,
+              sortOrder,
+              status: statusFilter,
+              genre: genreFilter,
+              year: yearFilter ? Number(yearFilter) : undefined,
+            })
+          : await getLibraryPage(currentLibrary!, {
+              startIndex: nextStartIndex,
+              sortBy,
+              sortOrder,
+              status: statusFilter,
+              genre: genreFilter,
+              year: yearFilter ? Number(yearFilter) : undefined,
+            });
       if (generation !== requestGeneration.current) return;
       setResults((current) => uniqueLibraryItems([...current, ...next.Items]));
       setTotalResults(next.TotalRecordCount ?? totalResults);
@@ -312,11 +444,14 @@ export function HomePage() {
   const switchLibrary = (id: string) => {
     setActiveLibrary(id);
     setActiveFeed(null);
-    setSortBy("SortName");
-    setSortOrder("Ascending");
-    setStatusFilter("all");
-    setGenreFilter("");
-    setYearFilter("");
+    const saved =
+      useBrowsePreferences.getState().profiles[scope]?.libraries[id] ??
+      defaultLibraryBrowse;
+    setSortBy(saved.sortBy);
+    setSortOrder(saved.sortOrder);
+    setStatusFilter(saved.status);
+    setGenreFilter(saved.genre);
+    setYearFilter(saved.year);
     setLibraryFilters({ Genres: [], Years: [] });
   };
   const seeAll = (section: { id: string; title: string }) => {
@@ -419,12 +554,34 @@ export function HomePage() {
           >
             Random movie
           </Button>
+          {!searching ? (
+            <>
+              <Button
+                theme="secondary"
+                onClick={() =>
+                  seeAll({ id: "recent", title: "Recently added" })
+                }
+              >
+                Recently added
+              </Button>
+              <Button
+                theme="secondary"
+                onClick={() => seeAll({ id: "completed", title: "Completed" })}
+              >
+                Completed
+              </Button>
+            </>
+          ) : null}
           {activeFeed ? (
             <Button theme="secondary" onClick={() => switchLibrary("")}>
               Back to home
             </Button>
           ) : null}
         </div>
+        <LibraryCollections
+          onOpen={(id) => setSelectedItem(id)}
+          onChanged={() => setRevision((value) => value + 1)}
+        />
         {randomError ? (
           <p role="alert" className="pb-4 text-center">
             {randomError}
@@ -466,6 +623,8 @@ export function HomePage() {
               preferences={preferences}
               onChange={(changes) => updatePreferences(scope, changes)}
               onReset={() => resetPreferences(scope)}
+              sectionSort={sectionSort}
+              onSort={(id, sort) => sortSection(scope, id, sort)}
             />
           </div>
         ) : null}
@@ -508,13 +667,16 @@ export function HomePage() {
                     className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
                     value={sortBy}
                     onChange={(event) =>
-                      setSortBy(event.target.value as LibrarySortBy)
+                      setSortBy(event.target.value as LibraryBrowseSort)
                     }
                   >
                     <option value="SortName">Title</option>
                     <option value="DateCreated">Date added</option>
                     <option value="ProductionYear">Release year</option>
                     <option value="CommunityRating">Rating</option>
+                    {currentLibrary.CollectionType === "tvshows" ? (
+                      <option value="SeriesLength">Total series length</option>
+                    ) : null}
                     {currentLibrary.CollectionType !== "boxsets" &&
                     currentLibrary.CollectionType !== "tvshows" ? (
                       <option value="Runtime">Runtime</option>
@@ -693,6 +855,7 @@ export function HomePage() {
                     key={section.id}
                     {...section}
                     preferences={preferences}
+                    sort={sectionSort?.[section.id]}
                     onSeeAll={() => seeAll(section)}
                     onSelect={selectItem}
                     onItemChanged={() => setRevision((value) => value + 1)}

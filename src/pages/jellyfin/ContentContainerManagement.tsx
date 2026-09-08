@@ -44,6 +44,7 @@ export function ContentContainerManagement({
   const [needsReload, setNeedsReload] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [draggedEntry, setDraggedEntry] = useState<string>();
   const [remove, setRemove] = useState<ContainerEntry | null>(null);
   const containerId = item.Id;
   const containerType = item.Type;
@@ -253,7 +254,57 @@ export function ContentContainerManagement({
             return (
               <div
                 key={key}
-                className="flex flex-wrap items-center gap-2 rounded-lg bg-background-secondary/50 p-3"
+                className={`flex flex-wrap items-center gap-2 rounded-lg bg-background-secondary/50 p-3 ${draggedEntry === entry.PlaylistItemId ? "opacity-50" : ""}`}
+                draggable={movable && !busy && !needsReload}
+                onDragStart={(event) => {
+                  if (!movable) return;
+                  event.dataTransfer.setData(
+                    "application/x-moviefin-playlist-entry",
+                    JSON.stringify({
+                      playlistId: item.Id,
+                      entryId: entry.PlaylistItemId,
+                    }),
+                  );
+                  event.dataTransfer.effectAllowed = "move";
+                  setDraggedEntry(entry.PlaylistItemId);
+                }}
+                onDragEnd={() => setDraggedEntry(undefined)}
+                onDragOver={(event) => {
+                  if (
+                    movable &&
+                    !busy &&
+                    !needsReload &&
+                    event.dataTransfer.types.includes(
+                      "application/x-moviefin-playlist-entry",
+                    )
+                  ) {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = "move";
+                  }
+                }}
+                onDrop={(event) => {
+                  if (!movable || busy || needsReload) return;
+                  event.preventDefault();
+                  setDraggedEntry(undefined);
+                  try {
+                    const data = JSON.parse(
+                      event.dataTransfer.getData(
+                        "application/x-moviefin-playlist-entry",
+                      ),
+                    );
+                    if (
+                      data.playlistId !== item.Id ||
+                      data.entryId === entry.PlaylistItemId
+                    )
+                      return;
+                    const source = entries.find(
+                      (candidate) => candidate.PlaylistItemId === data.entryId,
+                    );
+                    if (source) moveEntry(source, entry.PlaylistIndex);
+                  } catch {
+                    /* Unrelated drag data is ignored. */
+                  }
+                }}
               >
                 <span className="min-w-0 flex-1 truncate text-sm text-white">
                   {entry.Name}

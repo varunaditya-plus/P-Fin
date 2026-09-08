@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
 import { JellyfinItem, getImageUrl } from "@/backend/jellyfin/client";
+import {
+  getContainerPresentation,
+  libraryDragType,
+} from "@/backend/jellyfin/collections";
 import { getJellyfinDetailsTarget } from "@/backend/jellyfin/details";
+import { SeriesLengthItem } from "@/backend/jellyfin/seriesLength";
 import { MediaCard, MediaCardSkeleton } from "@/components/media/MediaCard";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { CarouselNavButtons } from "@/pages/discover/components/CarouselNavButtons";
@@ -42,48 +47,132 @@ export function JellyfinMediaCard({
   onItemChanged?: () => void;
 }) {
   const [userData, setUserData] = useState(item.UserData);
+  const holder = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  const [presentation, setPresentation] = useState<{
+    count: number;
+    items: JellyfinItem[];
+  }>();
+  const containerType =
+    item.Type === "BoxSet" || item.Type === "Playlist" ? item.Type : undefined;
+  useEffect(() => {
+    if (!containerType || !holder.current) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(holder.current);
+    return () => observer.disconnect();
+  }, [containerType]);
+  useEffect(() => {
+    if (
+      !containerType ||
+      !visible ||
+      (item.ChildCount !== undefined && item.ImageTags?.Primary)
+    )
+      return undefined;
+    const controller = new AbortController();
+    getContainerPresentation(containerType, item.Id, controller.signal)
+      .then((value) => {
+        if (!controller.signal.aborted) setPresentation(value);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [
+    containerType,
+    item.Id,
+    item.ChildCount,
+    item.ImageTags?.Primary,
+    visible,
+  ]);
+  const count = item.ChildCount ?? presentation?.count;
+  const artwork = !item.ImageTags?.Primary
+    ? (presentation?.items
+        .map((child) => getImageUrl(child, "Primary", 240))
+        .filter(Boolean) ?? [])
+    : [];
+  const seriesLength = item as SeriesLengthItem;
+  const seriesHours = Math.round(
+    (seriesLength.TotalSeriesRunTimeTicks ?? 0) / 36000000000,
+  );
+
   useEffect(() => setUserData(item.UserData), [item.UserData]);
   const currentItem = { ...item, UserData: userData };
   const position = userData?.PlaybackPositionTicks ?? 0;
   return (
-    <MediaCard
-      linkable
-      kindLabel={
-        item.Type === "BoxSet"
-          ? `Collection${item.ChildCount !== undefined ? ` · ${item.ChildCount} titles` : ""}`
-          : item.Type === "Playlist"
-            ? `Playlist${item.ChildCount !== undefined ? ` · ${item.ChildCount} items` : ""}`
+    <div
+      ref={holder}
+      draggable={!containerType}
+      onDragStart={(event) => {
+        event.dataTransfer.setData(libraryDragType, JSON.stringify([item.Id]));
+        event.dataTransfer.effectAllowed = "copy";
+      }}
+    >
+      <MediaCard
+        linkable
+        posterContent={
+          artwork.length ? (
+            <div
+              className={`grid h-full ${artwork.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}
+            >
+              {[...new Set(artwork)].map((image) => (
+                <img
+                  key={image}
+                  src={image}
+                  alt=""
+                  className="h-full min-h-0 w-full object-cover"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          ) : undefined
+        }
+        kindLabel={
+          item.Type === "BoxSet"
+            ? `Collection${count !== undefined ? ` · ${count} titles` : ""}`
+            : item.Type === "Playlist"
+              ? `Playlist${count !== undefined ? ` · ${count} items` : ""}`
+              : seriesLength.AvailableEpisodeCount !== undefined
+                ? `${seriesLength.AvailableEpisodeCount} episodes${(seriesLength.TotalSeriesRunTimeTicks ?? 0) > 0 ? ` · ${seriesHours || "<1"}h` : ""}`
+                : undefined
+        }
+        media={jellyfinMediaItem(item)}
+        percentage={
+          position && item.RunTimeTicks
+            ? Math.min(100, (position / item.RunTimeTicks) * 100)
+            : item.Type === "Series" && (userData?.PlayedPercentage ?? 0) > 0
+              ? userData?.PlayedPercentage
+              : undefined
+        }
+        series={
+          item.Type === "Episode"
+            ? {
+                episode: item.IndexNumber ?? 1,
+                season: item.ParentIndexNumber,
+                episodeId: item.Id,
+                seasonId: item.SeasonId || "",
+              }
             : undefined
-      }
-      media={jellyfinMediaItem(item)}
-      percentage={
-        position && item.RunTimeTicks
-          ? Math.min(100, (position / item.RunTimeTicks) * 100)
-          : undefined
-      }
-      series={
-        item.Type === "Episode"
-          ? {
-              episode: item.IndexNumber ?? 1,
-              season: item.ParentIndexNumber,
-              episodeId: item.Id,
-              seasonId: item.SeasonId || "",
-            }
-          : undefined
-      }
-      onShowDetails={() => onSelect(getJellyfinDetailsTarget(currentItem))}
-      renderContextMenu={(close) => (
-        <JellyfinCardMenu
-          item={currentItem}
-          onSelect={onSelect}
-          close={close}
-          onChanged={(data) => {
-            setUserData(data);
-            onItemChanged?.();
-          }}
-        />
-      )}
-    />
+        }
+        onShowDetails={() => onSelect(getJellyfinDetailsTarget(currentItem))}
+        renderContextMenu={(close) => (
+          <JellyfinCardMenu
+            item={currentItem}
+            onSelect={onSelect}
+            close={close}
+            onChanged={(data) => {
+              setUserData(data);
+              onItemChanged?.();
+            }}
+          />
+        )}
+      />
+    </div>
   );
 }
 
