@@ -16,6 +16,7 @@ import { PictureSettingsView } from "@/components/player/enhancements/PictureSet
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { TranscriptView } from "@/components/player/subtitleTools/TranscriptView";
 import { Transition } from "@/components/utils/Transition";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
@@ -160,6 +161,13 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
       </Menu.BackLink>
       <Menu.Section className="pb-4">
         {kind === "Subtitle" ? (
+          <Menu.ChevronLink
+            onClick={() => router.navigate("/captions/transcript")}
+          >
+            Transcript and translation
+          </Menu.ChevronLink>
+        ) : null}
+        {kind === "Subtitle" ? (
           <SelectableLink
             selected={subtitleIndex === -1}
             onClick={() => choose(-1)}
@@ -295,6 +303,14 @@ export function JellyfinSettingsRouter() {
         </OverlayPage>
         <OverlayPage id="settings" path="/audio-boost" width={343} height={496}>
           <AudioBoostSettingsView />
+        </OverlayPage>
+        <OverlayPage
+          id="settings"
+          path="/captions/transcript"
+          width={443}
+          height={560}
+        >
+          <TranscriptView />
         </OverlayPage>
         <OverlayPage id="settings" path="/controller" width={443} height={496}>
           <Menu.CardWithScrollable>
