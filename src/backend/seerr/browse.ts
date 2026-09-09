@@ -3,6 +3,8 @@ import { SeerrMedia, SeerrMediaType, SeerrPage } from "@/backend/seerr/types";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { matchesSeerrSession, useSeerrConnection } from "@/stores/seerr";
 
+import { createSharedRequest } from "./sharedRequest";
+
 export interface SeerrPerson {
   id: number;
   name: string;
@@ -39,6 +41,9 @@ export function uniqueSeerrMedia(items: SeerrMedia[]) {
 }
 
 const pages = new Map<string, { at: number; value: SeerrPage }>();
+const sharedPage = createSharedRequest<SeerrPage>();
+const readVersions = new Map<string, number>();
+let forcedRead = 0;
 
 export function cachedSeerrPage(path: string) {
   const key = connectionKey();
@@ -50,43 +55,60 @@ export async function getCachedSeerrPage(
   signal?: AbortSignal,
   force = false,
 ) {
+  signal?.throwIfAborted();
   const identity = connectionKey();
   // Always go through the authenticated API guard when Seerr has been disabled.
   if (!identity) return getSeerrPage(path, signal);
   const key = `${identity}:${path}`;
   const cached = pages.get(key);
   if (!force && cached && Date.now() - cached.at < 45_000) return cached.value;
-  const page = await getSeerrPage(path, signal);
-  const value = { ...page, results: uniqueSeerrMedia(page.results) };
-  signal?.throwIfAborted();
-  if (connectionKey() === identity) {
-    if (pages.size >= 40) pages.delete(pages.keys().next().value!);
-    pages.set(key, { at: Date.now(), value });
-  }
-  return value;
+  if (force) forcedRead += 1;
+  return sharedPage(
+    force ? `${key}:refresh:${forcedRead}` : key,
+    signal,
+    async (sharedSignal) => {
+      const version = (readVersions.get(key) ?? 0) + 1;
+      readVersions.set(key, version);
+      const page = await getSeerrPage(path, sharedSignal);
+      sharedSignal.throwIfAborted();
+      const value = { ...page, results: uniqueSeerrMedia(page.results) };
+      if (connectionKey() === identity && readVersions.get(key) === version) {
+        if (pages.size >= 40) pages.delete(pages.keys().next().value!);
+        pages.set(key, { at: Date.now(), value });
+      }
+      return value;
+    },
+  );
 }
 
 export async function randomSeerrMedia(
   type: SeerrMediaType,
   signal?: AbortSignal,
-  random = Math.random,
+  random?: () => number,
+  endpointOverride?: string,
 ) {
-  const endpoint = type === "movie" ? "/discover/movies" : "/discover/tv";
+  const choose = random ?? Math.random;
+  const endpoint =
+    endpointOverride ??
+    (type === "movie" ? "/discover/movies" : "/discover/tv");
   const first = await getCachedSeerrPage(endpoint, signal);
   const totalPages = Math.max(1, Math.min(first.totalPages || 1, 500));
   const pageNumber =
-    1 + Math.min(totalPages - 1, Math.floor(random() * totalPages));
+    1 + Math.min(totalPages - 1, Math.floor(choose() * totalPages));
   const page =
     pageNumber === 1
       ? first
-      : await getCachedSeerrPage(`${endpoint}?page=${pageNumber}`, signal);
+      : await getCachedSeerrPage(
+          `${endpoint}${endpoint.includes("?") ? "&" : "?"}page=${pageNumber}`,
+          signal,
+        );
   const candidates = page.results.filter((item) => item.mediaType === type);
   const available = candidates.length
     ? candidates
     : first.results.filter((item) => item.mediaType === type);
   return (
     available[
-      Math.min(available.length - 1, Math.floor(random() * available.length))
+      Math.min(available.length - 1, Math.floor(choose() * available.length))
     ] ?? null
   );
 }

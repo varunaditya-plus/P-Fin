@@ -56,7 +56,7 @@ describe("Seerr browsing", () => {
     ).resolves.toMatchObject({ id: 251 });
     expect(getSeerrPage).toHaveBeenLastCalledWith(
       "/discover/movies?page=251",
-      undefined,
+      expect.any(AbortSignal),
     );
   });
 
