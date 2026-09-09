@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.19",
+    "@huggingface/transformers": "3.8.1",
     "@ladjs/country-language": "^1.0.3",
     "@react-spring/web": "^9.7.5",
     "@sozialhelden/ietf-language-tags": "^5.4.2",

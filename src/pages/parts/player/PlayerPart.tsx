@@ -14,6 +14,7 @@ import {
   JellyfinSettingsRouter,
 } from "@/components/player/jellyfin/JellyfinControls";
 import { PauseOverlay } from "@/components/player/overlays/PauseOverlay";
+import { SubtitleAutoSyncRuntime } from "@/components/player/subtitleTools/AutoSync";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
@@ -78,6 +79,7 @@ export function PlayerPart(props: PlayerPartProps) {
       {props.children}
       <GamepadEvents />
       <PlaybackEnhancements />
+      <SubtitleAutoSyncRuntime />
       <PauseOverlay />
       <Player.BlackOverlay
         show={showTargets && status === playerStatus.PLAYING}

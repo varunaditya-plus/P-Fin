@@ -16,6 +16,7 @@ import { PictureSettingsView } from "@/components/player/enhancements/PictureSet
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { SubtitleSyncView } from "@/components/player/subtitleTools/AutoSync";
 import { TranscriptView } from "@/components/player/subtitleTools/TranscriptView";
 import { Transition } from "@/components/utils/Transition";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
@@ -168,6 +169,11 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
           </Menu.ChevronLink>
         ) : null}
         {kind === "Subtitle" ? (
+          <Menu.ChevronLink onClick={() => router.navigate("/captions/sync")}>
+            Synchronise subtitles
+          </Menu.ChevronLink>
+        ) : null}
+        {kind === "Subtitle" ? (
           <SelectableLink
             selected={subtitleIndex === -1}
             onClick={() => choose(-1)}
@@ -311,6 +317,14 @@ export function JellyfinSettingsRouter() {
           height={560}
         >
           <TranscriptView />
+        </OverlayPage>
+        <OverlayPage
+          id="settings"
+          path="/captions/sync"
+          width={443}
+          height={560}
+        >
+          <SubtitleSyncView />
         </OverlayPage>
         <OverlayPage id="settings" path="/controller" width={443} height={496}>
           <Menu.CardWithScrollable>
