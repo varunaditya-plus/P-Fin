@@ -108,9 +108,9 @@ export function SettingsTransfer() {
                 setMessage("");
                 if (!upload) return;
                 try {
-                  if (upload.size > 512 * 1024)
+                  if (upload.size > 8 * 1024 * 1024)
                     throw new Error(
-                      "Choose a settings file smaller than 512 KB.",
+                      "Choose a settings file smaller than 8 MB.",
                     );
                   const parsed = JSON.parse(await upload.text());
                   if (version !== readVersion.current) return;

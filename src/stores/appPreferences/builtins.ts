@@ -32,6 +32,7 @@ import {
   LOCKED_SHORTCUT_IDS,
 } from "@/utils/keyboardShortcuts";
 
+import { registerBrowsePreferences } from "./browseSection";
 import { registerAppPreferenceSection } from "./registry";
 
 const booleans = [
@@ -236,6 +237,7 @@ let registered = false;
 export function registerBuiltinPreferences() {
   if (registered) return;
   registered = true;
+  registerBrowsePreferences();
   registerAppPreferenceSection("home", {
     label: "Library layout",
     defaults: defaultHomePreferences,

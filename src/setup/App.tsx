@@ -22,6 +22,7 @@ const JellyfinPlayerView = lazy(() => import("@/pages/JellyfinPlayerView"));
 const JellyfinSettings = lazy(
   () => import("@/pages/jellyfin/JellyfinSettings"),
 );
+const TastePage = lazy(() => import("@/pages/taste/TastePage"));
 const SeerrDiscover = lazy(() =>
   import("@/pages/discover/SeerrDiscover").then((module) => ({
     default: module.SeerrDiscover,
@@ -150,6 +151,7 @@ export default function App() {
                     element={<JellyfinPlayerView />}
                   />
                   <Route path="/settings" element={<JellyfinSettings />} />
+                  <Route path="/taste" element={<TastePage />} />
                   <Route
                     path="/media/*"
                     element={<Navigate to="/" replace />}
