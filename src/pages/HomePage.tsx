@@ -41,6 +41,8 @@ import { LibraryCollections } from "@/pages/jellyfin/LibraryCollections";
 import { HomeLayout } from "@/pages/layouts/HomeLayout";
 import { HeroPart } from "@/pages/parts/home/HeroPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
+import { usePersonalRecommendations } from "@/pages/taste/usePersonalRecommendations";
+import { useTasteView } from "@/pages/taste/viewPreferences";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import {
   LibraryBrowseSort,
@@ -63,6 +65,7 @@ export function HomePage() {
   const [showBg, setShowBg] = useState(false);
   const session = useJellyfinAuth((state) => state.session);
   const scope = homePreferenceScope(session);
+  const tasteView = useTasteView();
   const [restored] = useState(() =>
     readBrowseSession(scope, window.location.pathname),
   );
@@ -411,7 +414,19 @@ export function HomePage() {
     }
   };
 
+  const recommendations = usePersonalRecommendations(
+    "library",
+    tasteView.type,
+    tasteView.library || enableFeatured,
+    revision,
+  );
+  const forYou =
+    tasteView.library && !search.trim() && !activeLibrary && !activeFeed;
   const featured = useMemo(() => {
+    if (recommendations.hasSignals && recommendations.hero.length)
+      return recommendations.hero
+        .map((candidate) => candidate.item)
+        .filter((item) => getImageUrl(item, "Backdrop"));
     const seen = new Set<string>();
     return sections
       .flatMap((section) => section.items)
@@ -426,7 +441,7 @@ export function HomePage() {
         return true;
       })
       .slice(0, 10);
-  }, [sections]);
+  }, [sections, recommendations.hasSignals, recommendations.hero]);
 
   const selectItem = (
     item: JellyfinItem,
@@ -442,6 +457,7 @@ export function HomePage() {
   const hasLibraryFilters =
     statusFilter !== "all" || Boolean(genreFilter) || Boolean(yearFilter);
   const switchLibrary = (id: string) => {
+    useTasteView.setState({ library: false });
     setActiveLibrary(id);
     setActiveFeed(null);
     const saved =
@@ -525,11 +541,22 @@ export function HomePage() {
         <div className="pb-4 w-full max-w-screen-xl mx-auto">
           <div className="relative flex justify-center">
             <div className="flex space-x-4 overflow-x-auto px-4 scrollbar-none">
+              <button
+                type="button"
+                aria-pressed={forYou}
+                className={`text-xl md:text-2xl font-bold p-2 rounded-full whitespace-nowrap tabbable ${forYou ? "text-type-link" : "text-type-secondary"}`}
+                onClick={() => {
+                  switchLibrary("");
+                  useTasteView.setState({ library: true });
+                }}
+              >
+                For you
+              </button>
               {[{ Id: "", Name: "Home" }, ...libraries].map((library) => (
                 <button
                   key={library.Id}
                   type="button"
-                  className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id && !activeFeed ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
+                  className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id && !activeFeed && !forYou ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
                   onClick={() => switchLibrary(library.Id)}
                 >
                   {library.Name}
@@ -578,6 +605,24 @@ export function HomePage() {
             </Button>
           ) : null}
         </div>
+        {forYou ? (
+          <div className="flex flex-wrap justify-center gap-3 py-3">
+            <Button theme="secondary" href="/taste">
+              My taste
+            </Button>
+            {(["movie", "tv"] as const).map((type) => (
+              <button
+                type="button"
+                key={type}
+                aria-pressed={tasteView.type === type}
+                className={`tabbable rounded-full px-4 py-2 ${tasteView.type === type ? "bg-buttons-primary text-white" : "text-type-secondary"}`}
+                onClick={() => useTasteView.setState({ type })}
+              >
+                {type === "movie" ? "Movies" : "TV shows"}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <LibraryCollections
           onOpen={(id) => setSelectedItem(id)}
           onChanged={() => setRevision((value) => value + 1)}
@@ -587,7 +632,7 @@ export function HomePage() {
             {randomError}
           </p>
         ) : null}
-        {!showingGrid ? (
+        {!showingGrid && !forYou ? (
           <div className="mb-6 space-y-4">
             {genres.length ? (
               <div
@@ -645,7 +690,55 @@ export function HomePage() {
           </div>
         </WideContainer>
       ) : null}
-      {showingGrid ? (
+      {forYou ? (
+        <WideContainer>
+          {recommendations.loading ? (
+            <p role="status" className="py-8 text-center">
+              Finding titles for you…
+            </p>
+          ) : null}
+          {recommendations.error ? (
+            <div role="alert" className="py-8 text-center">
+              <p>{recommendations.error}</p>
+              <Button
+                theme="secondary"
+                onClick={() => setRevision((value) => value + 1)}
+              >
+                Try again
+              </Button>
+            </div>
+          ) : null}
+          {!recommendations.loading && !recommendations.hasSignals ? (
+            <div className="py-10 text-center space-y-4">
+              <p>
+                Rate a few titles or choose your favourite genres to personalise
+                your library.
+              </p>
+              <Button href="/taste">Shape my recommendations</Button>
+            </div>
+          ) : null}
+          {recommendations.rows.map((row) => (
+            <section key={row.id} className="py-4">
+              <p className="px-4 text-sm text-type-secondary">
+                {row.description}
+              </p>
+              <JellyfinMediaCarousel
+                id={`foryou-${row.id}`}
+                title={row.title}
+                items={row.items.map((candidate) => candidate.item)}
+                onSelect={selectItem}
+              />
+            </section>
+          ))}
+          {!recommendations.loading &&
+          recommendations.hasSignals &&
+          !recommendations.rows.length ? (
+            <p className="py-10 text-center">
+              No new matching titles are available in your Jellyfin library yet.
+            </p>
+          ) : null}
+        </WideContainer>
+      ) : showingGrid ? (
         <WideContainer>
           <div className="pb-12 pt-8">
             <h2 className="text-2xl font-bold text-white mb-8">

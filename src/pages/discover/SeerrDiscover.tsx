@@ -36,6 +36,8 @@ import { MediaCard, MediaCardSkeleton } from "@/components/media/MediaCard";
 import { useFeaturedSlideTransition } from "@/hooks/useFeaturedSlideTransition";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
+import { usePersonalRecommendations } from "@/pages/taste/usePersonalRecommendations";
+import { useTasteView } from "@/pages/taste/viewPreferences";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { matchesSeerrSession, useSeerrConnection } from "@/stores/seerr";
 
@@ -397,6 +399,7 @@ function SeerrLibraryDiscover() {
   const session = useJellyfinAuth((state) => state.session);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const tasteView = useTasteView();
   const [user, setUser] = useState<SeerrUser>();
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
@@ -602,6 +605,13 @@ function SeerrLibraryDiscover() {
     return () => controller.abort();
   }, [category, user, unauthorized, filtersActive, filteredEndpoint]);
 
+  const recommendations = usePersonalRecommendations(
+    "seerr",
+    category,
+    Boolean(user) && tasteView.seerr,
+    refresh,
+  );
+  const personal = tasteView.seerr && !debouncedQuery;
   const requested = (details: SeerrDetails) => {
     setSelected(details);
     setRefresh((value) => value + 1);
@@ -649,7 +659,16 @@ function SeerrLibraryDiscover() {
         <>
           {!debouncedQuery && (
             <div className="!mt-[-170px]">
-              <SeerrFeatured media={featured} onShowDetails={setSelected} />
+              <SeerrFeatured
+                media={
+                  personal &&
+                  recommendations.hasSignals &&
+                  recommendations.hero.length
+                    ? recommendations.hero.map((candidate) => candidate.item)
+                    : featured
+                }
+                onShowDetails={setSelected}
+              />
             </div>
           )}
           <div className="relative z-20 px-4 md:px-10 min-h-screen">
@@ -662,7 +681,20 @@ function SeerrLibraryDiscover() {
                 hideTooltip
               />
             </div>
-            <div className="flex justify-center gap-3 pb-6">
+            <div className="flex flex-wrap justify-center gap-3 pb-6">
+              <Button
+                theme="secondary"
+                onClick={() =>
+                  useTasteView.setState({ seerr: !tasteView.seerr })
+                }
+              >
+                {tasteView.seerr ? "Browse discovery" : "For you"}
+              </Button>
+              {tasteView.seerr ? (
+                <Button theme="secondary" href="/taste">
+                  My taste
+                </Button>
+              ) : null}
               <Button
                 theme="secondary"
                 loading={randomLoading}
@@ -736,78 +768,137 @@ function SeerrLibraryDiscover() {
                     </div>
                   </div>
                 </div>
-                <SeerrDiscoveryFilters
-                  type={category}
-                  filters={filters}
-                  onChange={changeFilters}
-                />
-                {filtersActive ? (
+                {personal ? (
                   <WideContainer ultraWide classNames="!px-0">
-                    {filterError ? (
-                      <p role="alert" className="px-8 py-8">
-                        {filterError}
+                    {recommendations.loading ? (
+                      <p role="status" className="py-8 text-center">
+                        Finding recommendations…
                       </p>
-                    ) : filteredEndpoint ? (
-                      <SeerrCarousel
-                        key={filteredEndpoint}
-                        title={
-                          category === "movie"
-                            ? "Discover movies"
-                            : "Discover TV shows"
-                        }
-                        endpoint={filteredEndpoint}
-                        onShowDetails={setSelected}
-                        onUnauthorized={unauthorized}
-                        refresh={refresh}
-                      />
-                    ) : (
-                      <div className="flex justify-center py-12">
-                        <Spinner />
+                    ) : null}
+                    {recommendations.error ? (
+                      <div role="alert" className="py-8 text-center">
+                        <p>{recommendations.error}</p>
+                        <Button
+                          onClick={() => setRefresh((value) => value + 1)}
+                        >
+                          Try again
+                        </Button>
                       </div>
-                    )}
+                    ) : null}
+                    {!recommendations.loading && !recommendations.hasSignals ? (
+                      <div className="py-8 text-center space-y-4">
+                        <p>Rate movies and shows to personalise discovery.</p>
+                        <Button href="/taste">Shape my recommendations</Button>
+                      </div>
+                    ) : null}
+                    {recommendations.rows.map((row) => (
+                      <section key={row.id} className="py-6">
+                        <h2 className="text-2xl font-bold text-white">
+                          {row.title}
+                        </h2>
+                        <p className="mt-2 mb-5 text-type-secondary text-sm">
+                          {row.description}
+                        </p>
+                        <div className="flex gap-4 overflow-x-auto pb-4">
+                          {row.items.map((candidate) => (
+                            <div
+                              className="w-36 md:w-44 shrink-0"
+                              key={candidate.media.key}
+                            >
+                              <SeerrCard
+                                media={candidate.item}
+                                onShowDetails={setSelected}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                    {!recommendations.loading &&
+                    recommendations.hasSignals &&
+                    !recommendations.rows.length ? (
+                      <p className="py-8 text-center">
+                        No new matching titles found. Adjust your taste
+                        preferences or try again later.
+                      </p>
+                    ) : null}
                   </WideContainer>
                 ) : (
-                  <WideContainer ultraWide classNames="!px-0">
-                    <SeerrCarousel
-                      title="Trending"
-                      endpoint="/discover/trending"
-                      onShowDetails={setSelected}
-                      onUnauthorized={unauthorized}
-                      refresh={refresh}
+                  <>
+                    <SeerrDiscoveryFilters
+                      type={category}
+                      filters={filters}
+                      onChange={changeFilters}
                     />
-                    <SeerrCarousel
-                      key={`popular-${category}`}
-                      title={
-                        category === "movie"
-                          ? "Popular movies"
-                          : "Popular TV shows"
-                      }
-                      endpoint={
-                        category === "movie"
-                          ? "/discover/movies"
-                          : "/discover/tv"
-                      }
-                      onShowDetails={setSelected}
-                      onUnauthorized={unauthorized}
-                      refresh={refresh}
-                    />
-                    <SeerrCarousel
-                      key={`upcoming-${category}`}
-                      title={
-                        category === "movie"
-                          ? "Upcoming movies"
-                          : "Upcoming TV shows"
-                      }
-                      endpoint={
-                        category === "movie"
-                          ? "/discover/movies/upcoming"
-                          : "/discover/tv/upcoming"
-                      }
-                      onShowDetails={setSelected}
-                      onUnauthorized={unauthorized}
-                      refresh={refresh}
-                    />
-                  </WideContainer>
+                    {filtersActive ? (
+                      <WideContainer ultraWide classNames="!px-0">
+                        {filterError ? (
+                          <p role="alert" className="px-8 py-8">
+                            {filterError}
+                          </p>
+                        ) : filteredEndpoint ? (
+                          <SeerrCarousel
+                            key={filteredEndpoint}
+                            title={
+                              category === "movie"
+                                ? "Discover movies"
+                                : "Discover TV shows"
+                            }
+                            endpoint={filteredEndpoint}
+                            onShowDetails={setSelected}
+                            onUnauthorized={unauthorized}
+                            refresh={refresh}
+                          />
+                        ) : (
+                          <div className="flex justify-center py-12">
+                            <Spinner />
+                          </div>
+                        )}
+                      </WideContainer>
+                    ) : (
+                      <WideContainer ultraWide classNames="!px-0">
+                        <SeerrCarousel
+                          title="Trending"
+                          endpoint="/discover/trending"
+                          onShowDetails={setSelected}
+                          onUnauthorized={unauthorized}
+                          refresh={refresh}
+                        />
+                        <SeerrCarousel
+                          key={`popular-${category}`}
+                          title={
+                            category === "movie"
+                              ? "Popular movies"
+                              : "Popular TV shows"
+                          }
+                          endpoint={
+                            category === "movie"
+                              ? "/discover/movies"
+                              : "/discover/tv"
+                          }
+                          onShowDetails={setSelected}
+                          onUnauthorized={unauthorized}
+                          refresh={refresh}
+                        />
+                        <SeerrCarousel
+                          key={`upcoming-${category}`}
+                          title={
+                            category === "movie"
+                              ? "Upcoming movies"
+                              : "Upcoming TV shows"
+                          }
+                          endpoint={
+                            category === "movie"
+                              ? "/discover/movies/upcoming"
+                              : "/discover/tv/upcoming"
+                          }
+                          onShowDetails={setSelected}
+                          onUnauthorized={unauthorized}
+                          refresh={refresh}
+                        />
+                      </WideContainer>
+                    )}
+                  </>
                 )}
               </>
             )}
