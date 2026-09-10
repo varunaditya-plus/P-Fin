@@ -16,6 +16,9 @@ import { PictureSettingsView } from "@/components/player/enhancements/PictureSet
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { ChromecastSettingsView } from "@/components/player/remote/JellyfinChromecast";
+import { SyncPlaySettingsView } from "@/components/player/remote/JellyfinSyncPlay";
+import { useSyncPlayState } from "@/components/player/remote/syncplay";
 import { SubtitleSyncView } from "@/components/player/subtitleTools/AutoSync";
 import { TranscriptView } from "@/components/player/subtitleTools/TranscriptView";
 import { Transition } from "@/components/utils/Transition";
@@ -73,6 +76,12 @@ function JellyfinSettingsMenu() {
         <Menu.ChevronLink onClick={() => router.navigate("/captions/settings")}>
           Subtitle appearance
         </Menu.ChevronLink>
+        <Menu.ChevronLink onClick={() => router.navigate("/cast")}>
+          Google Cast
+        </Menu.ChevronLink>
+        <Menu.ChevronLink onClick={() => router.navigate("/syncplay")}>
+          SyncPlay
+        </Menu.ChevronLink>
         <Menu.ChevronLink onClick={() => router.navigate("/controller")}>
           Controller
         </Menu.ChevronLink>
@@ -84,6 +93,7 @@ function JellyfinSettingsMenu() {
 function JellyfinPlaybackSettings() {
   const router = useOverlayRouter("settings");
   const display = usePlayerStore((state) => state.display);
+  const syncGroup = useSyncPlayState((state) => state.group);
   const rate = usePlayerStore((state) => state.mediaPlaying.playbackRate);
   const autoplay = usePreferencesStore((state) => state.enableAutoplay);
   const setAutoplay = usePreferencesStore((state) => state.setEnableAutoplay);
@@ -115,12 +125,18 @@ function JellyfinPlaybackSettings() {
               key={speed}
               type="button"
               className={`w-full px-2 py-1 rounded-md tabbable ${rate === speed ? "bg-video-context-light/20 text-white" : ""}`}
+              disabled={Boolean(syncGroup)}
               onClick={() => display?.setPlaybackRate(speed)}
             >
               {speed}x
             </button>
           ))}
         </div>
+        {syncGroup ? (
+          <p className="py-2 text-sm">
+            SyncPlay controls playback speed and the group queue.
+          </p>
+        ) : null}
         <Menu.Link
           rightSide={<Toggle enabled={autoplay} onClick={toggleAutoplay} />}
         >
@@ -220,7 +236,7 @@ export function JellyfinSettingsRouter() {
   return (
     <Overlay id="settings">
       <OverlayRouter id="settings">
-        <OverlayPage id="settings" path="/" width={343} height={420}>
+        <OverlayPage id="settings" path="/" width={343} height={496}>
           <JellyfinSettingsMenu />
         </OverlayPage>
         <OverlayPage id="settings" path="/quality" width={343} height={420}>
@@ -325,6 +341,12 @@ export function JellyfinSettingsRouter() {
           height={560}
         >
           <SubtitleSyncView />
+        </OverlayPage>
+        <OverlayPage id="settings" path="/cast" width={443} height={560}>
+          <ChromecastSettingsView />
+        </OverlayPage>
+        <OverlayPage id="settings" path="/syncplay" width={443} height={560}>
+          <SyncPlaySettingsView />
         </OverlayPage>
         <OverlayPage id="settings" path="/controller" width={443} height={496}>
           <Menu.CardWithScrollable>
@@ -486,6 +508,7 @@ export function JellyfinNextEpisode({
   const duration = usePlayerStore((state) => state.progress.duration);
   const status = usePlayerStore((state) => state.status);
   const autoplay = usePreferencesStore((state) => state.enableAutoplay);
+  const syncGroup = useSyncPlayState((state) => state.group);
   const advanced = useRef(false);
   const index = episodes.findIndex((episode) => episode.Id === itemId);
   const next = index >= 0 ? episodes[index + 1] : undefined;
@@ -495,6 +518,7 @@ export function JellyfinNextEpisode({
   useEffect(() => {
     if (
       !compact &&
+      !syncGroup &&
       autoplay &&
       next &&
       duration > 0 &&
@@ -504,8 +528,8 @@ export function JellyfinNextEpisode({
       advanced.current = true;
       playItem(next.Id, true);
     }
-  }, [compact, autoplay, next, time, duration, playItem]);
-  if (!next) return null;
+  }, [compact, autoplay, next, time, duration, playItem, syncGroup]);
+  if (!next || syncGroup) return null;
   if (compact)
     return (
       <VideoPlayerButton

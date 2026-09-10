@@ -1,0 +1,356 @@
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useSearchParams } from "react-router-dom";
+
+import { Menu } from "@/components/player/internals/ContextMenu";
+import { useJellyfinPlayback } from "@/components/player/jellyfin/JellyfinPlaybackContext";
+import { useOverlayRouter } from "@/hooks/useOverlayRouter";
+import { useJellyfinAuth } from "@/stores/jellyfin";
+import { playerStatus } from "@/stores/player/slices/source";
+import { usePlayerStore } from "@/stores/player/store";
+
+import { installPlaybackCommands, localPlayback } from "./playbackCommands";
+import { JellyfinSyncPlay, SyncPlayGroup, useSyncPlayState } from "./syncplay";
+
+const SyncContext = createContext<{
+  controller: JellyfinSyncPlay;
+  blocked: boolean;
+} | null>(null);
+
+export function JellyfinSyncPlayProvider({
+  children,
+  onPlayItem,
+  blocked = false,
+}: {
+  children: ReactNode;
+  onPlayItem: (itemId: string, startTicks: number) => void;
+  blocked?: boolean;
+}) {
+  const session = useJellyfinAuth((state) => state.session);
+  const [search] = useSearchParams();
+  const router = useOverlayRouter("settings");
+  const { playback } = useJellyfinPlayback();
+  const invitationShown = useRef(false);
+  useEffect(() => {
+    if (!playback || invitationShown.current || !search.get("syncplay")) return;
+    invitationShown.current = true;
+    router.open("/syncplay");
+  }, [playback, search, router]);
+  const groupId = useSyncPlayState((state) => state.group?.GroupId);
+  const [controller, setController] = useState<JellyfinSyncPlay | null>(null);
+  const load = useRef(onPlayItem);
+  load.current = onPlayItem;
+  useEffect(() => {
+    if (!session) return;
+    const next = new JellyfinSyncPlay(
+      {
+        snapshot: () => {
+          const state = usePlayerStore.getState();
+          const video = document.getElementById(
+            "video-element",
+          ) as HTMLVideoElement | null;
+          return {
+            itemId: state.meta?.jellyfinItemId,
+            seconds: state.progress.time,
+            playing: state.mediaPlaying.isPlaying,
+            ready:
+              state.status === playerStatus.PLAYING &&
+              Boolean(video && video.readyState >= 3 && !video.seeking),
+            rate: state.mediaPlaying.playbackRate,
+          };
+        },
+        pause: () =>
+          localPlayback(() => usePlayerStore.getState().display?.pause()),
+        play: () =>
+          localPlayback(() => usePlayerStore.getState().display?.play()),
+        seek: (time) =>
+          localPlayback(() => usePlayerStore.getState().display?.setTime(time)),
+        rate: (rate) =>
+          usePlayerStore.getState().display?.setPlaybackRate(rate),
+        load: (id, ticks) => load.current(id, ticks),
+      },
+      session,
+    );
+    setController(next);
+    let endedItem = "";
+    const timer = setInterval(() => {
+      const video = document.getElementById(
+        "video-element",
+      ) as HTMLVideoElement | null;
+      const key =
+        useSyncPlayState.getState().queue?.Playlist[
+          useSyncPlayState.getState().queue?.PlayingItemIndex ?? 0
+        ]?.PlaylistItemId ?? "";
+      if (video?.ended && key && key !== endedItem) {
+        endedItem = key;
+        next.action("NextItem");
+      }
+      next.tick();
+    }, 500);
+    return () => {
+      clearInterval(timer);
+      next.dispose();
+    };
+  }, [session]);
+  useEffect(() => {
+    if (!controller || !groupId) return;
+    let seekTimer: ReturnType<typeof setTimeout>;
+    const uninstall = installPlaybackCommands({
+      selectItem: (id, ticks) => {
+        controller
+          .selectItem(id, ticks)
+          .catch((cause: Error) =>
+            useSyncPlayState.setState({ error: cause.message }),
+          );
+      },
+      play: () => controller.action("Unpause"),
+      pause: () => controller.action("Pause"),
+      seek: (seconds) => {
+        clearTimeout(seekTimer);
+        seekTimer = setTimeout(() => controller.action("Seek", seconds), 150);
+      },
+    });
+    return () => {
+      clearTimeout(seekTimer);
+      uninstall();
+    };
+  }, [controller, groupId]);
+  const value = useMemo(
+    () => (controller ? { controller, blocked } : null),
+    [controller, blocked],
+  );
+  return <SyncContext.Provider value={value}>{children}</SyncContext.Provider>;
+}
+
+export function SyncPlayIndicator() {
+  const group = useSyncPlayState((state) => state.group);
+  const router = useOverlayRouter("settings");
+  if (!group) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => router.navigate("/syncplay")}
+      className="tabbable rounded-full bg-video-context-background px-4 py-2 text-sm text-white"
+    >
+      SyncPlay · {group.GroupName}
+    </button>
+  );
+}
+
+export function SyncPlaySettingsView() {
+  const context = useContext(SyncContext);
+  const state = useSyncPlayState();
+  const { itemId, episodes } = useJellyfinPlayback();
+  const router = useOverlayRouter("settings");
+  const [groups, setGroups] = useState<SyncPlayGroup[]>([]);
+  const [name, setName] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
+  const invitation = new URLSearchParams(window.location.search).get(
+    "syncplay",
+  );
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const refresh = async () => {
+    if (!context) return;
+    setGroups(await context.controller.list());
+  };
+  useEffect(() => {
+    let cancelled = false;
+    context?.controller
+      .list()
+      .then((result) => {
+        if (!cancelled) setGroups(result);
+      })
+      .catch((cause: Error) => {
+        if (!cancelled) setError(cause.message);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [context?.controller]);
+  const run = async (action: () => Promise<void>) => {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await action();
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "SyncPlay is unavailable.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Menu.CardWithScrollable>
+      <Menu.BackLink onClick={() => router.navigate("/")}>
+        SyncPlay
+      </Menu.BackLink>
+      <Menu.Section className="space-y-3 pb-5">
+        {state.group ? (
+          <>
+            <p className="text-white font-medium">{state.group.GroupName}</p>
+            <p className="text-sm text-type-secondary">
+              {state.group.State} · {state.ping} ms
+            </p>
+            <p className="text-sm">{state.group.Participants.join(", ")}</p>
+            <p className="text-sm text-type-secondary">
+              Play, pause and seek controls now control the group.
+            </p>
+            <Menu.Link
+              clickable
+              onClick={async () => {
+                const url = new URL(
+                  `/play/${encodeURIComponent(itemId)}`,
+                  window.location.origin,
+                );
+                url.searchParams.set("syncplay", state.group!.GroupId);
+                try {
+                  await navigator.clipboard.writeText(url.toString());
+                  setCopyStatus("Invite link copied.");
+                } catch {
+                  setCopyStatus(
+                    "Could not copy the invitation. Check clipboard access and try again.",
+                  );
+                }
+              }}
+            >
+              Copy invite link
+            </Menu.Link>
+            {copyStatus ? (
+              <p role="status" className="text-sm">
+                {copyStatus}
+              </p>
+            ) : null}
+            <p className="text-xs text-type-secondary">
+              Guests sign in with their own Jellyfin accounts and need access to
+              this title.
+            </p>
+            <Menu.Link
+              clickable
+              onClick={() => context?.controller.action("PreviousItem")}
+            >
+              Previous in group queue
+            </Menu.Link>
+            <Menu.Link
+              clickable
+              onClick={() => context?.controller.action("NextItem")}
+            >
+              Next in group queue
+            </Menu.Link>
+            <Menu.Link
+              clickable
+              onClick={() => context?.controller.action("Stop")}
+            >
+              Stop group playback
+            </Menu.Link>
+            <Menu.Link
+              clickable
+              disabled={busy}
+              onClick={() => {
+                if (context) run(() => context.controller.leave());
+              }}
+            >
+              Leave group
+            </Menu.Link>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-type-secondary">
+              Watch together with people on this Jellyfin server.
+            </p>
+            {context?.blocked ? (
+              <p className="text-sm">
+                Stop Google Cast before joining SyncPlay.
+              </p>
+            ) : null}
+            <Menu.Link clickable disabled={busy} onClick={() => run(refresh)}>
+              Refresh groups
+            </Menu.Link>
+            {invitation &&
+            !groups.some((group) => group.GroupId === invitation) ? (
+              <p className="text-sm">
+                The invited group is no longer available or is inaccessible to
+                your account.
+              </p>
+            ) : null}
+            {groups.map((group) => (
+              <Menu.Link
+                key={group.GroupId}
+                clickable
+                disabled={busy || context?.blocked}
+                onClick={() => {
+                  if (context)
+                    run(() => context.controller.join(group.GroupId));
+                }}
+              >
+                <span>
+                  {group.GroupName}
+                  {group.GroupId === invitation ? " · Invitation" : ""}
+                  <span className="block text-xs text-type-secondary">
+                    {group.Participants.join(", ")}
+                  </span>
+                </span>
+              </Menu.Link>
+            ))}
+            {state.connected && !groups.length ? (
+              <p className="text-sm text-type-secondary">
+                No groups are active.
+              </p>
+            ) : null}
+            {state.access === "CreateAndJoinGroups" ? (
+              <>
+                <input
+                  aria-label="SyncPlay group name"
+                  placeholder="Group name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  maxLength={100}
+                  className="tabbable w-full rounded bg-video-context-inputBg p-3"
+                />
+                <Menu.Link
+                  clickable
+                  disabled={busy || !name.trim() || context?.blocked}
+                  onClick={() => {
+                    if (!context) return;
+                    const index = episodes.findIndex(
+                      (episode) => episode.Id === itemId,
+                    );
+                    const ids =
+                      index >= 0
+                        ? episodes.slice(index).map((episode) => episode.Id)
+                        : [itemId];
+                    run(() =>
+                      context.controller.create(
+                        name,
+                        ids,
+                        Math.round(
+                          usePlayerStore.getState().progress.time * 10_000_000,
+                        ),
+                      ),
+                    );
+                  }}
+                >
+                  Create group and watch this title
+                </Menu.Link>
+              </>
+            ) : null}
+          </>
+        )}
+        {error || state.error ? (
+          <p role="alert" className="text-sm text-type-danger">
+            {error || state.error}
+          </p>
+        ) : null}
+      </Menu.Section>
+    </Menu.CardWithScrollable>
+  );
+}

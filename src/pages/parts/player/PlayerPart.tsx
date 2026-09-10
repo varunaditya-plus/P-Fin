@@ -14,8 +14,12 @@ import {
   JellyfinSettingsRouter,
 } from "@/components/player/jellyfin/JellyfinControls";
 import { PauseOverlay } from "@/components/player/overlays/PauseOverlay";
+import { useChromecastState } from "@/components/player/remote/chromecast";
+import { ChromecastIndicator } from "@/components/player/remote/JellyfinChromecast";
+import { SyncPlayIndicator } from "@/components/player/remote/JellyfinSyncPlay";
 import { SubtitleAutoSyncRuntime } from "@/components/player/subtitleTools/AutoSync";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 
@@ -26,6 +30,8 @@ export interface PlayerPartProps {
 }
 
 export function PlayerPart(props: PlayerPartProps) {
+  const casting = useChromecastState((state) => state.casting);
+  const settings = useOverlayRouter("settings");
   const { showTargets, showTouchTargets } = useShouldShowControls();
   const status = usePlayerStore((s) => s.status);
   const { isMobile } = useIsMobile();
@@ -77,6 +83,24 @@ export function PlayerPart(props: PlayerPartProps) {
   return (
     <Player.Container onLoad={props.onLoad} showingControls={showTargets}>
       {props.children}
+      <div className="absolute top-20 inset-x-4 flex justify-center gap-2 z-50 pointer-events-none">
+        <div className="pointer-events-auto">
+          <ChromecastIndicator />
+          <SyncPlayIndicator />
+        </div>
+      </div>
+      {casting ? (
+        <div className="absolute inset-0 z-40 bg-background-main flex flex-col items-center justify-center gap-5 text-white">
+          <p className="text-xl">Playing on your cast receiver</p>
+          <button
+            type="button"
+            className="tabbable rounded-lg bg-white/10 px-5 py-3"
+            onClick={() => settings.open("/cast")}
+          >
+            Open cast controls
+          </button>
+        </div>
+      ) : null}
       <GamepadEvents />
       <PlaybackEnhancements />
       <SubtitleAutoSyncRuntime />

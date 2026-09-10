@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => {
   };
   const proxy = {
     "/jellyfin": {
+      ws: true,
       target: env.JELLYFIN_URL || "http://100.64.96.96:8096",
       changeOrigin: true,
       rewrite: (url: string) => url.replace(/^\/jellyfin/, ""),

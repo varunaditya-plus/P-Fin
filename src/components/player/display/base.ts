@@ -5,6 +5,7 @@ import {
   DisplayInterface,
   DisplayInterfaceEvents,
 } from "@/components/player/display/displayInterface";
+import { interceptPlayback } from "@/components/player/remote/playbackCommands";
 import { handleBuffered } from "@/components/player/utils/handleBuffered";
 import { getMediaErrorDetails } from "@/components/player/utils/mediaErrorDetails";
 import { LoadableSource, SourceQuality } from "@/stores/player/utils/qualities";
@@ -510,9 +511,11 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       containerElement = container;
     },
     pause() {
+      if (interceptPlayback("pause")) return;
       videoElement?.pause();
     },
     play() {
+      if (interceptPlayback("play")) return;
       videoElement?.play();
     },
     setSeeking(active) {
@@ -529,6 +532,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       this.pause();
     },
     setTime(t) {
+      if (interceptPlayback("seek", t)) return;
       if (!videoElement) return;
       // clamp time between 0 and max duration
       let time = Math.min(t, videoElement.duration);

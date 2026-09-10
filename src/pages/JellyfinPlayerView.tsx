@@ -27,6 +27,14 @@ import {
 import { Button } from "@/components/buttons/Button";
 import { Spinner } from "@/components/layout/Spinner";
 import { JellyfinPlaybackContext } from "@/components/player/jellyfin/JellyfinPlaybackContext";
+import { useChromecastState } from "@/components/player/remote/chromecast";
+import { JellyfinChromecastProvider } from "@/components/player/remote/JellyfinChromecast";
+import { JellyfinSyncPlayProvider } from "@/components/player/remote/JellyfinSyncPlay";
+import {
+  localPlayback,
+  selectRemoteItem,
+} from "@/components/player/remote/playbackCommands";
+import { useSyncPlayState } from "@/components/player/remote/syncplay";
 import { PlayerPart } from "@/pages/parts/player/PlayerPart";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
@@ -111,6 +119,10 @@ function JellyfinSessionReporter({ playback }: { playback: JellyfinPlayback }) {
 
 export function JellyfinPlayerView() {
   const { itemId = "" } = useParams();
+  const casting = useChromecastState((state) => state.casting);
+  const castConnected = useChromecastState((state) => state.connected);
+  const syncGroup = useSyncPlayState((state) => state.group);
+  const [castSuspended, setCastSuspended] = useState(false);
   const [search] = useSearchParams();
   const restart = search.get("restart") === "true";
   const mediaSourceId = search.get("mediaSourceId");
@@ -146,6 +158,7 @@ export function JellyfinPlayerView() {
       options: PlaybackOptions,
       startAt: number,
       preservePause = false,
+      autoplay: boolean | undefined = undefined,
     ) => {
       generation.current += 1;
       subtitleDownload.current?.abort();
@@ -174,7 +187,15 @@ export function JellyfinPlayerView() {
           state.mediaPlaying.hasPlayedOnce = previouslyPlayed;
         });
         setPlayback(result);
-        store.setSource(result.source, result.captions, startAt, !wasPaused);
+        store.setSource(
+          result.source,
+          result.captions,
+          startAt,
+          autoplay ??
+            (!wasPaused &&
+              !useSyncPlayState.getState().group &&
+              !useChromecastState.getState().casting),
+        );
         store.display?.setVolume(useVolumeStore.getState().volume);
         setBusy(false);
         const caption = result.captions.find(
@@ -224,7 +245,7 @@ export function JellyfinPlayerView() {
     subtitleSelection.current = -1;
     setBusy(true);
     const store = usePlayerStore.getState();
-    store.reset();
+    localPlayback(() => store.reset());
     const prepare = async () => {
       try {
         const [target, userConfiguration] = await Promise.all([
@@ -387,8 +408,10 @@ export function JellyfinPlayerView() {
       generation.current += 1;
       subtitleGeneration.current += 1;
       subtitleDownload.current?.abort();
-      store.display?.pause();
-      store.reset();
+      localPlayback(() => {
+        store.display?.pause();
+        store.reset();
+      });
     };
   }, [
     itemId,
@@ -514,6 +537,7 @@ export function JellyfinPlayerView() {
       subtitleIndex,
       maxBitrate,
       playItem: (id: string, fromStart = false) => {
+        if (selectRemoteItem(id, fromStart ? 0 : undefined)) return;
         const query = new URLSearchParams();
         if (fromStart) query.set("restart", "true");
         if (shuffle) query.set("shuffle", shuffle);
@@ -601,47 +625,76 @@ export function JellyfinPlayerView() {
 
   return (
     <JellyfinPlaybackContext.Provider value={controls}>
-      {playback ? <JellyfinSessionReporter playback={playback} /> : null}
-      <PlayerPart backUrl="/">
-        {busy || error ? (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-background-main/90 p-8">
-            <div className="max-w-lg text-center space-y-5">
-              {busy ? (
-                <>
-                  <Spinner className="mx-auto text-4xl" />
-                  <p className="text-white">Preparing Jellyfin playback…</p>
-                </>
-              ) : (
-                <>
-                  <h1 className="text-2xl font-bold text-white">
-                    Unable to play
-                  </h1>
-                  <p className="text-type-secondary">{error}</p>
-                  <div className="flex justify-center gap-3">
-                    <Button theme="secondary" href="/">
-                      Back to library
-                    </Button>
-                    {item ? (
-                      <Button
-                        onClick={() => {
-                          selectedBitrate.current = 20_000_000;
-                          setMaxBitrate(20_000_000);
-                          reload({
-                            forceTranscode: true,
-                            maxBitrate: 20_000_000,
-                          });
-                        }}
-                      >
-                        Retry playback
-                      </Button>
-                    ) : null}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        ) : null}
-      </PlayerPart>
+      <JellyfinSyncPlayProvider
+        blocked={castConnected}
+        onPlayItem={(id, ticks) => {
+          navigate(`/play/${encodeURIComponent(id)}?startTicks=${ticks}`);
+        }}
+      >
+        <JellyfinChromecastProvider
+          blocked={Boolean(syncGroup)}
+          onCastStarted={() => {
+            setCastSuspended(true);
+            localPlayback(() => usePlayerStore.getState().display?.pause());
+            if (playback) stopTranscode(playback).catch(() => {});
+          }}
+          onReturnToLocal={async (ticks, autoplay = true) => {
+            if (item)
+              await load(
+                item,
+                lastOptions.current,
+                ticks / 10_000_000,
+                true,
+                autoplay,
+              );
+            setCastSuspended(false);
+          }}
+        >
+          {playback && !casting && !castSuspended ? (
+            <JellyfinSessionReporter playback={playback} />
+          ) : null}
+          <PlayerPart backUrl="/">
+            {busy || error ? (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-background-main/90 p-8">
+                <div className="max-w-lg text-center space-y-5">
+                  {busy ? (
+                    <>
+                      <Spinner className="mx-auto text-4xl" />
+                      <p className="text-white">Preparing Jellyfin playback…</p>
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl font-bold text-white">
+                        Unable to play
+                      </h1>
+                      <p className="text-type-secondary">{error}</p>
+                      <div className="flex justify-center gap-3">
+                        <Button theme="secondary" href="/">
+                          Back to library
+                        </Button>
+                        {item ? (
+                          <Button
+                            onClick={() => {
+                              selectedBitrate.current = 20_000_000;
+                              setMaxBitrate(20_000_000);
+                              reload({
+                                forceTranscode: true,
+                                maxBitrate: 20_000_000,
+                              });
+                            }}
+                          >
+                            Retry playback
+                          </Button>
+                        ) : null}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </PlayerPart>
+        </JellyfinChromecastProvider>
+      </JellyfinSyncPlayProvider>
     </JellyfinPlaybackContext.Provider>
   );
 }
