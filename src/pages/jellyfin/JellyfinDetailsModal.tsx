@@ -13,7 +13,6 @@ import {
 import {
   ContentItem,
   ContentPolicy,
-  contentDownloadUrl,
   contentPermissions,
   getContentItem,
   getContentPolicy,
@@ -40,6 +39,7 @@ import { RatingCapsule } from "@/pages/taste/RatingCapsule";
 import { usePreferencesStore } from "@/stores/preferences";
 
 import { ContentContainerManagement } from "./ContentContainerManagement";
+import { ContentDownloadModal } from "./ContentDownloadModal";
 import { ContentInformation } from "./ContentInformation";
 import { ContentProviderLinks } from "./ContentProviderLinks";
 import { ContentSettingsModal } from "./ContentSettingsModal";
@@ -106,6 +106,7 @@ function JellyfinDetailsContent({
   const [loadingEpisodes, setLoadingEpisodes] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
   const [settingsForEpisode, setSettingsForEpisode] = useState(false);
   const [playbackOverrideId, setPlaybackOverrideId] = useState<string | null>(
     null,
@@ -132,6 +133,7 @@ function JellyfinDetailsContent({
   };
   useEffect(() => {
     setSettingsOpen(Boolean(selectedAction));
+    setDownloadOpen(false);
     setSettingsForEpisode(false);
   }, [selectedId, selectedAction]);
   useEffect(() => {
@@ -611,13 +613,7 @@ function JellyfinDetailsContent({
                                 <button
                                   type="button"
                                   disabled={!downloadAllowed}
-                                  onClick={() =>
-                                    window.open(
-                                      contentDownloadUrl(playbackItem.Id),
-                                      "_blank",
-                                      "noopener,noreferrer",
-                                    )
-                                  }
+                                  onClick={() => setDownloadOpen(true)}
                                   title={
                                     downloadAllowed
                                       ? item.Type === "Series"
@@ -1117,6 +1113,16 @@ function JellyfinDetailsContent({
           navigate(`/discover?media=${media.id}&type=${media.mediaType}`);
         }}
       />
+      {playbackItem ? (
+        <ContentDownloadModal
+          open={open && downloadOpen}
+          onClose={() => setDownloadOpen(false)}
+          item={playbackItem}
+          policy={policy}
+          sourceId={sourceId}
+          subtitleIndex={tracks.subtitleIndex}
+        />
+      ) : null}
       {item ? (
         <ContentSettingsModal
           open={open && settingsOpen}

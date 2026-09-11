@@ -12,7 +12,6 @@ import {
 } from "@/backend/jellyfin/client";
 import {
   ContentItem,
-  contentDownloadUrl,
   getContentItem,
   getContentPolicy,
 } from "@/backend/jellyfin/content";
@@ -22,13 +21,19 @@ import { JellyfinDetailsModal } from "./JellyfinDetailsModal";
 vi.mock("@/backend/jellyfin/client", async (original) => ({
   ...(await original<typeof import("@/backend/jellyfin/client")>()),
   getImageUrl: () => undefined,
+  getJellyfinSession: () => ({
+    serverUrl: "/jellyfin",
+    accessToken: "test-token",
+    userId: "user",
+    userName: "Test",
+    deviceId: "device",
+  }),
   getEpisodes: vi.fn(),
   getSeasons: vi.fn(),
   getSimilarItems: vi.fn(),
 }));
 vi.mock("@/backend/jellyfin/content", async (original) => ({
   ...(await original<typeof import("@/backend/jellyfin/content")>()),
-  contentDownloadUrl: vi.fn(),
   getContentItem: vi.fn(),
   getContentPolicy: vi.fn(),
 }));
@@ -183,7 +188,6 @@ beforeEach(() => {
   });
   vi.clearAllMocks();
   vi.spyOn(window, "open").mockReturnValue(null);
-  vi.mocked(contentDownloadUrl).mockImplementation((id) => `/downloads/${id}`);
   vi.mocked(getContentPolicy).mockResolvedValue({
     EnableContentDownloading: true,
   });
@@ -310,26 +314,65 @@ describe("Jellyfin series details integration", () => {
     );
   });
 
-  it("downloads the resume episode and follows the episode selected in settings", async () => {
+  it("opens the selected resume version and follows the episode chosen in settings for downloads", async () => {
+    const originalId = "11111111111111111111111111111111";
+    const alternateId = "22222222222222222222222222222222";
+    const otherId = "33333333333333333333333333333333";
+    vi.mocked(getContentItem).mockImplementation(async (id) => {
+      if (id === resume.Id)
+        return {
+          ...resume,
+          MediaSources: [
+            {
+              ...resume.MediaSources![0],
+              Id: originalId,
+              Path: "/media/original.mkv",
+              Size: 1024 ** 3,
+            },
+            {
+              ...resume.MediaSources![1],
+              Id: alternateId,
+              Path: "/media/alternate.mp4",
+              Size: 2 * 1024 ** 3,
+            },
+          ],
+        };
+      if (id === other.Id)
+        return {
+          ...other,
+          MediaSources: [{ Id: otherId, Path: "/media/other.mkv" }],
+        };
+      return series;
+    });
     await render();
+    await clickLabel("Content settings");
+    await selectValue("Version", alternateId);
+    await clickLabel("Close settings");
     await clickLabel("Download");
-    expect(contentDownloadUrl).toHaveBeenNthCalledWith(1, "resume-episode");
-    expect(window.open).toHaveBeenNthCalledWith(
-      1,
-      "/downloads/resume-episode",
-      "_blank",
-      "noopener,noreferrer",
+    const dialog = () =>
+      document.querySelector('[role="dialog"][aria-label="Download content"]');
+    const link = () =>
+      dialog()!.querySelector<HTMLAnchorElement>("a[download]")!;
+    expect(dialog()?.textContent).toContain("Resume Episode");
+    expect(dialog()?.textContent).toContain("alternate.mp4");
+    expect(dialog()?.textContent).toContain("2.0 GiB");
+    expect(new URL(link().href).pathname).toBe(
+      `/jellyfin/Items/${alternateId}/Download`,
     );
+    expect(link().download).toBe("alternate.mp4");
+    await selectValue("Version", originalId);
+    expect(new URL(link().href).pathname).toBe(
+      `/jellyfin/Items/${originalId}/Download`,
+    );
+    await clickLabel("Close downloads");
     await clickLabel("Settings for episode 4: Other Episode");
     await clickLabel("Close settings");
     await clickLabel("Download");
-    expect(contentDownloadUrl).toHaveBeenNthCalledWith(2, "other-episode");
-    expect(window.open).toHaveBeenNthCalledWith(
-      2,
-      "/downloads/other-episode",
-      "_blank",
-      "noopener,noreferrer",
+    expect(dialog()?.textContent).toContain("Other Episode");
+    expect(new URL(link().href).pathname).toBe(
+      `/jellyfin/Items/${otherId}/Download`,
     );
+    expect(new URL(link().href).searchParams.get("token")).toBe("test-token");
     expect(close).not.toHaveBeenCalled();
     expect(locationUrl().pathname).toBe("/");
   });
@@ -344,7 +387,9 @@ describe("Jellyfin series details integration", () => {
         ?.disabled,
     ).toBe(true);
     await clickLabel("Download");
-    expect(contentDownloadUrl).not.toHaveBeenCalled();
+    expect(
+      document.querySelector('[role="dialog"][aria-label="Download content"]'),
+    ).toBeNull();
     expect(window.open).not.toHaveBeenCalled();
   });
 });

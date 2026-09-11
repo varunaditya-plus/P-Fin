@@ -4,7 +4,6 @@ import {
   ContentItem,
   ContentPolicy,
   addContentToContainer,
-  contentDownloadUrl,
   contentPermissions,
   contentStreamUrl,
   createContentContainer,
@@ -23,6 +22,7 @@ import {
   ContentImageEditor,
   ContentSubtitleEditor,
 } from "./ContentAssetEditors";
+import { ContentDownloadModal } from "./ContentDownloadModal";
 import { ContentIdentifyEditor } from "./ContentIdentifyEditor";
 import {
   ContentCheckbox,
@@ -302,11 +302,13 @@ export function ContentActions({
   const permissions = policy ? contentPermissions(item, policy) : null;
   const [policyError, setPolicyError] = useState("");
   const [action, setAction] = useState("");
+  const [downloadOpen, setDownloadOpen] = useState(false);
   const [copyMessage, setCopyMessage] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const controller = new AbortController();
     setAction("");
+    setDownloadOpen(false);
     setPolicy(null);
     setPolicyError("");
     setCopyMessage("");
@@ -386,8 +388,7 @@ export function ContentActions({
     ...(permissions?.delete ? [{ id: "delete", name: "Delete" }] : []),
   ];
   const chooseAction = (id: string) => {
-    if (id === "download")
-      window.open(contentDownloadUrl(item.Id), "_blank", "noopener,noreferrer");
+    if (id === "download") setDownloadOpen(true);
     else if (id === "stream") copyStream();
     else setAction(id);
   };
@@ -405,6 +406,13 @@ export function ContentActions({
   };
   return (
     <div className={mode === "buttons" ? "space-y-4" : "mt-4"}>
+      <ContentDownloadModal
+        open={downloadOpen}
+        onClose={() => setDownloadOpen(false)}
+        item={item}
+        policy={policy}
+        sourceId={sourceId}
+      />
       {mode === "buttons" && !action ? (
         <div className="space-y-3">
           <h3 className="font-semibold text-white">Content actions</h3>
