@@ -1,8 +1,10 @@
 import { Listbox } from "@headlessui/react";
-import React, { Fragment } from "react";
+import React, { Fragment, useLayoutEffect, useRef, useState } from "react";
 
 import { Icon, Icons } from "@/components/Icon";
 import { Transition } from "@/components/utils/Transition";
+
+import { dropdownPlacement } from "./dropdownPlacement";
 
 export interface OptionItem {
   id: string;
@@ -20,6 +22,68 @@ interface DropdownProps {
   customMenu?: React.ReactNode;
   className?: string;
   preventWrap?: boolean;
+}
+
+function DropdownMenu({
+  open,
+  direction,
+  side,
+  children,
+}: {
+  open: boolean;
+  direction: "up" | "down";
+  side: "left" | "right";
+  children: React.ReactNode;
+}) {
+  const marker = useRef<HTMLDivElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const [placement, setPlacement] = useState({
+    direction,
+    left: 0,
+    maxHeight: 240,
+  });
+  useLayoutEffect(() => {
+    if (!open) return;
+    const measure = () => {
+      const anchor = marker.current?.parentElement;
+      if (!anchor) return;
+      setPlacement(
+        dropdownPlacement(
+          anchor.getBoundingClientRect(),
+          menu.current?.scrollWidth ?? anchor.offsetWidth,
+          { width: window.innerWidth, height: window.innerHeight },
+          direction,
+          side,
+        ),
+      );
+    };
+    measure();
+    const frame = requestAnimationFrame(measure);
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [open, direction, side]);
+  return (
+    <>
+      <div ref={marker} />
+      <Transition
+        animation={placement.direction === "up" ? "slide-up" : "slide-down"}
+        show={open}
+        style={{
+          left: placement.left,
+          maxHeight: placement.maxHeight,
+          maxWidth: "calc(100vw - 16px)",
+        }}
+        className={`absolute z-[40] min-w-[20px] w-max overflow-auto rounded-xl bg-dropdown-background py-1 text-white shadow-lg ring-1 ring-black ring-opacity-5 scrollbar-thin scrollbar-track-background-secondary scrollbar-thumb-type-secondary focus:outline-none ${placement.direction === "up" ? "bottom-full mb-1" : "top-full mt-1"}`}
+      >
+        <div ref={menu}>{children}</div>
+      </Transition>
+    </>
+  );
 }
 
 export function Dropdown(props: DropdownProps) {
@@ -48,12 +112,10 @@ export function Dropdown(props: DropdownProps) {
                 </span>
               </Listbox.Button>
             )}
-            <Transition
-              animation="slide-down"
-              show={open}
-              className={`absolute z-[40] min-w-[20px] w-fit max-h-60 overflow-auto rounded-xl bg-dropdown-background py-1 text-white shadow-lg ring-1 ring-black ring-opacity-5 scrollbar-thin scrollbar-track-background-secondary scrollbar-thumb-type-secondary focus:outline-none ${
-                direction === "up" ? "bottom-full mb-4" : "top-full mt-1"
-              } ${props.side === "right" ? "right-0" : "left-0"}`}
+            <DropdownMenu
+              open={open}
+              direction={direction}
+              side={props.side ?? "left"}
             >
               {customMenu ? (
                 <Listbox.Options static as={Fragment}>
@@ -79,7 +141,7 @@ export function Dropdown(props: DropdownProps) {
                   ))}
                 </Listbox.Options>
               )}
-            </Transition>
+            </DropdownMenu>
           </>
         )}
       </Listbox>
