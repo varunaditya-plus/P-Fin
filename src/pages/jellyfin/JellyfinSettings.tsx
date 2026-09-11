@@ -377,6 +377,17 @@ export default function JellyfinSettings() {
             styling={subtitles.styling}
             setStyling={subtitles.updateStyling}
           />
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold text-white">Integrations</h2>
+            <SettingRow
+              title="Lists and watch history"
+              description="Import Letterboxd lists and manage optional external service connections."
+            >
+              <Button theme="secondary" href="/settings/integrations">
+                Manage integrations
+              </Button>
+            </SettingRow>
+          </section>
           <SettingsTransfer />
         </div>
       </WideContainer>
