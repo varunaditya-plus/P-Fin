@@ -87,7 +87,10 @@ export function parseLibrarySearch(query: string) {
       ? tokens.find((token) => /^(19|20)\d{2}$/.test(token))
       : undefined;
   return {
-    title: tokens.filter((token) => token !== yearToken).join(" "),
+    title: tokens
+      .filter((token) => token !== yearToken)
+      .join(" ")
+      .replace(/^(?:the|an|a)\s+/, ""),
     year: yearToken ? Number(yearToken) : undefined,
   };
 }
@@ -113,7 +116,10 @@ function editDistance(left: string, right: string) {
 export function librarySearchScore(item: JellyfinItem, query: string) {
   const { title, year } = parseLibrarySearch(query);
   if (year && item.ProductionYear !== year) return 0;
-  const name = normalizeLibrarySearch(item.Name);
+  const name = normalizeLibrarySearch(item.Name).replace(
+    /^(?:the|an|a)\s+/,
+    "",
+  );
   if (name === title) return 1000;
   if (name.startsWith(`${title} `)) return 800;
   if (name.includes(title)) return 600;
@@ -179,6 +185,43 @@ export async function searchLibrary(query: string, signal?: AbortSignal) {
       ),
     ]);
   }
+  const collectionIds = new Set<string>();
+  const collections = /(?:^|\s)(?:\d+|ii|iii|iv|vi|vii|viii|ix)(?:\s|$)/.test(
+    parsed.title,
+  )
+    ? []
+    : direct
+        .filter(
+          (item) =>
+            item.Type === "BoxSet" && librarySearchScore(item, query) >= 600,
+        )
+        .slice(0, 2);
+  const members = await Promise.allSettled(
+    collections.map((collection) =>
+      jellyfinRequest<JellyfinItems>(
+        `Users/${session.userId}/Items`,
+        { signal },
+        {
+          ParentId: collection.Id,
+          Recursive: false,
+          IncludeItemTypes: "Movie,Series",
+          Fields: fields,
+          Years: parsed.year,
+          SortBy: "PremiereDate,SortName",
+          SortOrder: "Ascending",
+          Limit: 120,
+          EnableUserData: true,
+          IsMissing: false,
+          IsVirtualItem: false,
+        },
+      ),
+    ),
+  );
+  const expanded = members.flatMap((result) =>
+    result.status === "fulfilled" ? uniqueLibraryItems(result.value.Items) : [],
+  );
+  expanded.forEach((item) => collectionIds.add(item.Id));
+  candidates = uniqueLibraryItems([...candidates, ...expanded]);
   signal?.throwIfAborted();
   if (sessionKey() !== identity)
     throw new Error("Your Jellyfin account changed. Search again.");
@@ -188,13 +231,24 @@ export async function searchLibrary(query: string, signal?: AbortSignal) {
       item,
       score:
         librarySearchScore(item, query) ||
+        (collectionIds.has(item.Id) &&
+        (!parsed.year || item.ProductionYear === parsed.year)
+          ? 200
+          : 0) ||
         ((!parsed.year || item.ProductionYear === parsed.year) &&
         directIds.has(item.Id)
           ? 1
           : 0),
     }))
     .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score || a.item.Name.localeCompare(b.item.Name))
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        (b.item.CommunityRating ?? 0) - (a.item.CommunityRating ?? 0) ||
+        (b.item.ProductionYear ?? 0) - (a.item.ProductionYear ?? 0) ||
+        a.item.Name.localeCompare(b.item.Name) ||
+        a.item.Id.localeCompare(b.item.Id),
+    )
     .map(({ item }) => item);
   if (searchCache.size >= 30)
     searchCache.delete(searchCache.keys().next().value!);

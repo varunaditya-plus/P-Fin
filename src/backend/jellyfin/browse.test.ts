@@ -66,6 +66,44 @@ describe("library discovery", () => {
     ).toBe(0);
   });
 
+  it("ignores a leading article and includes known collection instalments without broadening numbered sequel queries", async () => {
+    expect(librarySearchScore(film("matrix", "The Matrix"), "Matrix")).toBe(
+      1000,
+    );
+    expect(librarySearchScore(film("matrix", "Matrix"), "The Matrix")).toBe(
+      1000,
+    );
+    vi.mocked(jellyfinRequest).mockImplementation(
+      async (_path, _init, query) => ({
+        Items: query?.ParentId
+          ? [film("empire", "The Empire Strikes Back", 1980)]
+          : [
+              {
+                Id: "collection",
+                Name: "Star Wars Collection",
+                Type: "BoxSet",
+              },
+              film("war", "Star Wars", 1977),
+            ],
+      }),
+    );
+    expect((await searchLibrary("Star Wars")).map((item) => item.Id)).toEqual([
+      "war",
+      "collection",
+      "empire",
+    ]);
+    expect(
+      vi
+        .mocked(jellyfinRequest)
+        .mock.calls.some((call) => call[2]?.ParentId === "collection"),
+    ).toBe(true);
+    vi.mocked(jellyfinRequest).mockClear();
+    await searchLibrary("Star Wars 2");
+    expect(
+      vi.mocked(jellyfinRequest).mock.calls.some((call) => call[2]?.ParentId),
+    ).toBe(false);
+  });
+
   it("uses server search first, bounds typo fallback, filters missing items and deduplicates", async () => {
     vi.mocked(jellyfinRequest).mockImplementation(
       async (_path, _init, query) => ({
