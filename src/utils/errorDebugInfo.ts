@@ -1,5 +1,6 @@
 import { detect } from "detect-browser";
 
+import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePlayerStore } from "@/stores/player/store";
 
 export interface ErrorDebugInfo {
@@ -8,6 +9,7 @@ export interface ErrorDebugInfo {
     message: string;
     type: string;
     stackTrace?: string;
+    componentStack?: string;
   };
   device: {
     userAgent: string;
@@ -78,41 +80,95 @@ export interface ErrorDebugInfo {
   };
 }
 
-export function gatherErrorDebugInfo(error: any): ErrorDebugInfo {
-  const browserInfo = detect();
-  const isMobile = window.innerWidth <= 768;
-  const isTV =
-    /SmartTV|Tizen|WebOS|SamsungBrowser|HbbTV|Viera|NetCast|AppleTV|Android TV|GoogleTV|Roku|PlayStation|Xbox|Opera TV|AquosBrowser|Hisense|SonyBrowser|SharpBrowser|AFT|Chromecast/i.test(
-      navigator.userAgent,
+function read(value: unknown, key: string): unknown {
+  try {
+    return value && (typeof value === "object" || typeof value === "function")
+      ? Reflect.get(value, key)
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+function text(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+function number(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value)
+    ? value
+    : undefined;
+}
+/** Remove authentication material before a report is displayed or copied. */
+export function redactDiagnostics(value: string): string {
+  let result = value
+    .replace(/(https?:\/\/)[^\s/@]+:[^\s/@]+@/gi, "$1[redacted]@")
+    .replace(
+      /([?&#](?:api[_-]?key|access[_-]?token|token|password|pw|secret|auth|authorization)=)[^&#\s"'<>]*/gi,
+      "$1[redacted]",
+    )
+    .replace(
+      /(\b(?:api[_-]?key|access[_-]?token|jellyfinAccessToken|token|password|pw|secret)["']?\s*[:=]\s*)(?:"[^"\r\n]*"|'[^'\r\n]*'|[^\s,;&}]+)/gi,
+      "$1[redacted]",
+    )
+    .replace(/(\bAuthorization["']?\s*[:=]\s*)[^\r\n]*/gi, "$1[redacted]")
+    .replace(/\bBearer\s+[^\s,;]+/gi, "Bearer [redacted]");
+  // Error messages sometimes embed a token without a field or URL parameter.
+  try {
+    const token = useJellyfinAuth.getState().session?.accessToken;
+    if (token) {
+      result = result.split(token).join("[redacted]");
+      result = result.split(encodeURIComponent(token)).join("[redacted]");
+    }
+  } catch {
+    // Reporting must remain usable when application state caused the failure.
+  }
+  return result;
+}
+
+export function errorMessage(error: unknown): string {
+  const message = text(read(error, "message")) ?? text(read(error, "key"));
+  if (message) return redactDiagnostics(message);
+  try {
+    return redactDiagnostics(
+      typeof error === "string" ? error : String(error ?? "Unknown error"),
     );
+  } catch {
+    return "Unknown error";
+  }
+}
 
+export function gatherErrorDebugInfo(
+  error: unknown,
+  componentStack?: string,
+): ErrorDebugInfo {
+  const browserInfo = detect();
   const playerStore = usePlayerStore.getState();
-
-  // Get network information
   const connection =
-    (navigator as any).connection ||
-    (navigator as any).mozConnection ||
-    (navigator as any).webkitConnection;
-
-  // Get performance information
-  const performanceInfo = performance.getEntriesByType(
-    "navigation",
-  )[0] as PerformanceNavigationTiming;
-  const memory = (performance as any).memory;
-
-  return {
+    read(navigator, "connection") ??
+    read(navigator, "mozConnection") ??
+    read(navigator, "webkitConnection");
+  const performanceInfo = performance.getEntriesByType?.("navigation")[0] as
+    | PerformanceNavigationTiming
+    | undefined;
+  const memory = read(performance, "memory");
+  const hls = read(error, "hls");
+  const levelDetails = read(hls, "levelDetails");
+  const frag = read(hls, "frag");
+  const info: ErrorDebugInfo = {
     timestamp: new Date().toISOString(),
     error: {
-      message: error?.message || error?.key || String(error),
-      type: error?.type || "unknown",
-      stackTrace: error?.stackTrace || error?.stack,
+      message: errorMessage(error),
+      type: text(read(error, "type")) ?? text(read(error, "name")) ?? "unknown",
+      stackTrace: text(read(error, "stackTrace")) ?? text(read(error, "stack")),
+      componentStack,
     },
     device: {
       userAgent: navigator.userAgent,
       browser: browserInfo?.name || "unknown",
       os: browserInfo?.os || "unknown",
-      isMobile,
-      isTV,
+      isMobile: window.innerWidth <= 768,
+      isTV: /SmartTV|Tizen|WebOS|SamsungBrowser|HbbTV|Viera|NetCast|AppleTV|Android TV|GoogleTV|Roku|PlayStation|Xbox|Opera TV|AquosBrowser|Hisense|SonyBrowser|SharpBrowser|AFT|Chromecast/i.test(
+        navigator.userAgent,
+      ),
       screenResolution: `${window.screen.width}x${window.screen.height}`,
       viewportSize: `${window.innerWidth}x${window.innerHeight}`,
     },
@@ -133,35 +189,35 @@ export function gatherErrorDebugInfo(error: any): ErrorDebugInfo {
     },
     network: {
       online: navigator.onLine,
-      connectionType: connection?.type,
-      effectiveType: connection?.effectiveType,
-      downlink: connection?.downlink,
-      rtt: connection?.rtt,
+      connectionType: text(read(connection, "type")),
+      effectiveType: text(read(connection, "effectiveType")),
+      downlink: number(read(connection, "downlink")),
+      rtt: number(read(connection, "rtt")),
     },
-    hls: error?.hls
+    hls: hls
       ? {
-          details: error.hls.details,
-          fatal: error.hls.fatal,
-          level: error.hls.level,
-          levelDetails: error.hls.levelDetails
+          details: text(read(hls, "details")) ?? "unknown",
+          fatal: read(hls, "fatal") === true,
+          level: number(read(hls, "level")),
+          levelDetails: levelDetails
             ? {
-                url: error.hls.levelDetails.url,
-                width: error.hls.levelDetails.width,
-                height: error.hls.levelDetails.height,
-                bitrate: error.hls.levelDetails.bitrate,
+                url: text(read(levelDetails, "url")) ?? "",
+                width: number(read(levelDetails, "width")) ?? 0,
+                height: number(read(levelDetails, "height")) ?? 0,
+                bitrate: number(read(levelDetails, "bitrate")) ?? 0,
               }
             : undefined,
-          frag: error.hls.frag
+          frag: frag
             ? {
-                url: error.hls.frag.url,
-                baseurl: error.hls.frag.baseurl,
-                duration: error.hls.frag.duration,
-                start: error.hls.frag.start,
-                sn: error.hls.frag.sn,
+                url: text(read(frag, "url")) ?? "",
+                baseurl: text(read(frag, "baseurl")) ?? "",
+                duration: number(read(frag, "duration")) ?? 0,
+                start: number(read(frag, "start")) ?? 0,
+                sn: number(read(frag, "sn")) ?? 0,
               }
             : undefined,
-          type: error.hls.type,
-          url: error.hls.url,
+          type: text(read(hls, "type")) ?? "unknown",
+          url: text(read(hls, "url")),
         }
       : undefined,
     url: {
@@ -172,9 +228,9 @@ export function gatherErrorDebugInfo(error: any): ErrorDebugInfo {
     performance: {
       memory: memory
         ? {
-            usedJSHeapSize: memory.usedJSHeapSize,
-            totalJSHeapSize: memory.totalJSHeapSize,
-            jsHeapSizeLimit: memory.jsHeapSizeLimit,
+            usedJSHeapSize: number(read(memory, "usedJSHeapSize")) ?? 0,
+            totalJSHeapSize: number(read(memory, "totalJSHeapSize")) ?? 0,
+            jsHeapSizeLimit: number(read(memory, "jsHeapSizeLimit")) ?? 0,
           }
         : undefined,
       timing: {
@@ -185,6 +241,12 @@ export function gatherErrorDebugInfo(error: any): ErrorDebugInfo {
       },
     },
   };
+  // Apply redaction to every string, including nested HLS URLs and stacks.
+  return JSON.parse(
+    JSON.stringify(info, (_key, value) =>
+      typeof value === "string" ? redactDiagnostics(value) : value,
+    ),
+  );
 }
 
 export function formatErrorDebugInfo(info: ErrorDebugInfo): string {
@@ -196,6 +258,9 @@ export function formatErrorDebugInfo(info: ErrorDebugInfo): string {
     `Type: ${info.error.type}`,
     `Message: ${info.error.message}`,
     info.error.stackTrace ? `Stack Trace:\n${info.error.stackTrace}` : "",
+    info.error.componentStack
+      ? `Component Stack:\n${info.error.componentStack}`
+      : "",
     ``,
     `=== DEVICE INFO ===`,
     `Browser: ${info.device.browser} (${info.device.os})`,
@@ -282,5 +347,23 @@ export function formatErrorDebugInfo(info: ErrorDebugInfo): string {
       : "Memory info not available",
   ];
 
-  return sections.filter(Boolean).join("\n");
+  return redactDiagnostics(sections.filter(Boolean).join("\n"));
+}
+
+export function createErrorReport(error: unknown, componentStack?: string) {
+  try {
+    return formatErrorDebugInfo(gatherErrorDebugInfo(error, componentStack));
+  } catch {
+    return redactDiagnostics(
+      [
+        "=== ERROR DETAILS ===",
+        errorMessage(error),
+        text(read(error, "stack")),
+        componentStack ? `Component stack:\n${componentStack}` : undefined,
+        "Additional diagnostics are unavailable.",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
+  }
 }
