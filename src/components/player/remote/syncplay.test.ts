@@ -174,7 +174,8 @@ describe("Jellyfin SyncPlay protocol", () => {
     expect(url.protocol).toBe("ws:");
     expect(url.pathname).toBe("/jellyfin/socket");
     expect(url.searchParams.get("deviceId")).toBe("browser");
-    expect(url.searchParams.has("token")).toBe(true);
+    expect(url.searchParams.get("ApiKey")).toBe(owner.accessToken);
+    expect(url.searchParams.has("token")).toBe(false);
   });
   it("enforces account permissions before creating or opening a socket", async () => {
     request.mockResolvedValue({ Policy: { SyncPlayAccess: "None" } });

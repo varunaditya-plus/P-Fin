@@ -81,7 +81,7 @@ export function syncPlaySocketUrl() {
   const session = getJellyfinSession();
   const url = new URL(
     jellyfinUrl("socket", {
-      token: session.accessToken,
+      ApiKey: session.accessToken,
       deviceId: session.deviceId,
     }),
   );
