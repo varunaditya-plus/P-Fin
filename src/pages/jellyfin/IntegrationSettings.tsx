@@ -2,6 +2,8 @@ import { Button } from "@/components/buttons/Button";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { Heading1 } from "@/components/utils/Text";
 import { LetterboxdSettings } from "@/pages/integrations/LetterboxdSettings";
+import { SimklSettings } from "@/pages/integrations/SimklSettings";
+import { TraktIntegrationSettings } from "@/pages/integrations/TraktIntegrationSettings";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 
 export default function IntegrationSettings() {
@@ -15,6 +17,8 @@ export default function IntegrationSettings() {
               Back to settings
             </Button>
           </div>
+          <SimklSettings />
+          <TraktIntegrationSettings />
           <LetterboxdSettings />
         </div>
       </WideContainer>
