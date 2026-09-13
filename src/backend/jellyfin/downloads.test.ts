@@ -59,13 +59,16 @@ afterEach(() => {
 describe("Jellyfin downloads", () => {
   it("downloads the selected original item while stream URLs select its media source", () => {
     expect(selectedDownloadSource(item, second)).toBe(source);
-    expect(new URL(originalDownloadUrl(item, source)!).pathname).toBe(
-      `/jellyfin/Items/${second}/Download`,
-    );
+    const original = new URL(originalDownloadUrl(item, source)!);
+    expect(original.searchParams.get("ApiKey")).toBe("test-token");
+    expect(original.searchParams.has("token")).toBe(false);
+    expect(original.pathname).toBe(`/jellyfin/Items/${second}/Download`);
     const stream = new URL(downloadStreamUrl(item, source));
     expect(stream.pathname).toBe(`/jellyfin/Videos/${first}/stream`);
     expect(stream.searchParams.get("MediaSourceId")).toBe(second);
-    expect(stream.searchParams.get("token")).toBe("test-token");
+    expect(stream.searchParams.get("ApiKey")).toBe("test-token");
+    expect(stream.searchParams.has("token")).toBe(false);
+    expect(stream.searchParams.get("Static")).toBe("true");
     expect(
       originalDownloadUrl(item, { Id: "remote-source", Protocol: "Http" }),
     ).toBeUndefined();
@@ -100,7 +103,10 @@ describe("Jellyfin downloads", () => {
     expect(result.text).toBe("Hé");
     expect(result.filename).toBe("Film.spa.3.forced.srt");
     expect(result.contentType).toContain("charset=utf-8");
-    expect(new URL(fetcher.mock.calls[0][0]).pathname).toBe(
+    const url = new URL(fetcher.mock.calls[0][0]);
+    expect(url.searchParams.get("ApiKey")).toBe("test-token");
+    expect(url.searchParams.has("token")).toBe(false);
+    expect(url.pathname).toBe(
       `/jellyfin/Videos/${first}/${second}/Subtitles/3/Stream.srt`,
     );
   });

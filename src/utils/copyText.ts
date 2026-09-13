@@ -18,8 +18,15 @@ export async function copyText(text: string): Promise<boolean> {
   const input = document.createElement("textarea");
   input.value = text;
   input.setAttribute("readonly", "");
+  input.setAttribute("tabindex", "-1");
+  input.setAttribute("aria-hidden", "true");
   input.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
-  document.body.appendChild(input);
+  // Stay inside any active dialog focus trap while performing the LAN fallback.
+  const host =
+    active instanceof HTMLElement && active !== document.body
+      ? (active.parentElement ?? document.body)
+      : document.body;
+  host.appendChild(input);
   let copied = false;
   try {
     input.select();

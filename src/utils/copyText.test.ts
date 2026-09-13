@@ -40,3 +40,20 @@ it("does not claim Copied when both mechanisms fail", async () => {
   });
   expect(await copyText("report")).toBe(false);
 });
+
+it("keeps the fallback selection inside the active modal's focus boundary", async () => {
+  vi.stubGlobal("navigator", {});
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog");
+  const button = document.createElement("button");
+  dialog.appendChild(button);
+  document.body.appendChild(dialog);
+  button.focus();
+  Object.defineProperty(document, "execCommand", {
+    configurable: true,
+    value: () =>
+      document.querySelector("textarea")?.closest('[role="dialog"]') === dialog,
+  });
+  expect(await copyText("private stream")).toBe(true);
+  expect(document.activeElement).toBe(button);
+});

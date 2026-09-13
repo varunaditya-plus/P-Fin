@@ -49,7 +49,7 @@ export function originalDownloadUrl(item: ContentItem, source?: ContentSource) {
   const id = originalDownloadId(item, source);
   return id
     ? jellyfinUrl(`Items/${encodeURIComponent(id)}/Download`, {
-        token: getJellyfinSession().accessToken,
+        ApiKey: getJellyfinSession().accessToken,
       })
     : undefined;
 }
@@ -57,7 +57,7 @@ export function downloadStreamUrl(item: ContentItem, source?: ContentSource) {
   return jellyfinUrl(`Videos/${encodeURIComponent(item.Id)}/stream`, {
     Static: true,
     MediaSourceId: source?.Id,
-    token: getJellyfinSession().accessToken,
+    ApiKey: getJellyfinSession().accessToken,
   });
 }
 export function downloadableSubtitle(stream: ContentStream) {
@@ -113,7 +113,7 @@ export async function downloadSubtitleFile(
   const owner = getJellyfinSession();
   const url = jellyfinUrl(
     `Videos/${encodeURIComponent(item.Id)}/${encodeURIComponent(source.Id)}/Subtitles/${stream.Index}/Stream.${format}`,
-    { token: owner.accessToken },
+    { ApiKey: owner.accessToken },
   );
   const response = await fetch(url, {
     signal: signal ?? AbortSignal.timeout(30000),

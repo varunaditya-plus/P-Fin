@@ -372,7 +372,7 @@ describe("Jellyfin series details integration", () => {
     expect(new URL(link().href).pathname).toBe(
       `/jellyfin/Items/${otherId}/Download`,
     );
-    expect(new URL(link().href).searchParams.get("token")).toBe("test-token");
+    expect(new URL(link().href).searchParams.get("ApiKey")).toBe("test-token");
     expect(close).not.toHaveBeenCalled();
     expect(locationUrl().pathname).toBe("/");
   });
