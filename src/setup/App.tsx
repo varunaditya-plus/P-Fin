@@ -7,6 +7,7 @@ import { Button } from "@/components/buttons/Button";
 import { Loading } from "@/components/layout/Loading";
 import { KeyboardCommandsEditModal } from "@/components/overlays/KeyboardCommandsEditModal";
 import { KeyboardCommandsModal } from "@/components/overlays/KeyboardCommandsModal";
+import { UpdateNotification } from "@/components/updates/UpdateNotification";
 import { useGlobalKeyboardEvents } from "@/hooks/useGlobalKeyboardEvents";
 import { useOnlineListener } from "@/hooks/usePing";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
@@ -118,6 +119,7 @@ export default function App() {
       <AccountPreferencesSync />
       <LanguageProvider />
       <KeyboardCommandsModal id="keyboard-commands" />
+      <UpdateNotification />
       <KeyboardCommandsEditModal id="keyboard-commands-edit" />
       <Suspense
         fallback={
