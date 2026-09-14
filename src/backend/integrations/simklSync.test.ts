@@ -59,6 +59,42 @@ beforeEach(() => {
   vi.mocked(simklRequest).mockResolvedValue({});
 });
 describe("Simkl mapping and additive sync", () => {
+  it("keeps movie and show export failures separate when TMDB numbers overlap", async () => {
+    const plan: SimklSyncPlan = {
+      mode: "export-watchlist",
+      identity: integrationIdentity(),
+      connectionToken: "simkl-test",
+      skipped: [],
+      rows: [
+        {
+          key: "movie:100",
+          title: "Movie",
+          detail: "",
+          bucket: "movies",
+          payload: { ids: { tmdb: 100 }, to: "plantowatch" },
+        },
+        {
+          key: "show:100",
+          title: "Series",
+          detail: "",
+          bucket: "shows",
+          payload: { ids: { tmdb: 100 }, to: "plantowatch" },
+        },
+      ],
+    };
+    vi.mocked(simklRequest).mockResolvedValueOnce({
+      not_found: { movies: [{ ids: { tmdb: 100 } }], shows: [] },
+    });
+    const result = await applySimklSync(
+      plan,
+      new Set(plan.rows.map((row) => row.key)),
+      new AbortController().signal,
+      vi.fn(),
+    );
+    expect(result.applied).toBe(1);
+    expect(result.failures).toHaveLength(1);
+    expect(result.failures[0].title).toBe("Movie");
+  });
   it("does not treat anime sequential numbering as Jellyfin season numbering", () => {
     const remote = {
       status: "completed",

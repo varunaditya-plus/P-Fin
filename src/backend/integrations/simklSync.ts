@@ -446,11 +446,10 @@ export async function applySimklSync(
           },
         );
         check();
-        const missing = [
-          ...(result.not_found?.movies ?? []),
-          ...(result.not_found?.shows ?? []),
-        ];
         for (const row of batch) {
+          const missing = row.bucket
+            ? (result.not_found?.[row.bucket] ?? [])
+            : [];
           const ids = row.payload?.ids as Ids;
           if (
             missing.some((item) =>

@@ -24,7 +24,7 @@ export async function integrationLibrary(types: string, signal?: AbortSignal) {
   const session = getJellyfinSession();
   const items = new Map<string, JellyfinItem>();
   let start = 0;
-  while (true) {
+  while (!signal?.aborted) {
     signal?.throwIfAborted();
     requireIntegrationIdentity(identity);
     const page = await jellyfinRequest<JellyfinItems>(
@@ -52,6 +52,7 @@ export async function integrationLibrary(types: string, signal?: AbortSignal) {
     )
       break;
   }
+  signal?.throwIfAborted();
   requireIntegrationIdentity(identity);
   return [...items.values()];
 }

@@ -32,6 +32,34 @@ beforeEach(() => {
 });
 
 describe("Letterboxd review and import", () => {
+  it("reports a full watchlist as failure rather than a successful import", async () => {
+    useIntegrationWatchlist.getState().merge(
+      homePreferenceScope(session),
+      Array.from({ length: 10000 }, (_, index) => ({
+        key: `tmdb:movie:${index + 1}`,
+        type: "movie",
+        title: `Film ${index + 1}`,
+        tmdbId: index + 1,
+        addedAt: "2026-01-01T00:00:00Z",
+      })),
+    );
+    const result = await applyLetterboxd(
+      [
+        {
+          id: 0,
+          title: "Another film",
+          candidates: [],
+          selected: { title: "Another film", tmdbId: 10001 },
+        },
+      ],
+      "watchlist",
+      new AbortController().signal,
+      vi.fn(),
+    );
+    expect(result.added).toBe(0);
+    expect(result.failures).toHaveLength(1);
+    expect(result.failures[0].error).toContain("10,000 titles");
+  });
   it("parses BOM, CRLF, quoted commas/newlines and escaped quotes; deduplicates title/year", () => {
     const result = parseLetterboxdCsv(
       '\uFEFFDate,Name,Year,Letterboxd URI\r\n2020-01-01,"A, ""film""\nname",2020,https://letterboxd.com/film/test/\r\n2020-01-02,"A, ""film"" name",2020,\r\n,Other,nope,',

@@ -19,7 +19,7 @@ export interface WatchlistEntry {
 export function validateWatchlist(value: unknown): WatchlistEntry[] {
   if (!Array.isArray(value)) return [];
   const entries = new Map<string, WatchlistEntry>();
-  value.slice(0, 10000).forEach((row) => {
+  value.forEach((row) => {
     if (!row || typeof row !== "object") return;
     const entry = row as Partial<WatchlistEntry>;
     if (entry.type !== "movie" && entry.type !== "tv") return;
@@ -59,6 +59,10 @@ export function validateWatchlist(value: unknown): WatchlistEntry[] {
           ? entry.addedAt
           : new Date().toISOString(),
     });
+    if (entries.size > 10000)
+      throw new Error(
+        "Your watchlist is limited to 10,000 titles. Remove some entries before importing more.",
+      );
   });
   return [...entries.values()];
 }
