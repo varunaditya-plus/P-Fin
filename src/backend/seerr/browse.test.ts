@@ -5,8 +5,10 @@ import { getSeerrPage, seerrFetch } from "@/backend/seerr/api";
 
 import {
   cachedSeerrPage,
+  cachedSeerrPopularPicks,
   getCachedSeerrPage,
   getSeerrPersonCredits,
+  getSeerrPopularPicks,
   randomSeerrMedia,
 } from "./browse";
 
@@ -37,6 +39,62 @@ beforeEach(() => {
 });
 
 describe("Seerr browsing", () => {
+  it("samples and shuffles a bounded popular pool without replacing the popular feed", async () => {
+    vi.mocked(getSeerrPage)
+      .mockResolvedValueOnce({
+        page: 1,
+        totalPages: 1000,
+        totalResults: 20000,
+        results: [{ id: 1, mediaType: "movie" }],
+      })
+      .mockResolvedValueOnce({
+        page: 26,
+        totalPages: 1000,
+        totalResults: 20000,
+        results: Array.from({ length: 20 }, (_, index) => ({
+          id: index + 2,
+          mediaType: "movie" as const,
+        })),
+      });
+    const picks = await getSeerrPopularPicks(
+      "movie",
+      undefined,
+      false,
+      () => 0.5,
+    );
+    expect(getSeerrPage).toHaveBeenLastCalledWith(
+      "/discover/movies?sortBy=popularity.desc&voteAverageGte=6&voteCountGte=300&page=26",
+      expect.any(AbortSignal),
+    );
+    expect(picks.results).toHaveLength(15);
+    expect(picks.results.map((item) => item.id)).not.toEqual(
+      Array.from({ length: 15 }, (_, index) => index + 2),
+    );
+    expect(await getSeerrPopularPicks("movie")).toBe(picks);
+    expect(getSeerrPage).toHaveBeenCalledTimes(2);
+    userId += 1;
+    expect(cachedSeerrPopularPicks("movie")).toBeUndefined();
+  });
+  it("caps TV pools at their available pages and reshuffles only on an explicit refresh", async () => {
+    vi.mocked(getSeerrPage).mockResolvedValue({
+      page: 1,
+      totalPages: 1,
+      totalResults: 3,
+      results: [
+        { id: 1, mediaType: "tv" },
+        { id: 2, mediaType: "tv" },
+        { id: 3, mediaType: "tv" },
+      ],
+    });
+    const first = await getSeerrPopularPicks("tv", undefined, false, () => 0);
+    const second = await getSeerrPopularPicks("tv", undefined, true, () => 0.9);
+    expect(first.results).not.toEqual(second.results);
+    expect(getSeerrPage).toHaveBeenCalledTimes(2);
+    expect(getSeerrPage).toHaveBeenLastCalledWith(
+      "/discover/tv?sortBy=popularity.desc&voteAverageGte=6&voteCountGte=150",
+      expect.any(AbortSignal),
+    );
+  });
   it("chooses from another page rather than repeatedly sampling the first carousel", async () => {
     vi.mocked(getSeerrPage)
       .mockResolvedValueOnce({

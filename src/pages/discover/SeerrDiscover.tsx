@@ -11,7 +11,10 @@ import {
 } from "@/backend/seerr/api";
 import {
   cachedSeerrPage,
+  cachedSeerrPopularPicks,
   getCachedSeerrPage,
+  getSeerrPopularPicks,
+  popularPicksPath,
   randomSeerrMedia,
   uniqueSeerrMedia,
 } from "@/backend/seerr/browse";
@@ -24,6 +27,7 @@ import {
 import {
   SeerrDetails,
   SeerrMedia,
+  SeerrMediaType,
   SeerrPage,
   SeerrUser,
 } from "@/backend/seerr/types";
@@ -219,15 +223,19 @@ function SeerrCarousel({
   onShowDetails,
   onUnauthorized,
   refresh,
+  popularPicksType,
 }: {
   title: string;
   endpoint: string;
   onShowDetails: (item: SeerrMedia) => void;
   onUnauthorized: () => void;
   refresh: number;
+  popularPicksType?: SeerrMediaType;
 }) {
   const [page, setPage] = useState<SeerrPage | undefined>(() =>
-    cachedSeerrPage(endpoint),
+    popularPicksType
+      ? cachedSeerrPopularPicks(popularPicksType)
+      : cachedSeerrPage(endpoint),
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -255,11 +263,12 @@ function SeerrCarousel({
     moreController.current?.abort();
     setLoading(true);
     setError("");
-    getCachedSeerrPage(
-      endpoint,
-      controller.signal,
-      refresh !== lastRead.current.refresh || retry !== lastRead.current.retry,
-    )
+    const force =
+      refresh !== lastRead.current.refresh || retry !== lastRead.current.retry;
+    const read = popularPicksType
+      ? getSeerrPopularPicks(popularPicksType, controller.signal, force)
+      : getCachedSeerrPage(endpoint, controller.signal, force);
+    read
       .then((value) => {
         if (!controller.signal.aborted) {
           setPage(value);
@@ -285,7 +294,7 @@ function SeerrCarousel({
       moreController.current?.abort();
       generation.current += 1;
     };
-  }, [endpoint, onUnauthorized, refresh, retry, active]);
+  }, [endpoint, onUnauthorized, refresh, retry, active, popularPicksType]);
 
   const loadMore = async () => {
     if (!page || loading || page.page >= page.totalPages) return;
@@ -333,6 +342,17 @@ function SeerrCarousel({
             {title}
           </h2>
         </div>
+        {popularPicksType ? (
+          <Button
+            theme="secondary"
+            className="mr-4 md:mr-8"
+            loading={loading && active}
+            icon={Icons.REPEAT}
+            onClick={() => setRetry((value) => value + 1)}
+          >
+            Shuffle picks
+          </Button>
+        ) : null}
       </div>
       {error && (
         <div className="px-8 py-4">
@@ -890,6 +910,15 @@ function SeerrLibraryDiscover() {
                               ? "/discover/movies"
                               : "/discover/tv"
                           }
+                          onShowDetails={setSelected}
+                          onUnauthorized={unauthorized}
+                          refresh={refresh}
+                        />
+                        <SeerrCarousel
+                          key={`popular-picks-${category}`}
+                          title="Popular Picks"
+                          endpoint={popularPicksPath(category)}
+                          popularPicksType={category}
                           onShowDetails={setSelected}
                           onUnauthorized={unauthorized}
                           refresh={refresh}
