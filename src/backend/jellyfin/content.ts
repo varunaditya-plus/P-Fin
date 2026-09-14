@@ -347,6 +347,7 @@ export async function getContentContainers(
       {
         UserId: getJellyfinSession().userId,
         IncludeItemTypes: type,
+        Fields: "ItemCounts,PrimaryImageAspectRatio",
         Recursive: true,
         SortBy: "SortName",
         StartIndex: start,

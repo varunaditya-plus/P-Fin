@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { getImageUrl } from "@/backend/jellyfin/client";
 import {
   ContainerType,
   addUniqueContainerItems,
@@ -13,6 +14,7 @@ import {
   getContentPolicy,
 } from "@/backend/jellyfin/content";
 import { Button } from "@/components/buttons/Button";
+import { Icon, Icons } from "@/components/Icon";
 
 import { contentInputClass } from "./ContentMetadataEditor";
 
@@ -127,7 +129,12 @@ export function LibraryCollections({
                     const result = await createEmptyContainer(type, name);
                     setItems((values) => [
                       ...values,
-                      { Id: result.Id, Name: name.trim(), Type: type },
+                      {
+                        Id: result.Id,
+                        Name: name.trim(),
+                        Type: type,
+                        ChildCount: 0,
+                      },
                     ]);
                     setName("");
                     return `${type === "BoxSet" ? "Collection" : "Private playlist"} created.`;
@@ -160,14 +167,14 @@ export function LibraryCollections({
               can also use a title’s actions menu.
             </p>
           ) : null}
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {items.map((item) => (
               <button
                 type="button"
                 key={item.Id}
                 disabled={busy}
                 onClick={() => onOpen(item.Id)}
-                className={`rounded-lg border px-4 py-3 text-white ${hovered === item.Id ? "border-type-link bg-white/10" : "border-white/10 bg-dropdown-background"}`}
+                className={`tabbable min-w-0 overflow-hidden rounded-lg border text-left text-white transition-colors ${hovered === item.Id ? "border-type-link bg-white/10" : "border-white/10 bg-dropdown-background hover:border-type-link"}`}
                 onDragOver={(event) => {
                   if (
                     !canCreate ||
@@ -194,13 +201,37 @@ export function LibraryCollections({
                         item.Id,
                         ids,
                       );
+                      if (added) setRevision((value) => value + 1);
                       return added
                         ? `Added ${added} ${added === 1 ? "title" : "titles"} to ${item.Name}.`
                         : `These titles are already in ${item.Name}.`;
                     });
                 }}
               >
-                {item.Name}
+                <div className="relative flex aspect-video items-center justify-center bg-background-main text-3xl text-type-secondary">
+                  <Icon icon={Icons.EPISODES} />
+                  {getImageUrl(item, "Primary", 400) ? (
+                    <img
+                      src={getImageUrl(item, "Primary", 400)}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : null}
+                </div>
+                <div className="space-y-1 p-3">
+                  <p className="line-clamp-2 font-medium">{item.Name}</p>
+                  <p className="text-xs text-type-secondary">
+                    {item.ChildCount === undefined
+                      ? type === "BoxSet"
+                        ? "Collection"
+                        : "Playlist"
+                      : `${item.ChildCount} ${item.ChildCount === 1 ? "item" : "items"}`}
+                  </p>
+                </div>
               </button>
             ))}
           </div>
