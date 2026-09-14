@@ -114,6 +114,7 @@ describe("validated app preference groups", () => {
       layout: "grid",
       density: "compact",
       rows: 3,
+      sections: {},
     });
     expect(() =>
       validateHomePreferences({
@@ -124,5 +125,37 @@ describe("validated app preference groups", () => {
         rows: 11,
       }),
     ).toThrow("layout");
+  });
+  it("validates per-section layout and edit state while retaining legacy global defaults", () => {
+    const source = {
+      order: [],
+      hidden: [],
+      layout: "grid",
+      density: "comfortable",
+      rows: 2,
+      sections: {
+        favorites: {
+          rows: 4,
+          density: "compact",
+          editing: true,
+          unknown: "drop",
+        },
+      },
+    };
+    expect(validateHomePreferences(source).sections).toEqual({
+      favorites: { rows: 4, density: "compact", editing: true },
+    });
+    expect(() =>
+      validateHomePreferences({
+        ...source,
+        sections: { favorites: { rows: 11 } },
+      }),
+    ).toThrow("section");
+    expect(() =>
+      validateHomePreferences({
+        ...source,
+        sections: { favorites: { editing: "yes" } },
+      }),
+    ).toThrow("section");
   });
 });

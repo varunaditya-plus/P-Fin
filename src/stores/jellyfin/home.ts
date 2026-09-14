@@ -3,12 +3,30 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import { JellyfinSession } from "@/stores/jellyfin";
 
+export interface HomeSectionPreferences {
+  rows?: number;
+  density?: "comfortable" | "compact";
+  editing?: boolean;
+}
+
 export interface HomePreferences {
   order: string[];
   hidden: string[];
   density: "comfortable" | "compact";
   layout: "carousel" | "grid";
   rows: number;
+  sections?: Record<string, HomeSectionPreferences>;
+}
+
+export function homeSectionPreferences(
+  preferences: HomePreferences,
+  id: string,
+) {
+  return {
+    rows: preferences.sections?.[id]?.rows ?? preferences.rows,
+    density: preferences.sections?.[id]?.density ?? preferences.density,
+    editing: preferences.sections?.[id]?.editing === true,
+  };
 }
 
 export const defaultHomePreferences: HomePreferences = {
@@ -17,6 +35,7 @@ export const defaultHomePreferences: HomePreferences = {
   density: "comfortable",
   layout: "carousel",
   rows: 2,
+  sections: {},
 };
 
 export function homePreferenceScope(session: JellyfinSession | null) {

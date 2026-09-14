@@ -6,6 +6,7 @@ import { JellyfinSession } from "@/stores/jellyfin";
 import {
   defaultHomePreferences,
   homePreferenceScope,
+  homeSectionPreferences,
   orderedHomeSections,
 } from "./home";
 
@@ -39,5 +40,30 @@ describe("home preferences", () => {
     ).toEqual(["resume", "movies", "new"]);
     expect(preferences.hidden).toEqual(["movies"]);
     expect(sections[0].id).toBe("new");
+  });
+  it("applies section overrides independently and migrates old layouts without overrides", () => {
+    const preferences = {
+      ...defaultHomePreferences,
+      rows: 3,
+      sections: {
+        favorites: { rows: 1, density: "compact" as const, editing: true },
+      },
+    };
+    expect(homeSectionPreferences(preferences, "favorites")).toEqual({
+      rows: 1,
+      density: "compact",
+      editing: true,
+    });
+    expect(homeSectionPreferences(preferences, "resume")).toEqual({
+      rows: 3,
+      density: "comfortable",
+      editing: false,
+    });
+    expect(
+      homeSectionPreferences(
+        { ...preferences, sections: undefined },
+        "favorites",
+      ).rows,
+    ).toBe(3);
   });
 });

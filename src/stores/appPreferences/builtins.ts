@@ -84,12 +84,44 @@ export function validateHomePreferences(value: unknown): HomePreferences {
     (input.rows as number) > 10
   )
     throw new Error("Invalid home layout.");
+  const sections: NonNullable<HomePreferences["sections"]> = {};
+  if (input.sections !== undefined) {
+    const sectionInput = object(input.sections);
+    if (Object.keys(sectionInput).length > 1000)
+      throw new Error("Invalid home section settings.");
+    Object.entries(sectionInput).forEach(([id, sectionValue]) => {
+      const section = object(sectionValue);
+      if (
+        !id ||
+        id.length > 200 ||
+        ["__proto__", "constructor", "prototype"].includes(id) ||
+        (section.rows !== undefined &&
+          (!Number.isInteger(section.rows) ||
+            (section.rows as number) < 1 ||
+            (section.rows as number) > 10)) ||
+        (section.density !== undefined &&
+          !["comfortable", "compact"].includes(section.density as string)) ||
+        (section.editing !== undefined && typeof section.editing !== "boolean")
+      )
+        throw new Error("Invalid home section settings.");
+      sections[id] = {
+        ...(section.rows !== undefined ? { rows: section.rows as number } : {}),
+        ...(section.density !== undefined
+          ? { density: section.density as "comfortable" | "compact" }
+          : {}),
+        ...(section.editing !== undefined
+          ? { editing: section.editing as boolean }
+          : {}),
+      };
+    });
+  }
   return {
     order: [...new Set(input.order as string[])],
     hidden: [...new Set(input.hidden as string[])],
     density: input.density as HomePreferences["density"],
     layout: input.layout as HomePreferences["layout"],
     rows: input.rows as number,
+    sections,
   };
 }
 function currentBoostPrefix() {

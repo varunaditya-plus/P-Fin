@@ -1,0 +1,28 @@
+.genre-chips-expansion {
+  transition: height 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.genre-chip {
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out,
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    color 180ms ease-out;
+  white-space: nowrap;
+}
+
+.genre-chip:active {
+  scale: 0.96;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genre-chips-expansion,
+  .genre-chip {
+    transition: none !important;
+  }
+
+  .genre-chip:active {
+    scale: 1;
+  }
+}

@@ -15,6 +15,7 @@ import {
   rankRecommendations,
   recommendationRows,
 } from "@/backend/personalisation/engine";
+import { recommendationHero } from "@/backend/personalisation/hero";
 import {
   TasteCandidate,
   TasteProfile,
@@ -188,10 +189,26 @@ export function usePersonalRecommendations(
     () => rankRecommendations(items, profile, type, Date.now(), state.activity),
     [items, profile, type, state.activity],
   );
+  const hero = useMemo(
+    () =>
+      recommendationHero(
+        ranked,
+        source === "library"
+          ? rankRecommendations(
+              items,
+              profile,
+              type === "movie" ? "tv" : "movie",
+              Date.now(),
+              state.activity,
+            )
+          : [],
+      ),
+    [ranked, source, items, profile, type, state.activity],
+  );
   return {
     rows: recommendationRows(ranked),
     ranked,
-    hero: ranked.slice(0, 5).map((entry) => entry.candidate),
+    hero,
     hasSignals: hasTasteSignals(
       profile,
       state.identity === identity ? state.activity : [],

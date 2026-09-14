@@ -29,6 +29,7 @@ import { Button } from "@/components/buttons/Button";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
+import { GenreChips } from "@/pages/jellyfin/GenreChips";
 import { HomeLayoutControls } from "@/pages/jellyfin/HomeLayoutControls";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { JellyfinFeaturedCarousel } from "@/pages/jellyfin/JellyfinFeaturedCarousel";
@@ -42,7 +43,7 @@ import { HomeLayout } from "@/pages/layouts/HomeLayout";
 import { HeroPart } from "@/pages/parts/home/HeroPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
 import { usePersonalRecommendations } from "@/pages/taste/usePersonalRecommendations";
-import { useTasteView } from "@/pages/taste/viewPreferences";
+import { resolveTasteView, useTasteView } from "@/pages/taste/viewPreferences";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import {
   LibraryBrowseSort,
@@ -105,7 +106,6 @@ export function HomePage() {
   } | null>(restored?.feed ?? null);
   const activeFeedSort = activeFeed ? sectionSort?.[activeFeed.id] : undefined;
   const [genres, setGenres] = useState<string[]>([]);
-  const [allGenres, setAllGenres] = useState(false);
   const [randomLoading, setRandomLoading] = useState(false);
   const [randomError, setRandomError] = useState("");
   const randomController = useRef<AbortController>();
@@ -417,11 +417,17 @@ export function HomePage() {
   const recommendations = usePersonalRecommendations(
     "library",
     tasteView.type,
-    tasteView.library || enableFeatured,
+    !search.trim() &&
+      !activeLibrary &&
+      !activeFeed &&
+      (tasteView.library !== false || enableFeatured),
     revision,
   );
   const forYou =
-    tasteView.library && !search.trim() && !activeLibrary && !activeFeed;
+    resolveTasteView(tasteView.library, recommendations.hasSignals) &&
+    !search.trim() &&
+    !activeLibrary &&
+    !activeFeed;
   const featured = useMemo(() => {
     if (recommendations.hasSignals && recommendations.hero.length)
       return recommendations.hero
@@ -570,12 +576,6 @@ export function HomePage() {
         <div className="flex flex-wrap items-center justify-center gap-3 py-4">
           <Button
             theme="secondary"
-            href={`/discover${searching ? `?q=${encodeURIComponent(search.trim())}` : ""}`}
-          >
-            Discover & request
-          </Button>
-          <Button
-            theme="secondary"
             loading={randomLoading}
             onClick={randomMovie}
           >
@@ -635,33 +635,13 @@ export function HomePage() {
         {!showingGrid && !forYou ? (
           <div className="mb-6 space-y-4">
             {genres.length ? (
-              <div
-                className="flex flex-wrap justify-center gap-2"
-                aria-label="Browse genres"
-              >
-                {(allGenres ? genres : genres.slice(0, 8)).map((genre) => (
-                  <button
-                    type="button"
-                    key={genre}
-                    className="rounded-full bg-buttons-cancel px-4 py-2 text-sm text-white hover:bg-buttons-cancelHover"
-                    onClick={() => {
-                      seeAll({ id: "all", title: genre });
-                      setGenreFilter(genre);
-                    }}
-                  >
-                    {genre}
-                  </button>
-                ))}
-                {genres.length > 8 ? (
-                  <button
-                    type="button"
-                    className="rounded-full px-4 py-2 text-sm text-type-link"
-                    onClick={() => setAllGenres((value) => !value)}
-                  >
-                    {allGenres ? "Fewer genres" : "More genres"}
-                  </button>
-                ) : null}
-              </div>
+              <GenreChips
+                genres={genres}
+                onSelect={(genre) => {
+                  seeAll({ id: "all", title: genre });
+                  setGenreFilter(genre);
+                }}
+              />
             ) : null}
             <HomeLayoutControls
               sections={orderedSections}
@@ -952,6 +932,17 @@ export function HomePage() {
                     onSeeAll={() => seeAll(section)}
                     onSelect={selectItem}
                     onItemChanged={() => setRevision((value) => value + 1)}
+                    onEditingChange={(editing) =>
+                      updatePreferences(scope, {
+                        sections: {
+                          ...preferences.sections,
+                          [section.id]: {
+                            ...preferences.sections?.[section.id],
+                            editing,
+                          },
+                        },
+                      })
+                    }
                   />
                 ))
             )}

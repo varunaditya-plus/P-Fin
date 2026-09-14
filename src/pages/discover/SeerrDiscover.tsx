@@ -37,7 +37,7 @@ import { useFeaturedSlideTransition } from "@/hooks/useFeaturedSlideTransition";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
 import { usePersonalRecommendations } from "@/pages/taste/usePersonalRecommendations";
-import { useTasteView } from "@/pages/taste/viewPreferences";
+import { resolveTasteView, useTasteView } from "@/pages/taste/viewPreferences";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { matchesSeerrSession, useSeerrConnection } from "@/stores/seerr";
 
@@ -608,10 +608,16 @@ function SeerrLibraryDiscover() {
   const recommendations = usePersonalRecommendations(
     "seerr",
     category,
-    Boolean(user) && tasteView.seerr,
+    Boolean(user) &&
+      !debouncedQuery &&
+      !filtersActive &&
+      tasteView.seerr !== false,
     refresh,
   );
-  const personal = tasteView.seerr && !debouncedQuery;
+  const personal =
+    resolveTasteView(tasteView.seerr, recommendations.hasSignals) &&
+    !debouncedQuery &&
+    !filtersActive;
   const requested = (details: SeerrDetails) => {
     setSelected(details);
     setRefresh((value) => value + 1);
@@ -684,13 +690,21 @@ function SeerrLibraryDiscover() {
             <div className="flex flex-wrap justify-center gap-3 pb-6">
               <Button
                 theme="secondary"
-                onClick={() =>
-                  useTasteView.setState({ seerr: !tasteView.seerr })
-                }
+                onClick={() => {
+                  if (!personal && filtersActive)
+                    changeFilters({
+                      ...filters,
+                      genre: "",
+                      language: "",
+                      region: "",
+                      sort: "popularity.desc",
+                    });
+                  useTasteView.setState({ seerr: !personal });
+                }}
               >
-                {tasteView.seerr ? "Browse discovery" : "For you"}
+                {personal ? "Browse discovery" : "For you"}
               </Button>
-              {tasteView.seerr ? (
+              {personal ? (
                 <Button theme="secondary" href="/taste">
                   My taste
                 </Button>
