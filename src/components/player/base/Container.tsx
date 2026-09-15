@@ -12,6 +12,7 @@ import { usePlayerStore } from "@/stores/player/store";
 export interface PlayerProps {
   children?: ReactNode;
   showingControls: boolean;
+  localPlaybackSuspended?: boolean;
   onLoad?: () => void;
 }
 
@@ -82,11 +83,17 @@ export function Container(props: PlayerProps) {
   return (
     <div className="relative">
       <BaseContainer>
-        <VideoContainer />
-        <KeyboardEvents />
-        <MediaSession />
+        <VideoContainer suspended={props.localPlaybackSuspended} />
+        {!props.localPlaybackSuspended ? (
+          <>
+            <KeyboardEvents />
+            <MediaSession />
+          </>
+        ) : null}
         <div className="relative h-screen overflow-hidden">
-          <VideoClickTarget showingControls={props.showingControls} />
+          {!props.localPlaybackSuspended ? (
+            <VideoClickTarget showingControls={props.showingControls} />
+          ) : null}
           <HeadUpdater />
           {props.children}
         </div>

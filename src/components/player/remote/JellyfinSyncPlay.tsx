@@ -15,6 +15,7 @@ import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
+import { copyText } from "@/utils/copyText";
 
 import { installPlaybackCommands, localPlayback } from "./playbackCommands";
 import { JellyfinSyncPlay, SyncPlayGroup, useSyncPlayState } from "./syncplay";
@@ -214,8 +215,12 @@ export function SyncPlaySettingsView() {
                 );
                 url.searchParams.set("syncplay", state.group!.GroupId);
                 try {
-                  await navigator.clipboard.writeText(url.toString());
-                  setCopyStatus("Invite link copied.");
+                  const copied = await copyText(url.toString());
+                  setCopyStatus(
+                    copied
+                      ? "Invite link copied."
+                      : "Could not copy the invitation. Check clipboard access and try again.",
+                  );
                 } catch {
                   setCopyStatus(
                     "Could not copy the invitation. Check clipboard access and try again.",

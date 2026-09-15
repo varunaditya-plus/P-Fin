@@ -27,11 +27,13 @@ export interface PlayerPartProps {
   children?: ReactNode;
   backUrl: string;
   onLoad?: () => void;
+  localPlaybackSuspended?: boolean;
 }
 
 export function PlayerPart(props: PlayerPartProps) {
   const casting = useChromecastState((state) => state.casting);
   const settings = useOverlayRouter("settings");
+  const suspended = casting || Boolean(props.localPlaybackSuspended);
   const { showTargets, showTouchTargets } = useShouldShowControls();
   const status = usePlayerStore((s) => s.status);
   const { isMobile } = useIsMobile();
@@ -81,7 +83,11 @@ export function PlayerPart(props: PlayerPartProps) {
   };
 
   return (
-    <Player.Container onLoad={props.onLoad} showingControls={showTargets}>
+    <Player.Container
+      onLoad={props.onLoad}
+      showingControls={showTargets}
+      localPlaybackSuspended={suspended}
+    >
       {props.children}
       <div className="absolute top-20 inset-x-4 flex justify-center gap-2 z-50 pointer-events-none">
         <div className="pointer-events-auto">
@@ -101,16 +107,20 @@ export function PlayerPart(props: PlayerPartProps) {
           </button>
         </div>
       ) : null}
-      <GamepadEvents />
-      <PlaybackEnhancements />
-      <SubtitleAutoSyncRuntime />
-      <PauseOverlay />
+      {!suspended ? (
+        <>
+          <GamepadEvents />
+          <PlaybackEnhancements />
+          <SubtitleAutoSyncRuntime />
+          <PauseOverlay />
+        </>
+      ) : null}
       <Player.BlackOverlay
         show={showTargets && status === playerStatus.PLAYING}
       />
       <JellyfinEpisodesRouter />
       <JellyfinSettingsRouter />
-      <Player.SubtitleView controlsShown={showTargets} />
+      {!suspended ? <Player.SubtitleView controlsShown={showTargets} /> : null}
 
       {status === playerStatus.PLAYING ? (
         <Player.CenterControls>

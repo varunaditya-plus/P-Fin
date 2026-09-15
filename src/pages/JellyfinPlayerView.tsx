@@ -27,6 +27,10 @@ import {
 import { Button } from "@/components/buttons/Button";
 import { Spinner } from "@/components/layout/Spinner";
 import { JellyfinPlaybackContext } from "@/components/player/jellyfin/JellyfinPlaybackContext";
+import {
+  allowLocalPlaybackRecovery,
+  suspendLocalCastPlayback,
+} from "@/components/player/remote/castPlayback";
 import { useChromecastState } from "@/components/player/remote/chromecast";
 import { JellyfinChromecastProvider } from "@/components/player/remote/JellyfinChromecast";
 import { JellyfinSyncPlayProvider } from "@/components/player/remote/JellyfinSyncPlay";
@@ -125,6 +129,7 @@ export function JellyfinPlayerView() {
   const [castSuspended, setCastSuspended] = useState(false);
   const [search] = useSearchParams();
   const restart = search.get("restart") === "true";
+  const startPaused = search.get("paused") === "true";
   const mediaSourceId = search.get("mediaSourceId");
   const startTicks = search.get("startTicks");
   const requestedAudio = search.get("audioIndex");
@@ -391,9 +396,13 @@ export function JellyfinPlayerView() {
               subtitle && !subtitle.IsTextSubtitleStream ? subtitle.Index : -1,
           },
           startAt,
+          false,
+          startPaused ? false : undefined,
         );
+        if (!useChromecastState.getState().casting) setCastSuspended(false);
       } catch (cause) {
         if (cancelled) return;
+        if (!useChromecastState.getState().casting) setCastSuspended(false);
         setError(
           cause instanceof Error
             ? cause.message
@@ -416,6 +425,7 @@ export function JellyfinPlayerView() {
   }, [
     itemId,
     restart,
+    startPaused,
     mediaSourceId,
     startTicks,
     requestedAudio,
@@ -435,7 +445,13 @@ export function JellyfinPlayerView() {
   );
 
   useEffect(() => {
-    if (status !== playerStatus.PLAYBACK_ERROR || !playback || busy || error)
+    if (
+      !allowLocalPlaybackRecovery(casting, castSuspended) ||
+      status !== playerStatus.PLAYBACK_ERROR ||
+      !playback ||
+      busy ||
+      error
+    )
       return;
     if (!lastOptions.current.forceTranscode && !fallbackAttempted.current) {
       fallbackAttempted.current = true;
@@ -446,10 +462,16 @@ export function JellyfinPlayerView() {
       setError(
         "Jellyfin could not play this stream. Retry with a compatible stream.",
       );
-  }, [status, playback, busy, error, reload]);
+  }, [status, playback, busy, error, reload, casting, castSuspended]);
 
   useEffect(() => {
-    if (!playback || busy || error) return;
+    if (
+      !allowLocalPlaybackRecovery(casting, castSuspended) ||
+      !playback ||
+      busy ||
+      error
+    )
+      return;
     const timeout = window.setTimeout(() => {
       const store = usePlayerStore.getState();
       if (
@@ -463,7 +485,7 @@ export function JellyfinPlayerView() {
       }
     }, 75_000);
     return () => window.clearTimeout(timeout);
-  }, [playback, busy, error]);
+  }, [playback, busy, error, casting, castSuspended]);
 
   const changeSubtitle = useCallback(
     async (index: number) => {
@@ -537,6 +559,7 @@ export function JellyfinPlayerView() {
       subtitleIndex,
       maxBitrate,
       playItem: (id: string, fromStart = false) => {
+        if (casting || castSuspended) return;
         if (selectRemoteItem(id, fromStart ? 0 : undefined)) return;
         const query = new URLSearchParams();
         if (fromStart) query.set("restart", "true");
@@ -547,6 +570,7 @@ export function JellyfinPlayerView() {
         );
       },
       changeAudio: (index: number) => {
+        if (casting || castSuspended) return;
         if (playback)
           rememberedTracks.current = rememberTrackSelection(
             playback.mediaSource,
@@ -556,6 +580,7 @@ export function JellyfinPlayerView() {
         reload({ audioIndex: index });
       },
       changeSource: (sourceId: string) => {
+        if (casting || castSuspended) return;
         const source = item?.MediaSources?.find(
           (entry) => entry.Id === sourceId,
         );
@@ -595,9 +620,11 @@ export function JellyfinPlayerView() {
         );
       },
       changeSubtitle: (index: number) => {
+        if (casting || castSuspended) return;
         changeSubtitle(index);
       },
       changeQuality: (bitrate: number) => {
+        if (casting || castSuspended) return;
         selectedBitrate.current = bitrate;
         setMaxBitrate(bitrate);
         reload({
@@ -620,6 +647,8 @@ export function JellyfinPlayerView() {
       reload,
       changeSubtitle,
       load,
+      casting,
+      castSuspended,
     ],
   );
 
@@ -635,10 +664,16 @@ export function JellyfinPlayerView() {
           blocked={Boolean(syncGroup)}
           onCastStarted={() => {
             setCastSuspended(true);
-            localPlayback(() => usePlayerStore.getState().display?.pause());
+            suspendLocalCastPlayback(usePlayerStore.getState().display);
             if (playback) stopTranscode(playback).catch(() => {});
           }}
-          onReturnToLocal={async (ticks, autoplay = true) => {
+          onReturnToLocal={async (ticks, autoplay, remoteItemId) => {
+            if (remoteItemId && remoteItemId !== item?.Id) {
+              const query = new URLSearchParams({ startTicks: String(ticks) });
+              if (autoplay === false) query.set("paused", "true");
+              navigate(`/play/${encodeURIComponent(remoteItemId)}?${query}`);
+              return;
+            }
             if (item)
               await load(
                 item,
@@ -653,8 +688,8 @@ export function JellyfinPlayerView() {
           {playback && !casting && !castSuspended ? (
             <JellyfinSessionReporter playback={playback} />
           ) : null}
-          <PlayerPart backUrl="/">
-            {busy || error ? (
+          <PlayerPart backUrl="/" localPlaybackSuspended={castSuspended}>
+            {!casting && (busy || (!castSuspended && error)) ? (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-background-main/90 p-8">
                 <div className="max-w-lg text-center space-y-5">
                   {busy ? (

@@ -127,6 +127,12 @@ export class JellyfinSyncPlay {
 
   private reportedReady = false;
 
+  private bufferReportInFlight = false;
+
+  private bufferReportSequence = 0;
+
+  private bufferReportRetryAt = 0;
+
   private bufferingSince = 0;
 
   private savedRate = 1;
@@ -155,7 +161,7 @@ export class JellyfinSyncPlay {
       throw new Error("Your Jellyfin account changed. Rejoin SyncPlay.");
   }
 
-  private request<T = void>(action: string, body?: unknown) {
+  private async request<T = void>(action: string, body?: unknown) {
     this.assertOwner();
     return jellyfinRequest<T>(`SyncPlay/${action}`, {
       method: "POST",
@@ -505,6 +511,7 @@ export class JellyfinSyncPlay {
     this.latestCommand = null;
     this.awaitingReady = true;
     this.reportedReady = false;
+    this.resetBufferReport();
     this.bufferingSince = 0;
     this.player.pause();
     const position = Math.max(
@@ -587,6 +594,7 @@ export class JellyfinSyncPlay {
           this.player.seek(target);
           this.awaitingReady = true;
           this.reportedReady = false;
+          this.resetBufferReport();
         }
       }
     };
@@ -603,7 +611,11 @@ export class JellyfinSyncPlay {
     if (snapshot.itemId !== currentQueueItem()?.ItemId) return;
     if (snapshot.ready) {
       this.bufferingSince = 0;
-      if (!this.reportedReady) {
+      if (
+        !this.reportedReady &&
+        !this.bufferReportInFlight &&
+        Date.now() >= this.bufferReportRetryAt
+      ) {
         if (this.awaitingReady) this.player.pause();
         this.reportedReady = true;
         this.awaitingReady = false;
@@ -633,24 +645,60 @@ export class JellyfinSyncPlay {
       }
     } else {
       if (!this.bufferingSince) this.bufferingSince = Date.now();
-      if (this.reportedReady && Date.now() - this.bufferingSince >= 3000) {
+      if (
+        this.reportedReady &&
+        !this.bufferReportInFlight &&
+        Date.now() >= this.bufferReportRetryAt &&
+        Date.now() - this.bufferingSince >= 3000
+      ) {
         this.reportedReady = false;
         this.reportBuffer(true);
       }
     }
   }
 
+  private resetBufferReport() {
+    this.bufferReportSequence += 1;
+    this.bufferReportInFlight = false;
+    this.bufferReportRetryAt = 0;
+  }
+
   private reportBuffer(buffering: boolean) {
     const snapshot = this.player.snapshot();
+    this.bufferReportSequence += 1;
+    const sequence = this.bufferReportSequence;
+    const groupId = useSyncPlayState.getState().group?.GroupId;
+    const playlistItemId = currentQueueItem()?.PlaylistItemId;
+    this.bufferReportInFlight = true;
     this.request(buffering ? "Buffering" : "Ready", {
       When: new Date(this.serverNow()).toISOString(),
       PositionTicks: Math.round(snapshot.seconds * TICKS),
       IsPlaying: snapshot.playing,
-      PlaylistItemId: currentQueueItem()?.PlaylistItemId,
-    }).catch((error) => this.fail(error));
+      PlaylistItemId: playlistItemId,
+    })
+      .catch((error) => {
+        if (
+          !this.alive ||
+          sequence !== this.bufferReportSequence ||
+          groupId !== useSyncPlayState.getState().group?.GroupId ||
+          playlistItemId !== currentQueueItem()?.PlaylistItemId
+        )
+          return;
+        // A failed report must not be treated as acknowledged. The next ticks
+        // retry with current media state, with backoff instead of a request loop.
+        this.reportedReady = buffering;
+        this.bufferReportRetryAt = Date.now() + 2000;
+        if (!buffering) this.awaitingReady = true;
+        this.fail(error);
+      })
+      .finally(() => {
+        if (sequence === this.bufferReportSequence)
+          this.bufferReportInFlight = false;
+      });
   }
 
   private resetGroup() {
+    this.resetBufferReport();
     clearTimeout(this.commandTimer);
     this.commandTimer = undefined;
     this.latestCommand = null;

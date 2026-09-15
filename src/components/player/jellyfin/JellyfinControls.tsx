@@ -16,6 +16,7 @@ import { PictureSettingsView } from "@/components/player/enhancements/PictureSet
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
+import { useChromecastState } from "@/components/player/remote/chromecast";
 import { ChromecastSettingsView } from "@/components/player/remote/JellyfinChromecast";
 import { SyncPlaySettingsView } from "@/components/player/remote/JellyfinSyncPlay";
 import { useSyncPlayState } from "@/components/player/remote/syncplay";
@@ -31,6 +32,7 @@ import { GamepadSettings } from "./GamepadSettings";
 import { useJellyfinPlayback } from "./JellyfinPlaybackContext";
 
 function JellyfinSettingsMenu() {
+  const casting = useChromecastState((state) => state.casting);
   const router = useOverlayRouter("settings");
   const { t } = useTranslation();
   const { playback, subtitleIndex, maxBitrate } = useJellyfinPlayback();
@@ -41,6 +43,19 @@ function JellyfinSettingsMenu() {
   const subtitle = streams.find(
     (track) => track.Type === "Subtitle" && track.Index === subtitleIndex,
   );
+  if (casting)
+    return (
+      <Menu.Card>
+        <Menu.Section>
+          <p className="text-sm text-type-secondary">
+            Playback is controlled on your cast receiver.
+          </p>
+          <Menu.ChevronLink onClick={() => router.navigate("/cast")}>
+            Google Cast controls
+          </Menu.ChevronLink>
+        </Menu.Section>
+      </Menu.Card>
+    );
   return (
     <Menu.Card>
       <Menu.Section grid>

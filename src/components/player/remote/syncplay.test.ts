@@ -335,3 +335,41 @@ describe("Jellyfin SyncPlay protocol", () => {
     expect(useSyncPlayState.getState().error).toContain("disconnected");
   });
 });
+
+it("retries a failed Ready report with backoff rather than leaving the group waiting", async () => {
+  await initialize();
+  joined();
+  request.mockRejectedValueOnce(new Error("Temporary network failure"));
+  controller.tick();
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(callsFor("Ready")).toHaveLength(1);
+  controller.tick();
+  expect(callsFor("Ready")).toHaveLength(1);
+  await vi.advanceTimersByTimeAsync(2000);
+  controller.tick();
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(callsFor("Ready")).toHaveLength(2);
+  expect(player.play).not.toHaveBeenCalled();
+});
+it("does not retry a failed Ready report after leaving its group", async () => {
+  await initialize();
+  joined();
+  let fail: (error: Error) => void = () => {};
+  request.mockImplementationOnce(
+    () =>
+      new Promise((_resolve, reject) => {
+        fail = reject;
+      }),
+  );
+  controller.tick();
+  await controller.leave();
+  fail(new Error("Old request failed"));
+  await vi.advanceTimersByTimeAsync(2000);
+  controller.tick();
+  expect(callsFor("Ready")).toHaveLength(1);
+  expect(useSyncPlayState.getState().error).toBe("");
+});

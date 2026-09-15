@@ -125,10 +125,10 @@ function VideoElement() {
   );
 }
 
-export function VideoContainer() {
+export function VideoContainer({ suspended = false }: { suspended?: boolean }) {
   const show = useShouldShowVideoElement();
   useDisplayInterface();
 
-  if (!show) return null;
+  if (!show || suspended) return null;
   return <VideoElement />;
 }

@@ -15,6 +15,7 @@ import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePlayerStore } from "@/stores/player/store";
 
+import { castReturnTarget } from "./castPlayback";
 import { JellyfinChromecast, useChromecastState } from "./chromecast";
 
 const CastContext = createContext<{
@@ -32,7 +33,11 @@ export function JellyfinChromecastProvider({
 }: {
   children: ReactNode;
   onCastStarted: () => void;
-  onReturnToLocal: (positionTicks: number, autoplay?: boolean) => Promise<void>;
+  onReturnToLocal: (
+    positionTicks: number,
+    autoplay?: boolean,
+    itemId?: string,
+  ) => Promise<void>;
   blocked?: boolean;
 }) {
   const session = useJellyfinAuth((state) => state.session);
@@ -46,21 +51,29 @@ export function JellyfinChromecastProvider({
   }, [session]);
   const casting = useChromecastState((state) => state.casting);
   const returning = useRef(false);
-  const lastRemoteTicks = useRef(0);
+  const lastRemote = useRef({
+    itemId: playback?.itemId ?? "",
+    positionTicks: 0,
+  });
   const localCallback = useRef(onReturnToLocal);
   localCallback.current = onReturnToLocal;
   const wasCasting = useRef(false);
   useEffect(
     () =>
       useChromecastState.subscribe((state) => {
-        const ticks = state.state?.PlayState?.PositionTicks;
-        if (ticks !== undefined) lastRemoteTicks.current = ticks;
+        lastRemote.current = castReturnTarget(state.state, lastRemote.current);
       }),
     [],
   );
   useEffect(() => {
     if (wasCasting.current && !casting && !returning.current)
-      localCallback.current(lastRemoteTicks.current, false).catch(() => {});
+      localCallback
+        .current(
+          lastRemote.current.positionTicks,
+          false,
+          lastRemote.current.itemId,
+        )
+        .catch(() => {});
     wasCasting.current = casting;
   }, [casting]);
   const callback = useRef(onCastStarted);
@@ -75,6 +88,10 @@ export function JellyfinChromecastProvider({
       throw new Error("Wait for the title to load before casting.");
     const state = usePlayerStore.getState();
     if (!state.meta) return;
+    lastRemote.current = {
+      itemId: playback.itemId,
+      positionTicks: Math.round(state.progress.time * 10_000_000),
+    };
     await controller.connect();
     await controller.play({
       item: {
@@ -91,14 +108,19 @@ export function JellyfinChromecastProvider({
   }, [blocked, controller, playback, subtitleIndex, maxBitrate]);
   const returnToLocal = useCallback(
     async (autoplay = true) => {
-      const position =
-        useChromecastState.getState().state?.PlayState?.PositionTicks ??
-        Math.round(usePlayerStore.getState().progress.time * 10_000_000);
+      const target = castReturnTarget(
+        useChromecastState.getState().state,
+        lastRemote.current,
+      );
       if (!controller) return;
       returning.current = true;
+      wasCasting.current = false;
       try {
         await controller.disconnect(true);
-        await onReturnToLocal(position, autoplay);
+        await onReturnToLocal(target.positionTicks, autoplay, target.itemId);
+      } catch (error) {
+        wasCasting.current = useChromecastState.getState().casting;
+        throw error;
       } finally {
         returning.current = false;
       }
