@@ -4,11 +4,18 @@ import { Button } from "@/components/buttons/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { timedTextToSrt } from "@/components/player/utils/ttml";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
+import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePlayerStore } from "@/stores/player/store";
 import { useSubtitleStore } from "@/stores/subtitles";
 import { formatSeconds } from "@/utils/formatSeconds";
 
 import { useSubtitleTools, validateSubtitleTools } from "./preferences";
+import {
+  applySubtitleTranslation,
+  restoreSubtitleTranslation,
+  subtitleToolIdentity,
+  useSubtitleToolState,
+} from "./state";
 import {
   transcriptCues,
   transcriptMatches,
@@ -18,6 +25,9 @@ import {
 export function TranscriptView() {
   const router = useOverlayRouter("settings");
   const caption = usePlayerStore((s) => s.caption.selected);
+  const source = usePlayerStore((s) => s.source);
+  const itemId = usePlayerStore((s) => s.meta?.jellyfinItemId);
+  const session = useJellyfinAuth((s) => s.session);
   const time = usePlayerStore((s) => s.progress.time);
   const delay = useSubtitleStore((s) => s.delay);
   const [query, setQuery] = useState("");
@@ -57,17 +67,17 @@ export function TranscriptView() {
   const [translationOpen, setTranslationOpen] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState("");
-  const [original, setOriginal] = useState<typeof caption>(null);
+  const original = useSubtitleToolState((state) => state.translation?.original);
   const controller = useRef<AbortController>();
   useEffect(() => {
-    setOriginal(null);
     setQuery("");
     setError("");
     return () => controller.current?.abort();
-  }, [caption?.id]);
+  }, [caption, source, itemId, session]);
   const translate = async () => {
     if (!caption || !parsed.cues.length || progress !== null) return;
     const request = new AbortController();
+    const identity = subtitleToolIdentity();
     controller.current = request;
     setError("");
     setProgress(0);
@@ -87,13 +97,8 @@ export function TranscriptView() {
         request.signal,
         setProgress,
       );
-      if (
-        request.signal.aborted ||
-        usePlayerStore.getState().caption.selected?.id !== caption.id
-      )
-        return;
-      setOriginal((value) => value ?? caption);
-      usePlayerStore.getState().setCaption({
+      if (request.signal.aborted) return;
+      applySubtitleTranslation(identity, caption, {
         ...caption,
         id: caption.id,
         language: target,
@@ -144,10 +149,7 @@ export function TranscriptView() {
             <button
               type="button"
               className="tabbable rounded-lg px-3 py-2"
-              onClick={() => {
-                usePlayerStore.getState().setCaption(original);
-                setOriginal(null);
-              }}
+              onClick={restoreSubtitleTranslation}
             >
               Restore original
             </button>

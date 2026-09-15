@@ -3,26 +3,33 @@ import { create } from "zustand";
 
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
+import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePlayerStore } from "@/stores/player/store";
-import { useSubtitleStore } from "@/stores/subtitles";
 
 import { Alignment } from "./alignment";
 import { capturePlaybackAudio } from "./capture";
 import { useSubtitleTools } from "./preferences";
+import {
+  applySubtitleAutoDelay,
+  matchesSubtitleToolIdentity,
+  subtitleToolIdentity,
+  undoSubtitleAutoDelay,
+  useSubtitleToolState,
+} from "./state";
 import { transcriptCues } from "./transcript";
 
 const useSyncStatus = create<{
   message: string;
   busy: boolean;
   error: string;
-  previous: number | null;
   cancel?: () => void;
-}>(() => ({ message: "", busy: false, error: "", previous: null }));
+}>(() => ({ message: "", busy: false, error: "" }));
 export async function syncCurrentSubtitles() {
   if (useSyncStatus.getState().busy) return;
   const player = usePlayerStore.getState();
   const caption = player.caption.selected;
   const itemId = player.meta?.jellyfinItemId;
+  const identity = subtitleToolIdentity();
   const video = document.getElementById(
     "video-element",
   ) as HTMLVideoElement | null;
@@ -34,11 +41,19 @@ export async function syncCurrentSubtitles() {
   }
   const source = video.currentSrc;
   const controller = new AbortController();
+  const abortIfChanged = () => {
+    if (
+      !matchesSubtitleToolIdentity(identity) ||
+      usePlayerStore.getState().caption.selected !== caption
+    )
+      controller.abort();
+  };
+  const unsubscribePlayer = usePlayerStore.subscribe(abortIfChanged);
+  const unsubscribeAccount = useJellyfinAuth.subscribe(abortIfChanged);
   let worker: Worker | undefined;
   useSyncStatus.setState({
     busy: true,
     error: "",
-    previous: null,
     message: "Listening to playback…",
     cancel: () => controller.abort(),
   });
@@ -109,14 +124,13 @@ export async function syncCurrentSubtitles() {
     if (
       controller.signal.aborted ||
       video.currentSrc !== source ||
-      usePlayerStore.getState().caption.selected?.srtData !== caption.srtData ||
+      usePlayerStore.getState().caption.selected !== caption ||
+      !matchesSubtitleToolIdentity(identity) ||
       usePlayerStore.getState().meta?.jellyfinItemId !== itemId
     )
       return;
-    const previous = useSubtitleStore.getState().delay;
-    useSubtitleStore.getState().setDelay(alignment.offset);
+    if (!applySubtitleAutoDelay(identity, caption, alignment.offset)) return;
     useSyncStatus.setState({
-      previous,
       message: `Applied ${alignment.offset.toFixed(2)}s delay from ${alignment.matches} matching lines (${Math.round(alignment.confidence * 100)}% confidence).`,
     });
   } catch (error) {
@@ -130,6 +144,8 @@ export async function syncCurrentSubtitles() {
       });
     else useSyncStatus.setState({ message: "Cancelled; delay unchanged." });
   } finally {
+    unsubscribePlayer();
+    unsubscribeAccount();
     worker?.terminate();
     useSyncStatus.setState({ busy: false, cancel: undefined });
   }
@@ -139,22 +155,35 @@ export function SubtitleAutoSyncRuntime() {
   const enabled = useSubtitleTools((s) => s.autoSync);
   const caption = usePlayerStore((s) => s.caption.selected);
   const itemId = usePlayerStore((s) => s.meta?.jellyfinItemId);
+  const source = usePlayerStore((s) => s.source);
+  const session = useJellyfinAuth((s) => s.session);
   const played = usePlayerStore((s) => s.mediaPlaying.hasPlayedOnce);
-  const attempted = useRef("");
+  const busy = useSyncStatus((state) => state.busy);
+  const attempted = useRef<{
+    identity: ReturnType<typeof subtitleToolIdentity>;
+    caption: typeof caption;
+  }>();
   useEffect(() => {
     useSyncStatus.getState().cancel?.();
-    useSyncStatus.setState({ previous: null, message: "", error: "" });
+    useSyncStatus.setState({ message: "", error: "" });
     return () => useSyncStatus.getState().cancel?.();
-  }, [caption?.id, itemId]);
+  }, [caption, itemId, source, session]);
   useEffect(() => {
-    const key = `${itemId}:${caption?.id}`;
-    if (!enabled || !played || !caption || attempted.current === key) return;
+    if (
+      !enabled ||
+      !played ||
+      !caption ||
+      busy ||
+      (attempted.current?.caption === caption &&
+        matchesSubtitleToolIdentity(attempted.current.identity))
+    )
+      return;
     const timer = setTimeout(() => {
-      attempted.current = key;
+      attempted.current = { identity: subtitleToolIdentity(), caption };
       syncCurrentSubtitles();
     }, 3000);
     return () => clearTimeout(timer);
-  }, [enabled, played, caption, itemId]);
+  }, [enabled, played, caption, itemId, source, session, busy]);
   return null;
 }
 
@@ -162,6 +191,7 @@ export function SubtitleSyncView() {
   const router = useOverlayRouter("settings");
   const enabled = useSubtitleTools((s) => s.autoSync);
   const status = useSyncStatus();
+  const autoDelay = useSubtitleToolState((state) => state.autoDelay);
   return (
     <Menu.CardWithScrollable>
       <Menu.BackLink onClick={() => router.navigate("/captions")}>
@@ -210,14 +240,13 @@ export function SubtitleSyncView() {
             {status.error}
           </p>
         ) : null}
-        {status.previous !== null ? (
+        {autoDelay ? (
           <button
             type="button"
             className="tabbable p-2"
             onClick={() => {
-              useSubtitleStore.getState().setDelay(status.previous!);
+              undoSubtitleAutoDelay();
               useSyncStatus.setState({
-                previous: null,
                 message: "Previous delay restored.",
               });
             }}
