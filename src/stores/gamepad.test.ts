@@ -1,7 +1,12 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { describe, expect, it } from "vitest";
 
-import { defaultGamepadMapping, pollGamepad, validateGamepad } from "./gamepad";
+import {
+  defaultGamepadMapping,
+  gamepadButtonLabel,
+  pollGamepad,
+  validateGamepad,
+} from "./gamepad";
 
 const pad = (pressed: number[]) => ({
   buttons: Array.from({ length: 16 }, (_, index) => ({
@@ -66,4 +71,17 @@ describe("controller input", () => {
       ),
     ).toEqual(["up"]);
   });
+});
+
+it("labels standard Xbox and PlayStation controls and preserves a remapped mute action", () => {
+  expect(gamepadButtonLabel(0, "Xbox Wireless Controller")).toBe("A");
+  expect(gamepadButtonLabel(0, "DualSense Wireless Controller")).toBe("Cross");
+  expect(gamepadButtonLabel(4)).toBe("LB / L1");
+  expect(gamepadButtonLabel(31, "Xbox")).toBe("Button 31");
+  expect(
+    validateGamepad({ enabled: true, mapping: { 10: "mute" } }).mapping[10],
+  ).toBe("mute");
+  const held = new Map();
+  expect(pollGamepad(pad([10]), { 10: "mute" }, held, 0)).toEqual(["mute"]);
+  expect(pollGamepad(pad([10]), { 10: "mute" }, held, 1000)).toEqual([]);
 });

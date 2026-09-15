@@ -7,6 +7,7 @@ export const gamepadActions = {
   back: "Close menu / return to library",
   play: "Play / pause",
   captions: "Toggle subtitles",
+  mute: "Mute / unmute",
   previous: "Previous episode",
   next: "Next episode",
   rewind: "Seek back 10 seconds",
@@ -39,6 +40,60 @@ export const defaultGamepadMapping: Record<number, GamepadAction> = {
   14: "left",
   15: "right",
 };
+/** Standard Gamepad API positions, with familiar names for supported controllers. */
+export function gamepadButtonLabel(index: number, controllerId = "") {
+  const xbox = [
+    "A",
+    "B",
+    "X",
+    "Y",
+    "LB",
+    "RB",
+    "LT",
+    "RT",
+    "View",
+    "Menu",
+    "Left stick press",
+    "Right stick press",
+    "D-pad up",
+    "D-pad down",
+    "D-pad left",
+    "D-pad right",
+    "Xbox button",
+  ];
+  const playstation = [
+    "Cross",
+    "Circle",
+    "Square",
+    "Triangle",
+    "L1",
+    "R1",
+    "L2",
+    "R2",
+    "Share / Create",
+    "Options",
+    "L3",
+    "R3",
+    "D-pad up",
+    "D-pad down",
+    "D-pad left",
+    "D-pad right",
+    "PS button",
+    "Touchpad press",
+  ];
+  if (/playstation|dualshock|dualsense|sony|054c/i.test(controllerId))
+    return playstation[index] ?? `Button ${index}`;
+  if (/xbox|xinput|microsoft|045e/i.test(controllerId))
+    return xbox[index] ?? `Button ${index}`;
+  const first = xbox[index];
+  const second = playstation[index];
+  return first && second
+    ? first === second
+      ? first
+      : `${first} / ${second}`
+    : `Button ${index}`;
+}
+
 export interface GamepadPreferences {
   enabled: boolean;
   mapping: Record<number, GamepadAction>;

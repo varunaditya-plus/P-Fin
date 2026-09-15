@@ -4,6 +4,7 @@ import {
   GamepadAction,
   defaultGamepadMapping,
   gamepadActions,
+  gamepadButtonLabel,
   useGamepadStore,
 } from "@/stores/gamepad";
 
@@ -50,7 +51,7 @@ export function GamepadSettings() {
               key={button}
               className="flex items-center justify-between gap-3 text-sm"
             >
-              <span>Button {button}</span>
+              <span>{gamepadButtonLabel(Number(button), controllers[0])}</span>
               <select
                 className="min-w-0 max-w-[70%] rounded-lg bg-dropdown-background p-2 text-white tabbable"
                 value={action}
@@ -76,7 +77,7 @@ export function GamepadSettings() {
       {enabled ? (
         <button
           type="button"
-          className="tabbable rounded-lg bg-buttons-secondary px-3 py-2"
+          className="tabbable rounded-lg bg-buttons-cancel px-3 py-2"
           onClick={() =>
             useGamepadStore.setState({ mapping: { ...defaultGamepadMapping } })
           }

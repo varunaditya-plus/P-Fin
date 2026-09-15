@@ -28,6 +28,11 @@ let pressed: number[];
 let root: ReturnType<typeof createRoot>;
 let container: HTMLDivElement;
 const play = vi.fn();
+const setVolume = vi.fn((value: number) =>
+  usePlayerStore.setState((state) => {
+    state.mediaPlaying.volume = value;
+  }),
+);
 const playItem = vi.fn();
 const cancelFrame = vi.fn();
 beforeEach(() => {
@@ -60,7 +65,7 @@ beforeEach(() => {
   });
   usePlayerStore.setState(usePlayerStore.getInitialState(), true);
   usePlayerStore.setState((s) => {
-    s.display = { play } as unknown as DisplayInterface;
+    s.display = { play, setVolume } as unknown as DisplayInterface;
     s.mediaPlaying.isPaused = true;
   });
   container = document.createElement("div");
@@ -105,4 +110,21 @@ describe("mounted controller actions", () => {
     act(() => useGamepadStore.setState({ enabled: false }));
     expect(cancelFrame).toHaveBeenCalledWith(1);
   });
+});
+
+it("mutes and restores the previous volume through a remapped controller button", () => {
+  act(() => {
+    useGamepadStore.setState({ mapping: { 0: "mute" } });
+    usePlayerStore.setState((state) => {
+      state.mediaPlaying.volume = 0.4;
+    });
+  });
+  pressed = [0];
+  act(() => frame(10));
+  expect(setVolume).toHaveBeenLastCalledWith(0);
+  pressed = [];
+  act(() => frame(20));
+  pressed = [0];
+  act(() => frame(30));
+  expect(setVolume).toHaveBeenLastCalledWith(0.4);
 });

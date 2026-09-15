@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useVolume } from "@/components/player/hooks/useVolume";
 import { useInternalOverlayRouter } from "@/hooks/useOverlayRouter";
 import { pollGamepad, useGamepadStore } from "@/stores/gamepad";
 import { PlayerHoverState } from "@/stores/player/slices/interface";
@@ -48,6 +49,9 @@ function moveFocus(root: HTMLElement, direction: string) {
 export function GamepadEvents() {
   const enabled = useGamepadStore((s) => s.enabled);
   const controls = useJellyfinPlayback();
+  const { toggleMute } = useVolume();
+  const mute = useRef(toggleMute);
+  mute.current = toggleMute;
   const latest = useRef(controls);
   latest.current = controls;
   const anchor = useRef<HTMLSpanElement>(null);
@@ -102,6 +106,9 @@ export function GamepadEvents() {
                 display?.setTime(
                   Math.min(state.progress.duration, state.progress.time + 10),
                 );
+                break;
+              case "mute":
+                mute.current();
                 break;
               case "quieter":
                 display?.setVolume(
