@@ -399,7 +399,8 @@ export function JellyfinPlayerView() {
           false,
           startPaused ? false : undefined,
         );
-        if (!useChromecastState.getState().casting) setCastSuspended(false);
+        if (!cancelled && !useChromecastState.getState().casting)
+          setCastSuspended(false);
       } catch (cause) {
         if (cancelled) return;
         if (!useChromecastState.getState().casting) setCastSuspended(false);

@@ -14,6 +14,8 @@ import {
   JellyfinChromecastProvider,
 } from "./JellyfinChromecast";
 
+const disconnected = vi.hoisted(() => vi.fn());
+
 vi.mock("@/components/player/jellyfin/JellyfinPlaybackContext", () => ({
   useJellyfinPlayback: () => ({
     playback: { itemId: "local-A", mediaSource: { Id: "source" } },
@@ -26,7 +28,8 @@ vi.mock("./chromecast", async (original) => ({
   JellyfinChromecast: class {
     initialize = async () => {};
 
-    disconnect = async () => {
+    disconnect = async (stop: boolean) => {
+      disconnected(stop);
       useChromecastState.setState({
         casting: false,
         connected: false,
@@ -114,4 +117,40 @@ it("retains receiver item and time when a disconnect clears the active receiver 
   );
   expect(returned).toHaveBeenCalledOnce();
   expect(returned).toHaveBeenCalledWith(300000000, false, "remote-B");
+});
+
+it("disconnects an idle receiver after a failed start without stopping its media or restarting local playback", async () => {
+  await act(async () =>
+    root.render(
+      <MemoryRouter>
+        <JellyfinChromecastProvider
+          onCastStarted={started}
+          onReturnToLocal={returned}
+        >
+          <ChromecastSettingsView />
+        </JellyfinChromecastProvider>
+      </MemoryRouter>,
+    ),
+  );
+  await act(async () =>
+    useChromecastState.setState({
+      connected: true,
+      casting: false,
+      error: "Receiver could not start this title.",
+    }),
+  );
+  const disconnect = [...container.querySelectorAll("button")].find(
+    (button) => button.textContent?.trim() === "Disconnect receiver",
+  );
+  expect(disconnect).toBeTruthy();
+  await act(async () => disconnect!.click());
+  expect(disconnected).toHaveBeenCalledWith(false);
+  expect(useChromecastState.getState().connected).toBe(false);
+  expect(returned).not.toHaveBeenCalled();
+  expect(started).not.toHaveBeenCalled();
+  expect(
+    [...container.querySelectorAll("button")].some(
+      (button) => button.textContent?.trim() === "Disconnect receiver",
+    ),
+  ).toBe(false);
 });

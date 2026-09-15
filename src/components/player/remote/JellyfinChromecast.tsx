@@ -336,6 +336,17 @@ export function ChromecastSettingsView() {
                   ? "Choose a receiver"
                   : "Loading Google Cast…"}
             </Menu.Link>
+            {state.connected ? (
+              <Menu.Link
+                clickable
+                disabled={busy || !context}
+                onClick={() => {
+                  if (context) run(() => context.controller.disconnect(false));
+                }}
+              >
+                Disconnect receiver
+              </Menu.Link>
+            ) : null}
             {context?.blocked ? (
               <p className="text-sm">Leave SyncPlay before casting.</p>
             ) : null}
