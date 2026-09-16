@@ -349,10 +349,16 @@ export async function getHomeFeedPage(
 }
 
 export async function getHomeGenres(signal?: AbortSignal): Promise<string[]> {
-  const filters = await jellyfinRequest<{ Genres?: string[] }>(
-    "Items/Filters",
+  const filters = await jellyfinRequest<{ Genres?: { Name?: string }[] }>(
+    "Items/Filters2",
     { signal },
     { UserId: getJellyfinSession().userId, IncludeItemTypes: "Movie,Series" },
   );
-  return [...new Set(filters.Genres ?? [])].filter(Boolean).sort();
+  return [
+    ...new Set(
+      (filters.Genres ?? [])
+        .map((genre) => genre.Name?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ].sort();
 }

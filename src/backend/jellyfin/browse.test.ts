@@ -5,6 +5,7 @@ import { JellyfinItem, jellyfinRequest } from "@/backend/jellyfin/client";
 
 import {
   getHomeFeedPage,
+  getHomeGenres,
   getRandomMovie,
   librarySearchScore,
   normalizeLibrarySearch,
@@ -35,6 +36,16 @@ beforeEach(() => {
 });
 
 describe("library discovery", () => {
+  it("reads named recursive genres from Jellyfin's current filter endpoint", async () => {
+    vi.mocked(jellyfinRequest).mockResolvedValue({
+      Genres: [{ Name: "Drama" }, { Name: "Comedy" }, { Name: "Drama" }, {}],
+    });
+    await expect(getHomeGenres()).resolves.toEqual(["Comedy", "Drama"]);
+    expect(vi.mocked(jellyfinRequest).mock.calls[0][0]).toBe("Items/Filters2");
+    expect(vi.mocked(jellyfinRequest).mock.calls[0][2]?.IncludeItemTypes).toBe(
+      "Movie,Series",
+    );
+  });
   it("normalises title punctuation and accents without treating a numeric title as a year", () => {
     expect(normalizeLibrarySearch("  Amélie: Life & Love  ")).toBe(
       "amelie life and love",
