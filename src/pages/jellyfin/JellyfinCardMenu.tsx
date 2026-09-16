@@ -12,6 +12,7 @@ import {
   getJellyfinDetailsId,
   getJellyfinDetailsTarget,
 } from "@/backend/jellyfin/details";
+import { resetResumePoint } from "@/backend/jellyfin/progress";
 import { Icon, Icons } from "@/components/Icon";
 import {
   ContextMenuDivider,
@@ -36,8 +37,10 @@ export function JellyfinCardMenu({
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [copyFallback, setCopyFallback] = useState(false);
+  const [confirmResumeReset, setConfirmResumeReset] = useState(false);
   const copyInput = useRef<HTMLInputElement>(null);
   const [canCollect, setCanCollect] = useState(false);
+  const [canResetResume, setCanResetResume] = useState(false);
   const active = useRef(true);
   const playable = [
     "Movie",
@@ -66,12 +69,18 @@ export function JellyfinCardMenu({
     if (!container)
       getContentPolicy(controller.signal)
         .then((policy) => {
-          if (!controller.signal.aborted)
+          if (!controller.signal.aborted) {
             setCanCollect(
               Boolean(
                 policy.IsAdministrator || policy.EnableCollectionManagement,
               ),
             );
+            setCanResetResume(
+              Boolean(policy.IsAdministrator) ||
+                (policy as { EnableUserPreferenceAccess?: boolean })
+                  .EnableUserPreferenceAccess !== false,
+            );
+          }
         })
         .catch(() => undefined);
     return () => {
@@ -161,6 +170,51 @@ export function JellyfinCardMenu({
             {item.UserData?.Played ? "Mark as unwatched" : "Mark as watched"}
           </span>
         </ContextMenuItem>
+      ) : null}
+      {playable &&
+      canResetResume &&
+      item.Type !== "Series" &&
+      (item.UserData?.PlaybackPositionTicks ?? 0) > 0 ? (
+        <>
+          <ContextMenuItem
+            disabled={busy}
+            onClick={() => setConfirmResumeReset((value) => !value)}
+          >
+            <Icon icon={Icons.X} className="text-lg w-5" />
+            <span className="flex-1">Remove from Continue Watching</span>
+          </ContextMenuItem>
+          {confirmResumeReset ? (
+            <div className="border-y border-white/10 py-2">
+              <p className="max-w-[260px] px-3 py-2 text-xs text-white/70">
+                This resets the saved resume point for this{" "}
+                {item.Type === "Episode" ? "episode" : "title"}. Watched status
+                and play history stay unchanged.
+              </p>
+              <ContextMenuItem
+                disabled={busy}
+                onClick={() =>
+                  action(async () => {
+                    const data = await resetResumePoint(item.Id);
+                    onChanged({
+                      ...item.UserData,
+                      ...data,
+                      PlaybackPositionTicks: 0,
+                    });
+                    if (active.current) close();
+                  })
+                }
+              >
+                Reset resume point
+              </ContextMenuItem>
+              <ContextMenuItem
+                disabled={busy}
+                onClick={() => setConfirmResumeReset(false)}
+              >
+                Cancel reset
+              </ContextMenuItem>
+            </div>
+          ) : null}
+        </>
       ) : null}
       <ContextMenuItem disabled={busy} onClick={() => mutate("favorite")}>
         <Icon

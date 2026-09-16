@@ -70,8 +70,9 @@ describe("series length", () => {
       status: "IsUnplayed",
       genre: "Drama",
     });
-    expect(result.Items.map((item) => item.Id)).toEqual(["long", "short"]);
-    expect(result.Items[0].TotalSeriesRunTimeTicks).toBe(900);
+    expect(result.Items.map((item) => item.Id)).toEqual(["short", "long"]);
+    expect(result.Items[0].AvailableEpisodeCount).toBe(500);
+    expect(result.Items[1].TotalSeriesRunTimeTicks).toBe(900);
     const calls = vi.mocked(jellyfinRequest).mock.calls;
     expect(
       calls.find((call) => call[2]?.IncludeItemTypes === "Series")?.[2],
@@ -82,11 +83,12 @@ describe("series length", () => {
         .every((call) => call[2]?.Filters === undefined),
     ).toBe(true);
     const count = calls.length;
-    await getSeriesLengthPage("shows", {
+    const ascending = await getSeriesLengthPage("shows", {
       sortOrder: "Ascending",
       status: "IsUnplayed",
       genre: "Drama",
     });
+    expect(ascending.Items.map((item) => item.Id)).toEqual(["long", "short"]);
     expect(jellyfinRequest).toHaveBeenCalledTimes(count);
   });
 });

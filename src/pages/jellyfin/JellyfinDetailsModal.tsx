@@ -23,6 +23,7 @@ import {
   getCollectionItems,
   getPlaylistItems,
 } from "@/backend/jellyfin/library";
+import { seriesProgress } from "@/backend/jellyfin/seriesProgress";
 import { tasteMediaFromJellyfin } from "@/backend/personalisation/catalog";
 import { Button } from "@/components/buttons/Button";
 import { IconPatch } from "@/components/buttons/IconPatch";
@@ -94,6 +95,10 @@ function JellyfinDetailsContent({
   const [contentsError, setContentsError] = useState("");
   const [seasons, setSeasons] = useState<JellyfinItem[]>([]);
   const [episodes, setEpisodes] = useState<JellyfinItem[]>([]);
+  const [seriesEpisodes, setSeriesEpisodes] = useState<{
+    seriesId: string;
+    items: JellyfinItem[];
+  } | null>(null);
   const [similar, setSimilar] = useState<JellyfinItem[]>([]);
   const [selectedSeason, setSelectedSeason] = useState("");
   const [episodeQuery, setEpisodeQuery] = useState("");
@@ -165,6 +170,7 @@ function JellyfinDetailsContent({
     setContentsOffset(0);
     setContentsError("");
     setEpisodes([]);
+    setSeriesEpisodes(null);
     setSeasons([]);
     setSimilar([]);
     setSelectedSeason("");
@@ -211,6 +217,7 @@ function JellyfinDetailsContent({
           );
           if (controller.signal.aborted) return;
           setSeasons(availableSeasons);
+          setSeriesEpisodes({ seriesId: details.Id, items: availableEpisodes });
           setSelectedSeason(
             resumeEpisode?.SeasonId ||
               availableSeasons.find((season) => !season.UserData?.Played)?.Id ||
@@ -317,6 +324,14 @@ function JellyfinDetailsContent({
     const updated = await getContentItem(item?.Id ?? selectedId);
     setItem((current) => (current?.Id === updated.Id ? updated : current));
     onItemChanged?.();
+    if (updated.Type === "Series") {
+      const all = await getEpisodes(updated.Id);
+      setSeriesEpisodes((current) =>
+        current?.seriesId === updated.Id
+          ? { seriesId: updated.Id, items: all }
+          : current,
+      );
+    }
   };
   const shuffleEpisodes = async (seasonOnly: boolean) => {
     if (!item || shuffling) return;
@@ -439,6 +454,9 @@ function JellyfinDetailsContent({
           : current;
       setItem((current) => (current ? update(current) : current));
       setEpisodes((current) => current.map(update));
+      setSeriesEpisodes((current) =>
+        current ? { ...current, items: current.items.map(update) } : current,
+      );
       setSeasons((current) => current.map(update));
       onItemChanged?.();
     } catch (reason: unknown) {
@@ -468,6 +486,10 @@ function JellyfinDetailsContent({
     return () => observer.disconnect();
   }, [loading, item?.Id, enableImageLogos]);
   const title = item?.Name;
+  const watchedProgress =
+    item?.Type === "Series" && seriesEpisodes?.seriesId === item.Id
+      ? seriesProgress(seriesEpisodes.items)
+      : null;
   const backdrop = item ? getImageUrl(item, "Backdrop", 1600) : undefined;
   const logo = item?.ImageTags?.Logo
     ? getImageUrl(item, "Logo", 800)
@@ -804,6 +826,33 @@ function JellyfinDetailsContent({
                       ) : null}
                       {item.Type === "Series" && (
                         <div className="mt-6 md:mt-0">
+                          {watchedProgress ? (
+                            <div
+                              className="mb-5 space-y-2"
+                              aria-label="Series watched progress"
+                            >
+                              <p className="text-sm text-type-secondary">
+                                {watchedProgress.watched} of{" "}
+                                {watchedProgress.total} episodes watched · all
+                                seasons
+                              </p>
+                              <div
+                                role="progressbar"
+                                aria-label="Watched episodes"
+                                aria-valuemin={0}
+                                aria-valuemax={watchedProgress.total || 1}
+                                aria-valuenow={watchedProgress.watched}
+                                className="h-1.5 overflow-hidden rounded-full bg-white/10"
+                              >
+                                <div
+                                  className="h-full bg-buttons-purple"
+                                  style={{
+                                    width: `${watchedProgress.percentage}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ) : null}
                           <div className="flex justify-between items-center mb-3">
                             <h4 className="text-lg font-semibold text-white">
                               Episodes

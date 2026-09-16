@@ -120,7 +120,7 @@ export async function getSeriesLengthPage(
   const direction = options.sortOrder === "Descending" ? -1 : 1;
   const sorted = [...items].sort(
     (a, b) =>
-      ((a.TotalSeriesRunTimeTicks ?? 0) - (b.TotalSeriesRunTimeTicks ?? 0)) *
+      ((a.AvailableEpisodeCount ?? 0) - (b.AvailableEpisodeCount ?? 0)) *
         direction || a.Name.localeCompare(b.Name),
   );
   const start = options.startIndex ?? 0;

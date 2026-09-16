@@ -10,6 +10,7 @@ import {
   setPlayed,
 } from "@/backend/jellyfin/client";
 import { getContentPolicy } from "@/backend/jellyfin/content";
+import { resetResumePoint } from "@/backend/jellyfin/progress";
 
 import { JellyfinCardMenu } from "./JellyfinCardMenu";
 
@@ -24,6 +25,7 @@ vi.mock("@/backend/jellyfin/content", () => ({
   getContentPolicy: vi.fn(),
   getContentItem: vi.fn(),
 }));
+vi.mock("@/backend/jellyfin/progress", () => ({ resetResumePoint: vi.fn() }));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -76,6 +78,38 @@ afterEach(() => {
 });
 
 describe("Jellyfin card actions", () => {
+  it("explains and confirms a resume reset without changing watched or favourite state", async () => {
+    vi.mocked(resetResumePoint).mockResolvedValue({
+      PlaybackPositionTicks: 0,
+      Played: false,
+      IsFavorite: true,
+    });
+    await render({
+      ...movie,
+      UserData: { PlaybackPositionTicks: 100, Played: false, IsFavorite: true },
+    });
+    await choose("Remove from Continue Watching");
+    expect(resetResumePoint).not.toHaveBeenCalled();
+    expect(container.textContent).toContain("resets the saved resume point");
+    await choose("Reset resume point");
+    expect(resetResumePoint).toHaveBeenCalledWith(movie.Id);
+    expect(changed).toHaveBeenCalledWith({
+      PlaybackPositionTicks: 0,
+      Played: false,
+      IsFavorite: true,
+    });
+    expect(setPlayed).not.toHaveBeenCalled();
+    expect(setFavorite).not.toHaveBeenCalled();
+  });
+  it("does not expose resume reset when Jellyfin denies preference changes", async () => {
+    vi.mocked(getContentPolicy).mockResolvedValue({
+      EnableUserPreferenceAccess: false,
+    } as Awaited<ReturnType<typeof getContentPolicy>>);
+    await render({ ...movie, UserData: { PlaybackPositionTicks: 100 } });
+    expect(container.textContent).not.toContain(
+      "Remove from Continue Watching",
+    );
+  });
   it("opens series details from episode actions while Resume plays the original episode", async () => {
     const episode: JellyfinItem = {
       Id: "episode",

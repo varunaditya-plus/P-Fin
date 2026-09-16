@@ -6,9 +6,11 @@ import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  JellyfinItem,
   getEpisodes,
   getSeasons,
   getSimilarItems,
+  setPlayed,
 } from "@/backend/jellyfin/client";
 import {
   ContentItem,
@@ -31,6 +33,7 @@ vi.mock("@/backend/jellyfin/client", async (original) => ({
   getEpisodes: vi.fn(),
   getSeasons: vi.fn(),
   getSimilarItems: vi.fn(),
+  setPlayed: vi.fn(),
 }));
 vi.mock("@/backend/jellyfin/content", async (original) => ({
   ...(await original<typeof import("@/backend/jellyfin/content")>()),
@@ -192,6 +195,7 @@ beforeEach(() => {
     EnableContentDownloading: true,
   });
   vi.mocked(getSimilarItems).mockResolvedValue([]);
+  vi.mocked(setPlayed).mockResolvedValue(undefined);
   vi.mocked(getContentItem).mockImplementation(async (id) => {
     const found = [series, resume, other, movie].find(
       (entry) => entry.Id === id,
@@ -220,6 +224,36 @@ afterEach(() => {
 });
 
 describe("Jellyfin series details integration", () => {
+  it("shows watched progress for all seasons and updates the total after an episode action", async () => {
+    const watched: JellyfinItem = {
+      Id: "season-one-episode",
+      Type: "Episode",
+      Name: "Earlier episode",
+      SeriesId: "series",
+      SeasonId: "season-1",
+      ParentIndexNumber: 1,
+      IndexNumber: 1,
+      UserData: { Played: true },
+    };
+    vi.mocked(getEpisodes).mockImplementation(async (_id, seasonId) =>
+      seasonId === undefined
+        ? [watched, resume, other, watched]
+        : seasonId === "season-1"
+          ? [watched]
+          : [resume, other],
+    );
+    await render();
+    expect(
+      document.querySelector('[aria-label="Series watched progress"]')
+        ?.textContent,
+    ).toContain("1 of 3 episodes watched · all seasons");
+    await clickLabel("Mark Other Episode as watched");
+    expect(setPlayed).toHaveBeenCalledWith("other-episode", true);
+    expect(
+      document.querySelector('[aria-label="Series watched progress"]')
+        ?.textContent,
+    ).toContain("2 of 3 episodes watched · all seasons");
+  });
   it("turns an episode deep link into series details and selects the season containing resume progress", async () => {
     await render();
     expect(

@@ -748,7 +748,7 @@ export function HomePage() {
                     <option value="ProductionYear">Release year</option>
                     <option value="CommunityRating">Rating</option>
                     {currentLibrary.CollectionType === "tvshows" ? (
-                      <option value="SeriesLength">Total series length</option>
+                      <option value="SeriesLength">Series episode count</option>
                     ) : null}
                     {currentLibrary.CollectionType !== "boxsets" &&
                     currentLibrary.CollectionType !== "tvshows" ? (
