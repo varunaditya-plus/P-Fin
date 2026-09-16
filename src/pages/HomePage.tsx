@@ -543,6 +543,19 @@ export function HomePage() {
           />
         )}
       </div>
+      {!showingGrid && !forYou && genres.length ? (
+        <WideContainer>
+          <div className="mb-5">
+            <GenreChips
+              genres={genres}
+              onSelect={(genre) => {
+                seeAll({ id: "all", title: genre });
+                setGenreFilter(genre);
+              }}
+            />
+          </div>
+        </WideContainer>
+      ) : null}
       {!searching && libraries.length > 0 ? (
         <div className="pb-4 w-full max-w-screen-xl mx-auto">
           <div className="relative flex justify-center">
@@ -634,15 +647,6 @@ export function HomePage() {
         ) : null}
         {!showingGrid && !forYou ? (
           <div className="mb-6 space-y-4">
-            {genres.length ? (
-              <GenreChips
-                genres={genres}
-                onSelect={(genre) => {
-                  seeAll({ id: "all", title: genre });
-                  setGenreFilter(genre);
-                }}
-              />
-            ) : null}
             <HomeLayoutControls
               sections={orderedSections}
               preferences={preferences}
