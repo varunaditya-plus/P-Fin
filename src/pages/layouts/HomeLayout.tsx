@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 
 import { Navigation } from "@/components/layout/Navigation";
-import { usePreferencesStore } from "@/stores/preferences";
 
 export function HomeLayout(props: {
   showBg: boolean;
+  hasFeaturedBackdrop: boolean;
   children: React.ReactNode;
 }) {
-  const enableFeatured = usePreferencesStore((state) => state.enableFeatured);
   const [clearBackground, setClearBackground] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setClearBackground(Boolean(enableFeatured) && window.scrollY < 600);
+      setClearBackground(props.hasFeaturedBackdrop && window.scrollY < 600);
     };
     window.addEventListener("scroll", handleScroll);
     // Initial check
@@ -21,14 +20,16 @@ export function HomeLayout(props: {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [enableFeatured]);
+  }, [props.hasFeaturedBackdrop]);
 
   return (
-    <div className="min-h-screen pb-24 md:pb-0">
+    <div className="min-h-screen">
       <Navigation
-        bg={enableFeatured ? true : props.showBg}
+        hideMobileNavigation
+        lightbarAtTop
+        bg={props.hasFeaturedBackdrop || props.showBg}
         clearBackground={clearBackground}
-        noLightbar={enableFeatured}
+        noLightbar={props.hasFeaturedBackdrop}
       />
       {props.children}
     </div>

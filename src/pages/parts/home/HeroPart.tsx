@@ -11,8 +11,6 @@ import { useRandomTranslation } from "@/hooks/useRandomTranslation";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { useBannerSize } from "@/stores/banner";
 
-import { DiscoverShortcut } from "./DiscoverShortcut";
-
 export interface HeroPartProps {
   setIsSticky: (val: boolean) => void;
   searchParams: ReturnType<typeof useSearchQuery>;
@@ -64,7 +62,6 @@ export function HeroPart({
   const [fixedPosition, setFixedPosition] = useState<{
     left: number;
     width: number;
-    top: number;
   } | null>(null);
 
   useEffect(() => {
@@ -77,37 +74,13 @@ export function HeroPart({
       setIsSticky(fixed);
       setFixedPosition((previous) => {
         if (!fixed) return null;
-        const leftNav = document
-          .querySelector('[data-navigation-cluster="left"]')
-          ?.getBoundingClientRect();
-        const rightNav = document
-          .querySelector('[data-navigation-cluster="right"]')
-          ?.getBoundingClientRect();
-        const leftEdge = (leftNav?.right ?? 0) + 16;
-        const rightEdge = (rightNav?.left ?? window.innerWidth) - 16;
-        const inline = !isMobile && rightEdge - leftEdge >= 360;
-        const width = inline
-          ? Math.min(rect.width, rightEdge - leftEdge)
-          : rect.width;
-        const left = inline
-          ? Math.max(leftEdge, Math.min(rect.left, rightEdge - width))
-          : rect.left;
-        const top =
-          !isMobile && !inline ? navbarHeight + bannerSize + 8 : topOffset;
-        if (
-          previous?.left === left &&
-          previous.width === width &&
-          previous.top === top
-        )
+        if (previous?.left === rect.left && previous.width === rect.width)
           return previous;
-        return { left, width, top };
+        return { left: rect.left, width: rect.width };
       });
     };
     const resizeObserver = new ResizeObserver(updatePosition);
     resizeObserver.observe(holder);
-    document
-      .querySelectorAll("[data-navigation-cluster]")
-      .forEach((cluster) => resizeObserver.observe(cluster));
     window.addEventListener("scroll", updatePosition, { passive: true });
     window.addEventListener("resize", updatePosition);
     updatePosition();
@@ -116,7 +89,7 @@ export function HeroPart({
       window.removeEventListener("scroll", updatePosition);
       window.removeEventListener("resize", updatePosition);
     };
-  }, [topOffset, setIsSticky, showTitle, isInFeatured, isMobile, bannerSize]);
+  }, [topOffset, setIsSticky, showTitle, isInFeatured]);
 
   const time = getTimeOfDay(new Date());
   const title = randomT(`home.titles.${time}`);
@@ -147,27 +120,23 @@ export function HeroPart({
                     top: 0,
                     left: fixedPosition.left,
                     width: fixedPosition.width,
-                    paddingTop: fixedPosition.top,
+                    paddingTop: topOffset,
                     transform: "translateZ(0)",
                   }
                 : undefined
             }
           >
-            <div className="flex items-start gap-2">
-              <div className="min-w-0 flex-1">
-                <SearchBarInput
-                  ref={inputRef}
-                  onChange={setSearch}
-                  value={search}
-                  onUnFocus={setSearchUnFocus}
-                  placeholder={placeholder ?? ""}
-                  isSticky={showBg}
-                  isInFeatured={isInFeatured}
-                  hideTooltip
-                />
-              </div>
-              <DiscoverShortcut query={search} />
-            </div>
+            <SearchBarInput
+              ref={inputRef}
+              onChange={setSearch}
+              value={search}
+              onUnFocus={setSearchUnFocus}
+              placeholder={placeholder ?? ""}
+              isSticky={showBg}
+              isInFeatured={isInFeatured}
+              fullHeight
+              hideTooltip
+            />
           </div>
         </div>
       </div>

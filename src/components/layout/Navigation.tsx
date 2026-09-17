@@ -20,6 +20,8 @@ export interface NavigationProps {
   noLightbar?: boolean;
   doBackground?: boolean;
   clearBackground?: boolean;
+  hideMobileNavigation?: boolean;
+  lightbarAtTop?: boolean;
 }
 
 export function Navigation(props: NavigationProps) {
@@ -62,7 +64,12 @@ export function Navigation(props: NavigationProps) {
             top: `${bannerHeight}px`,
           }}
         >
-          <div className="absolute inset-x-0 -mt-[22%] flex items-center sm:mt-0">
+          <div
+            className={classNames(
+              "absolute inset-x-0 -mt-[22%] flex items-center sm:mt-0",
+              props.lightbarAtTop && "sm:top-0",
+            )}
+          >
             <Lightbar noParticles={enableLowPerformanceMode} />
           </div>
         </div>
@@ -191,7 +198,7 @@ export function Navigation(props: NavigationProps) {
           </div>
         </div>
       </div>
-      {session ? <MobileNavigation /> : null}
+      {session && !props.hideMobileNavigation ? <MobileNavigation /> : null}
     </>
   );
 }

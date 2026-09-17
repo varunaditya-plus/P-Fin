@@ -6,7 +6,6 @@ import { MemoryRouter, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  JellyfinItem,
   getEpisodes,
   getSeasons,
   getSimilarItems,
@@ -224,35 +223,30 @@ afterEach(() => {
 });
 
 describe("Jellyfin series details integration", () => {
-  it("shows watched progress for all seasons and updates the total after an episode action", async () => {
-    const watched: JellyfinItem = {
-      Id: "season-one-episode",
-      Type: "Episode",
-      Name: "Earlier episode",
-      SeriesId: "series",
-      SeasonId: "season-1",
-      ParentIndexNumber: 1,
-      IndexNumber: 1,
-      UserData: { Played: true },
-    };
-    vi.mocked(getEpisodes).mockImplementation(async (_id, seasonId) =>
-      seasonId === undefined
-        ? [watched, resume, other, watched]
-        : seasonId === "season-1"
-          ? [watched]
-          : [resume, other],
-    );
+  it("keeps episode watched and settings actions without the removed summary, search or shuffle controls", async () => {
     await render();
     expect(
-      document.querySelector('[aria-label="Series watched progress"]')
-        ?.textContent,
-    ).toContain("1 of 3 episodes watched · all seasons");
+      document.querySelector('[aria-label="Series watched progress"]'),
+    ).toBeNull();
+    expect(
+      document.querySelector(
+        'input[aria-label="Find episode by title, number or S2E3"]',
+      ),
+    ).toBeNull();
+    expect(document.body.textContent).not.toContain("Shuffle season");
+    expect(document.body.textContent).not.toContain("Shuffle series");
+    expect(
+      document.querySelector(
+        'button[aria-label="Settings for episode 4: Other Episode"]',
+      ),
+    ).not.toBeNull();
     await clickLabel("Mark Other Episode as watched");
     expect(setPlayed).toHaveBeenCalledWith("other-episode", true);
     expect(
-      document.querySelector('[aria-label="Series watched progress"]')
-        ?.textContent,
-    ).toContain("2 of 3 episodes watched · all seasons");
+      document.querySelector(
+        'button[aria-label="Mark Other Episode as unwatched"]',
+      ),
+    ).not.toBeNull();
   });
   it("turns an episode deep link into series details and selects the season containing resume progress", async () => {
     await render();

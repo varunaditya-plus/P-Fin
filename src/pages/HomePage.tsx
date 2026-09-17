@@ -3,86 +3,41 @@ import { Helmet } from "react-helmet-async";
 import { useSearchParams } from "react-router-dom";
 
 import {
-  cachedHomeSnapshot,
-  getHomeFeedPage,
-  getHomeGenres,
-  getHomeSnapshot,
-  getRandomMovie,
-  searchLibrary,
-  uniqueLibraryItems,
-} from "@/backend/jellyfin/browse";
-import {
   JellyfinItem,
   getHomeSections,
   getImageUrl,
+  getLibraries,
+  searchItems,
 } from "@/backend/jellyfin/client";
 import { getJellyfinDetailsId } from "@/backend/jellyfin/details";
 import {
   LibraryFilters,
+  LibrarySortBy,
   LibrarySortOrder,
   LibraryStatus,
   getLibraryFilters,
   getLibraryPage,
 } from "@/backend/jellyfin/library";
-import { getSeriesLengthPage } from "@/backend/jellyfin/seriesLength";
 import { Button } from "@/components/buttons/Button";
 import { WideContainer } from "@/components/layout/WideContainer";
+import { MediaGrid } from "@/components/media/MediaGrid";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
-import { GenreChips } from "@/pages/jellyfin/GenreChips";
-import { HomeLayoutControls } from "@/pages/jellyfin/HomeLayoutControls";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { JellyfinFeaturedCarousel } from "@/pages/jellyfin/JellyfinFeaturedCarousel";
-import { JellyfinHomeSection } from "@/pages/jellyfin/JellyfinHomeSection";
 import {
   JellyfinMediaCard,
   JellyfinMediaCarousel,
 } from "@/pages/jellyfin/JellyfinMediaCarousel";
-import { LibraryCollections } from "@/pages/jellyfin/LibraryCollections";
 import { HomeLayout } from "@/pages/layouts/HomeLayout";
 import { HeroPart } from "@/pages/parts/home/HeroPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
-import { usePersonalRecommendations } from "@/pages/taste/usePersonalRecommendations";
-import { resolveTasteView, useTasteView } from "@/pages/taste/viewPreferences";
-import { useJellyfinAuth } from "@/stores/jellyfin";
-import {
-  LibraryBrowseSort,
-  defaultLibraryBrowse,
-  readBrowseSession,
-  saveBrowseSession,
-  useBrowsePreferences,
-} from "@/stores/jellyfin/browse";
-import {
-  defaultHomePreferences,
-  homePreferenceScope,
-  orderedHomeSections,
-  useHomePreferences,
-} from "@/stores/jellyfin/home";
 import { usePreferencesStore } from "@/stores/preferences";
 
 type HomeSection = Awaited<ReturnType<typeof getHomeSections>>[number];
 
 export function HomePage() {
   const [showBg, setShowBg] = useState(false);
-  const session = useJellyfinAuth((state) => state.session);
-  const scope = homePreferenceScope(session);
-  const tasteView = useTasteView();
-  const [restored] = useState(() =>
-    readBrowseSession(scope, window.location.pathname),
-  );
-  const savedFilters = restored?.library
-    ? useBrowsePreferences.getState().profiles[scope]?.libraries[
-        restored.library
-      ]
-    : undefined;
-  const restoreScroll = useRef(restored?.scroll);
-  const sectionSort = useBrowsePreferences(
-    (state) => state.profiles[scope]?.sectionSort,
-  );
-  const updateLibraryPreferences = useBrowsePreferences(
-    (state) => state.updateLibrary,
-  );
-  const sortSection = useBrowsePreferences((state) => state.sortSection);
   const searchParams = useSearchQuery();
   const [search] = searchParams;
   const debouncedSearch = useDebounce(search.trim(), 300);
@@ -93,122 +48,28 @@ export function HomePage() {
   const [detailsAction, setDetailsAction] = useState<
     "collection" | "playlist"
   >();
-  const [snapshot] = useState(cachedHomeSnapshot);
-  const [sections, setSections] = useState<HomeSection[]>(
-    snapshot?.sections ?? [],
-  );
-  const [libraries, setLibraries] = useState<JellyfinItem[]>(
-    snapshot?.libraries ?? [],
-  );
-  const [activeFeed, setActiveFeed] = useState<{
-    id: string;
-    title: string;
-  } | null>(restored?.feed ?? null);
-  const activeFeedSort = activeFeed ? sectionSort?.[activeFeed.id] : undefined;
-  const [genres, setGenres] = useState<string[]>([]);
-  const [randomLoading, setRandomLoading] = useState(false);
-  const [randomError, setRandomError] = useState("");
-  const randomController = useRef<AbortController>();
-  useEffect(() => () => randomController.current?.abort(), []);
-  const preferences = useHomePreferences(
-    (state) => state.profiles[scope] ?? defaultHomePreferences,
-  );
-  const updatePreferences = useHomePreferences((state) => state.update);
-  const resetPreferences = useHomePreferences((state) => state.reset);
-  const orderedSections = useMemo(
-    () => orderedHomeSections(sections, preferences),
-    [sections, preferences],
-  );
-  const [activeLibrary, setActiveLibrary] = useState(restored?.library ?? "");
+  const [sections, setSections] = useState<HomeSection[]>([]);
+  const [libraries, setLibraries] = useState<JellyfinItem[]>([]);
+  const [activeLibrary, setActiveLibrary] = useState("");
   const [libraryFilters, setLibraryFilters] = useState<LibraryFilters>({
     Genres: [],
     Years: [],
   });
-  const [sortBy, setSortBy] = useState<LibraryBrowseSort>(
-    savedFilters?.sortBy ?? "SortName",
-  );
-  const [sortOrder, setSortOrder] = useState<LibrarySortOrder>(
-    savedFilters?.sortOrder ?? "Ascending",
-  );
-  const [statusFilter, setStatusFilter] = useState<LibraryStatus>(
-    savedFilters?.status ?? "all",
-  );
-  const [genreFilter, setGenreFilter] = useState(
-    savedFilters?.genre ?? restored?.genre ?? "",
-  );
-  const [yearFilter, setYearFilter] = useState(savedFilters?.year ?? "");
+  const [sortBy, setSortBy] = useState<LibrarySortBy>("SortName");
+  const [sortOrder, setSortOrder] = useState<LibrarySortOrder>("Ascending");
+  const [statusFilter, setStatusFilter] = useState<LibraryStatus>("all");
+  const [genreFilter, setGenreFilter] = useState("");
+  const [yearFilter, setYearFilter] = useState("");
   const [results, setResults] = useState<JellyfinItem[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [nextStartIndex, setNextStartIndex] = useState(0);
-  const [loading, setLoading] = useState(!snapshot);
+  const [loading, setLoading] = useState(true);
   const [loadingResults, setLoadingResults] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [resultError, setResultError] = useState("");
   const [revision, setRevision] = useState(0);
   const requestGeneration = useRef(0);
-  const [resultsLoaded, setResultsLoaded] = useState(false);
-  const sessionView = useRef({
-    library: activeLibrary,
-    feed: activeFeed,
-    genre: genreFilter,
-  });
-  sessionView.current = {
-    library: activeLibrary,
-    feed: activeFeed,
-    genre: genreFilter,
-  };
-  useEffect(() => {
-    const path = window.location.pathname;
-    let timer: ReturnType<typeof setTimeout>;
-    const save = () =>
-      saveBrowseSession(scope, path, {
-        ...sessionView.current,
-        scroll: window.scrollY,
-      });
-    const scrolled = () => {
-      clearTimeout(timer);
-      timer = setTimeout(save, 300);
-    };
-    window.addEventListener("scroll", scrolled, { passive: true });
-    window.addEventListener("pagehide", save);
-    return () => {
-      clearTimeout(timer);
-      save();
-      window.removeEventListener("scroll", scrolled);
-      window.removeEventListener("pagehide", save);
-    };
-  }, [scope]);
-  useEffect(() => {
-    if (!activeLibrary) return;
-    updateLibraryPreferences(scope, activeLibrary, {
-      sortBy,
-      sortOrder,
-      status: statusFilter,
-      genre: genreFilter,
-      year: yearFilter,
-    });
-  }, [
-    scope,
-    activeLibrary,
-    sortBy,
-    sortOrder,
-    statusFilter,
-    genreFilter,
-    yearFilter,
-    updateLibraryPreferences,
-  ]);
-  useEffect(() => {
-    if (
-      restoreScroll.current === undefined ||
-      loading ||
-      ((activeLibrary || activeFeed) && !resultsLoaded)
-    )
-      return;
-    const value = restoreScroll.current;
-    restoreScroll.current = undefined;
-    requestAnimationFrame(() => window.scrollTo(0, value));
-  }, [loading, activeLibrary, activeFeed, resultsLoaded]);
   const enableFeatured = usePreferencesStore((state) => state.enableFeatured);
 
   useEffect(() => {
@@ -219,8 +80,8 @@ export function HomePage() {
   useEffect(() => {
     let active = true;
     setError("");
-    getHomeSnapshot(revision > 0)
-      .then(({ sections: homeSections, libraries: views }) => {
+    Promise.all([getHomeSections(), getLibraries()])
+      .then(([homeSections, views]) => {
         if (!active) return;
         setSections(homeSections);
         setLibraries(views);
@@ -239,17 +100,7 @@ export function HomePage() {
     return () => {
       active = false;
     };
-  }, [revision, scope]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    getHomeGenres(controller.signal)
-      .then((values) => {
-        if (!controller.signal.aborted) setGenres(values);
-      })
-      .catch(() => {});
-    return () => controller.abort();
-  }, [scope]);
+  }, [revision]);
 
   const currentLibrary = useMemo(
     () => libraries.find((item) => item.Id === activeLibrary),
@@ -278,57 +129,37 @@ export function HomePage() {
     requestGeneration.current += 1;
     setLoadingMore(false);
     setResultError("");
-    if (!debouncedSearch && !activeLibrary && !activeFeed) {
-      setResults([]);
-      setTotalResults(0);
-      setNextStartIndex(0);
+    setResults([]);
+    setTotalResults(0);
+    setNextStartIndex(0);
+    if (!debouncedSearch && !activeLibrary) {
       setLoadingResults(false);
       return () => controller.abort();
     }
     setLoadingResults(true);
     const load = debouncedSearch
-      ? searchLibrary(debouncedSearch, controller.signal).then((items) => ({
+      ? searchItems(debouncedSearch, controller.signal).then((items) => ({
           Items: items,
           TotalRecordCount: items.length,
           FetchedCount: items.length,
         }))
-      : activeFeed
-        ? getHomeFeedPage(
-            activeFeed.id,
-            0,
-            genreFilter,
+      : currentLibrary
+        ? getLibraryPage(
+            currentLibrary,
+            {
+              sortBy,
+              sortOrder,
+              status: statusFilter,
+              genre: genreFilter,
+              year: yearFilter ? Number(yearFilter) : undefined,
+            },
             controller.signal,
-            60,
-            activeFeedSort,
           )
-        : currentLibrary
-          ? sortBy === "SeriesLength"
-            ? getSeriesLengthPage(
-                currentLibrary.Id,
-                {
-                  sortOrder,
-                  status: statusFilter,
-                  genre: genreFilter,
-                  year: yearFilter ? Number(yearFilter) : undefined,
-                },
-                controller.signal,
-              )
-            : getLibraryPage(
-                currentLibrary,
-                {
-                  sortBy,
-                  sortOrder,
-                  status: statusFilter,
-                  genre: genreFilter,
-                  year: yearFilter ? Number(yearFilter) : undefined,
-                },
-                controller.signal,
-              )
-          : Promise.resolve({
-              Items: [] as JellyfinItem[],
-              TotalRecordCount: 0,
-              FetchedCount: 0,
-            });
+        : Promise.resolve({
+            Items: [] as JellyfinItem[],
+            TotalRecordCount: 0,
+            FetchedCount: 0,
+          });
     load
       .then((data) => {
         if (controller.signal.aborted) return;
@@ -345,17 +176,12 @@ export function HomePage() {
           );
       })
       .finally(() => {
-        if (!controller.signal.aborted) {
-          setLoadingResults(false);
-          setResultsLoaded(true);
-        }
+        if (!controller.signal.aborted) setLoadingResults(false);
       });
     return () => controller.abort();
   }, [
     debouncedSearch,
     activeLibrary,
-    activeFeed,
-    activeFeedSort,
     currentLibrary,
     sortBy,
     sortOrder,
@@ -363,43 +189,24 @@ export function HomePage() {
     genreFilter,
     yearFilter,
     revision,
-    scope,
   ]);
 
   const loadMore = async () => {
-    if (loadingMore || loadingResults || (!currentLibrary && !activeFeed))
-      return;
+    if (loadingMore || !currentLibrary) return;
     const generation = requestGeneration.current;
     setLoadingMore(true);
     setResultError("");
     try {
-      const next = activeFeed
-        ? await getHomeFeedPage(
-            activeFeed.id,
-            nextStartIndex,
-            genreFilter,
-            undefined,
-            60,
-            activeFeedSort,
-          )
-        : sortBy === "SeriesLength"
-          ? await getSeriesLengthPage(currentLibrary!.Id, {
-              startIndex: nextStartIndex,
-              sortOrder,
-              status: statusFilter,
-              genre: genreFilter,
-              year: yearFilter ? Number(yearFilter) : undefined,
-            })
-          : await getLibraryPage(currentLibrary!, {
-              startIndex: nextStartIndex,
-              sortBy,
-              sortOrder,
-              status: statusFilter,
-              genre: genreFilter,
-              year: yearFilter ? Number(yearFilter) : undefined,
-            });
+      const next = await getLibraryPage(currentLibrary, {
+        startIndex: nextStartIndex,
+        sortBy,
+        sortOrder,
+        status: statusFilter,
+        genre: genreFilter,
+        year: yearFilter ? Number(yearFilter) : undefined,
+      });
       if (generation !== requestGeneration.current) return;
-      setResults((current) => uniqueLibraryItems([...current, ...next.Items]));
+      setResults((current) => [...current, ...next.Items]);
       setTotalResults(next.TotalRecordCount ?? totalResults);
       setNextStartIndex((current) => current + next.FetchedCount);
     } catch (reason: unknown) {
@@ -414,25 +221,7 @@ export function HomePage() {
     }
   };
 
-  const recommendations = usePersonalRecommendations(
-    "library",
-    tasteView.type,
-    !search.trim() &&
-      !activeLibrary &&
-      !activeFeed &&
-      (tasteView.library !== false || enableFeatured),
-    revision,
-  );
-  const forYou =
-    resolveTasteView(tasteView.library, recommendations.hasSignals) &&
-    !search.trim() &&
-    !activeLibrary &&
-    !activeFeed;
   const featured = useMemo(() => {
-    if (recommendations.hasSignals && recommendations.hero.length)
-      return recommendations.hero
-        .map((candidate) => candidate.item)
-        .filter((item) => getImageUrl(item, "Backdrop"));
     const seen = new Set<string>();
     return sections
       .flatMap((section) => section.items)
@@ -447,7 +236,7 @@ export function HomePage() {
         return true;
       })
       .slice(0, 10);
-  }, [sections, recommendations.hasSignals, recommendations.hero]);
+  }, [sections]);
 
   const selectItem = (
     item: JellyfinItem,
@@ -458,52 +247,17 @@ export function HomePage() {
   };
   const searching = search.trim().length > 0;
   const showFeatured = enableFeatured && (loading || featured.length > 0);
-  const showingGrid =
-    searching || Boolean(activeLibrary) || Boolean(activeFeed);
+  const showingGrid = searching || Boolean(activeLibrary);
   const hasLibraryFilters =
     statusFilter !== "all" || Boolean(genreFilter) || Boolean(yearFilter);
   const switchLibrary = (id: string) => {
-    useTasteView.setState({ library: false });
     setActiveLibrary(id);
-    setActiveFeed(null);
-    const saved =
-      useBrowsePreferences.getState().profiles[scope]?.libraries[id] ??
-      defaultLibraryBrowse;
-    setSortBy(saved.sortBy);
-    setSortOrder(saved.sortOrder);
-    setStatusFilter(saved.status);
-    setGenreFilter(saved.genre);
-    setYearFilter(saved.year);
+    setSortBy("SortName");
+    setSortOrder("Ascending");
+    setStatusFilter("all");
+    setGenreFilter("");
+    setYearFilter("");
     setLibraryFilters({ Genres: [], Years: [] });
-  };
-  const seeAll = (section: { id: string; title: string }) => {
-    switchLibrary("");
-    setActiveFeed(section);
-  };
-  const randomMovie = async () => {
-    if (randomLoading) return;
-    const controller = new AbortController();
-    randomController.current = controller;
-    setRandomLoading(true);
-    setRandomError("");
-    try {
-      const item = await getRandomMovie(controller.signal);
-      if (controller.signal.aborted) return;
-      if (item) selectItem(item);
-      else
-        setRandomError(
-          "There are no available movies in your Jellyfin library.",
-        );
-    } catch (reason) {
-      if (!controller.signal.aborted)
-        setRandomError(
-          reason instanceof Error
-            ? reason.message
-            : "Unable to choose a movie.",
-        );
-    } finally {
-      if (!controller.signal.aborted) setRandomLoading(false);
-    }
   };
   const closeDetails = () => {
     setSelectedItem(null);
@@ -515,7 +269,10 @@ export function HomePage() {
   };
 
   return (
-    <HomeLayout showBg={showBg}>
+    <HomeLayout
+      showBg={showBg}
+      hasFeaturedBackdrop={Boolean(showFeatured && !showingGrid)}
+    >
       <Helmet>
         <style type="text/css">
           {"html, body { scrollbar-gutter: stable; }"}
@@ -543,39 +300,15 @@ export function HomePage() {
           />
         )}
       </div>
-      {!showingGrid && !forYou && genres.length ? (
-        <WideContainer>
-          <div className="mb-5">
-            <GenreChips
-              genres={genres}
-              onSelect={(genre) => {
-                seeAll({ id: "all", title: genre });
-                setGenreFilter(genre);
-              }}
-            />
-          </div>
-        </WideContainer>
-      ) : null}
       {!searching && libraries.length > 0 ? (
         <div className="pb-4 w-full max-w-screen-xl mx-auto">
           <div className="relative flex justify-center">
             <div className="flex space-x-4 overflow-x-auto px-4 scrollbar-none">
-              <button
-                type="button"
-                aria-pressed={forYou}
-                className={`text-xl md:text-2xl font-bold p-2 rounded-full whitespace-nowrap tabbable ${forYou ? "text-type-link" : "text-type-secondary"}`}
-                onClick={() => {
-                  switchLibrary("");
-                  useTasteView.setState({ library: true });
-                }}
-              >
-                For you
-              </button>
               {[{ Id: "", Name: "Home" }, ...libraries].map((library) => (
                 <button
                   key={library.Id}
                   type="button"
-                  className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id && !activeFeed && !forYou ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
+                  className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center whitespace-nowrap transition-transform duration-200 ${activeLibrary === library.Id ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
                   onClick={() => switchLibrary(library.Id)}
                 >
                   {library.Name}
@@ -585,79 +318,6 @@ export function HomePage() {
           </div>
         </div>
       ) : null}
-      <WideContainer>
-        <div className="flex flex-wrap items-center justify-center gap-3 py-4">
-          <Button
-            theme="secondary"
-            loading={randomLoading}
-            onClick={randomMovie}
-          >
-            Random movie
-          </Button>
-          {!searching ? (
-            <>
-              <Button
-                theme="secondary"
-                onClick={() =>
-                  seeAll({ id: "recent", title: "Recently added" })
-                }
-              >
-                Recently added
-              </Button>
-              <Button
-                theme="secondary"
-                onClick={() => seeAll({ id: "completed", title: "Completed" })}
-              >
-                Completed
-              </Button>
-            </>
-          ) : null}
-          {activeFeed ? (
-            <Button theme="secondary" onClick={() => switchLibrary("")}>
-              Back to home
-            </Button>
-          ) : null}
-        </div>
-        {forYou ? (
-          <div className="flex flex-wrap justify-center gap-3 py-3">
-            <Button theme="secondary" href="/taste">
-              My taste
-            </Button>
-            {(["movie", "tv"] as const).map((type) => (
-              <button
-                type="button"
-                key={type}
-                aria-pressed={tasteView.type === type}
-                className={`tabbable rounded-full px-4 py-2 ${tasteView.type === type ? "bg-buttons-primary text-white" : "text-type-secondary"}`}
-                onClick={() => useTasteView.setState({ type })}
-              >
-                {type === "movie" ? "Movies" : "TV shows"}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        <LibraryCollections
-          onOpen={(id) => setSelectedItem(id)}
-          onChanged={() => setRevision((value) => value + 1)}
-        />
-        {randomError ? (
-          <p role="alert" className="pb-4 text-center">
-            {randomError}
-          </p>
-        ) : null}
-        {!showingGrid && !forYou ? (
-          <div className="mb-6 space-y-4">
-            <HomeLayoutControls
-              sections={orderedSections}
-              preferences={preferences}
-              onChange={(changes) => updatePreferences(scope, changes)}
-              onReset={() => resetPreferences(scope)}
-              sectionSort={sectionSort}
-              onSort={(id, sort) => sortSection(scope, id, sort)}
-            />
-          </div>
-        ) : null}
-      </WideContainer>
       {error ? (
         <WideContainer>
           <div role="alert" className="py-12 text-center space-y-4">
@@ -674,63 +334,14 @@ export function HomePage() {
           </div>
         </WideContainer>
       ) : null}
-      {forYou ? (
-        <WideContainer>
-          {recommendations.loading ? (
-            <p role="status" className="py-8 text-center">
-              Finding titles for you…
-            </p>
-          ) : null}
-          {recommendations.error ? (
-            <div role="alert" className="py-8 text-center">
-              <p>{recommendations.error}</p>
-              <Button
-                theme="secondary"
-                onClick={() => setRevision((value) => value + 1)}
-              >
-                Try again
-              </Button>
-            </div>
-          ) : null}
-          {!recommendations.loading && !recommendations.hasSignals ? (
-            <div className="py-10 text-center space-y-4">
-              <p>
-                Rate a few titles or choose your favourite genres to personalise
-                your library.
-              </p>
-              <Button href="/taste">Shape my recommendations</Button>
-            </div>
-          ) : null}
-          {recommendations.rows.map((row) => (
-            <section key={row.id} className="py-4">
-              <p className="px-4 text-sm text-type-secondary">
-                {row.description}
-              </p>
-              <JellyfinMediaCarousel
-                id={`foryou-${row.id}`}
-                title={row.title}
-                items={row.items.map((candidate) => candidate.item)}
-                onSelect={selectItem}
-              />
-            </section>
-          ))}
-          {!recommendations.loading &&
-          recommendations.hasSignals &&
-          !recommendations.rows.length ? (
-            <p className="py-10 text-center">
-              No new matching titles are available in your Jellyfin library yet.
-            </p>
-          ) : null}
-        </WideContainer>
-      ) : showingGrid ? (
+      {showingGrid ? (
         <WideContainer>
           <div className="pb-12 pt-8">
             <h2 className="text-2xl font-bold text-white mb-8">
               {searching
                 ? "Search your library"
-                : (activeFeed?.title ??
-                  libraries.find((library) => library.Id === activeLibrary)
-                    ?.Name)}
+                : libraries.find((library) => library.Id === activeLibrary)
+                    ?.Name}
             </h2>
             {!searching && currentLibrary ? (
               <div
@@ -744,16 +355,13 @@ export function HomePage() {
                     className="rounded-lg bg-dropdown-background px-4 py-3 text-white"
                     value={sortBy}
                     onChange={(event) =>
-                      setSortBy(event.target.value as LibraryBrowseSort)
+                      setSortBy(event.target.value as LibrarySortBy)
                     }
                   >
                     <option value="SortName">Title</option>
                     <option value="DateCreated">Date added</option>
                     <option value="ProductionYear">Release year</option>
                     <option value="CommunityRating">Rating</option>
-                    {currentLibrary.CollectionType === "tvshows" ? (
-                      <option value="SeriesLength">Series episode count</option>
-                    ) : null}
                     {currentLibrary.CollectionType !== "boxsets" &&
                     currentLibrary.CollectionType !== "tvshows" ? (
                       <option value="Runtime">Runtime</option>
@@ -844,28 +452,11 @@ export function HomePage() {
                 ) : null}
               </div>
             ) : null}
-            {(loadingResults || debouncedSearch !== search.trim()) &&
-            !results.length ? (
+            {loadingResults || debouncedSearch !== search.trim() ? (
               <SearchLoadingPart />
             ) : (
               <>
-                {loadingResults || debouncedSearch !== search.trim() ? (
-                  <p role="status" className="mb-4 text-sm text-type-secondary">
-                    Updating titles…
-                  </p>
-                ) : (
-                  <p className="mb-4 text-sm text-type-secondary">
-                    {totalResults} {searching ? "matches" : "titles"}
-                  </p>
-                )}
-                <div
-                  aria-busy={loadingResults}
-                  className={
-                    preferences.density === "compact"
-                      ? "grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8"
-                      : "grid grid-cols-2 gap-7 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 3xl:grid-cols-8"
-                  }
-                >
+                <MediaGrid>
                   {results.map((item) => (
                     <JellyfinMediaCard
                       key={item.Id}
@@ -874,7 +465,7 @@ export function HomePage() {
                       onItemChanged={() => setRevision((value) => value + 1)}
                     />
                   ))}
-                </div>
+                </MediaGrid>
                 {!results.length && !resultError ? (
                   <p className="py-12 text-center">
                     {searching
@@ -902,7 +493,6 @@ export function HomePage() {
                     <Button
                       theme="secondary"
                       loading={loadingMore}
-                      disabled={loadingResults}
                       onClick={loadMore}
                     >
                       Load more
@@ -916,7 +506,7 @@ export function HomePage() {
       ) : (
         <WideContainer ultraWide classNames="!px-3 md:!px-9">
           <div className="space-y-4 pb-12">
-            {loading && !sections.length ? (
+            {loading ? (
               <JellyfinMediaCarousel
                 id="loading-library"
                 title="Your library"
@@ -925,41 +515,15 @@ export function HomePage() {
                 onSelect={selectItem}
               />
             ) : (
-              orderedSections
-                .filter((section) => !preferences.hidden.includes(section.id))
-                .map((section) => (
-                  <JellyfinHomeSection
-                    key={section.id}
-                    {...section}
-                    preferences={preferences}
-                    sort={sectionSort?.[section.id]}
-                    onSeeAll={() => seeAll(section)}
-                    onSelect={selectItem}
-                    onItemChanged={() => setRevision((value) => value + 1)}
-                    onEditingChange={(editing) =>
-                      updatePreferences(scope, {
-                        sections: {
-                          ...preferences.sections,
-                          [section.id]: {
-                            ...preferences.sections?.[section.id],
-                            editing,
-                          },
-                        },
-                      })
-                    }
-                  />
-                ))
+              sections.map((section) => (
+                <JellyfinMediaCarousel
+                  key={section.id}
+                  {...section}
+                  onSelect={selectItem}
+                  onItemChanged={() => setRevision((value) => value + 1)}
+                />
+              ))
             )}
-            {!loading &&
-            sections.length > 0 &&
-            sections.every((section) =>
-              preferences.hidden.includes(section.id),
-            ) ? (
-              <p className="py-12 text-center">
-                All home sections are hidden. Use Edit layout to show them
-                again.
-              </p>
-            ) : null}
             {!loading && !error && !sections.length ? (
               <p className="py-20 text-center">
                 There are no movies or series available to your Jellyfin
