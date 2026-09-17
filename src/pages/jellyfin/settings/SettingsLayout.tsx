@@ -1,5 +1,12 @@
 import classNames from "classnames";
-import { ReactNode, createContext, useContext, useRef, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { SearchBarInput } from "@/components/form/SearchBar";
 import { Icon, Icons } from "@/components/Icon";
