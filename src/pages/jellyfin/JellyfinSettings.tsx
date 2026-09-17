@@ -10,7 +10,8 @@ import {
   updateUserConfiguration,
 } from "@/backend/jellyfin/preferences";
 import { Button } from "@/components/buttons/Button";
-import { WideContainer } from "@/components/layout/WideContainer";
+import { Dropdown } from "@/components/form/Dropdown";
+import { Icons } from "@/components/Icon";
 import { GamepadSettings } from "@/components/player/jellyfin/GamepadSettings";
 import { Heading1 } from "@/components/utils/Text";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
@@ -22,7 +23,8 @@ import { usePreferencesStore } from "@/stores/preferences";
 import { useSubtitleStore } from "@/stores/subtitles";
 import { getLocaleInfo } from "@/utils/language";
 
-import { SettingRow, SettingToggle } from "./settings/SettingRow";
+import { SettingGroup, SettingRow, SettingToggle } from "./settings/SettingRow";
+import { SettingsLayout, SettingsPageSection } from "./settings/SettingsLayout";
 import { SettingsTransfer } from "./settings/SettingsTransfer";
 import { ThemeSettingsSection } from "./settings/ThemeSettingsSection";
 
@@ -140,119 +142,132 @@ export default function JellyfinSettings() {
 
   return (
     <SubPageLayout>
-      <WideContainer>
-        <div className="space-y-12 pb-12">
-          <Heading1 border>Settings</Heading1>
-          <p>
+      <SettingsLayout>
+        <SettingsPageSection id="preferences">
+          <Heading1 border>Preferences</Heading1>
+          <p className="text-sm text-type-secondary">
             Signed in to Jellyfin as{" "}
-            <span className="font-bold text-white">{session?.userName}</span>.
+            <span className="font-semibold text-white">
+              {session?.userName}
+            </span>
+            .
           </p>
-          <section className="space-y-4">
-            <Heading1 border>Language</Heading1>
+          <SettingGroup title="Language" icon={Icons.CAPTIONS}>
             <SettingRow
               title="Interface language"
               description="Language used for translated interface labels."
             >
-              <select
-                aria-label="Interface language"
-                value={language.language}
-                onChange={(event) => language.setLanguage(event.target.value)}
-                className="max-w-full rounded-lg bg-background-secondary p-3 text-white tabbable"
-              >
-                {Object.keys(locales).map((code) => (
-                  <option key={code} value={code}>
-                    {getLocaleInfo(code)?.nativeName ??
-                      getLocaleInfo(code)?.name ??
-                      code}
-                  </option>
-                ))}
-              </select>
+              <Dropdown
+                className="!my-0 w-full sm:min-w-56"
+                options={Object.keys(locales).map((code) => ({
+                  id: code,
+                  name:
+                    getLocaleInfo(code)?.nativeName ??
+                    getLocaleInfo(code)?.name ??
+                    code,
+                }))}
+                selectedItem={{
+                  id: language.language,
+                  name:
+                    getLocaleInfo(language.language)?.nativeName ??
+                    getLocaleInfo(language.language)?.name ??
+                    language.language,
+                }}
+                setSelectedItem={(item) => language.setLanguage(item.id)}
+              />
             </SettingRow>
-          </section>
-          <ThemeSettingsSection />
-          <section className="space-y-4">
-            <Heading1 border>Home</Heading1>
-            <SettingToggle
-              title="Featured carousel"
-              description="Show a featured title at the top of your library and Discover."
-              enabled={preferences.enableFeatured}
-              onChange={preferences.setEnableFeatured}
-            />
-            <SettingToggle
-              title="Image logos"
-              description="Use title artwork when it is available."
-              enabled={preferences.enableImageLogos}
-              onChange={preferences.setEnableImageLogos}
-            />
-            <SettingToggle
-              title="Minimal cards"
-              description="Keep title cards compact with fewer details."
-              enabled={preferences.enableMinimalCards}
-              onChange={preferences.setEnableMinimalCards}
-            />
-          </section>
-          <section className="space-y-4">
-            <Heading1 border>Player interface</Heading1>
-            <SettingToggle
-              title="Pause overlay"
-              description="Show title information while playback is paused."
-              enabled={preferences.enablePauseOverlay}
-              onChange={preferences.setEnablePauseOverlay}
-            />
-            <SettingToggle
-              title="Compact episode list"
-              description="Use a compact list in the player episode menu."
-              enabled={preferences.forceCompactEpisodeView}
-              onChange={preferences.setForceCompactEpisodeView}
-            />
-          </section>
-          <section className="space-y-4">
-            <Heading1 border>Controls</Heading1>
-            <SettingToggle
-              title="Hold to boost"
-              description="Hold the video to temporarily increase playback speed."
-              enabled={preferences.enableHoldToBoost}
-              onChange={preferences.setEnableHoldToBoost}
-            />
-            <SettingToggle
-              title="Double-click to seek"
-              description="Double-click either side of the video to seek."
-              enabled={preferences.enableDoubleClickToSeek}
-              onChange={preferences.setEnableDoubleClickToSeek}
-            />
-            <SettingToggle
-              title="Number key seeking"
-              description="Use number keys to jump to a position in the video."
-              enabled={preferences.enableNumberKeySeeking}
-              onChange={preferences.setEnableNumberKeySeeking}
-            />
-            <SettingRow
-              title="Keyboard shortcuts"
-              description="Change player shortcuts and review fixed keys."
-            >
-              <Button
-                theme="secondary"
-                onClick={() => showModal("keyboard-commands-edit")}
+          </SettingGroup>
+          <div className="grid gap-8 xl:grid-cols-2">
+            <SettingGroup title="Player controls" icon={Icons.TACHOMETER}>
+              <SettingToggle
+                title="Hold to boost"
+                description="Hold the video to temporarily increase playback speed."
+                enabled={preferences.enableHoldToBoost}
+                onChange={preferences.setEnableHoldToBoost}
+              />
+              <SettingToggle
+                title="Double-click to seek"
+                description="Double-click either side of the video to seek."
+                enabled={preferences.enableDoubleClickToSeek}
+                onChange={preferences.setEnableDoubleClickToSeek}
+              />
+              <SettingToggle
+                title="Number key seeking"
+                description="Use number keys to jump to a position in the video."
+                enabled={preferences.enableNumberKeySeeking}
+                onChange={preferences.setEnableNumberKeySeeking}
+              />
+              <SettingRow
+                title="Keyboard shortcuts"
+                description="Change player shortcuts and review fixed keys."
               >
-                Configure shortcuts
-              </Button>
-            </SettingRow>
-            <div className="rounded-lg bg-dropdown-background px-5 py-4">
-              <h2 className="mb-4 font-bold text-white">Game controller</h2>
-              <GamepadSettings />
+                <Button
+                  theme="secondary"
+                  onClick={() => showModal("keyboard-commands-edit")}
+                >
+                  Configure shortcuts
+                </Button>
+              </SettingRow>
+              <div className="px-4 py-3">
+                <h2 className="mb-4 font-bold text-white">Game controller</h2>
+                <GamepadSettings />
+              </div>
+            </SettingGroup>
+            <SettingGroup title="Performance" icon={Icons.SETTINGS}>
+              <SettingToggle
+                title="Low performance mode"
+                description="Reduce background effects and card animations to use fewer resources."
+                enabled={preferences.enableLowPerformanceMode}
+                onChange={preferences.setEnableLowPerformanceMode}
+              />
+            </SettingGroup>
+          </div>
+        </SettingsPageSection>
+        <SettingsPageSection id="appearance">
+          <div className="grid gap-8 xl:grid-cols-2">
+            <div className="space-y-8">
+              <Heading1 border>Appearance</Heading1>
+              <SettingGroup title="Appearance" icon={Icons.BRUSH}>
+                <SettingToggle
+                  title="Featured carousel"
+                  description="Show a featured title at the top of your library and Discover."
+                  enabled={preferences.enableFeatured}
+                  onChange={preferences.setEnableFeatured}
+                />
+                <SettingToggle
+                  title="Image logos"
+                  description="Use title artwork when it is available."
+                  enabled={preferences.enableImageLogos}
+                  onChange={preferences.setEnableImageLogos}
+                />
+                <SettingToggle
+                  title="Minimal cards"
+                  description="Keep title cards compact with fewer details."
+                  enabled={preferences.enableMinimalCards}
+                  onChange={preferences.setEnableMinimalCards}
+                />
+              </SettingGroup>
+              <SettingGroup title="Player UI" icon={Icons.PLAY}>
+                <SettingToggle
+                  title="Pause overlay"
+                  description="Show title information while playback is paused."
+                  enabled={preferences.enablePauseOverlay}
+                  onChange={preferences.setEnablePauseOverlay}
+                />
+                <SettingToggle
+                  title="Compact episode list"
+                  description="Use a compact list in the player episode menu."
+                  enabled={preferences.forceCompactEpisodeView}
+                  onChange={preferences.setForceCompactEpisodeView}
+                />
+              </SettingGroup>
             </div>
-          </section>
-          <section className="space-y-4">
-            <Heading1 border>Performance</Heading1>
-            <SettingToggle
-              title="Low performance mode"
-              description="Reduce background effects and card animations to use fewer resources."
-              enabled={preferences.enableLowPerformanceMode}
-              onChange={preferences.setEnableLowPerformanceMode}
-            />
-          </section>
-          <section className="space-y-6">
-            <Heading1 border>Jellyfin playback</Heading1>
+            <ThemeSettingsSection />
+          </div>
+        </SettingsPageSection>
+        <SettingsPageSection id="playback">
+          <Heading1 border>Jellyfin playback</Heading1>
+          <SettingGroup title="Languages and playback" icon={Icons.PLAY}>
             {loadingPlayback ? (
               <p className="text-type-secondary">
                 Loading Jellyfin preferences…
@@ -273,7 +288,7 @@ export default function JellyfinSettings() {
             ) : null}
             {configuration ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[38rem]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
                   <label className="flex flex-col gap-2 text-sm text-type-secondary">
                     Preferred audio language
                     <select
@@ -372,13 +387,17 @@ export default function JellyfinSettings() {
                 </p>
               </>
             ) : null}
-          </section>
+          </SettingGroup>
+        </SettingsPageSection>
+        <SettingsPageSection id="captions">
           <CaptionsPart
             styling={subtitles.styling}
             setStyling={subtitles.updateStyling}
           />
-          <section className="space-y-4">
-            <h2 className="text-xl font-bold text-white">Integrations</h2>
+        </SettingsPageSection>
+        <SettingsPageSection id="connections">
+          <Heading1 border>Connections</Heading1>
+          <SettingGroup title="Connections" icon={Icons.LINK}>
             <SettingRow
               title="Lists and watch history"
               description="Import Letterboxd lists and manage optional external service connections."
@@ -387,10 +406,12 @@ export default function JellyfinSettings() {
                 Manage integrations
               </Button>
             </SettingRow>
-          </section>
+          </SettingGroup>
+        </SettingsPageSection>
+        <SettingsPageSection id="backup">
           <SettingsTransfer />
-        </div>
-      </WideContainer>
+        </SettingsPageSection>
+      </SettingsLayout>
     </SubPageLayout>
   );
 }
