@@ -2,49 +2,22 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { enrichTasteMedia } from "@/backend/personalisation/catalog";
 import { TasteMedia, TasteRating } from "@/backend/personalisation/types";
+import { Icon, Icons } from "@/components/Icon";
 import { tasteScope, useTasteProfile, useTasteStore } from "@/stores/taste";
 
-const options: { value: TasteRating; label: string; path: string }[] = [
-  {
-    value: "loved",
-    label: "Love",
-    path: "M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z",
-  },
-  {
-    value: "liked",
-    label: "Like",
-    path: "M7 10v11H3V10h4Zm0 0 5-8c2 0 3 2 2 5l-1 3h6c2 0 2 1 2 3l-2 7c0 1-1 1-2 1H7",
-  },
-  {
-    value: "disliked",
-    label: "Dislike",
-    path: "M7 14V3H3v11h4Zm0 0 5 8c2 0 3-2 2-5l-1-3h6c2 0 2-1 2-3l-2-7c0-1-1-1-2-1H7",
-  },
-  {
-    value: "hated",
-    label: "Hate",
-    path: "M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8ZM12 6l-2 5 4 2-2 6",
-  },
+const options: { value: TasteRating; label: string; icon: Icons }[] = [
+  { value: "loved", label: "Love it", icon: Icons.HEART },
+  { value: "liked", label: "Like", icon: Icons.THUMBS_UP },
+  { value: "disliked", label: "Dislike", icon: Icons.THUMBS_DOWN },
+  { value: "hated", label: "Hate it", icon: Icons.HEART_CRACK },
 ];
 function RatingIcon({ value }: { value?: TasteRating }) {
   return (
-    <svg
-      width="1.15em"
-      height="1.15em"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path
-        d={
-          (options.find((option) => option.value === value) ?? options[1]).path
-        }
-      />
-    </svg>
+    <Icon
+      icon={
+        (options.find((option) => option.value === value) ?? options[1]).icon
+      }
+    />
   );
 }
 export function RatingCapsule({ media }: { media: TasteMedia }) {

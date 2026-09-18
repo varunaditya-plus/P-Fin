@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -7,11 +7,8 @@ import {
   seerrTasteEnabled,
   tastePoster,
 } from "@/backend/personalisation/catalog";
-import { buildTasteAffinities } from "@/backend/personalisation/engine";
 import {
-  FRANCHISES,
-  GENRES,
-  MOODS,
+  RatedTasteMedia,
   TasteCandidate,
   TasteMedia,
   TasteType,
@@ -19,9 +16,11 @@ import {
 import { getSeerrUser } from "@/backend/seerr/api";
 import { SeerrUser } from "@/backend/seerr/types";
 import { Button } from "@/components/buttons/Button";
+import { Icon, Icons } from "@/components/Icon";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaCard } from "@/components/media/MediaCard";
 import { Heading1 } from "@/components/utils/Text";
+import { CarouselNavButtons } from "@/pages/discover/components/CarouselNavButtons";
 import { SeerrDetailsModal } from "@/pages/discover/SeerrDetailsModal";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
@@ -30,9 +29,18 @@ import { useSeerrConnection } from "@/stores/seerr";
 import { useTasteProfile, useTasteStore } from "@/stores/taste";
 
 import { RatingCapsule } from "./RatingCapsule";
+import { TasteChart } from "./TasteChart";
 import { TasteQuiz } from "./TasteQuiz";
+import { usePersonalRecommendations } from "./usePersonalRecommendations";
 
-function TasteCard({
+const ratingLabels: Record<string, string> = {
+  loved: "Loved it",
+  liked: "Liked it",
+  okay: "It was okay",
+  disliked: "Didn't like it",
+  hated: "Hated it",
+};
+function TasteRow({
   media,
   onSelect,
   remove,
@@ -41,103 +49,109 @@ function TasteCard({
   onSelect: (media: TasteMedia) => void;
   remove?: () => void;
 }) {
+  const rating = (media as RatedTasteMedia).rating;
   return (
-    <div className="min-w-0 space-y-3">
-      <MediaCard
-        media={{
-          id: media.key,
-          title: media.title,
-          year: media.year,
-          poster: tastePoster(media),
-          type: media.type === "tv" ? "show" : "movie",
-          release_date: new Date(0),
-        }}
-        onShowDetails={() => onSelect(media)}
-      />
-      <div className="flex items-center justify-between gap-2">
-        <RatingCapsule media={media} />
-        {remove ? (
-          <button
-            type="button"
-            className="tabbable text-xs text-type-secondary hover:text-white"
-            onClick={remove}
-            aria-label={`Remove rating for ${media.title}`}
-          >
-            Remove
-          </button>
-        ) : null}
+    <div className="flex items-center gap-3 rounded-lg bg-white/5 p-2">
+      <button
+        type="button"
+        aria-label={`Details for ${media.title}`}
+        onClick={() => onSelect(media)}
+        className="tabbable shrink-0 rounded"
+      >
+        {tastePoster(media) ? (
+          <img
+            src={tastePoster(media)}
+            alt=""
+            className="h-16 w-11 rounded object-cover"
+          />
+        ) : (
+          <div className="h-16 w-11 rounded bg-white/10" />
+        )}
+      </button>
+      <div className="min-w-0 flex-1">
+        <button
+          type="button"
+          onClick={() => onSelect(media)}
+          className="tabbable block max-w-full truncate text-left text-sm font-medium text-white"
+        >
+          {media.title}
+        </button>
+        <p className="text-xs text-type-secondary">
+          {media.year ?? "—"} · {media.type === "movie" ? "Movie" : "Show"}
+          {rating ? ` · ${ratingLabels[rating]}` : ""}
+        </p>
       </div>
+      <RatingCapsule media={media} />
+      {remove ? (
+        <button
+          type="button"
+          aria-label={`Remove rating for ${media.title}`}
+          title="Remove rating"
+          onClick={remove}
+          className="tabbable p-2 text-type-secondary transition-colors hover:text-white"
+        >
+          <Icon icon={Icons.X} />
+        </button>
+      ) : null}
     </div>
   );
 }
-function TasteChart({ type }: { type: TasteType }) {
-  const profile = useTasteProfile();
-  const affinities = useMemo(
-    () =>
-      [...buildTasteAffinities(profile, type).genres].sort(
-        (a, b) => b[1] - a[1],
-      ),
-    [profile, type],
-  );
-  const positive = affinities.filter(([, weight]) => weight > 0);
-  const total = positive.reduce((sum, [, weight]) => sum + weight, 0);
-  const colors = [
-    "#3987e5",
-    "#199e70",
-    "#c98500",
-    "#9085e9",
-    "#e66767",
-    "#d55181",
-    "#d95926",
-  ];
-  let position = 0;
-  const segments = positive.map(([, weight], index) => {
-    const start = position;
-    position += (weight / total) * 100;
-    return `${colors[index % colors.length]} ${start}% ${position}%`;
-  });
+function TasteRecommendations({
+  type,
+  onSelect,
+}: {
+  type: TasteType;
+  onSelect: (media: TasteMedia) => void;
+}) {
+  const recommendations = usePersonalRecommendations("library", type);
+  const refs = useRef<Record<string, HTMLDivElement | null>>({});
+  const id = `taste-${type}`;
+  if (!recommendations.ranked.length)
+    return recommendations.loading ? (
+      <p role="status" className="text-sm text-type-secondary">
+        Finding {type === "movie" ? "movies" : "shows"} in your library…
+      </p>
+    ) : recommendations.error ? (
+      <p role="alert" className="text-sm text-type-secondary">
+        {recommendations.error}
+      </p>
+    ) : null;
   return (
-    <div className="flex flex-col sm:flex-row gap-6 rounded-xl bg-dropdown-background p-5">
-      <div
-        role="img"
-        aria-label={`${type === "movie" ? "Movie" : "TV"} taste profile: ${positive.map(([genre, weight]) => `${genre} ${Math.round((weight / total) * 100)}%`).join(", ") || "No ratings yet"}`}
-        className="relative h-40 w-40 rounded-full shrink-0 self-center"
-        style={{
-          background: segments.length
-            ? `conic-gradient(${segments.join(", ")})`
-            : "rgb(var(--colors-background-main))",
-        }}
-      >
-        <div className="absolute inset-5 rounded-full bg-dropdown-background flex items-center justify-center text-center text-sm font-bold text-white px-3">
-          {type === "movie" ? "Movie taste" : "TV taste"}
-        </div>
-      </div>
-      <div className="flex-1 space-y-3">
-        {affinities.slice(0, 10).map(([genre, weight]) => (
-          <div key={genre}>
-            <div className="flex justify-between text-sm gap-3">
-              <span>{genre}</span>
-              <span className="text-type-secondary">
-                {weight > 0 ? "Enjoy" : "Avoid"}
-              </span>
-            </div>
-            <div className="mt-1 h-1.5 rounded-full bg-background-main overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none ${weight > 0 ? "bg-buttons-purple" : "bg-red-400"}`}
-                style={{
-                  width: `${Math.min(100, (Math.abs(weight) / Math.max(...affinities.map(([, amount]) => Math.abs(amount)), 1)) * 100)}%`,
+    <section
+      aria-label={type === "movie" ? "Recommended movies" : "Recommended shows"}
+    >
+      <h3 className="mb-3 text-xl font-bold text-white">
+        {type === "movie" ? "Movies" : "Shows"}
+      </h3>
+      <div className="relative overflow-hidden carousel-container">
+        <div
+          ref={(element) => {
+            refs.current[id] = element;
+          }}
+          className="grid grid-flow-col auto-cols-max gap-4 overflow-x-auto scrollbar-none"
+        >
+          {recommendations.ranked.slice(0, 20).map(({ candidate }) => (
+            <div
+              key={candidate.media.key}
+              className="w-[10rem] md:w-[11.5rem] p-2"
+            >
+              <MediaCard
+                media={{
+                  id: candidate.media.key,
+                  title: candidate.media.title,
+                  year: candidate.media.year,
+                  poster: tastePoster(candidate.media),
+                  type: type === "movie" ? "movie" : "show",
                 }}
+                linkable
+                onShowDetails={() => onSelect(candidate.media)}
               />
             </div>
-          </div>
-        ))}
-        {!affinities.length ? (
-          <p className="text-sm text-type-secondary">
-            Rate titles or choose a few genres to build your profile.
-          </p>
-        ) : null}
+          ))}
+        </div>
+        <CarouselNavButtons categorySlug={id} carouselRefs={refs} />
       </div>
-    </div>
+    </section>
   );
 }
 export default function TastePage() {
@@ -145,7 +159,6 @@ export default function TastePage() {
   const connection = useSeerrConnection((state) => state.connection);
   const profile = useTasteProfile();
   const store = useTasteStore();
-  const [type, setType] = useState<TasteType>("movie");
   const [source, setSource] = useState<"library" | "seerr">("library");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<TasteCandidate[]>([]);
@@ -216,9 +229,9 @@ export default function TastePage() {
           posterPath: selected.posterPath,
         }
       : undefined;
-  const rated = Object.values(profile.ratings)
-    .filter((rating) => rating.type === type)
-    .sort((a, b) => b.ratedAt - a.ratedAt);
+  const rated = Object.values(profile.ratings).sort(
+    (a, b) => b.ratedAt - a.ratedAt,
+  );
   const select = async (media: TasteMedia) => {
     if (media.jellyfinId || (enabled && seerrUser)) setSelected(media);
     else setError("Connect Seerr in Discover to view this title's details.");
@@ -242,34 +255,65 @@ export default function TastePage() {
     <SubPageLayout>
       <WideContainer>
         <div className="space-y-10 pb-12">
-          <div className="flex justify-between items-start gap-4 flex-wrap">
-            <div>
-              <Heading1>Your taste</Heading1>
-              <p className="mt-2 text-type-secondary">
-                Rate what you have seen to shape recommendations. Ratings are
-                separate from Jellyfin favourites and watched status.
-              </p>
-            </div>
-            <Button theme="purple" onClick={() => setQuiz((value) => !value)}>
-              {quiz
-                ? "Close setup"
-                : profile.preferences.completedQuiz
-                  ? "Retake taste setup"
-                  : "Set up your taste"}
-            </Button>
+          <div>
+            <Heading1>Your taste</Heading1>
+            <p className="mt-2 text-type-secondary">
+              This is what your ratings have taught your recommendations so far.
+              Love and hate count more than like and dislike. Ratings are
+              separate from Jellyfin favourites and watched status.
+            </p>
           </div>
           {quiz ? (
             <TasteQuiz key={identity} onFinish={() => setQuiz(false)} />
+          ) : (
+            <div className="flex flex-col items-start gap-3 rounded-xl bg-white/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-medium text-white">
+                  {profile.preferences.completedQuiz
+                    ? "Tune your recommendations"
+                    : "Create my taste profile"}
+                </p>
+                <p className="text-sm text-type-secondary">
+                  {profile.preferences.completedQuiz
+                    ? "Retake the quiz to update your taste profile."
+                    : "Rate a few movies and shows and we'll start suggesting things you'll like."}
+                </p>
+              </div>
+              <Button theme="purple" onClick={() => setQuiz(true)}>
+                {profile.preferences.completedQuiz
+                  ? "Retake quiz"
+                  : "Get started"}
+              </Button>
+            </div>
+          )}
+          {rated.length ? (
+            <TasteChart />
+          ) : (
+            <div className="rounded-xl bg-white/5 p-6 text-center text-type-secondary">
+              No ratings yet. Take the quiz to get some, or search below to rate
+              something you have seen already.
+            </div>
+          )}
+          {rated.length ? (
+            <section className="space-y-6">
+              <h2 className="text-lg font-semibold text-white">
+                We think you would like…
+              </h2>
+              <TasteRecommendations type="movie" onSelect={select} />
+              <TasteRecommendations type="tv" onSelect={select} />
+            </section>
           ) : null}
           <section className="space-y-5">
-            <Heading1 border>Find titles to rate</Heading1>
+            <h2 className="text-lg font-semibold text-white">
+              Rate something you have watched
+            </h2>
             <div className="flex flex-col sm:flex-row gap-3">
               <input
                 aria-label="Find watched titles"
                 placeholder="Search a title you have seen…"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                className="flex-1 rounded-lg bg-dropdown-background px-4 py-3 text-white tabbable"
+                className="flex-1 min-w-0 rounded-xl bg-white/5 px-4 py-3 text-white placeholder:text-type-secondary tabbable"
               />
               <select
                 aria-label="Search source"
@@ -305,101 +349,33 @@ export default function TastePage() {
             !error ? (
               <p>No matching titles found.</p>
             ) : null}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-5 gap-y-8">
+            <div className="space-y-2">
               {results.map((item) => (
                 <div
                   key={item.media.key}
                   onPointerEnter={() => enrichResult(item.media)}
                   onFocus={() => enrichResult(item.media)}
                 >
-                  <TasteCard media={item.media} onSelect={select} />
+                  <TasteRow media={item.media} onSelect={select} />
                 </div>
               ))}
             </div>
           </section>
-          <section className="space-y-5">
-            <Heading1 border>Preferences</Heading1>
-            {(
-              [
-                {
-                  key: "favoriteGenres",
-                  title: "Favourite genres",
-                  choices: GENRES.map((genre) => ({ id: genre, label: genre })),
-                },
-                { key: "moods", title: "Moods", choices: MOODS },
-                {
-                  key: "franchises",
-                  title: "Franchises and studios",
-                  choices: FRANCHISES,
-                },
-              ] as const
-            ).map((group) => (
-              <fieldset key={group.key}>
-                <legend className="mb-3 font-bold text-white">
-                  {group.title}
-                </legend>
-                <div className="flex flex-wrap gap-2">
-                  {group.choices.map((choice) => {
-                    const active = profile.preferences[group.key].includes(
-                      choice.id,
-                    );
-                    return (
-                      <button
-                        key={choice.id}
-                        type="button"
-                        aria-pressed={active}
-                        className={`tabbable rounded-full px-4 py-2 text-sm transition-colors ${active ? "bg-buttons-purple text-white" : "bg-dropdown-background text-type-secondary hover:text-white"}`}
-                        onClick={() =>
-                          store.setPreferences({
-                            [group.key]: active
-                              ? profile.preferences[group.key].filter(
-                                  (id) => id !== choice.id,
-                                )
-                              : [...profile.preferences[group.key], choice.id],
-                          })
-                        }
-                      >
-                        {choice.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            ))}
-          </section>
-          <section className="space-y-5">
-            <div className="flex flex-wrap justify-between items-center gap-3">
-              <Heading1 border>Your ratings</Heading1>
-              <div className="flex gap-2">
-                {(["movie", "tv"] as const).map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={type === value}
-                    className={`tabbable rounded-full px-4 py-2 text-sm ${type === value ? "bg-buttons-purple text-white" : "bg-dropdown-background"}`}
-                    onClick={() => setType(value)}
-                  >
-                    {value === "movie" ? "Movies" : "TV shows"}
-                  </button>
+          {rated.length ? (
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold text-white">Your ratings</h2>
+              <div className="space-y-2">
+                {rated.map((media) => (
+                  <TasteRow
+                    key={media.key}
+                    media={media}
+                    onSelect={select}
+                    remove={() => store.remove(media.key)}
+                  />
                 ))}
               </div>
-            </div>
-            <TasteChart type={type} />
-            <p className="text-sm text-type-secondary">
-              {rated.length} rated {type === "movie" ? "movies" : "shows"}.
-              Select the active rating again to clear it.
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-5 gap-y-8">
-              {rated.map((media) => (
-                <TasteCard
-                  key={media.key}
-                  media={media}
-                  onSelect={select}
-                  remove={() => store.remove(media.key)}
-                />
-              ))}
-            </div>
-          </section>
+            </section>
+          ) : null}
           <JellyfinDetailsModal
             itemId={selected?.jellyfinId}
             onClose={() => setSelected(undefined)}
