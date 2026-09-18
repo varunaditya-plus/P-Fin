@@ -17,8 +17,10 @@ export default function IntegrationSettings() {
               Back to settings
             </Button>
           </div>
-          <SimklSettings />
-          <TraktIntegrationSettings />
+          <div className="grid gap-6 lg:grid-cols-2 items-start">
+            <SimklSettings />
+            <TraktIntegrationSettings />
+          </div>
           <LetterboxdSettings />
         </div>
       </WideContainer>

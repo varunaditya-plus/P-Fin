@@ -8,7 +8,10 @@ import {
   watchlistCsv,
 } from "@/backend/integrations/letterboxd";
 import { Button } from "@/components/buttons/Button";
+import { Icon, Icons } from "@/components/Icon";
+import { SettingsCard } from "@/components/layout/SettingsCard";
 import { Heading1 } from "@/components/utils/Text";
+import { SettingsFilePicker } from "@/pages/jellyfin/settings/SettingsFilePicker";
 import { useIntegrationWatchlist } from "@/stores/integrations/watchlist";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { homePreferenceScope } from "@/stores/jellyfin/home";
@@ -35,6 +38,10 @@ export function LetterboxdSettings() {
   const [lookupSeerr, setLookupSeerr] = useState(false);
   const [file, setFile] = useState<File>();
   const [status, setStatus] = useState("");
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [phase, setPhase] = useState<
+    "idle" | "matching" | "ready" | "importing" | "done"
+  >("idle");
   const [error, setError] = useState("");
   const [failures, setFailures] = useState<{ title: string; error: string }[]>(
     [],
@@ -46,6 +53,8 @@ export function LetterboxdSettings() {
   const controller = useRef<AbortController>();
   useEffect(() => {
     setRows([]);
+    setProgress({ done: 0, total: 0 });
+    setPhase("idle");
     setStatus("");
     setError("");
     setFailures([]);
@@ -64,9 +73,12 @@ export function LetterboxdSettings() {
     setError("");
     setFailures([]);
     setLimit(50);
+    setPhase("matching");
+    setProgress({ done: 0, total: 0 });
     try {
       const parsed = parseLetterboxdCsv(await file.text());
       run.signal.throwIfAborted();
+      setProgress({ done: 0, total: parsed.titles.length });
       setStatus(
         `${parsed.titles.length} films; ${parsed.duplicates} duplicate rows and ${parsed.invalid} invalid rows skipped. Loading your library…`,
       );
@@ -76,12 +88,16 @@ export function LetterboxdSettings() {
         progress: (next) => {
           if (run.signal.aborted) return;
           setRows(next);
+          setProgress({ done: next.length, total: parsed.titles.length });
           setStatus(
             `Matched ${next.length} of ${parsed.titles.length}. ${parsed.duplicates} duplicate rows and ${parsed.invalid} invalid rows skipped.`,
           );
         },
       });
-      if (!run.signal.aborted) setReviewed(true);
+      if (!run.signal.aborted) {
+        setReviewed(true);
+        setPhase("ready");
+      }
     } catch (reason) {
       if (!run.signal.aborted)
         setError(
@@ -100,16 +116,21 @@ export function LetterboxdSettings() {
     setBusy(true);
     setError("");
     setFailures([]);
+    setPhase("importing");
+    setProgress({ done: 0, total: rows.length });
     try {
       const result = await applyLetterboxd(rows, mode, run.signal, (count) => {
-        if (!run.signal.aborted)
+        if (!run.signal.aborted) {
           setStatus(`Imported ${count} of ${rows.length} rows…`);
+          setProgress({ done: count, total: rows.length });
+        }
       });
       if (run.signal.aborted) return;
       setStatus(
         `${result.added} ${mode === "watched" ? "marked watched" : "added to your watchlist"}; ${result.skipped} unmatched or existing entries skipped; ${result.failures.length} failed.`,
       );
       setFailures(result.failures);
+      setPhase("done");
     } catch (reason) {
       if (!run.signal.aborted)
         setError(
@@ -142,23 +163,33 @@ export function LetterboxdSettings() {
           , extract the ZIP, then choose watchlist.csv or watched.csv. Reviews,
           ratings and diary dates are not imported.
         </p>
-        <div className="space-y-4 rounded-lg bg-dropdown-background p-5">
-          <label className="block font-bold text-white">
-            CSV file
-            <input
-              aria-label="Letterboxd CSV file"
-              type="file"
+        <SettingsCard
+          className="space-y-4"
+          paddingClass="px-5 py-5 sm:px-8 sm:py-6"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">Import your films</p>
+              <p className="mt-1 text-sm text-type-secondary">
+                Select a Letterboxd CSV, review the matches, then import.
+              </p>
+            </div>
+            <SettingsFilePicker
+              label="Letterboxd CSV file"
               accept=".csv,text/csv"
+              fileName={file?.name}
               disabled={busy}
-              className="mt-2 block max-w-full font-normal"
               onChange={(event) => {
                 setFile(event.target.files?.[0]);
                 setRows([]);
                 setReviewed(false);
                 setStatus("");
+                setError("");
+                setProgress({ done: 0, total: 0 });
+                setPhase("idle");
               }}
             />
-          </label>
+          </div>
           <label className="block">
             Import as
             <select
@@ -202,6 +233,7 @@ export function LetterboxdSettings() {
                   controller.current?.abort();
                   setBusy(false);
                   setReviewed(false);
+                  setPhase("idle");
                   setStatus(
                     "Stopped. Completed changes are retained; importing again skips existing entries.",
                   );
@@ -211,10 +243,82 @@ export function LetterboxdSettings() {
               </Button>
             ) : null}
           </div>
-        </div>
-        {status ? <p role="status">{status}</p> : null}
+          {file ? (
+            <div className="grid gap-3 md:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)_minmax(0,1fr)]">
+              {[
+                { label: "Letterboxd", value: file.name },
+                { label: "Parsed", value: progress.total },
+                {
+                  label: "Status",
+                  value: error
+                    ? "Error"
+                    : phase === "idle"
+                      ? "Ready to preview"
+                      : phase[0].toUpperCase() + phase.slice(1),
+                },
+              ].map((entry) => (
+                <div
+                  key={entry.label}
+                  className="min-w-0 rounded-2xl border border-settings-card-border/60 bg-black/20 px-4 py-3"
+                >
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-type-secondary/80">
+                    {entry.label}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-semibold text-white">
+                    {entry.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {busy && progress.total > 0 ? (
+            <div className="rounded-2xl border border-settings-card-border/60 bg-black/20 px-4 py-3">
+              <div className="mb-3 flex items-center justify-between gap-3 text-sm">
+                <span className="font-medium text-white">
+                  {phase === "importing" ? "Importing" : "Matching films"}
+                </span>
+                <span>
+                  {progress.done} of {progress.total}
+                </span>
+              </div>
+              <div
+                role="progressbar"
+                aria-label={
+                  phase === "importing" ? "Importing films" : "Matching films"
+                }
+                aria-valuemin={0}
+                aria-valuemax={progress.total}
+                aria-valuenow={progress.done}
+                className="h-2 w-full overflow-hidden rounded-full bg-background-secondary"
+              >
+                <div
+                  className="h-full bg-buttons-purple transition-[width] duration-200 motion-reduce:transition-none"
+                  style={{
+                    width: `${Math.min(100, (progress.done / progress.total) * 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          ) : null}
+        </SettingsCard>
+        {status ? (
+          <p
+            role="status"
+            className={
+              phase === "done"
+                ? "flex items-center gap-2 rounded-2xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400"
+                : "text-sm text-type-secondary"
+            }
+          >
+            {phase === "done" ? <Icon icon={Icons.CHECKMARK} /> : null}
+            {status}
+          </p>
+        ) : null}
         {error ? (
-          <p role="alert" className="text-type-danger">
+          <p
+            role="alert"
+            className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-type-danger"
+          >
             {error}
           </p>
         ) : null}

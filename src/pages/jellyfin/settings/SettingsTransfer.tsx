@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 
 import { Button } from "@/components/buttons/Button";
+import { Icon, Icons } from "@/components/Icon";
+import { SettingsCard } from "@/components/layout/SettingsCard";
 import { Heading1 } from "@/components/utils/Text";
 import {
   exportAppPreferences,
@@ -8,6 +10,8 @@ import {
   importAppPreferences,
 } from "@/stores/appPreferences/registry";
 import { useAppPreferencesSync } from "@/stores/appPreferences/sync";
+
+import { SettingsFilePicker } from "./SettingsFilePicker";
 
 export function SettingsTransfer() {
   const sync = useAppPreferencesSync();
@@ -61,16 +65,23 @@ export function SettingsTransfer() {
           </Button>
         ) : null}
       </div>
-      <div className="rounded-xl bg-dropdown-background p-5 space-y-5">
+      <SettingsCard
+        className="space-y-5"
+        paddingClass="px-5 py-5 sm:px-8 sm:py-6"
+      >
         <p className="text-sm text-type-secondary">
           Choose which groups to export or import. Backups contain no passwords,
           login tokens or server addresses.
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
           {groups.map(([name, section]) => (
-            <label key={name} className="flex items-center gap-3 text-white">
+            <label
+              key={name}
+              className="flex cursor-pointer items-center gap-3 rounded-lg border border-settings-card-border/60 bg-black/10 px-4 py-3 text-white hover:bg-white/[0.03]"
+            >
               <input
                 type="checkbox"
+                className="h-4 w-4 accent-[rgb(var(--colors-buttons-purple))]"
                 checked={selected.includes(name)}
                 onChange={(event) =>
                   setSelected(
@@ -90,51 +101,47 @@ export function SettingsTransfer() {
             disabled={!selected.length}
             onClick={exportFile}
           >
+            <Icon icon={Icons.DOWNLOAD} className="mr-2" />
             Export selected
           </Button>
-          <label className="text-white text-sm space-y-2 block">
-            Import settings file
-            <input
-              className="block max-w-full"
-              type="file"
-              accept="application/json,.json"
-              onChange={async (event) => {
-                readVersion.current += 1;
-                const version = readVersion.current;
-                const upload = event.target.files?.[0];
-                setFile(null);
-                setFileName("");
-                setError("");
-                setMessage("");
-                if (!upload) return;
-                try {
-                  if (upload.size > 8 * 1024 * 1024)
-                    throw new Error(
-                      "Choose a settings file smaller than 8 MB.",
-                    );
-                  const parsed = JSON.parse(await upload.text());
-                  if (version !== readVersion.current) return;
-                  if (
-                    parsed?.format !== "movie-fin-settings" ||
-                    parsed?.version !== 1
-                  )
-                    throw new Error("Choose a Movie-Fin settings export.");
-                  setFile(parsed);
-                  setFileName(upload.name);
-                } catch (reason) {
-                  if (version !== readVersion.current) return;
-                  setError(
-                    reason instanceof Error
-                      ? reason.message
-                      : "Unable to read settings file.",
-                  );
-                }
-              }}
-            />
-          </label>
+          <SettingsFilePicker
+            label="Import settings file"
+            accept="application/json,.json"
+            fileName={fileName}
+            onChange={async (event) => {
+              readVersion.current += 1;
+              const version = readVersion.current;
+              const upload = event.target.files?.[0];
+              setFile(null);
+              setFileName("");
+              setError("");
+              setMessage("");
+              if (!upload) return;
+              try {
+                if (upload.size > 8 * 1024 * 1024)
+                  throw new Error("Choose a settings file smaller than 8 MB.");
+                const parsed = JSON.parse(await upload.text());
+                if (version !== readVersion.current) return;
+                if (
+                  parsed?.format !== "movie-fin-settings" ||
+                  parsed?.version !== 1
+                )
+                  throw new Error("Choose a Movie-Fin settings export.");
+                setFile(parsed);
+                setFileName(upload.name);
+              } catch (reason) {
+                if (version !== readVersion.current) return;
+                setError(
+                  reason instanceof Error
+                    ? reason.message
+                    : "Unable to read settings file.",
+                );
+              }
+            }}
+          />
         </div>
         {file ? (
-          <div className="space-y-3">
+          <div className="space-y-3 rounded-xl border border-settings-card-border/60 bg-black/20 p-4">
             <p className="text-sm">
               Import the selected groups from {fileName}? Existing values in
               those groups will be replaced.
@@ -162,16 +169,23 @@ export function SettingsTransfer() {
           </div>
         ) : null}
         {message ? (
-          <p role="status" className="text-sm">
+          <p
+            role="status"
+            className="flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/10 px-4 py-3 text-sm text-green-400"
+          >
+            <Icon icon={Icons.CHECKMARK} />
             {message}
           </p>
         ) : null}
         {error ? (
-          <p role="alert" className="text-type-danger">
+          <p
+            role="alert"
+            className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-type-danger"
+          >
             {error}
           </p>
         ) : null}
-      </div>
+      </SettingsCard>
     </section>
   );
 }

@@ -6,6 +6,7 @@ import {
   traktJellyfinSettingsUrl,
 } from "@/backend/integrations/trakt";
 import { Button } from "@/components/buttons/Button";
+import { SettingsCard } from "@/components/layout/SettingsCard";
 import { JellyfinSession, useJellyfinAuth } from "@/stores/jellyfin";
 
 function statusCopy(status: TraktServerStatus) {
@@ -87,7 +88,7 @@ function TraktAccountSettings({ session }: { session: JellyfinSession }) {
   );
 
   return (
-    <section aria-labelledby="trakt-settings-heading" className="space-y-4">
+    <SettingsCard className="space-y-4 h-full">
       <div>
         <h2
           id="trakt-settings-heading"
@@ -95,14 +96,14 @@ function TraktAccountSettings({ session }: { session: JellyfinSession }) {
         >
           Trakt
         </h2>
-        <p className="mt-2 text-type-secondary">
+        <p className="mt-2 text-sm text-type-secondary">
           Use Jellyfin&apos;s Trakt plugin to scrobble playback and synchronise
           watched history. Jellyfin manages the connection and sends updates
           from your playback in this client.
         </p>
       </div>
       <div
-        className="rounded-lg bg-dropdown-background p-5 space-y-3"
+        className="rounded-xl border border-settings-card-border/60 bg-black/20 px-4 py-3 space-y-3"
         data-theme-surface
         aria-live="polite"
         aria-busy={loading}
@@ -142,7 +143,7 @@ function TraktAccountSettings({ session }: { session: JellyfinSession }) {
           Check again
         </Button>
       </div>
-      <p className="text-sm text-type-secondary">
+      <p className="border-t border-settings-card-border/50 pt-3 text-xs text-type-secondary">
         To stop syncing, disable the relevant options or disconnect your user in
         the Jellyfin plugin. No separate Trakt connection is stored in this
         client.
@@ -150,7 +151,7 @@ function TraktAccountSettings({ session }: { session: JellyfinSession }) {
           ? " Open your Jellyfin web client and go to Dashboard → Plugins → Trakt."
           : ""}
       </p>
-    </section>
+    </SettingsCard>
   );
 }
 

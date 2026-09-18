@@ -15,7 +15,7 @@ import {
   previewSimklSync,
 } from "@/backend/integrations/simklSync";
 import { Button } from "@/components/buttons/Button";
-import { Heading1 } from "@/components/utils/Text";
+import { SettingsCard } from "@/components/layout/SettingsCard";
 import {
   useSimklConnection,
   useSimklPreferences,
@@ -208,45 +208,48 @@ export function SimklSettings() {
     }
   };
   return (
-    <section className="space-y-4">
-      <Heading1 border>Simkl</Heading1>
-      <p>
-        Connect an optional Simkl account to move your watchlist or watched
-        state. Sync runs only when you apply a preview. Jellyfin continues to
-        report playback; use your server’s tracking plugin for ongoing
-        scrobbling.
+    <SettingsCard className="space-y-4 h-full">
+      <h2 className="font-bold text-xl text-white">Simkl</h2>
+      <p className="text-sm text-type-secondary">
+        Import or export your watchlist and watched state. Preview the changes
+        before applying them.
       </p>
       {!connection ? (
-        <div className="space-y-4 rounded-lg bg-dropdown-background p-5">
-          <p>
-            Create a public <strong className="text-white">AUTH V2</strong> app
-            in{" "}
-            <a
-              href="https://simkl.com/settings/developer/"
-              target="_blank"
-              rel="noreferrer"
-              className="text-white underline"
-            >
-              Simkl developer settings
-            </a>
-            . Choose{" "}
-            <strong className="text-white">
-              TV, devices &amp; command line
-            </strong>{" "}
-            or{" "}
-            <strong className="text-white">
-              Mobile, desktop &amp; browser apps
-            </strong>
-            , then paste its client ID. No application secret is needed.{" "}
-            <a
-              href="https://api.simkl.org/api-reference/oauth2-device"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              Setup guide
-            </a>
-          </p>
+        <div className="space-y-4">
+          <details className="rounded-lg bg-black/10 px-4 py-3 text-sm text-type-secondary">
+            <summary className="tabbable cursor-pointer font-medium text-white">
+              Set up your Simkl application
+            </summary>
+            <p className="mt-3">
+              Create a public <strong className="text-white">AUTH V2</strong>{" "}
+              app in{" "}
+              <a
+                href="https://simkl.com/settings/developer/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-white underline"
+              >
+                Simkl developer settings
+              </a>
+              . Choose{" "}
+              <strong className="text-white">
+                TV, devices &amp; command line
+              </strong>{" "}
+              or{" "}
+              <strong className="text-white">
+                Mobile, desktop &amp; browser apps
+              </strong>
+              , then paste its client ID. No application secret is needed.{" "}
+              <a
+                href="https://api.simkl.org/api-reference/oauth2-device"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                Setup guide
+              </a>
+            </p>
+          </details>
           <label className="block">
             Public application client ID
             <input
@@ -259,17 +262,19 @@ export function SimklSettings() {
             />
           </label>
           <Button
-            theme="secondary"
+            theme="purple"
             disabled={busy || !clientId.trim()}
             onClick={connect}
           >
             Connect Simkl
           </Button>
           {device ? (
-            <div className="space-y-3">
+            <div className="space-y-3 rounded-xl border border-settings-card-border/60 bg-black/20 p-4">
               <p>
                 Approve this connection on Simkl. Code:{" "}
-                <strong className="text-white">{device.user_code}</strong>
+                <strong className="mt-2 block font-mono text-2xl tracking-widest text-white">
+                  {device.user_code}
+                </strong>
               </p>
               <Button theme="purple" href={device.verification_uri}>
                 Open Simkl approval
@@ -279,7 +284,7 @@ export function SimklSettings() {
           ) : null}
         </div>
       ) : (
-        <div className="space-y-4 rounded-lg bg-dropdown-background p-5">
+        <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p>
               Connected as{" "}
@@ -346,9 +351,16 @@ export function SimklSettings() {
           Stop
         </Button>
       ) : null}
-      {status ? <p role="status">{status}</p> : null}
+      {status ? (
+        <p role="status" className="text-sm text-type-secondary">
+          {status}
+        </p>
+      ) : null}
       {error ? (
-        <p role="alert" className="text-type-danger">
+        <p
+          role="alert"
+          className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-type-danger"
+        >
           {error}
         </p>
       ) : null}
@@ -437,6 +449,10 @@ export function SimklSettings() {
           </ul>
         </details>
       ) : null}
-    </section>
+      <p className="border-t border-settings-card-border/50 pt-3 text-xs text-type-secondary">
+        Jellyfin reports playback. Use your server’s tracking plugin for ongoing
+        scrobbling.
+      </p>
+    </SettingsCard>
   );
 }
