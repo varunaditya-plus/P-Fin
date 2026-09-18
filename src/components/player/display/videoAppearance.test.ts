@@ -16,7 +16,7 @@ describe("video picture settings", () => {
         saturation: NaN,
         hue: Infinity,
       }),
-    ).toEqual({ brightness: 10, contrast: 200, saturation: 100, hue: 0 });
+    ).toEqual({ brightness: 0, contrast: 200, saturation: 100, hue: 0 });
     expect(normalizeVideoAppearance({})).toEqual(DEFAULT_VIDEO_APPEARANCE);
   });
   it("removes the filter entirely at default values", () => {

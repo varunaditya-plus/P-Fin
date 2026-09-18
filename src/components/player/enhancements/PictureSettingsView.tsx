@@ -1,5 +1,4 @@
-import { useId } from "react";
-
+import { Icon, Icons } from "@/components/Icon";
 import {
   DEFAULT_VIDEO_APPEARANCE,
   VIDEO_APPEARANCE_LIMITS,
@@ -8,73 +7,68 @@ import {
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 
+import { PlaybackSlider } from "./PlaybackSlider";
 import { usePlaybackEnhancements } from "./preferences";
 
-function PictureControl({
+export function PictureControl({
   field,
   label,
 }: {
   field: keyof VideoAppearance;
   label: string;
 }) {
-  const id = useId();
   const value = usePlaybackEnhancements((state) => state.picture[field]);
   const setPicture = usePlaybackEnhancements((state) => state.setPicture);
   const resetPicture = usePlaybackEnhancements((state) => state.resetPicture);
   const [min, max] = VIDEO_APPEARANCE_LIMITS[field];
   return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center gap-3">
-        <label htmlFor={id} className="font-medium">
-          {label}
-        </label>
-        <span className="text-sm tabular-nums">
-          {value}
-          {field === "hue" ? "°" : "%"}
-        </span>
-        <button
-          type="button"
-          className="tabbable text-xs text-video-context-type-accent disabled:opacity-40"
-          disabled={value === DEFAULT_VIDEO_APPEARANCE[field]}
-          onClick={() => resetPicture(field)}
-        >
-          Reset
-        </button>
-      </div>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={1}
-        value={value}
-        onChange={(event) => setPicture(field, Number(event.target.value))}
-        className="w-full accent-video-context-light cursor-pointer"
-      />
-    </div>
+    <PlaybackSlider
+      label={label}
+      value={value}
+      min={min}
+      max={max}
+      defaultValue={DEFAULT_VIDEO_APPEARANCE[field]}
+      unit={field === "hue" ? "°" : "%"}
+      onChange={(next) => setPicture(field, next)}
+      onReset={() => resetPicture(field)}
+    />
   );
 }
 
 export function PictureSettingsView() {
   const router = useOverlayRouter("settings");
   const reset = usePlaybackEnhancements((state) => state.resetPicture);
+  const picture = usePlaybackEnhancements((state) => state.picture);
+  const changed = Object.entries(DEFAULT_VIDEO_APPEARANCE).some(
+    ([key, value]) => picture[key as keyof VideoAppearance] !== value,
+  );
   return (
     <Menu.CardWithScrollable>
-      <Menu.BackLink onClick={() => router.navigate("/playback")}>
-        Picture
+      <Menu.BackLink
+        onClick={() => router.navigate("/playback")}
+        rightSide={
+          changed ? (
+            <button
+              type="button"
+              className="-mr-2 -my-1 px-2 p-[0.4em] rounded tabbable hover:bg-video-context-light hover:bg-opacity-10 text-video-context-type-secondary hover:text-video-context-type-main transition-colors flex items-center justify-center cursor-pointer"
+              onClick={() => reset()}
+              aria-label="Reset all colour adjustments"
+              title="Reset all"
+            >
+              <Icon icon={Icons.REPEAT} className="text-lg" />
+            </button>
+          ) : null
+        }
+      >
+        Colour adjustments
       </Menu.BackLink>
-      <Menu.Section className="space-y-5 pb-5">
-        <PictureControl field="brightness" label="Brightness" />
-        <PictureControl field="contrast" label="Contrast" />
-        <PictureControl field="saturation" label="Saturation" />
-        <PictureControl field="hue" label="Hue" />
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="tabbable w-full py-2 px-3 rounded-lg bg-video-context-light/10 hover:bg-video-context-light/20 text-sm"
-        >
-          Reset picture settings
-        </button>
+      <Menu.Section className="pb-5">
+        <div className="space-y-4 mt-3">
+          <PictureControl field="brightness" label="Brightness" />
+          <PictureControl field="contrast" label="Contrast" />
+          <PictureControl field="saturation" label="Saturation" />
+          <PictureControl field="hue" label="Hue" />
+        </div>
       </Menu.Section>
     </Menu.CardWithScrollable>
   );

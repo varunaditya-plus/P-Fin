@@ -44,7 +44,7 @@ describe("saved playback enhancements", () => {
 
   it("validates imported boost values", () => {
     expect(
-      normalizeBoostByTitle({ low: -10, high: 900, invalid: "bad", nan: NaN }),
-    ).toEqual({ low: 100, high: 600 });
+      normalizeBoostByTitle({ low: -10, high: 1500, invalid: "bad", nan: NaN }),
+    ).toEqual({ low: 100, high: 1000 });
   });
 });

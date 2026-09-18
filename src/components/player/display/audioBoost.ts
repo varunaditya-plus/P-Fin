@@ -9,7 +9,7 @@ interface AudioGraph {
 const graphs = new WeakMap<HTMLVideoElement, AudioGraph>();
 
 export function clampAudioBoost(multiplier: number): number {
-  return Number.isFinite(multiplier) ? Math.max(1, Math.min(6, multiplier)) : 1;
+  return Number.isFinite(multiplier) ? Math.max(1, Math.min(10, multiplier)) : 1;
 }
 
 function applyGain(graph: AudioGraph, multiplier: number) {

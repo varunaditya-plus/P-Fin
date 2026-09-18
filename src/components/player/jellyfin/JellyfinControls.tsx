@@ -11,8 +11,12 @@ import { Overlay } from "@/components/overlays/OverlayDisplay";
 import { OverlayPage } from "@/components/overlays/OverlayPage";
 import { OverlayRouter } from "@/components/overlays/OverlayRouter";
 import { CaptionSettingsView } from "@/components/player/atoms/settings/CaptionSettingsView";
-import { AudioBoostSettingsView } from "@/components/player/enhancements/AudioBoostSettingsView";
+import {
+  AudioBoostControls,
+  AudioBoostSettingsView,
+} from "@/components/player/enhancements/AudioBoostSettingsView";
 import { PictureSettingsView } from "@/components/player/enhancements/PictureSettingsView";
+import { PlaybackSpeedControl } from "@/components/player/enhancements/PlaybackSpeedControl";
 import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
@@ -134,35 +138,31 @@ function JellyfinPlaybackSettings() {
       </Menu.BackLink>
       <Menu.Section>
         <Menu.FieldTitle>Playback speed</Menu.FieldTitle>
-        <div className="flex items-center bg-video-context-light/10 p-1 rounded-lg mt-3">
-          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
-            <button
-              key={speed}
-              type="button"
-              className={`w-full px-2 py-1 rounded-md tabbable ${rate === speed ? "bg-video-context-light/20 text-white" : ""}`}
-              disabled={Boolean(syncGroup)}
-              onClick={() => display?.setPlaybackRate(speed)}
-            >
-              {speed}x
-            </button>
-          ))}
+        <div className="mt-3">
+          <PlaybackSpeedControl
+            value={rate}
+            disabled={Boolean(syncGroup)}
+            onChange={(speed) => display?.setPlaybackRate(speed)}
+          />
         </div>
         {syncGroup ? (
           <p className="py-2 text-sm">
             SyncPlay controls playback speed and the group queue.
           </p>
         ) : null}
+      </Menu.Section>
+      <Menu.Section>
         <Menu.Link
           rightSide={<Toggle enabled={autoplay} onClick={toggleAutoplay} />}
         >
           Autoplay next episode
         </Menu.Link>
-        <Menu.ChevronLink onClick={() => router.navigate("/picture")}>
-          Picture
-        </Menu.ChevronLink>
-        <Menu.ChevronLink onClick={() => router.navigate("/audio-boost")}>
-          Volume boost
-        </Menu.ChevronLink>
+        <div className="space-y-4 mt-3">
+          <AudioBoostControls />
+          <Menu.ChevronLink onClick={() => router.navigate("/picture")}>
+            Colour adjustments
+          </Menu.ChevronLink>
+        </div>
         {error ? (
           <p role="alert" className="py-2 text-type-danger">
             {error}
@@ -332,7 +332,7 @@ export function JellyfinSettingsRouter() {
             <CaptionSettingsView id="settings" />
           </Menu.Card>
         </OverlayPage>
-        <OverlayPage id="settings" path="/playback" width={343} height={330}>
+        <OverlayPage id="settings" path="/playback" width={343} height={560}>
           <JellyfinPlaybackSettings />
         </OverlayPage>
         <OverlayPage id="settings" path="/picture" width={343} height={496}>

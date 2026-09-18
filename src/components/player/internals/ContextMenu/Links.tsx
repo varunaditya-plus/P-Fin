@@ -200,6 +200,7 @@ export function SelectableLink(props: {
       onClick={props.onClick}
       onDoubleClick={props.onDoubleClick}
       clickable={!props.disabled}
+      disabled={props.disabled}
       rightSide={rightContent}
       box={props.box}
     >

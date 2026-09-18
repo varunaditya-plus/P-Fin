@@ -15,7 +15,7 @@ export const VIDEO_APPEARANCE_LIMITS: Record<
   keyof VideoAppearance,
   [number, number]
 > = {
-  brightness: [10, 200],
+  brightness: [0, 200],
   contrast: [0, 200],
   saturation: [0, 200],
   hue: [-180, 180],
