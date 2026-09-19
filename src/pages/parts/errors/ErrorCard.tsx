@@ -76,7 +76,7 @@ export function ErrorCard(props: {
       <pre
         tabIndex={0}
         aria-label="Error report"
-        className="tabbable pointer-events-auto mt-4 max-h-[55dvh] min-h-40 select-text overflow-auto whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-left text-xs sm:text-sm"
+        className="tabbable pointer-events-auto mt-4 h-64 max-h-[55dvh] select-text overflow-auto whitespace-pre-wrap break-words [overflow-wrap:anywhere] rounded-lg border border-white/5 bg-black/20 p-3 text-left font-mono text-xs leading-relaxed text-white/90"
       >
         {report}
       </pre>
