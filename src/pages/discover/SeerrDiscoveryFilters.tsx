@@ -7,6 +7,8 @@ import {
 } from "@/backend/seerr/filters";
 import { SeerrMediaType } from "@/backend/seerr/types";
 import { Button } from "@/components/buttons/Button";
+import { Dropdown, OptionItem } from "@/components/form/Dropdown";
+import { Icon, Icons } from "@/components/Icon";
 
 export function SeerrDiscoveryFilters({
   type,
@@ -43,101 +45,102 @@ export function SeerrDiscoveryFilters({
     filters.region ||
     filters.genre ||
     filters.sort !== "popularity.desc";
+  const controls: {
+    key: keyof DiscoveryFilters;
+    label: string;
+    options: OptionItem[];
+  }[] = [
+    {
+      key: "language",
+      label: "Original language",
+      options: [
+        { id: "", name: "Seerr default" },
+        { id: "all", name: "All languages" },
+        ...(choices?.languages.map((value) => ({
+          id: value.iso_639_1,
+          name: value.english_name,
+        })) ?? []),
+      ],
+    },
+    {
+      key: "region",
+      label: "Streaming region",
+      options: [
+        { id: "", name: "All regions" },
+        ...(choices?.regions.map((value) => ({
+          id: value.iso_3166_1,
+          name: value.english_name,
+        })) ?? []),
+      ],
+    },
+    {
+      key: "genre",
+      label: "Genre",
+      options: [
+        { id: "", name: "All genres" },
+        ...(choices?.genres.map((value) => ({
+          id: String(value.id),
+          name: value.name,
+        })) ?? []),
+      ],
+    },
+    {
+      key: "sort",
+      label: "Sort",
+      options: [
+        { id: "popularity.desc", name: "Popular" },
+        { id: "vote_average.desc", name: "Highest rated" },
+        {
+          id:
+            type === "movie"
+              ? "primary_release_date.desc"
+              : "first_air_date.desc",
+          name: "Newest release",
+        },
+      ],
+    },
+  ];
   return (
-    <div className="mx-auto max-w-screen-xl mb-8 px-4">
+    <div className="mx-auto max-w-screen-xl mb-8 px-4 relative z-30">
       <div
-        className="flex items-end gap-3 overflow-x-auto pb-3 scrollbar-none"
+        className="flex flex-wrap items-center justify-center gap-2 sm:gap-3"
         aria-label="Discovery filters"
       >
-        <label className="flex shrink-0 flex-col gap-2 text-sm text-type-secondary">
-          Original language
-          <select
-            aria-label="Discovery language"
-            className="max-w-48 rounded-lg bg-dropdown-background px-4 py-3 text-white"
-            value={filters.language}
-            onChange={(event) =>
-              onChange({ ...filters, language: event.target.value })
-            }
-          >
-            <option value="">Seerr default</option>
-            <option value="all">All languages</option>
-            {choices?.languages.map((language) => (
-              <option key={language.iso_639_1} value={language.iso_639_1}>
-                {language.english_name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex shrink-0 flex-col gap-2 text-sm text-type-secondary">
-          Streaming region
-          <select
-            aria-label="Discovery region"
-            className="max-w-48 rounded-lg bg-dropdown-background px-4 py-3 text-white"
-            value={filters.region}
-            onChange={(event) =>
-              onChange({ ...filters, region: event.target.value })
-            }
-          >
-            <option value="">All regions</option>
-            {choices?.regions.map((region) => (
-              <option key={region.iso_3166_1} value={region.iso_3166_1}>
-                {region.english_name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex shrink-0 flex-col gap-2 text-sm text-type-secondary">
-          Genre
-          <select
-            aria-label="Discovery genre"
-            className="max-w-48 rounded-lg bg-dropdown-background px-4 py-3 text-white"
-            value={filters.genre}
-            onChange={(event) =>
-              onChange({ ...filters, genre: event.target.value })
-            }
-          >
-            <option value="">All genres</option>
-            {choices?.genres.map((genre) => (
-              <option key={genre.id} value={genre.id}>
-                {genre.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex shrink-0 flex-col gap-2 text-sm text-type-secondary">
-          Sort
-          <select
-            aria-label="Discovery sort"
-            className="max-w-48 rounded-lg bg-dropdown-background px-4 py-3 text-white"
-            value={filters.sort}
-            onChange={(event) =>
-              onChange({
-                ...filters,
-                sort: event.target.value as DiscoveryFilters["sort"],
-              })
-            }
-          >
-            <option value="popularity.desc">Popular</option>
-            <option value="vote_average.desc">Highest rated</option>
-            <option
-              value={
-                type === "movie"
-                  ? "primary_release_date.desc"
-                  : "first_air_date.desc"
+        {controls.map((control) => {
+          const selected = control.options.find(
+            (option) => option.id === filters[control.key],
+          ) ?? { id: filters[control.key], name: filters[control.key] };
+          return (
+            <Dropdown
+              key={control.key}
+              className="!my-0"
+              selectedItem={selected}
+              setSelectedItem={(value) =>
+                onChange({ ...filters, [control.key]: value.id })
               }
-            >
-              Newest release
-            </option>
-          </select>
-        </label>
+              options={control.options}
+              customButton={
+                <button
+                  type="button"
+                  aria-label={`${control.label}: ${selected.name}`}
+                  className="tabbable flex max-w-56 items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm text-type-secondary transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <span className="truncate">{selected.name}</span>
+                  <Icon icon={Icons.CHEVRON_DOWN} />
+                </button>
+              }
+            />
+          );
+        })}
         {changed ? (
-          <Button
-            theme="secondary"
-            className="shrink-0"
+          <button
+            type="button"
             onClick={() => onChange(defaultSeerrFilters)}
+            className="tabbable flex items-center gap-2 rounded-full px-3 py-2 text-sm text-type-secondary hover:text-white"
           >
+            <Icon icon={Icons.X} />
             Clear filters
-          </Button>
+          </button>
         ) : null}
       </div>
       {error ? (

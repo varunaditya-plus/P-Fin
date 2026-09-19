@@ -15,7 +15,6 @@ import {
   getCachedSeerrPage,
   getSeerrPopularPicks,
   popularPicksPath,
-  randomSeerrMedia,
   uniqueSeerrMedia,
 } from "@/backend/seerr/browse";
 import {
@@ -37,6 +36,7 @@ import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 import { WideContainer } from "@/components/layout/WideContainer";
 import { MediaCard, MediaCardSkeleton } from "@/components/media/MediaCard";
+import { Flare } from "@/components/utils/Flare";
 import { useFeaturedSlideTransition } from "@/hooks/useFeaturedSlideTransition";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { PageTitle } from "@/pages/parts/util/PageTitle";
@@ -50,6 +50,7 @@ import { ScrollToTopButton } from "./components/ScrollToTopButton";
 import { SeerrCardMenu } from "./SeerrCardMenu";
 import { SeerrDetailsModal } from "./SeerrDetailsModal";
 import { SeerrDiscoveryFilters } from "./SeerrDiscoveryFilters";
+import { SeerrRandomButton } from "./SeerrRandomButton";
 import { SeerrSetup } from "./SeerrSetup";
 
 function SeerrFeatured({
@@ -217,6 +218,53 @@ function SeerrCard({
   );
 }
 
+function SeerrRecommendationRow({
+  title,
+  description,
+  items,
+  onSelect,
+}: {
+  title: string;
+  description?: string;
+  items: SeerrMedia[];
+  onSelect: (item: SeerrMedia) => void;
+}) {
+  const refs = useRef<Record<string, HTMLDivElement | null>>({});
+  if (!items.length) return null;
+  return (
+    <section className="mb-8" aria-label={title}>
+      <div className="flex flex-col ml-2 md:ml-8 pl-2 lg:pl-[68px]">
+        <h2 className="text-2xl font-bold text-white">{title}</h2>
+        {description ? (
+          <p className="mt-1 text-sm text-type-secondary">{description}</p>
+        ) : null}
+      </div>
+      <div className="relative overflow-hidden carousel-container md:pb-4">
+        <div
+          className="grid grid-flow-col auto-cols-max gap-4 overflow-x-auto scrollbar-none md:px-8"
+          ref={(element) => {
+            refs.current[title] = element;
+          }}
+        >
+          <div className="lg:w-12" />
+          {items.map((item) => (
+            <div
+              key={`${item.mediaType}:${item.id}`}
+              className="mt-4 p-2 w-[10rem] md:w-[11.5rem]"
+            >
+              <SeerrCard media={item} onShowDetails={onSelect} />
+            </div>
+          ))}
+          <div className="lg:w-12" />
+        </div>
+        <div className="hidden md:block">
+          <CarouselNavButtons categorySlug={title} carouselRefs={refs} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SeerrCarousel({
   title,
   endpoint,
@@ -224,6 +272,8 @@ function SeerrCarousel({
   onUnauthorized,
   refresh,
   popularPicksType,
+  expanded = false,
+  onMore,
 }: {
   title: string;
   endpoint: string;
@@ -231,6 +281,8 @@ function SeerrCarousel({
   onUnauthorized: () => void;
   refresh: number;
   popularPicksType?: SeerrMediaType;
+  expanded?: boolean;
+  onMore?: (title: string, endpoint: string) => void;
 }) {
   const [page, setPage] = useState<SeerrPage | undefined>(() =>
     popularPicksType
@@ -243,7 +295,7 @@ function SeerrCarousel({
   const lastRead = useRef({ refresh, retry: 0 });
   const generation = useRef(0);
   const sectionRef = useRef<HTMLElement>(null);
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(expanded);
   useEffect(() => {
     if (!sectionRef.current) return undefined;
     const observer = new IntersectionObserver(
@@ -342,17 +394,30 @@ function SeerrCarousel({
             {title}
           </h2>
         </div>
-        {popularPicksType ? (
-          <Button
-            theme="secondary"
-            className="mr-4 md:mr-8"
-            loading={loading && active}
-            icon={Icons.REPEAT}
-            onClick={() => setRetry((value) => value + 1)}
-          >
-            Shuffle picks
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-3 mr-4 md:mr-8">
+          {popularPicksType ? (
+            <button
+              type="button"
+              aria-label="Shuffle popular picks"
+              title="Shuffle popular picks"
+              disabled={loading && active}
+              className="tabbable p-2 text-type-secondary transition-colors hover:text-white disabled:opacity-50"
+              onClick={() => setRetry((value) => value + 1)}
+            >
+              <Icon icon={Icons.REPEAT} />
+            </button>
+          ) : null}
+          {!expanded && Boolean(page?.results.length) && onMore ? (
+            <button
+              type="button"
+              onClick={() => onMore(title, endpoint)}
+              className="tabbable flex items-center gap-2 text-sm text-type-secondary hover:text-white"
+            >
+              More
+              <Icon icon={Icons.ARROW_RIGHT} />
+            </button>
+          ) : null}
+        </div>
       </div>
       {error && (
         <div className="px-8 py-4">
@@ -369,16 +434,20 @@ function SeerrCarousel({
       )}
       <div className="relative overflow-hidden carousel-container md:pb-4">
         <div
-          className="grid grid-flow-col auto-cols-max gap-4 pt-0 overflow-x-scroll scrollbar-none rounded-xl overflow-y-hidden md:pl-8 md:pr-8"
+          className={
+            expanded
+              ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 px-2 md:px-8"
+              : "grid grid-flow-col auto-cols-max gap-4 pt-0 overflow-x-scroll scrollbar-none rounded-xl overflow-y-hidden md:pl-8 md:pr-8"
+          }
           ref={(element) => {
             carouselRefs.current[endpoint] = element;
           }}
         >
-          <div className="lg:w-12" />
+          {!expanded ? <div className="lg:w-12" /> : null}
           {page?.results.map((item) => (
             <div
               key={`${item.mediaType}-${item.id}`}
-              className="relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 w-[10rem] md:w-[11.5rem] h-auto"
+              className={`relative mt-4 group cursor-pointer user-select-none rounded-xl p-2 bg-transparent transition-colors duration-300 ${expanded ? "min-w-0" : "w-[10rem] md:w-[11.5rem]"} h-auto`}
             >
               <SeerrCard media={item} onShowDetails={onShowDetails} />
             </div>
@@ -390,16 +459,38 @@ function SeerrCarousel({
                 <MediaCardSkeleton />
               </div>
             ))}
-          {page && page.page < page.totalPages && (
-            <div className="flex items-center justify-center px-4 w-[10rem]">
-              <Button theme="secondary" loading={loading} onClick={loadMore}>
-                More
-              </Button>
+          {!expanded && page && page.page < page.totalPages && onMore ? (
+            <div className="relative mt-4 rounded-xl p-2 w-[10rem] md:w-[11.5rem]">
+              <button
+                type="button"
+                onClick={() => onMore(title, endpoint)}
+                className="tabbable block w-full"
+              >
+                <Flare.Base className="group -m-[0.705em] rounded-xl bg-background-main transition-all duration-300 hover:scale-95 hover:bg-mediaCard-hoverBackground">
+                  <Flare.Light
+                    flareSize={300}
+                    cssColorVar="--colors-mediaCard-hoverAccent"
+                    backgroundClass="bg-mediaCard-hoverBackground duration-100"
+                    className="rounded-xl bg-background-main group-hover:opacity-100"
+                  />
+                  <Flare.Child className="pointer-events-auto relative p-[0.4em]">
+                    <div className="relative w-full pb-[150%]">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <Icon
+                          icon={Icons.ARROW_RIGHT}
+                          className="text-4xl mb-2"
+                        />
+                        <span className="text-sm">More</span>
+                      </div>
+                    </div>
+                  </Flare.Child>
+                </Flare.Base>
+              </button>
             </div>
-          )}
-          <div className="lg:w-12" />
+          ) : null}
+          {!expanded ? <div className="lg:w-12" /> : null}
         </div>
-        {page?.results.length ? (
+        {!expanded && page?.results.length ? (
           <div className="hidden md:block">
             <CarouselNavButtons
               categorySlug={endpoint}
@@ -408,6 +499,13 @@ function SeerrCarousel({
           </div>
         ) : null}
       </div>
+      {expanded && page && page.page < page.totalPages ? (
+        <div className="flex justify-center mt-8">
+          <Button theme="secondary" loading={loading} onClick={loadMore}>
+            Load more
+          </Button>
+        </div>
+      ) : null}
       {!loading && !error && !page?.results.length && (
         <p className="px-8 py-6 text-type-secondary">No titles found.</p>
       )}
@@ -471,10 +569,24 @@ function SeerrLibraryDiscover() {
   }, [category, filters, filtersActive, user]);
   const [featured, setFeatured] = useState<SeerrMedia[]>([]);
   const [selected, setSelected] = useState<SeerrMedia>();
-  const [randomLoading, setRandomLoading] = useState(false);
   const [randomError, setRandomError] = useState("");
-  const randomController = useRef<AbortController>();
-  useEffect(() => () => randomController.current?.abort(), []);
+  const feed = searchParams.get("feed");
+  const expandedFeed =
+    feed &&
+    /^\/(?:discover\/(?:trending|movies(?:\/upcoming)?|tv(?:\/upcoming)?)|search)(?:\?|$)/.test(
+      feed,
+    )
+      ? { endpoint: feed, title: searchParams.get("view") || "Discover" }
+      : undefined;
+  const openMore = (title: string, endpoint: string) => {
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.set("view", title);
+      next.set("feed", endpoint);
+      return next;
+    });
+    window.scrollTo({ top: 0 });
+  };
   useEffect(() => {
     const id = Number(searchParams.get("media"));
     const mediaType = searchParams.get("type");
@@ -496,34 +608,6 @@ function SeerrLibraryDiscover() {
       },
       { replace: true },
     );
-  };
-  const pickRandom = async () => {
-    if (randomLoading) return;
-    const controller = new AbortController();
-    randomController.current = controller;
-    setRandomLoading(true);
-    setRandomError("");
-    try {
-      const item = await randomSeerrMedia(
-        category,
-        controller.signal,
-        Math.random,
-        filtersActive ? filteredEndpoint : undefined,
-      );
-      if (!controller.signal.aborted) {
-        if (item) setSelected(item);
-        else setRandomError("Seerr has no titles to choose from.");
-      }
-    } catch (reason) {
-      if (!controller.signal.aborted)
-        setRandomError(
-          reason instanceof Error
-            ? reason.message
-            : "Unable to choose a title.",
-        );
-    } finally {
-      if (!controller.signal.aborted) setRandomLoading(false);
-    }
   };
   const [refresh, setRefresh] = useState(0);
   const [authRetry, setAuthRetry] = useState(0);
@@ -628,16 +712,42 @@ function SeerrLibraryDiscover() {
   const recommendations = usePersonalRecommendations(
     "seerr",
     category,
-    Boolean(user) &&
-      !debouncedQuery &&
-      !filtersActive &&
-      tasteView.seerr !== false,
+    Boolean(user) && !debouncedQuery && !filtersActive && !expandedFeed,
     refresh,
   );
   const personal =
     resolveTasteView(tasteView.seerr, recommendations.hasSignals) &&
     !debouncedQuery &&
-    !filtersActive;
+    !filtersActive &&
+    recommendations.hasSignals;
+  const otherRecommendations = usePersonalRecommendations(
+    "seerr",
+    category === "movie" ? "tv" : "movie",
+    Boolean(user) && personal && !expandedFeed,
+    refresh,
+  );
+  const combinedRows = recommendations.rows.map((row) => {
+    const other =
+      otherRecommendations.rows.find((value) => value.id === row.id)?.items ??
+      [];
+    return {
+      ...row,
+      items: uniqueSeerrMedia(
+        Array.from(
+          { length: Math.max(row.items.length, other.length) },
+          (_, index) => [row.items[index]?.item, other[index]?.item],
+        )
+          .flat()
+          .filter((item): item is SeerrMedia => Boolean(item)),
+      ),
+    };
+  });
+  for (const row of otherRecommendations.rows)
+    if (!combinedRows.some((existing) => existing.id === row.id))
+      combinedRows.push({
+        ...row,
+        items: row.items.map((candidate) => candidate.item),
+      });
   const requested = (details: SeerrDetails) => {
     setSelected(details);
     setRefresh((value) => value + 1);
@@ -683,7 +793,7 @@ function SeerrLibraryDiscover() {
         </div>
       ) : (
         <>
-          {!debouncedQuery && (
+          {!debouncedQuery && !expandedFeed && (
             <div className="!mt-[-170px]">
               <SeerrFeatured
                 media={
@@ -698,248 +808,281 @@ function SeerrLibraryDiscover() {
             </div>
           )}
           <div className="relative z-20 px-4 md:px-10 min-h-screen">
-            <div className="mx-auto max-w-xl mb-8 px-4">
-              <SearchBarInput
-                value={query}
-                onChange={setQuery}
-                onUnFocus={() => undefined}
-                placeholder="Search movies and TV shows to request"
-                hideTooltip
-              />
-            </div>
-            <div className="flex flex-wrap justify-center gap-3 pb-6">
-              <Button
-                theme="secondary"
-                onClick={() => {
-                  if (!personal && filtersActive)
-                    changeFilters({
-                      ...filters,
-                      genre: "",
-                      language: "",
-                      region: "",
-                      sort: "popularity.desc",
+            {expandedFeed ? (
+              <>
+                <button
+                  type="button"
+                  className="tabbable flex items-center gap-2 text-white hover:text-type-link mb-6"
+                  onClick={() => {
+                    setSearchParams((previous) => {
+                      const next = new URLSearchParams(previous);
+                      next.delete("feed");
+                      next.delete("view");
+                      return next;
                     });
-                  useTasteView.setState({ seerr: !personal });
-                }}
-              >
-                {personal ? "Browse discovery" : "For you"}
-              </Button>
-              {personal ? (
-                <Button theme="secondary" href="/taste">
-                  My taste
-                </Button>
-              ) : null}
-              <Button
-                theme="secondary"
-                loading={randomLoading}
-                disabled={filtersActive && !filteredEndpoint}
-                onClick={pickRandom}
-              >
-                Random {category === "movie" ? "movie" : "TV show"}
-              </Button>
-              <Button
-                theme="secondary"
-                href={
-                  query.trim()
-                    ? `/browse/${encodeURIComponent(query.trim())}`
-                    : "/"
-                }
-              >
-                Search my library
-              </Button>
-            </div>
-            {randomError ? (
-              <p role="alert" className="pb-4 text-center">
-                {randomError}
-              </p>
-            ) : null}
-            {debouncedQuery ? (
-              <WideContainer ultraWide classNames="!px-0">
+                  }}
+                >
+                  <Icon icon={Icons.ARROW_LEFT} />
+                  Back
+                </button>
                 <SeerrCarousel
-                  key={debouncedQuery}
-                  title={`Results for “${debouncedQuery}”`}
-                  endpoint={`/search?query=${encodeURIComponent(debouncedQuery)}`}
+                  key={expandedFeed.endpoint}
+                  title={expandedFeed.title}
+                  endpoint={expandedFeed.endpoint}
+                  expanded
                   onShowDetails={setSelected}
                   onUnauthorized={unauthorized}
                   refresh={refresh}
                 />
-              </WideContainer>
+              </>
             ) : (
               <>
-                <div className="pb-4 w-full max-w-screen-xl mx-auto">
-                  <div className="relative flex justify-center">
-                    <div className="flex space-x-4">
-                      {(["movie", "tv"] as const).map((value) => (
-                        <button
-                          key={value}
-                          type="button"
-                          className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center transition-transform duration-200 ${category === value ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
-                          onClick={() => {
-                            if (category === value) return;
-                            featuredGeneration.current += 1;
-                            setFeatured([]);
-                            setCategory(value);
-                            changeFilters(
-                              {
-                                ...filters,
-                                genre: "",
-                                sort:
-                                  filters.sort ===
-                                    "primary_release_date.desc" ||
-                                  filters.sort === "first_air_date.desc"
-                                    ? value === "movie"
-                                      ? "primary_release_date.desc"
-                                      : "first_air_date.desc"
-                                    : filters.sort,
-                              },
-                              value,
-                            );
-                          }}
-                        >
-                          {value === "movie" ? "Movies" : "TV shows"}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                <div className="mx-auto max-w-xl mb-8 px-4">
+                  <SearchBarInput
+                    value={query}
+                    onChange={setQuery}
+                    onUnFocus={() => undefined}
+                    placeholder="Search movies and TV shows to request"
+                    hideTooltip
+                  />
                 </div>
-                {personal ? (
+                {debouncedQuery ? (
+                  <div className="flex justify-center pb-6">
+                    <Button
+                      theme="secondary"
+                      href={`/browse/${encodeURIComponent(query.trim())}`}
+                    >
+                      Search my library
+                    </Button>
+                  </div>
+                ) : null}
+                {randomError ? (
+                  <p role="alert" className="pb-4 text-center">
+                    {randomError}
+                  </p>
+                ) : null}
+                {debouncedQuery ? (
                   <WideContainer ultraWide classNames="!px-0">
-                    {recommendations.loading ? (
-                      <p role="status" className="py-8 text-center">
-                        Finding recommendations…
-                      </p>
-                    ) : null}
-                    {recommendations.error ? (
-                      <div role="alert" className="py-8 text-center">
-                        <p>{recommendations.error}</p>
-                        <Button
-                          onClick={() => setRefresh((value) => value + 1)}
-                        >
-                          Try again
-                        </Button>
-                      </div>
-                    ) : null}
-                    {!recommendations.loading && !recommendations.hasSignals ? (
-                      <div className="py-8 text-center space-y-4">
-                        <p>Rate movies and shows to personalise discovery.</p>
-                        <Button href="/taste">Shape my recommendations</Button>
-                      </div>
-                    ) : null}
-                    {recommendations.rows.map((row) => (
-                      <section key={row.id} className="py-6">
-                        <h2 className="text-2xl font-bold text-white">
-                          {row.title}
-                        </h2>
-                        <p className="mt-2 mb-5 text-type-secondary text-sm">
-                          {row.description}
-                        </p>
-                        <div className="flex gap-4 overflow-x-auto pb-4">
-                          {row.items.map((candidate) => (
-                            <div
-                              className="w-36 md:w-44 shrink-0"
-                              key={candidate.media.key}
-                            >
-                              <SeerrCard
-                                media={candidate.item}
-                                onShowDetails={setSelected}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </section>
-                    ))}
-                    {!recommendations.loading &&
-                    recommendations.hasSignals &&
-                    !recommendations.rows.length ? (
-                      <p className="py-8 text-center">
-                        No new matching titles found. Adjust your taste
-                        preferences or try again later.
-                      </p>
-                    ) : null}
+                    <SeerrCarousel
+                      key={debouncedQuery}
+                      title={`Results for “${debouncedQuery}”`}
+                      endpoint={`/search?query=${encodeURIComponent(debouncedQuery)}`}
+                      onShowDetails={setSelected}
+                      onUnauthorized={unauthorized}
+                      onMore={openMore}
+                      refresh={refresh}
+                    />
                   </WideContainer>
                 ) : (
                   <>
-                    <SeerrDiscoveryFilters
-                      type={category}
-                      filters={filters}
-                      onChange={changeFilters}
-                    />
-                    {filtersActive ? (
-                      <WideContainer ultraWide classNames="!px-0">
-                        {filterError ? (
-                          <p role="alert" className="px-8 py-8">
-                            {filterError}
-                          </p>
-                        ) : filteredEndpoint ? (
-                          <SeerrCarousel
-                            key={filteredEndpoint}
-                            title={
-                              category === "movie"
-                                ? "Discover movies"
-                                : "Discover TV shows"
+                    <div className="pb-4 w-full max-w-screen-xl mx-auto">
+                      <div className="relative flex justify-center">
+                        <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4">
+                          {recommendations.hasSignals ? (
+                            <button
+                              type="button"
+                              className={`tabbable text-xl md:text-2xl font-bold p-2 rounded-full transition-transform duration-200 ${personal ? "scale-105 text-type-link" : "text-type-secondary"}`}
+                              onClick={() => {
+                                changeFilters(defaultSeerrFilters);
+                                useTasteView.setState({ seerr: true });
+                              }}
+                            >
+                              For You
+                            </button>
+                          ) : null}
+                          {(["movie", "tv"] as const).map((value) => (
+                            <button
+                              key={value}
+                              type="button"
+                              className={`text-xl md:text-2xl font-bold p-2 bg-transparent text-center rounded-full cursor-pointer flex items-center transition-transform duration-200 ${!personal && category === value ? "transform scale-105 text-type-link" : "text-type-secondary"}`}
+                              onClick={() => {
+                                useTasteView.setState({ seerr: false });
+                                if (category === value && !personal) return;
+                                featuredGeneration.current += 1;
+                                setFeatured([]);
+                                setCategory(value);
+                                changeFilters(
+                                  {
+                                    ...filters,
+                                    genre: "",
+                                    sort:
+                                      filters.sort ===
+                                        "primary_release_date.desc" ||
+                                      filters.sort === "first_air_date.desc"
+                                        ? value === "movie"
+                                          ? "primary_release_date.desc"
+                                          : "first_air_date.desc"
+                                        : filters.sort,
+                                  },
+                                  value,
+                                );
+                              }}
+                            >
+                              {value === "movie" ? "Movies" : "TV shows"}
+                            </button>
+                          ))}
+                          <SeerrRandomButton
+                            type={category}
+                            endpoint={
+                              filtersActive ? filteredEndpoint : undefined
                             }
-                            endpoint={filteredEndpoint}
-                            onShowDetails={setSelected}
-                            onUnauthorized={unauthorized}
-                            refresh={refresh}
+                            disabled={filtersActive && !filteredEndpoint}
+                            onSelect={setSelected}
+                            onError={setRandomError}
                           />
-                        ) : (
-                          <div className="flex justify-center py-12">
-                            <Spinner />
+                        </div>
+                      </div>
+                    </div>
+                    {personal ? (
+                      <WideContainer ultraWide classNames="!px-0">
+                        {recommendations.loading ? (
+                          <p role="status" className="py-8 text-center">
+                            Finding recommendations…
+                          </p>
+                        ) : null}
+                        {recommendations.error ? (
+                          <div role="alert" className="py-8 text-center">
+                            <p>{recommendations.error}</p>
+                            <Button
+                              onClick={() => setRefresh((value) => value + 1)}
+                            >
+                              Try again
+                            </Button>
                           </div>
-                        )}
+                        ) : null}
+                        {!recommendations.loading &&
+                        !recommendations.hasSignals ? (
+                          <div className="py-8 text-center space-y-4">
+                            <p>
+                              Rate movies and shows to personalise discovery.
+                            </p>
+                            <Button href="/taste">
+                              Shape my recommendations
+                            </Button>
+                          </div>
+                        ) : null}
+                        {combinedRows.map((row) => (
+                          <SeerrRecommendationRow
+                            key={row.id}
+                            title={row.title}
+                            description={row.description}
+                            items={row.items}
+                            onSelect={setSelected}
+                          />
+                        ))}
+                        <SeerrRecommendationRow
+                          title={category === "movie" ? "Movies" : "Shows"}
+                          items={recommendations.ranked.map(
+                            (entry) => entry.candidate.item,
+                          )}
+                          onSelect={setSelected}
+                        />
+                        <SeerrRecommendationRow
+                          title={category === "movie" ? "Shows" : "Movies"}
+                          items={otherRecommendations.ranked.map(
+                            (entry) => entry.candidate.item,
+                          )}
+                          onSelect={setSelected}
+                        />
+                        {!recommendations.loading &&
+                        recommendations.hasSignals &&
+                        !recommendations.rows.length ? (
+                          <p className="py-8 text-center">
+                            No new matching titles found. Adjust your taste
+                            preferences or try again later.
+                          </p>
+                        ) : null}
                       </WideContainer>
                     ) : (
-                      <WideContainer ultraWide classNames="!px-0">
-                        <SeerrCarousel
-                          title="Trending"
-                          endpoint="/discover/trending"
-                          onShowDetails={setSelected}
-                          onUnauthorized={unauthorized}
-                          refresh={refresh}
+                      <>
+                        <SeerrDiscoveryFilters
+                          type={category}
+                          filters={filters}
+                          onChange={changeFilters}
                         />
-                        <SeerrCarousel
-                          key={`popular-${category}`}
-                          title={
-                            category === "movie"
-                              ? "Popular movies"
-                              : "Popular TV shows"
-                          }
-                          endpoint={
-                            category === "movie"
-                              ? "/discover/movies"
-                              : "/discover/tv"
-                          }
-                          onShowDetails={setSelected}
-                          onUnauthorized={unauthorized}
-                          refresh={refresh}
-                        />
-                        <SeerrCarousel
-                          key={`popular-picks-${category}`}
-                          title="Popular Picks"
-                          endpoint={popularPicksPath(category)}
-                          popularPicksType={category}
-                          onShowDetails={setSelected}
-                          onUnauthorized={unauthorized}
-                          refresh={refresh}
-                        />
-                        <SeerrCarousel
-                          key={`upcoming-${category}`}
-                          title={
-                            category === "movie"
-                              ? "Upcoming movies"
-                              : "Upcoming TV shows"
-                          }
-                          endpoint={
-                            category === "movie"
-                              ? "/discover/movies/upcoming"
-                              : "/discover/tv/upcoming"
-                          }
-                          onShowDetails={setSelected}
-                          onUnauthorized={unauthorized}
-                          refresh={refresh}
-                        />
-                      </WideContainer>
+                        {filtersActive ? (
+                          <WideContainer ultraWide classNames="!px-0">
+                            {filterError ? (
+                              <p role="alert" className="px-8 py-8">
+                                {filterError}
+                              </p>
+                            ) : filteredEndpoint ? (
+                              <SeerrCarousel
+                                key={filteredEndpoint}
+                                title={
+                                  category === "movie"
+                                    ? "Discover movies"
+                                    : "Discover TV shows"
+                                }
+                                endpoint={filteredEndpoint}
+                                onShowDetails={setSelected}
+                                onUnauthorized={unauthorized}
+                                onMore={openMore}
+                                refresh={refresh}
+                              />
+                            ) : (
+                              <div className="flex justify-center py-12">
+                                <Spinner />
+                              </div>
+                            )}
+                          </WideContainer>
+                        ) : (
+                          <WideContainer ultraWide classNames="!px-0">
+                            <SeerrCarousel
+                              title="Trending"
+                              endpoint="/discover/trending"
+                              onShowDetails={setSelected}
+                              onUnauthorized={unauthorized}
+                              onMore={openMore}
+                              refresh={refresh}
+                            />
+                            <SeerrCarousel
+                              key={`popular-${category}`}
+                              title={
+                                category === "movie"
+                                  ? "Popular movies"
+                                  : "Popular TV shows"
+                              }
+                              endpoint={
+                                category === "movie"
+                                  ? "/discover/movies"
+                                  : "/discover/tv"
+                              }
+                              onShowDetails={setSelected}
+                              onUnauthorized={unauthorized}
+                              onMore={openMore}
+                              refresh={refresh}
+                            />
+                            <SeerrCarousel
+                              key={`popular-picks-${category}`}
+                              title="Popular Picks"
+                              endpoint={popularPicksPath(category)}
+                              popularPicksType={category}
+                              onShowDetails={setSelected}
+                              onUnauthorized={unauthorized}
+                              onMore={openMore}
+                              refresh={refresh}
+                            />
+                            <SeerrCarousel
+                              key={`upcoming-${category}`}
+                              title={
+                                category === "movie"
+                                  ? "Upcoming movies"
+                                  : "Upcoming TV shows"
+                              }
+                              endpoint={
+                                category === "movie"
+                                  ? "/discover/movies/upcoming"
+                                  : "/discover/tv/upcoming"
+                              }
+                              onShowDetails={setSelected}
+                              onUnauthorized={unauthorized}
+                              onMore={openMore}
+                              refresh={refresh}
+                            />
+                          </WideContainer>
+                        )}
+                      </>
                     )}
                   </>
                 )}
