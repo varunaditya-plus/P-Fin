@@ -88,9 +88,23 @@ export function GamepadEvents() {
             const overlay = routerRef.current;
             const container =
               anchor.current?.closest<HTMLElement>(".popout-location");
-            const root = overlay.currentRoute
-              ? container?.querySelector<HTMLElement>(".popout-wrapper")
-              : container;
+            const dialog = Array.from(
+              document.querySelectorAll<HTMLElement>('[role="dialog"]'),
+            )
+              .filter((node) => !node.closest('[aria-hidden="true"]'))
+              .at(-1);
+            const root =
+              dialog ??
+              (overlay.currentRoute
+                ? container?.querySelector<HTMLElement>(".popout-wrapper")
+                : container);
+            if (
+              dialog &&
+              !["up", "down", "left", "right", "confirm", "back"].includes(
+                action,
+              )
+            )
+              continue;
             const index = c.episodes.findIndex(
               (episode) => episode.Id === c.itemId,
             );
@@ -143,7 +157,15 @@ export function GamepadEvents() {
                 overlay.open();
                 break;
               case "back":
-                if (overlay.currentRoute) overlay.close();
+                if (dialog) {
+                  (document.activeElement ?? dialog).dispatchEvent(
+                    new KeyboardEvent("keydown", {
+                      key: "Escape",
+                      code: "Escape",
+                      bubbles: true,
+                    }),
+                  );
+                } else if (overlay.currentRoute) overlay.close();
                 else navigate("/");
                 break;
               case "confirm":

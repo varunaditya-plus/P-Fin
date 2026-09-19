@@ -128,3 +128,26 @@ it("mutes and restores the previous volume through a remapped controller button"
   act(() => frame(30));
   expect(setVolume).toHaveBeenLastCalledWith(0.4);
 });
+
+it("keeps controller playback actions inside an open dialog", () => {
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog");
+  const button = document.createElement("button");
+  const activate = vi.fn();
+  button.onclick = activate;
+  dialog.append(button);
+  document.body.append(dialog);
+  button.focus();
+  pressed = [0, 1, 8];
+  act(() => frame(10));
+  expect(play).not.toHaveBeenCalled();
+  expect(playItem).not.toHaveBeenCalled();
+  expect(open).not.toHaveBeenCalled();
+  pressed = [];
+  act(() => frame(20));
+  act(() => useGamepadStore.setState({ mapping: { 0: "confirm" } }));
+  pressed = [0];
+  act(() => frame(30));
+  expect(activate).toHaveBeenCalledOnce();
+  dialog.remove();
+});
