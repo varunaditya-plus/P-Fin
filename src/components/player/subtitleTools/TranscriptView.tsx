@@ -1,39 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Button } from "@/components/buttons/Button";
+import { Icon, Icons } from "@/components/Icon";
 import { Menu } from "@/components/player/internals/ContextMenu";
-import { timedTextToSrt } from "@/components/player/utils/ttml";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
-import { useJellyfinAuth } from "@/stores/jellyfin";
 import { usePlayerStore } from "@/stores/player/store";
 import { useSubtitleStore } from "@/stores/subtitles";
-import { formatSeconds } from "@/utils/formatSeconds";
+import { durationExceedsHour, formatSeconds } from "@/utils/formatSeconds";
 
-import { useSubtitleTools, validateSubtitleTools } from "./preferences";
-import {
-  applySubtitleTranslation,
-  restoreSubtitleTranslation,
-  subtitleToolIdentity,
-  useSubtitleToolState,
-} from "./state";
-import {
-  transcriptCues,
-  transcriptMatches,
-  translateTranscript,
-} from "./transcript";
+import { restoreSubtitleTranslation, useSubtitleToolState } from "./state";
+import { transcriptCues, transcriptMatches } from "./transcript";
 
 export function TranscriptView() {
   const router = useOverlayRouter("settings");
-  const caption = usePlayerStore((s) => s.caption.selected);
-  const source = usePlayerStore((s) => s.source);
-  const itemId = usePlayerStore((s) => s.meta?.jellyfinItemId);
-  const session = useJellyfinAuth((s) => s.session);
-  const time = usePlayerStore((s) => s.progress.time);
-  const delay = useSubtitleStore((s) => s.delay);
+  const caption = usePlayerStore((state) => state.caption.selected);
+  const { time, duration } = usePlayerStore((state) => state.progress);
+  const delay = useSubtitleStore((state) => state.delay);
+  const original = useSubtitleToolState((state) => state.translation?.original);
   const [query, setQuery] = useState("");
-  const [count, setCount] = useState(150);
-  const [follow, setFollow] = useState(false);
-  const activeRef = useRef<HTMLButtonElement>(null);
+  const [edges, setEdges] = useState({ top: true, bottom: false });
+  const viewport = useRef<HTMLDivElement>(null);
+  const target = useRef<HTMLButtonElement>(null);
   const parsed = useMemo(() => {
     try {
       return {
@@ -52,209 +38,125 @@ export function TranscriptView() {
     () => parsed.cues.filter((cue) => transcriptMatches(cue.text, query)),
     [parsed, query],
   );
-  const activeIndex = parsed.cues.findIndex(
+  const active = filtered.find(
     (cue) => time >= cue.start / 1000 + delay && time < cue.end / 1000 + delay,
   );
-  const start = follow && !query ? Math.max(0, activeIndex - 40) : 0;
-  const visible = filtered.slice(start, start + count);
+  const following =
+    active ?? filtered.find((cue) => cue.start / 1000 + delay > time);
+  useEffect(() => setQuery(""), [caption]);
   useEffect(() => {
-    if (follow) activeRef.current?.scrollIntoView?.({ block: "nearest" });
-  }, [activeIndex, follow]);
-  const preferences = useSubtitleTools();
-  const [endpoint, setEndpoint] = useState(preferences.translationEndpoint);
-  const [target, setTarget] = useState(preferences.targetLanguage);
-  const [apiKey, setApiKey] = useState("");
-  const [translationOpen, setTranslationOpen] = useState(false);
-  const [progress, setProgress] = useState<number | null>(null);
-  const [error, setError] = useState("");
-  const original = useSubtitleToolState((state) => state.translation?.original);
-  const controller = useRef<AbortController>();
-  useEffect(() => {
-    setQuery("");
-    setError("");
-    return () => controller.current?.abort();
-  }, [caption, source, itemId, session]);
-  const translate = async () => {
-    if (!caption || !parsed.cues.length || progress !== null) return;
-    const request = new AbortController();
-    const identity = subtitleToolIdentity();
-    controller.current = request;
-    setError("");
-    setProgress(0);
-    try {
-      useSubtitleTools.setState(
-        validateSubtitleTools({
-          ...preferences,
-          translationEndpoint: endpoint,
-          targetLanguage: target,
-        }),
-      );
-      const cues = await translateTranscript(
-        parsed.cues,
-        endpoint,
-        target,
-        apiKey,
-        request.signal,
-        setProgress,
-      );
-      if (request.signal.aborted) return;
-      applySubtitleTranslation(identity, caption, {
-        ...caption,
-        id: caption.id,
-        language: target,
-        srtData: timedTextToSrt(cues),
+    const timer = setTimeout(() => {
+      const parent = viewport.current;
+      const line = target.current;
+      if (!parent || !line) return;
+      const reduced = window.matchMedia?.(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      const next =
+        parent.scrollTop +
+        line.getBoundingClientRect().top -
+        parent.getBoundingClientRect().top +
+        line.offsetHeight / 2 -
+        parent.clientHeight * 0.6;
+      parent.scrollTo?.({
+        top: Math.max(
+          0,
+          Math.min(next, parent.scrollHeight - parent.clientHeight),
+        ),
+        behavior: reduced ? "auto" : "smooth",
       });
-      setTranslationOpen(false);
-    } catch (cause) {
-      if (!request.signal.aborted)
-        setError(
-          cause instanceof Error ? cause.message : "Translation failed.",
-        );
-    } finally {
-      setProgress(null);
-    }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [following?.index, query]);
+  const updateEdges = () => {
+    const element = viewport.current;
+    if (element)
+      setEdges({
+        top: element.scrollTop <= 0,
+        bottom:
+          element.scrollHeight - element.scrollTop - element.clientHeight < 2,
+      });
   };
+  useEffect(updateEdges, [filtered.length]);
   return (
     <Menu.CardWithScrollable>
       <Menu.BackLink onClick={() => router.navigate("/captions")}>
         Transcript
       </Menu.BackLink>
-      <Menu.Section className="space-y-3">
-        <input
-          aria-label="Search transcript"
-          placeholder="Search transcript"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setCount(150);
-          }}
-          className="w-full rounded-lg bg-video-context-inputBg p-3 text-white tabbable"
-        />
-        <div className="flex flex-wrap gap-2 text-sm">
-          <button
-            type="button"
-            className="tabbable rounded-lg bg-video-context-light/10 px-3 py-2"
-            onClick={() => setFollow(!follow)}
-          >
-            {follow ? "Stop following" : "Follow current line"}
-          </button>
-          <button
-            type="button"
-            className="tabbable rounded-lg bg-video-context-light/10 px-3 py-2"
-            onClick={() => setTranslationOpen(!translationOpen)}
-          >
-            Translate…
-          </button>
+      <div className="min-h-0 flex flex-col">
+        <Menu.Section>
+          <div className="w-full relative">
+            <Icon
+              icon={Icons.SEARCH}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-video-context-inputPlaceholder"
+            />
+            <input
+              aria-label="Search transcript"
+              placeholder="Search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="w-full py-2 px-3 pl-[calc(0.75rem+24px)] tabbable bg-video-context-inputBg rounded placeholder:text-video-context-inputPlaceholder"
+            />
+          </div>
           {original ? (
             <button
               type="button"
-              className="tabbable rounded-lg px-3 py-2"
               onClick={restoreSubtitleTranslation}
+              className="tabbable text-xs text-video-context-type-accent pt-3"
             >
               Restore original
             </button>
           ) : null}
-        </div>
-        {translationOpen ? (
-          <div className="space-y-3 rounded-xl bg-video-context-light/5 p-3">
-            <p className="text-sm text-type-secondary">
-              Send this track&apos;s text to your configured
-              LibreTranslate-compatible service. Translation replaces the local
-              text track until you restore it or switch tracks.
-            </p>
-            <label className="block text-sm">
-              Translate endpoint
-              <input
-                aria-label="Translate endpoint"
-                type="url"
-                value={endpoint}
-                onChange={(e) => setEndpoint(e.target.value)}
-                placeholder="https://translate.example/translate"
-                className="mt-1 w-full rounded-lg bg-video-context-inputBg p-2 text-white"
-              />
-            </label>
-            <label className="block text-sm">
-              Target language
-              <input
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
-                className="mt-1 w-full rounded-lg bg-video-context-inputBg p-2 text-white"
-              />
-            </label>
-            <label className="block text-sm">
-              API key (optional, kept for this panel only)
-              <input
-                type="password"
-                autoComplete="off"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="mt-1 w-full rounded-lg bg-video-context-inputBg p-2 text-white"
-              />
-            </label>
-            <Button
-              disabled={progress !== null || !caption}
-              onClick={translate}
-            >
-              {progress === null
-                ? "Translate track"
-                : `Translating ${progress}%`}
-            </Button>
-            {progress !== null ? (
-              <button type="button" onClick={() => controller.current?.abort()}>
-                Cancel
-              </button>
+        </Menu.Section>
+        <div
+          ref={viewport}
+          onScroll={updateEdges}
+          className={`max-h-[18rem] min-h-0 overflow-y-auto vertical-carousel-container ${edges.top ? "hide-top-gradient" : ""} ${edges.bottom ? "hide-bottom-gradient" : ""}`}
+        >
+          <div className="flex flex-col gap-1 pb-4">
+            {parsed.error ? (
+              <p role="alert" className="text-type-danger py-3 text-sm">
+                {parsed.error}
+              </p>
             ) : null}
+            {!caption ? (
+              <p className="py-3 text-sm text-type-secondary">
+                Select a text subtitle track to see its transcript.
+              </p>
+            ) : null}
+            {caption && !filtered.length && !parsed.error ? (
+              <p className="py-3 text-sm text-type-secondary">
+                No matching lines.
+              </p>
+            ) : null}
+            {filtered.map((cue) => {
+              const current = active === cue;
+              const seconds = Math.max(0, cue.start / 1000 + delay);
+              return (
+                <button
+                  key={`${cue.index}-${cue.start}`}
+                  ref={following === cue ? target : undefined}
+                  type="button"
+                  aria-current={current ? "true" : undefined}
+                  onClick={() =>
+                    usePlayerStore.getState().display?.setTime(seconds)
+                  }
+                  className={`tabbable flex w-full items-start py-2 px-2 rounded-lg text-left transition-colors duration-100 hover:bg-video-context-light/20 ${current ? "bg-video-context-light/20" : ""}`}
+                >
+                  <span className="mr-3 flex-none w-[4.5rem] h-[1.75rem] flex items-center justify-center px-0 leading-tight rounded-md bg-video-context-light/20 text-video-context-type-main font-normal whitespace-nowrap overflow-hidden text-sm">
+                    {formatSeconds(seconds, durationExceedsHour(duration))}
+                  </span>
+                  <span
+                    className={`flex-1 text-sm whitespace-pre-line ${current ? "text-white font-semibold" : "text-video-context-type-main"}`}
+                  >
+                    {cue.text}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        ) : null}
-        {error || parsed.error ? (
-          <p role="alert" className="text-type-danger">
-            {error || parsed.error}
-          </p>
-        ) : null}
-        {!caption ? (
-          <p className="text-type-secondary">
-            Select a text subtitle track to see its transcript.
-          </p>
-        ) : null}
-        {caption && !filtered.length && !parsed.error ? (
-          <p className="text-type-secondary">No matching lines.</p>
-        ) : null}
-        {visible.map((cue) => {
-          const active =
-            time >= cue.start / 1000 + delay && time < cue.end / 1000 + delay;
-          return (
-            <button
-              ref={active ? activeRef : undefined}
-              type="button"
-              key={`${cue.index}-${cue.start}`}
-              aria-current={active ? "true" : undefined}
-              onClick={() =>
-                usePlayerStore
-                  .getState()
-                  .display?.setTime(Math.max(0, cue.start / 1000 + delay))
-              }
-              className={`tabbable block w-full rounded-lg px-3 py-2 text-left ${active ? "bg-video-context-light/20 text-white" : "text-type-secondary hover:bg-video-context-light/10"}`}
-            >
-              <span className="mr-2 text-xs tabular-nums">
-                {formatSeconds(Math.max(0, cue.start / 1000 + delay), true)}
-              </span>
-              {cue.text}
-            </button>
-          );
-        })}
-        {start + count < filtered.length ? (
-          <button
-            type="button"
-            className="tabbable w-full py-3"
-            onClick={() => {
-              setFollow(false);
-              setCount(count + 150);
-            }}
-          >
-            Show more lines
-          </button>
-        ) : null}
-      </Menu.Section>
+        </div>
+      </div>
     </Menu.CardWithScrollable>
   );
 }

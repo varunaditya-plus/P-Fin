@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { create } from "zustand";
 
+import { Toggle } from "@/components/buttons/Toggle";
+import { Spinner } from "@/components/layout/Spinner";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { useJellyfinAuth } from "@/stores/jellyfin";
@@ -203,23 +205,26 @@ export function SubtitleSyncView() {
           align matching subtitle lines. Audio stays in this browser. The first
           run downloads a speech model. Leave playback running at normal speed.
         </p>
-        <label className="flex gap-3 items-center">
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={(event) =>
-              useSubtitleTools.setState({ autoSync: event.target.checked })
-            }
-          />{" "}
+        <Menu.Link
+          rightSide={
+            <Toggle
+              enabled={enabled}
+              onClick={() => useSubtitleTools.setState({ autoSync: !enabled })}
+            />
+          }
+        >
           Try automatically for each text track
-        </label>
+        </Menu.Link>
         <button
           className="tabbable w-full rounded-lg bg-video-context-light/10 p-3 disabled:opacity-40"
           type="button"
           disabled={status.busy}
           onClick={syncCurrentSubtitles}
         >
-          Synchronise now
+          <span className="flex items-center justify-center gap-2">
+            {status.busy ? <Spinner className="text-lg" /> : null}
+            {status.busy ? "Synchronising…" : "Synchronise now"}
+          </span>
         </button>
         {status.busy ? (
           <button

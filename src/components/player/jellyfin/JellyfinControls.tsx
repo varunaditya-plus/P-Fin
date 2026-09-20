@@ -26,6 +26,7 @@ import { SyncPlaySettingsView } from "@/components/player/remote/JellyfinSyncPla
 import { useSyncPlayState } from "@/components/player/remote/syncplay";
 import { SubtitleSyncView } from "@/components/player/subtitleTools/AutoSync";
 import { TranscriptView } from "@/components/player/subtitleTools/TranscriptView";
+import { TranslationView } from "@/components/player/subtitleTools/TranslationView";
 import { Transition } from "@/components/utils/Transition";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
@@ -188,7 +189,20 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
   };
   return (
     <Menu.CardWithScrollable>
-      <Menu.BackLink onClick={() => router.navigate("/")}>
+      <Menu.BackLink
+        onClick={() => router.navigate("/")}
+        rightSide={
+          kind === "Subtitle" ? (
+            <button
+              type="button"
+              onClick={() => router.navigate("/captions/settings")}
+              className="-mr-2 -my-1 px-2 p-[0.4em] rounded tabbable hover:bg-video-context-light/10"
+            >
+              Customize
+            </button>
+          ) : undefined
+        }
+      >
         {kind === "Subtitle" ? "Subtitles" : "Audio"}
       </Menu.BackLink>
       <Menu.Section className="pb-4">
@@ -196,7 +210,14 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
           <Menu.ChevronLink
             onClick={() => router.navigate("/captions/transcript")}
           >
-            Transcript and translation
+            Transcript
+          </Menu.ChevronLink>
+        ) : null}
+        {kind === "Subtitle" ? (
+          <Menu.ChevronLink
+            onClick={() => router.navigate("/captions/translate")}
+          >
+            Translate subtitles
           </Menu.ChevronLink>
         ) : null}
         {kind === "Subtitle" ? (
@@ -345,9 +366,17 @@ export function JellyfinSettingsRouter() {
           id="settings"
           path="/captions/transcript"
           width={443}
-          height={560}
+          height={430}
         >
           <TranscriptView />
+        </OverlayPage>
+        <OverlayPage
+          id="settings"
+          path="/captions/translate"
+          width={443}
+          height={496}
+        >
+          <TranslationView />
         </OverlayPage>
         <OverlayPage
           id="settings"
