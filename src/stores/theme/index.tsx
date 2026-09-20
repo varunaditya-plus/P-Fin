@@ -91,10 +91,16 @@ export const useThemeStore = create(
 
 export const usePreviewThemeStore = create<{
   previewTheme: string | null;
+  previewPalette: ThemePalette | null;
   setPreviewTheme(value: string | null): void;
+  setPreviewPalette(value: ThemePalette | null): void;
 }>((set) => ({
   previewTheme: null,
-  setPreviewTheme: (previewTheme) => set({ previewTheme }),
+  previewPalette: null,
+  setPreviewTheme: (previewTheme) =>
+    set({ previewTheme, previewPalette: null }),
+  setPreviewPalette: (previewPalette) =>
+    set({ previewPalette, previewTheme: previewPalette ? "custom" : null }),
 }));
 
 export function ThemeProvider({
@@ -105,13 +111,16 @@ export function ThemeProvider({
   applyGlobal?: boolean;
 }) {
   const preview = usePreviewThemeStore((state) => state.previewTheme);
+  const previewPalette = usePreviewThemeStore((state) => state.previewPalette);
   const settings = useThemeStore();
   const selected = preview ?? settings.theme ?? "default";
   const custom = settings.savedCustomThemes.find(
     (theme) => theme.id === selected,
   );
   const palette =
-    custom ?? (selected === "custom" ? settings.customTheme : undefined);
+    previewPalette ??
+    custom ??
+    (selected === "custom" ? settings.customTheme : undefined);
   const selector = palette ? "theme-custom" : `theme-${selected}`;
   const signature = JSON.stringify([selected, palette]);
   const previous = useRef(signature);

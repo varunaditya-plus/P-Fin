@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useThemeStore } from "@/stores/theme";
+import { usePreviewThemeStore, useThemeStore } from "@/stores/theme";
 import {
   defaultPalette,
   defaultThemeSettings,
@@ -55,6 +55,13 @@ describe("theme editor", () => {
     host.remove();
   });
   it("previews hex changes without changing the active theme and saves the named theme", async () => {
+    await act(async () =>
+      host
+        .querySelector<HTMLButtonElement>(
+          '[aria-label="Accent custom colour"]',
+        )!
+        .click(),
+    );
     const input = host.querySelector<HTMLInputElement>(
       '[aria-label="Accent hex colour"]',
     )!;
@@ -66,6 +73,9 @@ describe("theme editor", () => {
       "18 52 86",
     );
     expect(useThemeStore.getState().theme).toBe(null);
+    expect(usePreviewThemeStore.getState().previewPalette?.primaryHex).toBe(
+      "#123456",
+    );
     expect(useThemeStore.getState().savedCustomThemes).toEqual([]);
     await act(async () =>
       host
@@ -80,8 +90,16 @@ describe("theme editor", () => {
     });
     expect(useThemeStore.getState().theme).toBe("custom-preview");
     expect(close).toHaveBeenCalledOnce();
+    expect(usePreviewThemeStore.getState().previewPalette).toBeNull();
   });
   it("rejects an invalid hex colour and leaves existing themes unchanged when cancelled", async () => {
+    await act(async () =>
+      host
+        .querySelector<HTMLButtonElement>(
+          '[aria-label="Background custom colour"]',
+        )!
+        .click(),
+    );
     await act(async () =>
       setInput(
         host.querySelector<HTMLInputElement>(
@@ -108,5 +126,40 @@ describe("theme editor", () => {
     );
     expect(close).toHaveBeenCalledOnce();
     expect(useThemeStore.getState().savedCustomThemes).toEqual([]);
+  });
+  it("reopens saved hex colours in custom mode and discards edits on cancel", async () => {
+    const saved = {
+      ...defaultPalette,
+      id: "custom-existing",
+      name: "Existing",
+      primaryHex: "#aabbcc",
+      tertiaryHex: "#101122",
+    };
+    await act(async () => {
+      useThemeStore.getState().saveCustomTheme(saved);
+      useThemeStore.getState().setTheme(saved.id);
+    });
+    await act(async () =>
+      root.render(
+        <MemoryRouter>
+          <CustomThemeEditor key={saved.id} initial={saved} onClose={close} />
+        </MemoryRouter>,
+      ),
+    );
+    const field = host.querySelector<HTMLInputElement>(
+      '[aria-label="Accent hex colour"]',
+    )!;
+    expect(field.value).toBe("#aabbcc");
+    await act(async () => setInput(field, "#112233"));
+    await act(async () =>
+      [...host.querySelectorAll("button")]
+        .find((button) => button.textContent === "Cancel")!
+        .click(),
+    );
+    expect(useThemeStore.getState().savedCustomThemes[0].primaryHex).toBe(
+      "#aabbcc",
+    );
+    expect(useThemeStore.getState().theme).toBe(saved.id);
+    expect(usePreviewThemeStore.getState().previewPalette).toBeNull();
   });
 });

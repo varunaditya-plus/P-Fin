@@ -136,14 +136,18 @@ export function ThemePreview(props: {
   const { t } = useTranslation();
 
   return (
-    <div
-      className={classNames(props.selector, "cursor-pointer group tabbable")}
+    <button
+      type="button"
+      aria-label={`Use ${props.name} theme`}
+      aria-pressed={Boolean(props.active)}
+      className={classNames(
+        props.selector,
+        "w-full text-left cursor-pointer group tabbable rounded-lg",
+      )}
       onClick={props.onClick}
     >
       {/* Little card thing */}
       <div
-        tabIndex={0}
-        onKeyUp={(e) => e.key === "Enter" && e.currentTarget.click()}
         className={classNames(
           "tabbable scroll-mt-32 w-full h-32 relative rounded-lg border bg-gradient-to-br from-themePreview-primary/20 to-themePreview-secondary/10 bg-clip-content transition-colors duration-150",
           props.active
@@ -215,6 +219,6 @@ export function ThemePreview(props: {
           {t("settings.appearance.activeTheme")}
         </span>
       </div>
-    </div>
+    </button>
   );
 }
