@@ -34,6 +34,11 @@ import { PeopleCarousel } from "@/pages/jellyfin/PeopleCarousel";
 import { PersonModal, PersonSelection } from "@/pages/jellyfin/PersonModal";
 import { RatingCapsule } from "@/pages/taste/RatingCapsule";
 
+import {
+  SeerrCollectionButton,
+  SeerrRelatedContent,
+} from "./SeerrRelatedContent";
+
 function SeerrDetailsContent({
   media,
   user,
@@ -421,6 +426,12 @@ function SeerrDetailsContent({
                                 {seerrStatusLabel(details.mediaInfo?.status)}
                               </span>
                             </p>
+                            {details.collection && onSelectMedia ? (
+                              <SeerrCollectionButton
+                                collection={details.collection}
+                                onSelect={onSelectMedia}
+                              />
+                            ) : null}
                             <ContentProviderLinks
                               item={{
                                 Id: String(media.id),
@@ -561,7 +572,13 @@ function SeerrDetailsContent({
                             tmdbId: Number(person.id),
                           })
                         }
-                      />
+                      />{" "}
+                      {onSelectMedia ? (
+                        <SeerrRelatedContent
+                          details={details}
+                          onSelect={onSelectMedia}
+                        />
+                      ) : null}
                     </div>
                   </div>
                 )}
