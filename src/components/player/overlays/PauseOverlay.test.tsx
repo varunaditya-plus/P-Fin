@@ -62,11 +62,11 @@ function paused(value: boolean) {
 }
 
 describe("pause overlay timing", () => {
-  it("waits for actual playback, then a continuous two-second pause", () => {
+  it("waits for actual playback, then a continuous one-second pause", () => {
     advance(5000);
     expect(visible()).toBe(false);
     paused(true);
-    advance(1999);
+    advance(999);
     expect(visible()).toBe(false);
     advance(1);
     expect(visible()).toBe(true);
@@ -76,7 +76,7 @@ describe("pause overlay timing", () => {
 
   it("cancels pending timers on resume, item changes and when disabled", () => {
     paused(true);
-    advance(1000);
+    advance(500);
     paused(false);
     advance(1500);
     expect(visible()).toBe(false);
@@ -94,4 +94,36 @@ describe("pause overlay timing", () => {
     act(() => usePreferencesStore.setState({ enablePauseOverlay: false }));
     expect(visible()).toBe(false);
   });
+});
+
+it("honours the image logo preference and hides metadata while seeking", () => {
+  act(() => {
+    usePlayerStore.setState((state) => {
+      state.meta!.logo = "/logo.png";
+    });
+    usePreferencesStore.setState({ enableImageLogos: false });
+  });
+  paused(true);
+  advance(1000);
+  expect(visible()).toBe(true);
+  expect(container.querySelector("img")).toBeNull();
+  act(() => usePreferencesStore.setState({ enableImageLogos: true }));
+  expect(container.querySelector("img")?.getAttribute("src")).toBe("/logo.png");
+  act(() =>
+    usePlayerStore.setState((state) => {
+      state.interface.isSeeking = true;
+    }),
+  );
+  expect(visible()).toBe(false);
+  advance(2000);
+  expect(visible()).toBe(false);
+  act(() =>
+    usePlayerStore.setState((state) => {
+      state.interface.isSeeking = false;
+    }),
+  );
+  advance(999);
+  expect(visible()).toBe(false);
+  advance(1);
+  expect(visible()).toBe(true);
 });
