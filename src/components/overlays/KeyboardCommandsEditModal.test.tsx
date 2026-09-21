@@ -9,6 +9,7 @@ import { DEFAULT_KEYBOARD_SHORTCUTS } from "@/utils/keyboardShortcuts";
 import { KeyboardCommandsEditModal } from "./KeyboardCommandsEditModal";
 
 const hideModal = vi.fn();
+let shown = true;
 const preferences = {
   keyboardShortcuts: {
     ...DEFAULT_KEYBOARD_SHORTCUTS,
@@ -24,14 +25,14 @@ vi.mock("react-i18next", () => ({
 vi.mock("./Modal", () => ({
   Modal: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   ModalCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  useModal: () => ({ isShown: true }),
+  useModal: () => ({ isShown: shown, hide: hideModal }),
 }));
 vi.mock("@/stores/interface/overlayStack", () => ({
   useOverlayStack: () => ({ hideModal }),
 }));
 vi.mock("@/stores/preferences", () => ({
-  usePreferencesStore: (selector: (value: typeof preferences) => unknown) =>
-    selector(preferences),
+  usePreferencesStore: (selector?: (value: typeof preferences) => unknown) =>
+    selector ? selector(preferences) : preferences,
 }));
 
 let root: Root;
@@ -39,6 +40,11 @@ let container: HTMLDivElement;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  shown = true;
+  preferences.keyboardShortcuts = {
+    ...DEFAULT_KEYBOARD_SHORTCUTS,
+    mute: { key: "Q" },
+  };
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal("fetch", vi.fn());
   container = document.createElement("div");
@@ -82,4 +88,41 @@ it("saves keyboard preferences locally without an account backend", () => {
   expect(preferences.setEnableNumberKeySeeking).toHaveBeenCalledWith(false);
   expect(hideModal).toHaveBeenCalledWith("keyboard-edit");
   expect(fetch).not.toHaveBeenCalled();
+});
+
+it("discards cancelled drafts and reads current shortcuts when reopened", () => {
+  const reset = [...container.querySelectorAll("button")].find(
+    (button) =>
+      button.textContent === "global.keyboardShortcuts.resetAllToDefault",
+  )!;
+  act(() => reset.click());
+  expect(
+    container.querySelector(
+      '[aria-label="Edit global.keyboardShortcuts.shortcuts.mute"]',
+    )?.textContent,
+  ).toBe("M");
+  const cancel = [...container.querySelectorAll("button")].find(
+    (button) => button.textContent === "global.keyboardShortcuts.cancel",
+  )!;
+  act(() => cancel.click());
+  expect(preferences.setKeyboardShortcuts).not.toHaveBeenCalled();
+  const render = () =>
+    root.render(
+      <MemoryRouter>
+        <KeyboardCommandsEditModal id="keyboard-edit" />
+      </MemoryRouter>,
+    );
+  shown = false;
+  act(render);
+  preferences.keyboardShortcuts = {
+    ...DEFAULT_KEYBOARD_SHORTCUTS,
+    mute: { key: "V" },
+  };
+  shown = true;
+  act(render);
+  expect(
+    container.querySelector(
+      '[aria-label="Edit global.keyboardShortcuts.shortcuts.mute"]',
+    )?.textContent,
+  ).toBe("V");
 });

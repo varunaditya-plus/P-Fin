@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { Modal, ModalCard } from "@/components/overlays/Modal";
-import { Heading2 } from "@/components/utils/Text";
+import { KeyboardCommandsFrame } from "@/components/overlays/KeyboardCommandsFrame";
+import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePreferencesStore } from "@/stores/preferences";
 import {
   DEFAULT_KEYBOARD_SHORTCUTS,
@@ -35,10 +35,10 @@ function KeyBadge({
   const modifier = config?.modifier;
 
   return (
-    <kbd className="relative inline-flex items-center justify-center min-w-[2rem] h-8 px-2 text-sm font-mono bg-gray-800 text-gray-200 rounded border border-gray-600 shadow-sm">
+    <kbd className="relative inline-flex items-center justify-center shrink-0 min-w-[1.5rem] h-5 px-1.5 text-[11px] font-mono text-white/40 rounded border border-white/[0.1] bg-white/[0.05]">
       {children}
       {modifier && (
-        <span className="absolute -top-1 -right-1 text-xs bg-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
+        <span className="absolute -top-1.5 -right-1.5 text-[9px] leading-none bg-type-link text-white rounded-full w-3 h-3 flex items-center justify-center font-sans font-bold">
           {getModifierSymbol(modifier)}
         </span>
       )}
@@ -81,43 +81,43 @@ const getShortcutGroups = (
           description: t("global.keyboardShortcuts.shortcuts.playPauseAlt"),
         },
         {
-          key: getDisplayKey(ShortcutId.SKIP_FORWARD_5) || "→",
+          key: getDisplayKey(ShortcutId.SKIP_FORWARD_5),
           description: t("global.keyboardShortcuts.shortcuts.skipForward5"),
           config: getConfig(ShortcutId.SKIP_FORWARD_5),
         },
         {
-          key: getDisplayKey(ShortcutId.SKIP_BACKWARD_5) || "←",
+          key: getDisplayKey(ShortcutId.SKIP_BACKWARD_5),
           description: t("global.keyboardShortcuts.shortcuts.skipBackward5"),
           config: getConfig(ShortcutId.SKIP_BACKWARD_5),
         },
         {
-          key: getDisplayKey(ShortcutId.SKIP_BACKWARD_10) || "J",
+          key: getDisplayKey(ShortcutId.SKIP_BACKWARD_10),
           description: t("global.keyboardShortcuts.shortcuts.skipBackward10"),
           config: getConfig(ShortcutId.SKIP_BACKWARD_10),
         },
         {
-          key: getDisplayKey(ShortcutId.SKIP_FORWARD_10) || "L",
+          key: getDisplayKey(ShortcutId.SKIP_FORWARD_10),
           description: t("global.keyboardShortcuts.shortcuts.skipForward10"),
           config: getConfig(ShortcutId.SKIP_FORWARD_10),
         },
         {
-          key: getDisplayKey(ShortcutId.SKIP_FORWARD_1) || ".",
+          key: getDisplayKey(ShortcutId.SKIP_FORWARD_1),
           description: t("global.keyboardShortcuts.shortcuts.skipForward1"),
           config: getConfig(ShortcutId.SKIP_FORWARD_1),
         },
         {
-          key: getDisplayKey(ShortcutId.SKIP_BACKWARD_1) || ",",
+          key: getDisplayKey(ShortcutId.SKIP_BACKWARD_1),
           description: t("global.keyboardShortcuts.shortcuts.skipBackward1"),
           config: getConfig(ShortcutId.SKIP_BACKWARD_1),
         },
         {
-          key: getDisplayKey(ShortcutId.NEXT_EPISODE) || "P",
+          key: getDisplayKey(ShortcutId.NEXT_EPISODE),
           description: t("global.keyboardShortcuts.shortcuts.nextEpisode"),
           condition: t("global.keyboardShortcuts.conditions.showsOnly"),
           config: getConfig(ShortcutId.NEXT_EPISODE),
         },
         {
-          key: getDisplayKey(ShortcutId.PREVIOUS_EPISODE) || "O",
+          key: getDisplayKey(ShortcutId.PREVIOUS_EPISODE),
           description: t("global.keyboardShortcuts.shortcuts.previousEpisode"),
           condition: t("global.keyboardShortcuts.conditions.showsOnly"),
           config: getConfig(ShortcutId.PREVIOUS_EPISODE),
@@ -128,12 +128,12 @@ const getShortcutGroups = (
       title: t("global.keyboardShortcuts.groups.jumpToPosition"),
       shortcuts: [
         {
-          key: getDisplayKey(ShortcutId.JUMP_TO_0) || "0",
+          key: getDisplayKey(ShortcutId.JUMP_TO_0),
           description: t("global.keyboardShortcuts.shortcuts.jumpTo0"),
           config: getConfig(ShortcutId.JUMP_TO_0),
         },
         {
-          key: getDisplayKey(ShortcutId.JUMP_TO_9) || "9",
+          key: getDisplayKey(ShortcutId.JUMP_TO_9),
           description: t("global.keyboardShortcuts.shortcuts.jumpTo9"),
           config: getConfig(ShortcutId.JUMP_TO_9),
         },
@@ -151,12 +151,12 @@ const getShortcutGroups = (
           description: t("global.keyboardShortcuts.shortcuts.decreaseVolume"),
         },
         {
-          key: getDisplayKey(ShortcutId.MUTE) || "M",
+          key: getDisplayKey(ShortcutId.MUTE),
           description: t("global.keyboardShortcuts.shortcuts.mute"),
           config: getConfig(ShortcutId.MUTE),
         },
         {
-          key: getDisplayKey(ShortcutId.TOGGLE_FULLSCREEN) || "F",
+          key: getDisplayKey(ShortcutId.TOGGLE_FULLSCREEN),
           description: t("global.keyboardShortcuts.shortcuts.toggleFullscreen"),
           config: getConfig(ShortcutId.TOGGLE_FULLSCREEN),
         },
@@ -166,31 +166,31 @@ const getShortcutGroups = (
       title: t("global.keyboardShortcuts.groups.subtitlesAccessibility"),
       shortcuts: [
         {
-          key: getDisplayKey(ShortcutId.TOGGLE_CAPTIONS) || "C",
+          key: getDisplayKey(ShortcutId.TOGGLE_CAPTIONS),
           description: t("global.keyboardShortcuts.shortcuts.toggleCaptions"),
           config: getConfig(ShortcutId.TOGGLE_CAPTIONS),
         },
         {
-          key: getDisplayKey(ShortcutId.RANDOM_CAPTION) || "Shift+C",
+          key: getDisplayKey(ShortcutId.RANDOM_CAPTION),
           description: t("global.keyboardShortcuts.shortcuts.randomCaption"),
           config: getConfig(ShortcutId.RANDOM_CAPTION),
         },
         {
-          key: getDisplayKey(ShortcutId.SYNC_SUBTITLES_EARLIER) || "[",
+          key: getDisplayKey(ShortcutId.SYNC_SUBTITLES_EARLIER),
           description: t(
             "global.keyboardShortcuts.shortcuts.syncSubtitlesEarlier",
           ),
           config: getConfig(ShortcutId.SYNC_SUBTITLES_EARLIER),
         },
         {
-          key: getDisplayKey(ShortcutId.SYNC_SUBTITLES_LATER) || "]",
+          key: getDisplayKey(ShortcutId.SYNC_SUBTITLES_LATER),
           description: t(
             "global.keyboardShortcuts.shortcuts.syncSubtitlesLater",
           ),
           config: getConfig(ShortcutId.SYNC_SUBTITLES_LATER),
         },
         {
-          key: getDisplayKey(ShortcutId.TOGGLE_NATIVE_SUBTITLES) || "S",
+          key: getDisplayKey(ShortcutId.TOGGLE_NATIVE_SUBTITLES),
           description: t(
             "global.keyboardShortcuts.shortcuts.toggleNativeSubtitles",
           ),
@@ -202,7 +202,7 @@ const getShortcutGroups = (
       title: t("global.keyboardShortcuts.groups.interface"),
       shortcuts: [
         {
-          key: getDisplayKey(ShortcutId.BARREL_ROLL) || "R",
+          key: getDisplayKey(ShortcutId.BARREL_ROLL),
           description: t("global.keyboardShortcuts.shortcuts.barrelRoll"),
           config: getConfig(ShortcutId.BARREL_ROLL),
         },
@@ -222,78 +222,69 @@ interface KeyboardCommandsModalProps {
 export function KeyboardCommandsModal({ id }: KeyboardCommandsModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const hideModal = useOverlayStack((state) => state.hideModal);
+  const numberSeeking = usePreferencesStore(
+    (state) => state.enableNumberKeySeeking,
+  );
   const keyboardShortcuts = usePreferencesStore((s) => s.keyboardShortcuts);
   const shortcutGroups = getShortcutGroups(t, keyboardShortcuts);
 
   return (
-    <Modal id={id}>
-      <ModalCard>
-        <div className="space-y-6">
-          <div className="text-center">
-            <Heading2 className="!mt-0 !mb-2">
-              {t("global.keyboardShortcuts.title")}
-            </Heading2>
-            <p className="text-type-secondary text-lg">
-              {(() => {
-                const subtitle = t("global.keyboardShortcuts.subtitle");
-                const [before, after] = subtitle.split("`");
-                return (
-                  <>
-                    {before}
-                    <KeyBadge config={undefined}>`</KeyBadge>
-                    {after}
-                  </>
-                );
-              })()}
-            </p>
-            <p className="text-type-secondary text-sm mt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  navigate("/settings?category=settings-preferences");
-                }}
-                className="text-type-link hover:text-type-linkHover"
-              >
-                {t("global.keyboardShortcuts.editInSettings")}
-              </button>
-            </p>
-          </div>
-
-          <div className="space-y-6 max-h-[60vh] overflow-y-auto">
-            {shortcutGroups.map((group) => (
-              <div key={group.title} className="space-y-3">
-                <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
+    <KeyboardCommandsFrame id={id} title={t("global.keyboardShortcuts.title")}>
+      <div className="space-y-4">
+        <div className="flex justify-end -mt-2">
+          <button
+            type="button"
+            onClick={() => {
+              hideModal(id);
+              navigate("/settings?category=settings-preferences");
+            }}
+            className="tabbable text-xs text-type-link hover:text-white transition-colors"
+          >
+            {t("global.keyboardShortcuts.editInSettings")}
+          </button>
+        </div>
+        <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 max-h-[62vh] overflow-y-auto">
+          {shortcutGroups
+            .filter(
+              (group) =>
+                numberSeeking ||
+                group.title !==
+                  t("global.keyboardShortcuts.groups.jumpToPosition"),
+            )
+            .map((group) => (
+              <div key={group.title}>
+                <h3 className="text-[10px] uppercase tracking-widest text-white/25 font-medium mb-1.5">
                   {group.title}
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-0.5">
                   {group.shortcuts
-                    .filter((shortcut) => shortcut.key) // Only show shortcuts that have a key configured
+                    .filter((shortcut) => shortcut.key)
                     .map((shortcut) => (
                       <div
-                        key={shortcut.key}
-                        className="flex items-center justify-between py-1"
+                        key={`${shortcut.description}:${shortcut.key}`}
+                        className="flex items-center justify-between py-1 px-1.5 rounded hover:bg-white/[0.04] transition-colors gap-3"
                       >
-                        <div className="flex items-center gap-3">
-                          <KeyBadge config={shortcut.config}>
-                            {shortcut.key}
-                          </KeyBadge>
-                          <span className="text-type-secondary">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-xs text-white/55">
                             {shortcut.description}
                           </span>
+                          {shortcut.condition ? (
+                            <span className="text-[10px] text-white/25 italic shrink-0">
+                              {shortcut.condition}
+                            </span>
+                          ) : null}
                         </div>
-                        {shortcut.condition && (
-                          <span className="text-xs text-gray-400 italic">
-                            {shortcut.condition}
-                          </span>
-                        )}
+                        <KeyBadge config={shortcut.config}>
+                          {shortcut.key}
+                        </KeyBadge>
                       </div>
                     ))}
                 </div>
               </div>
             ))}
-          </div>
         </div>
-      </ModalCard>
-    </Modal>
+      </div>
+    </KeyboardCommandsFrame>
   );
 }

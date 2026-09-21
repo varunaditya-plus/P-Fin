@@ -1,12 +1,12 @@
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/buttons/Button";
 import { Toggle } from "@/components/buttons/Toggle";
 import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
-import { Modal, ModalCard, useModal } from "@/components/overlays/Modal";
-import { Heading2 } from "@/components/utils/Text";
+import { KeyboardCommandsFrame } from "@/components/overlays/KeyboardCommandsFrame";
+import { useModal } from "@/components/overlays/Modal";
 import { useOverlayStack } from "@/stores/interface/overlayStack";
 import { usePreferencesStore } from "@/stores/preferences";
 import {
@@ -40,32 +40,39 @@ function KeyBadge({
   onClick,
   editing,
   hasConflict,
+  label,
 }: {
   config?: KeyboardShortcutConfig;
   children: ReactNode;
   onClick?: () => void;
   editing?: boolean;
   hasConflict?: boolean;
+  label?: string;
 }) {
   const modifier = config?.modifier;
 
-  return (
-    <kbd
-      className={`
-        relative inline-flex items-center justify-center min-w-[2rem] h-8 px-2 text-sm font-mono bg-gray-800 text-gray-200 rounded border shadow-sm
-        ${onClick ? "cursor-pointer hover:bg-gray-700" : ""}
-        ${editing ? "ring-2 ring-blue-500" : ""}
-        ${hasConflict ? "border-red-500 bg-red-900/20" : "border-gray-600"}
-      `}
-      onClick={onClick}
-    >
+  const content = (
+    <>
       {children}
-      {modifier && (
-        <span className="absolute -top-1 -right-1 text-xs bg-blue-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
+      {modifier ? (
+        <span className="absolute -top-1.5 -right-1.5 text-[9px] leading-none bg-type-link text-white rounded-full w-3 h-3 flex items-center justify-center font-sans font-bold">
           {getModifierSymbol(modifier)}
         </span>
-      )}
-    </kbd>
+      ) : null}
+    </>
+  );
+  const className = `relative inline-flex items-center justify-center shrink-0 min-w-[1.75rem] h-6 px-1.5 text-[11px] font-mono rounded border transition-colors ${hasConflict ? "border-type-danger text-type-danger bg-type-danger/10" : "border-white/[0.1] text-white/40"} ${onClick ? "tabbable hover:bg-white/[0.08] hover:text-white/70" : "bg-white/[0.05]"} ${editing ? "ring-2 ring-type-link" : ""}`;
+  return onClick ? (
+    <button
+      type="button"
+      aria-label={label}
+      className={className}
+      onClick={onClick}
+    >
+      {content}
+    </button>
+  ) : (
+    <kbd className={className}>{content}</kbd>
   );
 }
 
@@ -217,16 +224,20 @@ export function KeyboardCommandsEditModal({
   const [editingEnableNumberKeySeeking, setEditingEnableNumberKeySeeking] =
     useState(enableNumberKeySeeking);
 
-  // Cancel any active editing when modal closes
+  const wasShown = useRef(false);
   useEffect(() => {
-    if (!modal.isShown) {
+    if (modal.isShown && !wasShown.current) {
+      setEditingShortcuts(keyboardShortcuts);
+      setEditingEnableNumberKeySeeking(enableNumberKeySeeking);
+    }
+    if (!modal.isShown || !wasShown.current) {
       setEditingId(null);
       setEditingModifier("");
       setEditingKey("");
       setIsCapturingKey(false);
-      setEditingEnableNumberKeySeeking(enableNumberKeySeeking);
     }
-  }, [modal.isShown, enableNumberKeySeeking]);
+    wasShown.current = modal.isShown;
+  }, [modal.isShown, keyboardShortcuts, enableNumberKeySeeking]);
 
   const shortcutGroups = getShortcutGroups(t, editingShortcuts).map(
     (group) => ({
@@ -361,179 +372,170 @@ export function KeyboardCommandsEditModal({
   }, [hideModal, id]);
 
   return (
-    <Modal id={id}>
-      <ModalCard className="!max-w-2xl">
-        <div className="space-y-6">
-          <div className="text-center">
-            <Heading2 className="!mt-0 !mb-2">
-              {t("global.keyboardShortcuts.title")}
-            </Heading2>
-            <p className="text-type-secondary text-sm">
-              {t("global.keyboardShortcuts.clickToEdit")}
+    <KeyboardCommandsFrame id={id} title={t("global.keyboardShortcuts.title")}>
+      <div className="space-y-5 !text-base">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-white/40">
+            {t("global.keyboardShortcuts.clickToEdit")}
+          </p>
+          {conflicts.length > 0 ? (
+            <p className="text-xs text-type-danger shrink-0">
+              {conflicts.length}{" "}
+              {t(
+                conflicts.length > 1
+                  ? "global.keyboardShortcuts.conflicts"
+                  : "global.keyboardShortcuts.conflict",
+              )}{" "}
+              {t("global.keyboardShortcuts.detected")}
             </p>
-          </div>
+          ) : null}
+        </div>
+        <div className="space-y-5 max-h-[55vh] overflow-y-auto pr-1">
+          {shortcutGroups.map((group) => (
+            <div key={group.title} className="space-y-1.5">
+              <h3 className="text-[10px] uppercase tracking-widest text-white/25 font-medium">
+                {group.title}
+              </h3>
+              <div className="space-y-0.5">
+                {group.shortcuts.map((shortcut) => {
+                  const isEditing = editingId === shortcut.id;
+                  const hasConflict = conflictIds.has(shortcut.id);
+                  const config = editingShortcuts[shortcut.id];
 
-          <div className="flex flex-grow justify-between items-center gap-2">
-            {conflicts.length > 0 ? (
-              <p className="text-red-400 text-sm">
-                {conflicts.length}{" "}
-                {conflicts.length > 1
-                  ? t("global.keyboardShortcuts.conflicts")
-                  : t("global.keyboardShortcuts.conflict")}{" "}
-                {t("global.keyboardShortcuts.detected")}
-              </p>
-            ) : (
-              <div /> // Empty div to take up space
-            )}
-            <Button theme="secondary" onClick={handleResetAll}>
-              <Icon icon={Icons.RELOAD} className="mr-2" />
-              {t("global.keyboardShortcuts.resetAllToDefault")}
-            </Button>
-          </div>
-
-          <div className="space-y-6 max-h-[60vh] overflow-y-auto">
-            {shortcutGroups.map((group) => (
-              <div key={group.title} className="space-y-3">
-                <h3 className="text-lg font-semibold text-white border-b border-gray-700 pb-2">
-                  {group.title}
-                </h3>
-                <div className="space-y-2">
-                  {group.shortcuts.map((shortcut) => {
-                    const isEditing = editingId === shortcut.id;
-                    const hasConflict = conflictIds.has(shortcut.id);
-                    const config = editingShortcuts[shortcut.id];
-
-                    return (
-                      <div
-                        key={shortcut.id}
-                        className="flex items-center justify-between py-1"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          {isEditing ? (
-                            <div className="flex items-center justify-between w-full gap-2">
-                              <div className="flex items-center gap-2">
-                                <Dropdown
-                                  selectedItem={
-                                    modifierOptions.find(
-                                      (opt) => opt.id === editingModifier,
-                                    ) || modifierOptions[0]
-                                  }
-                                  setSelectedItem={(item) =>
-                                    setEditingModifier(
-                                      item.id as KeyboardModifier | "",
-                                    )
-                                  }
-                                  options={modifierOptions}
-                                  className="w-32 !my-1"
-                                />
-                                <KeyBadge
-                                  config={
-                                    editingKey
-                                      ? {
-                                          modifier:
-                                            editingModifier || undefined,
-                                          key: editingKey,
-                                        }
-                                      : undefined
-                                  }
-                                  editing
-                                >
-                                  {isCapturingKey
-                                    ? t("global.keyboardShortcuts.pressKey")
-                                    : editingKey
-                                      ? getKeyDisplayName(editingKey)
-                                      : t("global.keyboardShortcuts.none")}
-                                </KeyBadge>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  theme="secondary"
-                                  onClick={handleSaveEdit}
-                                  className="px-2 py-1 text-xs"
-                                >
-                                  {t("global.keyboardShortcuts.save")}
-                                </Button>
-                                <Button
-                                  theme="secondary"
-                                  onClick={handleCancelEdit}
-                                  className="px-2 py-1 text-xs"
-                                >
-                                  {t("global.keyboardShortcuts.cancel")}
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
+                  return (
+                    <div
+                      key={shortcut.id}
+                      className="flex items-center justify-between gap-3 py-1 px-1.5 rounded hover:bg-white/[0.04] transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        {isEditing ? (
+                          <div className="flex items-center justify-between w-full gap-2">
+                            <div className="flex items-center gap-2">
+                              <Dropdown
+                                selectedItem={
+                                  modifierOptions.find(
+                                    (opt) => opt.id === editingModifier,
+                                  ) || modifierOptions[0]
+                                }
+                                setSelectedItem={(item) =>
+                                  setEditingModifier(
+                                    item.id as KeyboardModifier | "",
+                                  )
+                                }
+                                options={modifierOptions}
+                                className="w-28 !my-0 text-xs"
+                              />
                               <KeyBadge
-                                config={config}
-                                onClick={() => handleStartEdit(shortcut.id)}
-                                hasConflict={hasConflict}
+                                config={
+                                  editingKey
+                                    ? {
+                                        modifier: editingModifier || undefined,
+                                        key: editingKey,
+                                      }
+                                    : undefined
+                                }
+                                editing
                               >
-                                {config?.key
-                                  ? getKeyDisplayName(config.key)
-                                  : t("global.keyboardShortcuts.none")}
+                                {isCapturingKey
+                                  ? t("global.keyboardShortcuts.pressKey")
+                                  : editingKey
+                                    ? getKeyDisplayName(editingKey)
+                                    : t("global.keyboardShortcuts.none")}
                               </KeyBadge>
-                              <span className="text-type-secondary">
-                                {shortcut.description}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {shortcut.condition && !isEditing && (
-                            <span className="text-xs text-gray-400 italic">
-                              {shortcut.condition}
-                            </span>
-                          )}
-                          {!isEditing && (
-                            <button
-                              type="button"
-                              onClick={() => handleResetShortcut(shortcut.id)}
-                              className="text-type-secondary hover:text-white transition-colors"
-                              title={t(
-                                "global.keyboardShortcuts.resetToDefault",
-                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                theme="secondary"
+                                onClick={handleSaveEdit}
+                                className="px-2 py-1 !text-xs"
+                              >
+                                {t("global.keyboardShortcuts.save")}
+                              </Button>
+                              <Button
+                                theme="secondary"
+                                onClick={handleCancelEdit}
+                                className="px-2 py-1 !text-xs"
+                              >
+                                {t("global.keyboardShortcuts.cancel")}
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <KeyBadge
+                              config={config}
+                              label={`Edit ${shortcut.description}`}
+                              onClick={() => handleStartEdit(shortcut.id)}
+                              hasConflict={hasConflict}
                             >
-                              <Icon icon={Icons.RELOAD} />
-                            </button>
-                          )}
-                        </div>
+                              {config?.key
+                                ? getKeyDisplayName(config.key)
+                                : t("global.keyboardShortcuts.none")}
+                            </KeyBadge>
+                            <span className="text-xs text-white/55">
+                              {shortcut.description}
+                            </span>
+                          </>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="flex items-center gap-2">
+                        {shortcut.condition && !isEditing && (
+                          <span className="text-[10px] text-white/25 italic shrink-0">
+                            {shortcut.condition}
+                          </span>
+                        )}
+                        {!isEditing && (
+                          <button
+                            type="button"
+                            onClick={() => handleResetShortcut(shortcut.id)}
+                            className="tabbable text-white/25 hover:text-white/70 transition-colors shrink-0"
+                            title={t("global.keyboardShortcuts.resetToDefault")}
+                          >
+                            <Icon icon={Icons.RELOAD} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-            <div className="flex items-center justify-between py-3 border-t border-gray-700">
-              <div className="flex-1">
-                <p className="text-white font-medium">
-                  {t("global.keyboardShortcuts.numberKeySeeking")}
-                </p>
-                <p className="text-type-secondary text-sm">
-                  {t("global.keyboardShortcuts.numberKeySeekingDescription")}
-                </p>
-              </div>
-              <Toggle
-                enabled={editingEnableNumberKeySeeking}
-                onClick={() =>
-                  setEditingEnableNumberKeySeeking(
-                    !editingEnableNumberKeySeeking,
-                  )
-                }
-              />
             </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-700">
-            <Button theme="secondary" onClick={handleCancel}>
-              {t("global.keyboardShortcuts.cancel")}
-            </Button>
-            <Button theme="purple" onClick={handleSave}>
-              {t("global.keyboardShortcuts.saveChanges")}
-            </Button>
+          ))}
+          <div className="flex items-center justify-between py-3 border-t border-white/10">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-white/70">
+                {t("global.keyboardShortcuts.numberKeySeeking")}
+              </p>
+              <p className="text-xs text-white/40">
+                {t("global.keyboardShortcuts.numberKeySeekingDescription")}
+              </p>
+            </div>
+            <Toggle
+              enabled={editingEnableNumberKeySeeking}
+              onClick={() =>
+                setEditingEnableNumberKeySeeking(!editingEnableNumberKeySeeking)
+              }
+            />
           </div>
         </div>
-      </ModalCard>
-    </Modal>
+
+        <div className="flex flex-wrap justify-end gap-3 pt-3 border-t border-white/10">
+          <button
+            type="button"
+            onClick={handleResetAll}
+            className="tabbable mr-auto flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+          >
+            <Icon icon={Icons.RELOAD} />
+            {t("global.keyboardShortcuts.resetAllToDefault")}
+          </button>
+          <Button theme="secondary" onClick={handleCancel}>
+            {t("global.keyboardShortcuts.cancel")}
+          </Button>
+          <Button theme="purple" onClick={handleSave}>
+            {t("global.keyboardShortcuts.saveChanges")}
+          </Button>
+        </div>
+      </div>
+    </KeyboardCommandsFrame>
   );
 }

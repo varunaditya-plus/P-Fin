@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { SearchBarInput } from "@/components/form/SearchBar";
 import { Icon, Icons } from "@/components/Icon";
@@ -90,7 +91,24 @@ export function SettingsPageSection({
 }
 
 export function SettingsLayout({ children }: { children: ReactNode }) {
-  const [category, setCategory] = useState("");
+  const [params, setParams] = useSearchParams();
+  const requestedCategory =
+    params.get("category")?.replace(/^settings-/, "") ?? "";
+  const category = settingsCategories.some(
+    (entry) => entry.id === requestedCategory,
+  )
+    ? requestedCategory
+    : "";
+  const setCategory = (value: string) =>
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        if (value) next.set("category", `settings-${value}`);
+        else next.delete("category");
+        return next;
+      },
+      { replace: true },
+    );
   const [query, setQuery] = useState("");
   const search = useRef<HTMLInputElement>(null);
   const visibility = useMemo(() => ({ category, query }), [category, query]);

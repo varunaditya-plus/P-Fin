@@ -1,5 +1,6 @@
 import { act, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { MemoryRouter } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { afterEach, beforeEach, expect, it } from "vitest";
 
@@ -25,17 +26,19 @@ beforeEach(async () => {
   root = createRoot(host);
   await act(async () =>
     root.render(
-      <SettingsLayout>
-        <SettingsPageSection id="preferences">
-          <Controls />
-        </SettingsPageSection>
-        <SettingsPageSection id="appearance">
-          <p>Theme collection</p>
-        </SettingsPageSection>
-        <SettingsPageSection id="captions">
-          <p>Caption appearance</p>
-        </SettingsPageSection>
-      </SettingsLayout>,
+      <MemoryRouter>
+        <SettingsLayout>
+          <SettingsPageSection id="preferences">
+            <Controls />
+          </SettingsPageSection>
+          <SettingsPageSection id="appearance">
+            <p>Theme collection</p>
+          </SettingsPageSection>
+          <SettingsPageSection id="captions">
+            <p>Caption appearance</p>
+          </SettingsPageSection>
+        </SettingsLayout>
+      </MemoryRouter>,
     ),
   );
 });
@@ -93,4 +96,30 @@ it("lets the whole toggle row activate its labelled control exactly once", async
   expect(
     host.querySelector('[role="switch"]')!.getAttribute("aria-checked"),
   ).toBe("true");
+});
+
+it("opens the preferences category from the keyboard guide link", async () => {
+  await act(async () =>
+    root.render(
+      <MemoryRouter
+        key="guide-link"
+        initialEntries={["/settings?category=settings-preferences"]}
+      >
+        <SettingsLayout>
+          <SettingsPageSection id="preferences">
+            <p>Player controls</p>
+          </SettingsPageSection>
+          <SettingsPageSection id="appearance">
+            <p>Themes</p>
+          </SettingsPageSection>
+        </SettingsLayout>
+      </MemoryRouter>,
+    ),
+  );
+  expect(host.querySelector<HTMLElement>("#settings-preferences")!.hidden).toBe(
+    false,
+  );
+  expect(host.querySelector<HTMLElement>("#settings-appearance")!.hidden).toBe(
+    true,
+  );
 });
