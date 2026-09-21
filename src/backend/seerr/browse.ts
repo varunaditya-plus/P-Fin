@@ -205,17 +205,44 @@ export function getSeerrPerson(id: number, signal?: AbortSignal) {
   return seerrFetch<SeerrPerson>(`/person/${id}`, { signal });
 }
 
-export async function getSeerrPersonCredits(id: number, signal?: AbortSignal) {
-  const credits = await seerrFetch<{ cast: SeerrMedia[]; crew: SeerrMedia[] }>(
-    `/person/${id}/combined_credits`,
-    { signal },
-  );
-  return uniqueSeerrMedia([
-    ...(credits.cast ?? []),
-    ...(credits.crew ?? []),
-  ]).sort((a, b) =>
-    (b.releaseDate || b.firstAirDate || "").localeCompare(
-      a.releaseDate || a.firstAirDate || "",
+export interface SeerrPersonCredit extends SeerrMedia {
+  character?: string;
+  job?: string;
+}
+export interface SeerrFilmography {
+  acting: SeerrPersonCredit[];
+  directing: SeerrPersonCredit[];
+}
+export function sortPersonCredits(credits: SeerrPersonCredit[]) {
+  const unique = new Map<string, SeerrPersonCredit>();
+  for (const credit of credits) {
+    if (!["movie", "tv"].includes(credit.mediaType)) continue;
+    const key = `${credit.mediaType}:${credit.id}`;
+    const existing = unique.get(key);
+    if (!existing || (credit.popularity ?? 0) > (existing.popularity ?? 0))
+      unique.set(key, credit);
+  }
+  return [...unique.values()].sort((a, b) => {
+    const year = (item: SeerrMedia) =>
+      parseInt(
+        (item.releaseDate || item.firstAirDate || "0").slice(0, 4),
+        10,
+      ) || 0;
+    return year(b) - year(a) || (b.popularity ?? 0) - (a.popularity ?? 0);
+  });
+}
+export async function getSeerrPersonCredits(
+  id: number,
+  signal?: AbortSignal,
+): Promise<SeerrFilmography> {
+  const credits = await seerrFetch<{
+    cast: SeerrPersonCredit[];
+    crew: SeerrPersonCredit[];
+  }>(`/person/${id}/combined_credits`, { signal });
+  return {
+    acting: sortPersonCredits(credits.cast ?? []),
+    directing: sortPersonCredits(
+      (credits.crew ?? []).filter((credit) => credit.job === "Director"),
     ),
-  );
+  };
 }

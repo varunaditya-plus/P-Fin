@@ -5,6 +5,7 @@ import { JellyfinItem, getImageUrl } from "@/backend/jellyfin/client";
 import { getLibraryPerson, getPersonLibrary } from "@/backend/jellyfin/people";
 import { seerrImage, seerrToMediaItem } from "@/backend/seerr/api";
 import {
+  SeerrFilmography,
   SeerrPerson,
   findSeerrPerson,
   getSeerrPerson,
@@ -51,7 +52,11 @@ function PersonContent({
   const [libraryPerson, setLibraryPerson] = useState<JellyfinItem>();
   const [remotePerson, setRemotePerson] = useState<SeerrPerson>();
   const [library, setLibrary] = useState<JellyfinItem[]>([]);
-  const [credits, setCredits] = useState<SeerrMedia[]>([]);
+  const [credits, setCredits] = useState<SeerrFilmography>({
+    acting: [],
+    directing: [],
+  });
+  const [expandedBio, setExpandedBio] = useState(false);
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
   const [creditsLimit, setCreditsLimit] = useState(24);
@@ -171,15 +176,15 @@ function PersonContent({
     >
       <div className="pointer-events-auto fixed inset-x-0 bottom-0 top-16 mx-auto max-w-5xl overflow-y-auto rounded-t-xl bg-background-main p-6 md:inset-10 md:rounded-xl md:p-10">
         <div className="flex items-start justify-between gap-4 mb-8">
-          <div className="flex gap-5">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 min-w-0">
             {image ? (
               <img
                 src={image}
                 alt={person.name}
-                className="w-24 h-36 md:w-36 md:h-52 object-cover rounded-lg"
+                className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover ring-1 ring-white/10 shadow-lg shrink-0 mx-auto md:mx-0"
               />
             ) : (
-              <div className="w-24 h-36 rounded-lg bg-white/5 flex items-center justify-center">
+              <div className="w-40 h-40 md:w-48 md:h-48 rounded-full bg-white/5 ring-1 ring-white/10 shrink-0 flex items-center justify-center">
                 <Icon icon={Icons.USER} className="text-3xl" />
               </div>
             )}
@@ -188,7 +193,7 @@ function PersonContent({
                 {person.name}
               </h2>
               {remotePerson?.knownForDepartment ? (
-                <p className="mt-2 text-type-secondary">
+                <p className="mt-2 text-sm text-type-secondary uppercase tracking-wider">
                   {remotePerson.knownForDepartment}
                 </p>
               ) : null}
@@ -203,6 +208,25 @@ function PersonContent({
               {remotePerson?.deathday ? (
                 <p className="mt-1 text-sm">Died {remotePerson.deathday}</p>
               ) : null}
+              {biography ? (
+                <div className="mt-3">
+                  <p
+                    className={`whitespace-pre-line text-sm text-type-text leading-relaxed ${expandedBio ? "" : "line-clamp-6"}`}
+                  >
+                    {biography}
+                  </p>
+                  {biography.length > 400 ? (
+                    <button
+                      type="button"
+                      className="tabbable mt-2 text-sm text-type-link"
+                      aria-expanded={expandedBio}
+                      onClick={() => setExpandedBio((value) => !value)}
+                    >
+                      {expandedBio ? "Show less" : "Read more"}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
           <button
@@ -214,13 +238,6 @@ function PersonContent({
             <Icon icon={Icons.X} />
           </button>
         </div>
-        {biography ? (
-          <p className="whitespace-pre-line leading-relaxed mb-10">
-            {biography}
-          </p>
-        ) : !loading && !loadingSeerr ? (
-          <p className="text-type-secondary mb-8">No biography is available.</p>
-        ) : null}
         <h3 className="text-xl font-bold text-white mb-6">In your library</h3>
         {loading ? (
           <div className="py-8">
@@ -267,30 +284,49 @@ function PersonContent({
                 <Spinner />
               </div>
             ) : null}
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
-              {credits.slice(0, creditsLimit).map((media) => (
-                <MediaCard
-                  key={`${media.mediaType}:${media.id}`}
-                  media={seerrToMediaItem(media)}
-                  linkable
-                  onShowDetails={() => {
-                    onClose();
-                    onSelectSeerr(media);
-                  }}
-                />
-              ))}
-            </div>
+            {(
+              [
+                ["acting", "Cast"],
+                ["directing", "Director"],
+              ] as const
+            ).map(([key, title]) =>
+              credits[key].length ? (
+                <section key={key} className="mb-10">
+                  <h4 className="mb-5 flex items-center gap-2 text-lg font-semibold text-white">
+                    <Icon icon={Icons.RISING_STAR} />
+                    {title}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+                    {credits[key].slice(0, creditsLimit).map((media) => (
+                      <MediaCard
+                        key={`${key}:${media.mediaType}:${media.id}`}
+                        media={seerrToMediaItem(media)}
+                        linkable
+                        onShowDetails={() => {
+                          onClose();
+                          onSelectSeerr(media);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ) : null,
+            )}
             {seerrError ? (
               <p role="alert" className="my-4">
                 {seerrError}
               </p>
             ) : null}
-            {!loadingSeerr && !credits.length && !seerrError ? (
+            {!loadingSeerr &&
+            !credits.acting.length &&
+            !credits.directing.length &&
+            !seerrError ? (
               <p className="text-type-secondary">
                 No additional filmography is available.
               </p>
             ) : null}
-            {credits.length > creditsLimit ? (
+            {Math.max(credits.acting.length, credits.directing.length) >
+            creditsLimit ? (
               <div className="mt-6">
                 <Button
                   theme="secondary"

@@ -145,18 +145,29 @@ describe("Seerr browsing", () => {
     );
   });
 
-  it("merges acting and directing credits without losing a TV title with the same ID", async () => {
+  it("separates acting and directing credits without losing a TV title with the same ID", async () => {
     vi.mocked(seerrFetch).mockResolvedValue({
       cast: [
         { id: 1, mediaType: "movie", releaseDate: "2000-01-01" },
         { id: 1, mediaType: "tv", firstAirDate: "2020-01-01" },
       ],
-      crew: [{ id: 1, mediaType: "movie", releaseDate: "2000-01-01" }],
+      crew: [
+        {
+          id: 1,
+          mediaType: "movie",
+          releaseDate: "2000-01-01",
+          job: "Director",
+        },
+        { id: 2, mediaType: "movie", job: "Producer" },
+      ],
     });
-    await expect(getSeerrPersonCredits(12)).resolves.toMatchObject([
-      { id: 1, mediaType: "tv" },
-      { id: 1, mediaType: "movie" },
-    ]);
+    await expect(getSeerrPersonCredits(12)).resolves.toMatchObject({
+      acting: [
+        { id: 1, mediaType: "tv" },
+        { id: 1, mediaType: "movie" },
+      ],
+      directing: [{ id: 1, mediaType: "movie", job: "Director" }],
+    });
     expect(seerrFetch).toHaveBeenCalledWith("/person/12/combined_credits", {
       signal: undefined,
     });

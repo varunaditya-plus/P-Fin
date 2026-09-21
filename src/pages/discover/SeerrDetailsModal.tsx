@@ -30,6 +30,7 @@ import {
 import { Flare } from "@/components/utils/Flare";
 import { ContentProviderLinks } from "@/pages/jellyfin/ContentProviderLinks";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
+import { PeopleCarousel } from "@/pages/jellyfin/PeopleCarousel";
 import { PersonModal, PersonSelection } from "@/pages/jellyfin/PersonModal";
 import { RatingCapsule } from "@/pages/taste/RatingCapsule";
 
@@ -526,44 +527,41 @@ function SeerrDetailsContent({
                             </div>
                           </div>
                         )}
-                      {details.credits?.cast?.length ? (
-                        <div className="mt-8">
-                          <h4 className="text-xl font-bold text-white mb-4">
-                            Cast
-                          </h4>
-                          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
-                            {details.credits.cast.slice(0, 20).map((person) => (
-                              <button
-                                type="button"
-                                key={person.id}
-                                className="flex-shrink-0 w-28 text-left tabbable rounded-lg"
-                                onClick={() =>
-                                  setPerson({
-                                    name: person.name,
-                                    tmdbId: person.id,
-                                  })
-                                }
-                              >
-                                <img
-                                  src={
-                                    seerrImage(person.profilePath, "w185") ||
-                                    "/placeholder.png"
-                                  }
-                                  alt={person.name}
-                                  loading="lazy"
-                                  className="aspect-[2/3] w-full object-cover rounded-lg mb-2"
-                                />
-                                <p className="text-sm text-white">
-                                  {person.name}
-                                </p>
-                                <p className="text-xs text-type-secondary">
-                                  {person.character}
-                                </p>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ) : null}
+                      <PeopleCarousel
+                        people={[
+                          ...(details.credits?.crew ?? [])
+                            .filter((person) => person.job === "Director")
+                            .slice(0, 1)
+                            .map((person) => ({
+                              id: String(person.id),
+                              name: person.name,
+                              director: true,
+                              image: seerrImage(person.profilePath, "w185"),
+                            })),
+                          ...(details.credits?.cast ?? [])
+                            .filter(
+                              (person) =>
+                                !details.credits?.crew?.some(
+                                  (crew) =>
+                                    crew.id === person.id &&
+                                    crew.job === "Director",
+                                ),
+                            )
+                            .slice(0, 20)
+                            .map((person) => ({
+                              id: String(person.id),
+                              name: person.name,
+                              role: person.character,
+                              image: seerrImage(person.profilePath, "w185"),
+                            })),
+                        ]}
+                        onSelect={(person) =>
+                          setPerson({
+                            name: person.name,
+                            tmdbId: Number(person.id),
+                          })
+                        }
+                      />
                     </div>
                   </div>
                 )}

@@ -34,6 +34,7 @@ import {
   useRetainedModalValue,
 } from "@/components/overlays/DetailsModalFrame";
 import { Flare } from "@/components/utils/Flare";
+import { PeopleCarousel } from "@/pages/jellyfin/PeopleCarousel";
 import { RatingCapsule } from "@/pages/taste/RatingCapsule";
 import { usePreferencesStore } from "@/stores/preferences";
 
@@ -934,69 +935,41 @@ function JellyfinDetailsContent({
                           )}
                         </div>
                       )}
-                      {item.People?.some(
-                        (person) => person.Type === "Actor",
-                      ) ? (
-                        <div className="mt-6">
-                          <h4 className="text-lg font-semibold text-white mb-4">
-                            Cast
-                          </h4>
-                          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
-                            {item.People.filter(
-                              (person) => person.Type === "Actor",
-                            )
-                              .slice(0, 30)
-                              .map((person) => (
-                                <button
-                                  type="button"
-                                  key={person.Id || person.Name}
-                                  className="flex-shrink-0 w-28 text-center tabbable rounded-lg"
-                                  onClick={() =>
-                                    setSelectedPerson({
-                                      name: person.Name,
-                                      jellyfinId: person.Id,
-                                    })
-                                  }
-                                >
-                                  <div className="w-24 h-24 mx-auto rounded-full bg-white/5 overflow-hidden">
-                                    {person.PrimaryImageTag && person.Id ? (
-                                      <img
-                                        loading="lazy"
-                                        src={getImageUrl(
-                                          {
-                                            Id: person.Id,
-                                            Name: person.Name,
-                                            Type: "Person",
-                                            ImageTags: {
-                                              Primary: person.PrimaryImageTag,
-                                            },
-                                          },
-                                          "Primary",
-                                          200,
-                                        )}
-                                        alt={person.Name}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="h-full flex items-center justify-center">
-                                        <Icon
-                                          icon={Icons.USER}
-                                          className="text-3xl text-white/40"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <p className="mt-2 text-sm text-white line-clamp-2">
-                                    {person.Name}
-                                  </p>
-                                  <p className="text-xs text-white/60 line-clamp-2">
-                                    {person.Role}
-                                  </p>
-                                </button>
-                              ))}
-                          </div>
-                        </div>
-                      ) : null}
+                      <PeopleCarousel
+                        people={(item.People ?? [])
+                          .filter((person) =>
+                            ["Actor", "Director"].includes(person.Type ?? ""),
+                          )
+                          .map((person) => ({
+                            id: person.Id || person.Name,
+                            name: person.Name,
+                            role: person.Role,
+                            director: person.Type === "Director",
+                            image:
+                              person.Id && person.PrimaryImageTag
+                                ? getImageUrl(
+                                    {
+                                      Id: person.Id,
+                                      Name: person.Name,
+                                      Type: "Person",
+                                      ImageTags: {
+                                        Primary: person.PrimaryImageTag,
+                                      },
+                                    },
+                                    "Primary",
+                                    300,
+                                  )
+                                : undefined,
+                          }))}
+                        onSelect={(person) =>
+                          setSelectedPerson({
+                            name: person.name,
+                            jellyfinId: item.People?.find(
+                              (value) => (value.Id || value.Name) === person.id,
+                            )?.Id,
+                          })
+                        }
+                      />
                       {similar.length ? (
                         <div className="mt-6 -mx-6">
                           <JellyfinMediaCarousel

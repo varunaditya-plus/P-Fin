@@ -36,6 +36,7 @@ export interface SeerrMedia {
   firstAirDate?: string;
   voteAverage?: number;
   mediaInfo?: SeerrMediaInfo;
+  popularity?: number;
 }
 
 export interface SeerrDetails extends SeerrMedia {
@@ -53,7 +54,21 @@ export interface SeerrDetails extends SeerrMedia {
     posterPath?: string | null;
     airDate?: string;
   }[];
+  relatedVideos?: { key: string; name: string; site: string; type: string }[];
+  collection?: {
+    id: number;
+    name: string;
+    posterPath?: string;
+    backdropPath?: string;
+  };
   credits?: {
+    crew?: {
+      id: number;
+      name: string;
+      job?: string;
+      department?: string;
+      profilePath?: string | null;
+    }[];
     cast?: {
       id: number;
       name: string;
