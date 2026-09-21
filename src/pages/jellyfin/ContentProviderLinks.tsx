@@ -1,6 +1,8 @@
 import { ContentItem } from "@/backend/jellyfin/content";
 import { Icon, Icons } from "@/components/Icon";
 
+import "./contentProviderLinks.css";
+
 type Provider = "imdb" | "tmdb";
 interface ProviderLink {
   provider: Provider;
@@ -76,22 +78,28 @@ export function ContentProviderLinks({
   if (!links.length) return null;
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {links.map(({ provider, url }) => (
-        <a
-          key={provider}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`View on ${provider === "imdb" ? "IMDb" : "TMDB"} (opens in a new tab)`}
-          title={provider === "imdb" ? "IMDb" : "TMDB"}
-          className={`w-8 h-8 rounded-md flex items-center justify-center transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white motion-reduce:transition-none ${provider === "imdb" ? "bg-yellow-500" : "bg-[#0d253f]"}`}
-        >
-          <Icon
-            icon={provider === "imdb" ? Icons.IMDB : Icons.TMDB}
-            className={`text-sm ${provider === "imdb" ? "text-black" : "text-white"}`}
-          />
-        </a>
-      ))}
+      {[...links]
+        .sort(
+          (a, b) =>
+            Number(b.provider === "tmdb") - Number(a.provider === "tmdb"),
+        )
+        .map(({ provider, url }, index) => (
+          <a
+            key={provider}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`View on ${provider === "imdb" ? "IMDb" : "TMDB"} (opens in a new tab)`}
+            title={provider === "imdb" ? "IMDb" : "TMDB"}
+            style={{ animationDelay: `${60 + index * 60}ms` }}
+            className={`content-provider-link w-8 h-8 rounded-md flex items-center justify-center transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white motion-reduce:transition-none ${provider === "imdb" ? "bg-yellow-500" : "bg-[#0d253f]"}`}
+          >
+            <Icon
+              icon={provider === "imdb" ? Icons.IMDB : Icons.TMDB}
+              className={`text-sm ${provider === "imdb" ? "text-black" : "text-white"}`}
+            />
+          </a>
+        ))}
     </div>
   );
 }
