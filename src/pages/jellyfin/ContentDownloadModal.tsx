@@ -16,12 +16,12 @@ import {
   selectedDownloadSource,
 } from "@/backend/jellyfin/downloads";
 import { mediaSourceLabel } from "@/backend/jellyfin/mediaSourceLabel";
-import { Button } from "@/components/buttons/Button";
+import { Dropdown } from "@/components/form/Dropdown";
 import { Icon, Icons } from "@/components/Icon";
 import { useRetainedModalValue } from "@/components/overlays/DetailsModalFrame";
 import { copyText } from "@/utils/copyText";
 
-function DownloadPanel({
+export function DownloadPanel({
   item,
   policy,
   sourceId,
@@ -112,120 +112,151 @@ function DownloadPanel({
     }
   };
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {!allowed ? (
-        <p role="alert" className="text-type-secondary">
+        <p role="alert" className="text-sm text-type-secondary py-4">
           Downloads are unavailable for this account.
         </p>
       ) : (
         <>
-          {item.MediaSources?.length ? (
-            <label className="block text-sm text-type-secondary space-y-2">
-              <span>Version</span>
-              <select
-                value={source?.Id}
-                onChange={(event) => chooseVersion(event.target.value)}
-                className="tabbable w-full rounded-xl bg-dropdown-background p-3 text-white"
-              >
-                {item.MediaSources.map((entry) => (
-                  <option key={entry.Id} value={entry.Id}>
-                    {mediaSourceLabel(entry)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null}
-          <section className="space-y-3">
-            <h3 className="font-semibold text-white">Original file</h3>
-            <p className="text-sm break-all text-type-secondary">
-              {downloadFileName(item, source)}
-            </p>
-            <p className="text-sm text-type-secondary">
-              {source?.Container?.toUpperCase() ?? "Original format"} ·{" "}
-              {downloadSize(source?.Size)}
-            </p>
-            {original ? (
-              <a
-                href={original}
-                download={downloadFileName(item, source)}
-                className="tabbable inline-flex items-center gap-2 rounded-lg bg-buttons-cancel py-2 px-4 text-white hover:bg-buttons-cancelHover"
-              >
-                <Icon icon={Icons.DOWNLOAD} />
-                Download original file
-              </a>
-            ) : (
-              <p className="text-sm text-type-secondary">
-                This source is available as a stream. Jellyfin does not expose a
-                downloadable original file.
+          {(item.MediaSources?.length ?? 0) > 1 ? (
+            <div>
+              <p className="text-xs text-video-context-type-secondary">
+                Version
               </p>
-            )}
-          </section>
-          <section className="space-y-3">
-            <h3 className="font-semibold text-white">Stream link</h3>
-            <p className="text-sm text-type-secondary">
-              Open the selected version in a compatible media player. This
-              private link includes your Jellyfin sign-in token.
-            </p>
-            <Button theme="secondary" padding="px-4 py-2" onClick={copy}>
-              Copy stream URL
-            </Button>
-            {error.includes("copy manually") ||
-            error.includes("copy it manually") ? (
-              <textarea
-                aria-label="Private stream URL"
-                readOnly
-                value={downloadStreamUrl(item, source)}
-                onFocus={(event) => event.target.select()}
-                className="tabbable w-full h-24 rounded-xl bg-dropdown-background p-3 text-sm text-white break-all"
+              <Dropdown
+                className="!my-2 w-full"
+                selectedItem={{
+                  id: source?.Id ?? "",
+                  name: source ? mediaSourceLabel(source) : "Select a version",
+                }}
+                options={(item.MediaSources ?? []).map((entry) => ({
+                  id: entry.Id,
+                  name: mediaSourceLabel(entry),
+                }))}
+                setSelectedItem={(entry) => chooseVersion(entry.id)}
               />
-            ) : null}
-          </section>
+            </div>
+          ) : null}
+          {original ? (
+            <a
+              href={original}
+              download={downloadFileName(item, source)}
+              className="tabbable flex items-center justify-between gap-3 py-3 px-3 -mx-3 rounded-lg hover:bg-video-context-light/20 transition-colors"
+            >
+              <span className="min-w-0 text-left">
+                <span className="flex items-center gap-2 flex-wrap text-sm text-white font-medium">
+                  Download original file
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/60 uppercase tracking-wide">
+                    {source?.Container ?? "Original"}
+                  </span>
+                </span>
+                <span className="block text-xs text-type-secondary mt-1">
+                  {downloadSize(source?.Size)}
+                </span>
+                <span
+                  className="block text-xs text-type-secondary/70 break-all line-clamp-2 mt-1"
+                  title={downloadFileName(item, source)}
+                >
+                  {downloadFileName(item, source)}
+                </span>
+              </span>
+              <Icon
+                className="text-xl shrink-0 text-video-context-type-main"
+                icon={Icons.DOWNLOAD}
+              />
+            </a>
+          ) : (
+            <p className="text-sm text-type-secondary py-3">
+              Jellyfin does not expose an original file for this source.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={copy}
+            className="tabbable flex w-full items-center justify-between gap-3 py-3 text-left rounded-lg hover:bg-video-context-light/20 transition-colors"
+          >
+            <span>
+              <span className="block text-sm text-white font-medium">
+                Copy stream URL
+              </span>
+              <span className="block text-xs text-type-secondary mt-1">
+                Open this version in another media player
+              </span>
+            </span>
+            <Icon className="text-xl shrink-0" icon={Icons.LINK} />
+          </button>
+          <p className="text-xs text-type-secondary">
+            The private stream link includes your Jellyfin sign-in token.
+          </p>
+          {error.includes("copy manually") ||
+          error.includes("copy it manually") ? (
+            <textarea
+              aria-label="Private stream URL"
+              readOnly
+              value={downloadStreamUrl(item, source)}
+              onFocus={(event) => event.target.select()}
+              className="tabbable w-full h-24 rounded bg-video-context-inputBg p-3 text-sm text-white break-all"
+            />
+          ) : null}
           {subtitles.length ? (
-            <section className="space-y-3">
-              <h3 className="font-semibold text-white">Text subtitles</h3>
-              <div className="flex gap-2">
-                <select
-                  aria-label="Subtitle to download"
-                  value={subtitle}
-                  onChange={(event) => setSubtitle(event.target.value)}
-                  className="tabbable min-w-0 flex-1 rounded-xl bg-dropdown-background p-3 text-white"
-                >
-                  {subtitles.map((track) => (
-                    <option key={track.Index} value={track.Index}>
-                      {track.DisplayTitle ??
-                        track.Language ??
-                        `Subtitle ${track.Index}`}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  aria-label="Subtitle file format"
-                  value={format}
-                  onChange={(event) =>
-                    setFormat(event.target.value as "srt" | "vtt")
+            <div className="border-t border-white/10 pt-3">
+              <div className="flex items-center gap-2">
+                <Dropdown
+                  className="!my-1 flex-1 min-w-0"
+                  selectedItem={{
+                    id: subtitle,
+                    name:
+                      subtitles.find(
+                        (track) => String(track.Index) === subtitle,
+                      )?.DisplayTitle ??
+                      subtitles.find(
+                        (track) => String(track.Index) === subtitle,
+                      )?.Language ??
+                      "Subtitle",
+                  }}
+                  options={subtitles.map((track) => ({
+                    id: String(track.Index),
+                    name:
+                      track.DisplayTitle ??
+                      track.Language ??
+                      `Subtitle ${track.Index}`,
+                  }))}
+                  setSelectedItem={(choice) => setSubtitle(choice.id)}
+                />
+                <Dropdown
+                  className="!my-1"
+                  selectedItem={{
+                    id: format,
+                    name: format === "srt" ? "SRT" : "WebVTT",
+                  }}
+                  options={[
+                    { id: "srt", name: "SRT" },
+                    { id: "vtt", name: "WebVTT" },
+                  ]}
+                  setSelectedItem={(choice) =>
+                    setFormat(choice.id as "srt" | "vtt")
                   }
-                  className="tabbable rounded-xl bg-dropdown-background p-3 text-white"
-                >
-                  <option value="srt">SRT</option>
-                  <option value="vtt">WebVTT</option>
-                </select>
+                />
               </div>
-              <Button
-                theme="secondary"
-                padding="px-4 py-2"
+              <button
+                type="button"
                 disabled={busy}
                 onClick={saveSubtitle}
+                className="tabbable flex items-center justify-between w-full gap-3 py-3 text-sm text-white font-medium rounded-lg hover:bg-video-context-light/20 transition-colors disabled:opacity-50"
               >
-                {busy ? "Preparing subtitle…" : "Download subtitle"}
-              </Button>
-              <p className="text-xs text-type-secondary">
-                Exported as UTF-8. Image-based subtitles stay embedded in the
-                original video.
-              </p>
-            </section>
+                <span className="flex items-center gap-2">
+                  {busy ? "Preparing subtitle…" : "Download subtitle"}
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/60 uppercase tracking-wide">
+                    {format}
+                  </span>
+                </span>
+                <Icon icon={Icons.DOWNLOAD} className="text-xl" />
+              </button>
+            </div>
           ) : null}
           {message ? (
-            <p role="status" className="text-sm text-white">
+            <p role="status" className="text-sm text-video-context-type-accent">
               {message}
             </p>
           ) : null}
@@ -234,26 +265,38 @@ function DownloadPanel({
               {error}
             </p>
           ) : null}
-          <details className="text-sm text-type-secondary">
-            <summary className="tabbable cursor-pointer font-medium text-white">
+          <details className="text-sm text-type-secondary border-t border-white/10 pt-3">
+            <summary className="tabbable cursor-pointer text-video-context-type-main">
               Download help
             </summary>
-            <select
-              aria-label="Download device"
-              value={platform}
-              onChange={(event) => setPlatform(event.target.value)}
-              className="tabbable w-full rounded-xl bg-dropdown-background p-3 text-white mt-3"
-            >
-              <option value="desktop">Computer</option>
-              <option value="ios">iPhone or iPad</option>
-              <option value="android">Android</option>
-            </select>
-            <p className="mt-3">
+            <Dropdown
+              className="w-full"
+              selectedItem={{
+                id: platform,
+                name:
+                  platform === "ios"
+                    ? "iPhone or iPad"
+                    : platform === "android"
+                      ? "Android"
+                      : "Computer",
+              }}
+              options={[
+                { id: "desktop", name: "Computer" },
+                { id: "ios", name: "iPhone or iPad" },
+                { id: "android", name: "Android" },
+              ]}
+              setSelectedItem={(choice) => setPlatform(choice.id)}
+            />
+            <p className="mt-3 text-xs">
               {platform === "ios"
-                ? "Use Safari's download button or the Share menu and Save to Files. Large files may need free local storage. Open the saved video and subtitle together in a compatible player."
+                ? "Use Safari's download button or the Share menu and Save to Files. Open the saved video and subtitle together in a compatible player."
                 : platform === "android"
                   ? "Find saved files in your browser's Downloads or the Files app. A compatible media player can open the private stream URL and load the downloaded subtitle."
                   : "Your browser saves the original file to its Downloads folder. If it opens a video tab, use the browser's Save video action. Put the subtitle beside the video or select it in your media player."}
+            </p>
+            <p className="mt-2 text-xs">
+              Text subtitles use UTF-8. Image subtitles remain embedded in the
+              original video.
             </p>
           </details>
         </>

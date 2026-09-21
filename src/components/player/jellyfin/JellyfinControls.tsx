@@ -34,6 +34,7 @@ import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 
 import { GamepadSettings } from "./GamepadSettings";
+import { JellyfinDownloads } from "./JellyfinDownloads";
 import { useJellyfinPlayback } from "./JellyfinPlaybackContext";
 
 function JellyfinSettingsMenu() {
@@ -88,6 +89,16 @@ function JellyfinSettingsMenu() {
             {audio?.DisplayTitle ?? "Default"}
           </span>
         </Menu.ChevronLink>
+      </Menu.Section>
+      <Menu.Section>
+        <Menu.Link
+          clickable
+          disabled={!playback}
+          onClick={() => router.navigate("/download")}
+          rightSide={<Icon className="text-xl" icon={Icons.DOWNLOAD} />}
+        >
+          Download
+        </Menu.Link>
       </Menu.Section>
       <Menu.Section>
         <Menu.ChevronLink onClick={() => router.navigate("/playback")}>
@@ -274,6 +285,9 @@ export function JellyfinSettingsRouter() {
       <OverlayRouter id="settings">
         <OverlayPage id="settings" path="/" width={343} height={496}>
           <JellyfinSettingsMenu />
+        </OverlayPage>
+        <OverlayPage id="settings" path="/download" width={343} height={496}>
+          <JellyfinDownloads />
         </OverlayPage>
         <OverlayPage id="settings" path="/quality" width={343} height={420}>
           <Menu.Card>
