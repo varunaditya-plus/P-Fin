@@ -220,8 +220,26 @@ export function KeyboardEvents() {
 
   useEffect(() => {
     const keydownEventHandler = (evt: KeyboardEvent) => {
-      if (evt.target && (evt.target as HTMLInputElement).nodeName === "INPUT")
+      if (evt.defaultPrevented) return;
+      if (evt.key === LOCKED_SHORTCUTS.ESCAPE) {
+        if (
+          useOverlayStack.getState().getTopModal() ||
+          document.querySelector('[role="dialog"][aria-modal="true"]')
+        )
+          return;
+        if (dataRef.current.router.isRouterActive) {
+          evt.preventDefault();
+          dataRef.current.router.close();
+        }
         return;
+      }
+      if (evt.target instanceof HTMLElement) {
+        if (
+          ["INPUT", "TEXTAREA", "SELECT"].includes(evt.target.nodeName) ||
+          evt.target.isContentEditable
+        )
+          return;
+      }
 
       const k = evt.key;
       const keyL = evt.key.toLowerCase();
@@ -490,9 +508,6 @@ export function KeyboardEvents() {
         const action = dataRef.current.mediaPlaying.isPaused ? "play" : "pause";
         dataRef.current.display?.[action]();
       }
-      // Escape is locked
-      if (k === LOCKED_SHORTCUTS.ESCAPE) dataRef.current.router.close();
-
       // Episode navigation (shows only) - customizable
       if (
         matchesShortcut(

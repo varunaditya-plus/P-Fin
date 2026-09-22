@@ -21,16 +21,30 @@ export function useGlobalKeyboardEvents() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.metaKey || event.altKey) return;
+      if (event.key === "Escape") {
+        const target =
+          event.target instanceof Element
+            ? event.target
+            : document.activeElement;
+        // Headless UI owns the Escape lifecycle of its focused details dialog.
+        if (target?.closest("[data-details-modal-layer]")) return;
+        const topModal = getTopModal();
+        if (topModal) {
+          event.preventDefault();
+          event.stopPropagation();
+          hideModal(topModal);
+        }
+        return;
+      }
       // Don't handle keyboard events if user is typing in an input
       if (
-        event.target &&
-        (event.target as HTMLInputElement).nodeName === "INPUT"
+        event.target instanceof HTMLElement &&
+        (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.nodeName) ||
+          event.target.isContentEditable)
       ) {
         return;
       }
-
-      // Cancel if command or alt is pressed
-      if (event.metaKey || event.altKey) return;
 
       // Handle backtick (`) key hold for keyboard commands
       if (event.key === "`") {
@@ -44,14 +58,6 @@ export function useGlobalKeyboardEvents() {
           holdTimeoutRef.current = setTimeout(() => {
             showKeyboardCommands();
           }, 150);
-        }
-      }
-
-      // Handle Escape key to close modals
-      if (event.key === "Escape") {
-        const topModal = getTopModal();
-        if (topModal) {
-          hideModal(topModal);
         }
       }
     };
