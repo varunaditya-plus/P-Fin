@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   SeerrError,
@@ -517,11 +517,14 @@ function SeerrLibraryDiscover() {
   const session = useJellyfinAuth((state) => state.session);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const urlQuery = searchParams.get("q") || "";
   const tasteView = useTasteView();
   const [user, setUser] = useState<SeerrUser>();
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
-  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [query, setQuery] = useState(urlQuery);
+  useEffect(() => setQuery(urlQuery), [urlQuery]);
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [category, setCategory] = useState<"movie" | "tv">(
     searchParams.get("kind") === "tv" ? "tv" : "movie",
@@ -579,12 +582,15 @@ function SeerrLibraryDiscover() {
       ? { endpoint: feed, title: searchParams.get("view") || "Discover" }
       : undefined;
   const openMore = (title: string, endpoint: string) => {
-    setSearchParams((previous) => {
-      const next = new URLSearchParams(previous);
-      next.set("view", title);
-      next.set("feed", endpoint);
-      return next;
-    });
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.set("view", title);
+        next.set("feed", endpoint);
+        return next;
+      },
+      { state: { discoverGrid: true } },
+    );
     window.scrollTo({ top: 0 });
   };
   useEffect(() => {
@@ -666,6 +672,7 @@ function SeerrLibraryDiscover() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setDebouncedQuery(query.trim());
+      if (query.trim() === urlQuery) return;
       setSearchParams(
         (previous) => {
           const next = new URLSearchParams(previous);
@@ -673,11 +680,11 @@ function SeerrLibraryDiscover() {
           else next.delete("q");
           return next;
         },
-        { replace: true },
+        { replace: true, state: location.state },
       );
     }, 350);
     return () => window.clearTimeout(timer);
-  }, [query, setSearchParams]);
+  }, [query, urlQuery, setSearchParams, location.state]);
 
   useEffect(() => {
     if (!user || (filtersActive && !filteredEndpoint)) return undefined;
@@ -814,12 +821,19 @@ function SeerrLibraryDiscover() {
                   type="button"
                   className="tabbable flex items-center gap-2 text-white hover:text-type-link mb-6"
                   onClick={() => {
-                    setSearchParams((previous) => {
-                      const next = new URLSearchParams(previous);
-                      next.delete("feed");
-                      next.delete("view");
-                      return next;
-                    });
+                    if (location.state?.discoverGrid) {
+                      navigate(-1);
+                      return;
+                    }
+                    setSearchParams(
+                      (previous) => {
+                        const next = new URLSearchParams(previous);
+                        next.delete("feed");
+                        next.delete("view");
+                        return next;
+                      },
+                      { replace: true },
+                    );
                   }}
                 >
                   <Icon icon={Icons.ARROW_LEFT} />

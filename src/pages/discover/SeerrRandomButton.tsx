@@ -28,7 +28,7 @@ export function SeerrRandomButton({
     setCountdown(undefined);
     setLoading(false);
     return () => controller.current?.abort();
-  }, [type, endpoint]);
+  }, [type, endpoint, disabled]);
   useEffect(() => {
     if (countdown === undefined || !pick) return;
     if (countdown === 0) {

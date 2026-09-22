@@ -76,4 +76,20 @@ describe("random discovery countdown", () => {
     expect(select).not.toHaveBeenCalled();
     expect(host.textContent).not.toContain("A film");
   });
+  it("cancels an active countdown while replacement discovery filters are resolving", async () => {
+    await act(async () => host.querySelector("button")!.click());
+    await act(async () =>
+      root.render(
+        <SeerrRandomButton
+          type="movie"
+          disabled
+          onSelect={select}
+          onError={error}
+        />,
+      ),
+    );
+    await act(async () => vi.advanceTimersByTime(6000));
+    expect(select).not.toHaveBeenCalled();
+    expect(host.textContent).not.toContain("A film");
+  });
 });
