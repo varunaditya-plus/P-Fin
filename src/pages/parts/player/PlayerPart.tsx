@@ -15,11 +15,14 @@ import {
 } from "@/components/player/jellyfin/JellyfinControls";
 import { PauseOverlay } from "@/components/player/overlays/PauseOverlay";
 import { useChromecastState } from "@/components/player/remote/chromecast";
-import { ChromecastIndicator } from "@/components/player/remote/JellyfinChromecast";
+import {
+  CastReceiverStatus,
+  ChromecastIndicator,
+  JellyfinChromecastButton,
+} from "@/components/player/remote/JellyfinChromecast";
 import { SyncPlayIndicator } from "@/components/player/remote/JellyfinSyncPlay";
 import { SubtitleAutoSyncRuntime } from "@/components/player/subtitleTools/AutoSync";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 
@@ -32,7 +35,6 @@ export interface PlayerPartProps {
 
 export function PlayerPart(props: PlayerPartProps) {
   const casting = useChromecastState((state) => state.casting);
-  const settings = useOverlayRouter("settings");
   const suspended = casting || Boolean(props.localPlaybackSuspended);
   const { showTargets, showTouchTargets } = useShouldShowControls();
   const status = usePlayerStore((s) => s.status);
@@ -95,18 +97,7 @@ export function PlayerPart(props: PlayerPartProps) {
           <SyncPlayIndicator />
         </div>
       </div>
-      {casting ? (
-        <div className="absolute inset-0 z-40 bg-background-main flex flex-col items-center justify-center gap-5 text-white">
-          <p className="text-xl">Playing on your cast receiver</p>
-          <button
-            type="button"
-            className="tabbable rounded-lg bg-white/10 px-5 py-3"
-            onClick={() => settings.open("/cast")}
-          >
-            Open cast controls
-          </button>
-        </div>
-      ) : null}
+      {casting ? <CastReceiverStatus /> : null}
       {!suspended ? (
         <>
           <GamepadEvents />
@@ -167,7 +158,12 @@ export function PlayerPart(props: PlayerPartProps) {
             <BrandPill />
           </div>
           <div className="flex lg:hidden items-center justify-end">
-            {status === playerStatus.PLAYING ? <Player.Airplay /> : null}
+            {status === playerStatus.PLAYING ? (
+              <>
+                <JellyfinChromecastButton />
+                <Player.Airplay />
+              </>
+            ) : null}
           </div>
         </div>
       </Player.TopControls>
@@ -199,6 +195,7 @@ export function PlayerPart(props: PlayerPartProps) {
             {status === playerStatus.PLAYING ? (
               <>
                 <Player.Pip />
+                <JellyfinChromecastButton />
                 <Player.Airplay />
               </>
             ) : null}

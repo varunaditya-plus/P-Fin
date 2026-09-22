@@ -108,9 +108,11 @@ function JellyfinSettingsMenu() {
           Subtitle appearance
         </Menu.ChevronLink>
         <Menu.ChevronLink onClick={() => router.navigate("/cast")}>
+          <Icon icon={Icons.CASTING} className="mr-3" />
           Google Cast
         </Menu.ChevronLink>
         <Menu.ChevronLink onClick={() => router.navigate("/syncplay")}>
+          <Icon icon={Icons.WATCH_PARTY} className="mr-3" />
           SyncPlay
         </Menu.ChevronLink>
         <Menu.ChevronLink onClick={() => router.navigate("/controller")}>

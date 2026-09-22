@@ -9,6 +9,9 @@ import {
   useState,
 } from "react";
 
+import { Dropdown } from "@/components/form/Dropdown";
+import { Icon, Icons } from "@/components/Icon";
+import { VideoPlayerButton } from "@/components/player/internals/Button";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { useJellyfinPlayback } from "@/components/player/jellyfin/JellyfinPlaybackContext";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
@@ -134,6 +137,90 @@ export function JellyfinChromecastProvider({
   return <CastContext.Provider value={value}>{children}</CastContext.Provider>;
 }
 
+export function JellyfinChromecastButton() {
+  const context = useContext(CastContext);
+  const state = useChromecastState();
+  const router = useOverlayRouter("settings");
+  const [connecting, setConnecting] = useState(false);
+  useEffect(() => {
+    if (
+      !window.isSecureContext ||
+      !/Chrome|Chromium|Edg\//.test(navigator.userAgent)
+    )
+      return;
+    context?.controller.initialize().catch(() => {});
+  }, [context?.controller]);
+  if (!context || (!state.available && !state.connected)) return null;
+  return (
+    <VideoPlayerButton
+      icon={Icons.CASTING}
+      label={
+        connecting
+          ? "Connecting to Google Cast"
+          : state.casting
+            ? `Casting to ${state.receiver}`
+            : "Cast to a device"
+      }
+      className={
+        connecting
+          ? "animate-pulse"
+          : state.error
+            ? "text-video-scraping-error"
+            : state.casting
+              ? "text-video-audio-set"
+              : undefined
+      }
+      onClick={() => {
+        if (connecting) return;
+        if (state.casting || context.blocked) {
+          router.open("/cast");
+          return;
+        }
+        setConnecting(true);
+        context
+          .start()
+          .catch((cause) => {
+            useChromecastState.setState({
+              error:
+                cause instanceof Error
+                  ? cause.message
+                  : "Google Cast is unavailable.",
+            });
+            router.open("/cast");
+          })
+          .finally(() => setConnecting(false));
+      }}
+    />
+  );
+}
+
+export function CastReceiverStatus() {
+  const receiver = useChromecastState((state) => state.receiver);
+  const remote = useChromecastState((state) => state.state);
+  const settings = useOverlayRouter("settings");
+  return (
+    <div className="absolute inset-0 z-40 bg-background-main flex flex-col items-center justify-center gap-5 px-6 text-center text-white">
+      <Icon icon={Icons.CASTING} className="text-5xl text-video-audio-set" />
+      <div className="space-y-2">
+        <p className="text-xl font-semibold">{receiver || "Google Cast"}</p>
+        <p className="text-type-secondary">
+          {remote?.NowPlayingItem?.Name || "Playing on your cast receiver"}
+        </p>
+        <p className="text-sm text-type-secondary">
+          {remote?.PlayState?.IsPaused ? "Paused" : "Playing"}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="tabbable rounded-lg bg-video-context-light/10 px-5 py-3 hover:bg-video-context-light/20 transition-colors"
+        onClick={() => settings.open("/cast")}
+      >
+        Open cast controls
+      </button>
+    </div>
+  );
+}
+
 export function ChromecastIndicator() {
   const casting = useChromecastState((state) => state.casting);
   const receiver = useChromecastState((state) => state.receiver);
@@ -143,8 +230,9 @@ export function ChromecastIndicator() {
     <button
       type="button"
       onClick={() => router.navigate("/cast")}
-      className="tabbable rounded-full bg-video-context-background px-4 py-2 text-sm text-white"
+      className="tabbable inline-flex items-center gap-2 rounded-full bg-video-context-background px-4 py-2 text-sm text-white hover:bg-video-context-hoverColor transition-colors"
     >
+      <Icon icon={Icons.CASTING} className="text-video-audio-set" />
       Casting to {receiver}
     </button>
   );
@@ -194,12 +282,23 @@ export function ChromecastSettingsView() {
       <Menu.Section className="space-y-3 pb-5">
         {state.casting ? (
           <>
-            <p className="font-medium text-white">{state.receiver}</p>
-            <p className="text-sm text-type-secondary">
-              {remote?.NowPlayingItem?.Name ?? "Playing on your receiver"} ·{" "}
-              {Math.floor(position / 60)}:
-              {String(position % 60).padStart(2, "0")}
-            </p>
+            <div className="rounded-lg bg-video-context-light/5 p-3 space-y-2">
+              <div className="flex items-center gap-2 font-medium text-white">
+                <Icon icon={Icons.CASTING} className="text-video-audio-set" />
+                <span className="truncate">{state.receiver}</span>
+              </div>
+              <p className="text-sm text-type-secondary truncate">
+                {remote?.NowPlayingItem?.Name ?? "Playing on your receiver"}
+              </p>
+              <p className="text-xs text-type-secondary flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-video-audio-set" />
+                {remote?.PlayState?.IsPaused ? "Paused" : "Playing"}
+                <span className="ml-auto tabular-nums">
+                  {Math.floor(position / 60)}:
+                  {String(position % 60).padStart(2, "0")}
+                </span>
+              </p>
+            </div>
             <Menu.Link
               clickable
               disabled={busy}
@@ -212,6 +311,10 @@ export function ChromecastSettingsView() {
                   );
               }}
             >
+              <Icon
+                icon={remote?.PlayState?.IsPaused ? Icons.PLAY : Icons.PAUSE}
+                className="mr-3"
+              />
               {remote?.PlayState?.IsPaused ? "Resume" : "Pause"}
             </Menu.Link>
             <div className="flex gap-2 items-center">
@@ -263,37 +366,51 @@ export function ChromecastSettingsView() {
             </label>
             {(["Audio", "Subtitle"] as const).map((kind) =>
               streams.some((stream) => stream.Type === kind) ? (
-                <label key={kind} className="block text-sm">
-                  {kind === "Subtitle" ? "Subtitles" : "Audio"}
-                  <select
-                    aria-label={`Cast ${kind.toLowerCase()}`}
-                    className="tabbable w-full rounded bg-video-context-inputBg p-2 mt-2"
-                    value={
-                      (kind === "Audio"
-                        ? remote?.PlayState?.AudioStreamIndex
-                        : remote?.PlayState?.SubtitleStreamIndex) ?? -1
-                    }
-                    onChange={(event) => {
+                <div key={kind} className="space-y-1">
+                  <Menu.FieldTitle>
+                    {kind === "Subtitle" ? "Subtitles" : "Audio"}
+                  </Menu.FieldTitle>
+                  <Dropdown
+                    className="!my-0 !w-full !max-w-none"
+                    selectedItem={{
+                      id: String(
+                        (kind === "Audio"
+                          ? remote?.PlayState?.AudioStreamIndex
+                          : remote?.PlayState?.SubtitleStreamIndex) ?? -1,
+                      ),
+                      name:
+                        streams.find(
+                          (stream) =>
+                            stream.Type === kind &&
+                            stream.Index ===
+                              (kind === "Audio"
+                                ? remote?.PlayState?.AudioStreamIndex
+                                : remote?.PlayState?.SubtitleStreamIndex),
+                        )?.DisplayTitle ??
+                        (kind === "Subtitle" ? "Off" : "Default"),
+                    }}
+                    options={[
+                      ...(kind === "Subtitle"
+                        ? [{ id: "-1", name: "Off" }]
+                        : []),
+                      ...streams
+                        .filter((stream) => stream.Type === kind)
+                        .map((stream) => ({
+                          id: String(stream.Index),
+                          name:
+                            stream.DisplayTitle ?? `${kind} ${stream.Index}`,
+                        })),
+                    ]}
+                    setSelectedItem={({ id }) => {
                       if (context)
                         run(() =>
                           context.controller.command(`Set${kind}StreamIndex`, {
-                            index: Number(event.target.value),
+                            index: Number(id),
                           }),
                         );
                     }}
-                  >
-                    {kind === "Subtitle" ? (
-                      <option value={-1}>Off</option>
-                    ) : null}
-                    {streams
-                      .filter((stream) => stream.Type === kind)
-                      .map((stream) => (
-                        <option key={stream.Index} value={stream.Index}>
-                          {stream.DisplayTitle ?? `${kind} ${stream.Index}`}
-                        </option>
-                      ))}
-                  </select>
-                </label>
+                  />
+                </div>
               ) : null,
             )}
             <Menu.Link
@@ -303,6 +420,7 @@ export function ChromecastSettingsView() {
                 if (context) run(() => context.returnToLocal());
               }}
             >
+              <Icon icon={Icons.PLAY} className="mr-3" />
               Play on this device
             </Menu.Link>
             <Menu.Link
@@ -312,6 +430,7 @@ export function ChromecastSettingsView() {
                 if (context) run(() => context.returnToLocal(false));
               }}
             >
+              <Icon icon={Icons.X} className="mr-3" />
               Stop casting
             </Menu.Link>
           </>
@@ -330,6 +449,10 @@ export function ChromecastSettingsView() {
                 if (context) run(context.start);
               }}
             >
+              <Icon
+                icon={Icons.CASTING}
+                className={`mr-3 ${busy ? "animate-pulse" : ""}`}
+              />
               {busy
                 ? "Waiting for receiver…"
                 : state.initialized

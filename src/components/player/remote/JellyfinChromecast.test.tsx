@@ -10,7 +10,9 @@ import { useJellyfinAuth } from "@/stores/jellyfin";
 
 import { useChromecastState } from "./chromecast";
 import {
+  CastReceiverStatus,
   ChromecastSettingsView,
+  JellyfinChromecastButton,
   JellyfinChromecastProvider,
 } from "./JellyfinChromecast";
 
@@ -53,6 +55,7 @@ beforeEach(() => {
     initialized: true,
     connected: false,
     casting: false,
+    available: false,
     state: null,
     error: "",
   });
@@ -153,4 +156,43 @@ it("disconnects an idle receiver after a failed start without stopping its media
       (button) => button.textContent?.trim() === "Disconnect receiver",
     ),
   ).toBe(false);
+});
+
+it("only exposes the toolbar cast action for an available receiver and identifies paused receiver playback", async () => {
+  await act(async () =>
+    root.render(
+      <MemoryRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <JellyfinChromecastProvider
+          onCastStarted={started}
+          onReturnToLocal={returned}
+        >
+          <JellyfinChromecastButton />
+          <CastReceiverStatus />
+        </JellyfinChromecastProvider>
+      </MemoryRouter>,
+    ),
+  );
+  expect(container.querySelector('[aria-label="Cast to a device"]')).toBeNull();
+  await act(async () => useChromecastState.setState({ available: true }));
+  expect(
+    container.querySelector('[aria-label="Cast to a device"]'),
+  ).not.toBeNull();
+  await act(async () =>
+    useChromecastState.setState({
+      casting: true,
+      connected: true,
+      receiver: "Living room",
+      state: {
+        NowPlayingItem: { Id: "remote-B", Name: "Episode two" },
+        PlayState: { IsPaused: true },
+      },
+    }),
+  );
+  expect(
+    container.querySelector('[aria-label="Casting to Living room"]'),
+  ).not.toBeNull();
+  expect(container.textContent).toContain("Episode two");
+  expect(container.textContent).toContain("Paused");
 });

@@ -9,6 +9,8 @@ import {
 } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import { Icon, Icons } from "@/components/Icon";
+import { Spinner } from "@/components/layout/Spinner";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { useJellyfinPlayback } from "@/components/player/jellyfin/JellyfinPlaybackContext";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
@@ -138,9 +140,13 @@ export function SyncPlayIndicator() {
     <button
       type="button"
       onClick={() => router.navigate("/syncplay")}
-      className="tabbable rounded-full bg-video-context-background px-4 py-2 text-sm text-white"
+      className="tabbable inline-flex items-center gap-2 rounded-full bg-video-context-background px-4 py-2 text-sm text-white transition-colors hover:bg-video-context-hoverColor"
     >
-      SyncPlay · {group.GroupName}
+      <Icon icon={Icons.WATCH_PARTY} className="text-video-audio-set" />
+      {group.GroupName}
+      <span className="rounded-full bg-white/10 px-1.5 text-xs">
+        {group.Participants.length}
+      </span>
     </button>
   );
 }
@@ -158,19 +164,35 @@ export function SyncPlaySettingsView() {
   );
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const refresh = async () => {
     if (!context) return;
-    setGroups(await context.controller.list());
+    setLoading(true);
+    try {
+      setGroups(await context.controller.list());
+      setLoaded(true);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setLoaded(false);
     context?.controller
       .list()
       .then((result) => {
-        if (!cancelled) setGroups(result);
+        if (!cancelled) {
+          setGroups(result);
+          setLoaded(true);
+        }
       })
       .catch((cause: Error) => {
         if (!cancelled) setError(cause.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
@@ -192,18 +214,62 @@ export function SyncPlaySettingsView() {
   };
   return (
     <Menu.CardWithScrollable>
-      <Menu.BackLink onClick={() => router.navigate("/")}>
+      <Menu.BackLink
+        onClick={() => router.navigate("/")}
+        rightSide={
+          !state.group ? (
+            <button
+              type="button"
+              aria-label="Refresh groups"
+              disabled={busy || loading}
+              onClick={() => run(refresh)}
+              className="tabbable rounded p-2 text-type-secondary hover:text-white disabled:opacity-50"
+            >
+              <Icon
+                icon={Icons.REPEAT}
+                className={loading ? "animate-spin" : undefined}
+              />
+            </button>
+          ) : null
+        }
+      >
         SyncPlay
       </Menu.BackLink>
       <Menu.Section className="space-y-3 pb-5">
         {state.group ? (
           <>
-            <p className="text-white font-medium">{state.group.GroupName}</p>
-            <p className="text-sm text-type-secondary">
-              {state.group.State} · {state.ping} ms
-            </p>
-            <p className="text-sm">{state.group.Participants.join(", ")}</p>
-            <p className="text-sm text-type-secondary">
+            <div className="rounded-lg bg-video-context-light/5 p-3 space-y-2">
+              <div className="flex items-center gap-2 text-white font-medium">
+                <Icon icon={Icons.WATCH_PARTY} />
+                <span className="truncate">{state.group.GroupName}</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-type-secondary">
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${state.connected ? "bg-video-audio-set" : "bg-type-danger"}`}
+                />
+                <span>
+                  {state.connected ? state.group.State : "Reconnecting…"}
+                </span>
+                <span className="ml-auto tabular-nums">{state.ping} ms</span>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Menu.FieldTitle>
+                Watching together ({state.group.Participants.length})
+              </Menu.FieldTitle>
+              <ul className="max-h-32 space-y-0.5 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20">
+                {[...new Set(state.group.Participants)].map((participant) => (
+                  <li
+                    key={participant}
+                    className="flex items-center gap-2 py-1 text-sm"
+                  >
+                    <Icon icon={Icons.USER} className="text-type-secondary" />
+                    <span className="truncate">{participant}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-xs text-type-secondary">
               Play, pause and seek controls now control the group.
             </p>
             <Menu.Link
@@ -228,6 +294,7 @@ export function SyncPlaySettingsView() {
                 }
               }}
             >
+              <Icon icon={Icons.LINK} className="mr-3" />
               Copy invite link
             </Menu.Link>
             {copyStatus ? (
@@ -243,18 +310,21 @@ export function SyncPlaySettingsView() {
               clickable
               onClick={() => context?.controller.action("PreviousItem")}
             >
+              <Icon icon={Icons.CHEVRON_LEFT} className="mr-3" />
               Previous in group queue
             </Menu.Link>
             <Menu.Link
               clickable
               onClick={() => context?.controller.action("NextItem")}
             >
+              <Icon icon={Icons.CHEVRON_RIGHT} className="mr-3" />
               Next in group queue
             </Menu.Link>
             <Menu.Link
               clickable
               onClick={() => context?.controller.action("Stop")}
             >
+              <Icon icon={Icons.X} className="mr-3" />
               Stop group playback
             </Menu.Link>
             <Menu.Link
@@ -264,7 +334,10 @@ export function SyncPlaySettingsView() {
                 if (context) run(() => context.controller.leave());
               }}
             >
-              Leave group
+              <span className="flex items-center text-type-danger">
+                <Icon icon={Icons.LOGOUT} className="mr-3" />
+                Leave group
+              </span>
             </Menu.Link>
           </>
         ) : (
@@ -277,10 +350,18 @@ export function SyncPlaySettingsView() {
                 Stop Google Cast before joining SyncPlay.
               </p>
             ) : null}
-            <Menu.Link clickable disabled={busy} onClick={() => run(refresh)}>
-              Refresh groups
-            </Menu.Link>
-            {invitation &&
+            <Menu.FieldTitle>Join a group</Menu.FieldTitle>
+            {loading ? (
+              <div
+                role="status"
+                className="flex items-center gap-2 py-3 text-sm text-type-secondary"
+              >
+                <Spinner className="h-4 w-4" />
+                Finding groups…
+              </div>
+            ) : null}
+            {loaded &&
+            invitation &&
             !groups.some((group) => group.GroupId === invitation) ? (
               <p className="text-sm">
                 The invited group is no longer available or is inaccessible to
@@ -291,13 +372,14 @@ export function SyncPlaySettingsView() {
               <Menu.Link
                 key={group.GroupId}
                 clickable
-                disabled={busy || context?.blocked}
+                disabled={busy || context?.blocked || state.access === "None"}
                 onClick={() => {
                   if (context)
                     run(() => context.controller.join(group.GroupId));
                 }}
               >
-                <span>
+                <Icon icon={Icons.WATCH_PARTY} className="mr-3 mt-1" />
+                <span className="min-w-0">
                   {group.GroupName}
                   {group.GroupId === invitation ? " · Invitation" : ""}
                   <span className="block text-xs text-type-secondary">
@@ -306,13 +388,19 @@ export function SyncPlaySettingsView() {
                 </span>
               </Menu.Link>
             ))}
-            {state.connected && !groups.length ? (
+            {loaded && !loading && !groups.length ? (
               <p className="text-sm text-type-secondary">
                 No groups are active.
               </p>
             ) : null}
+            {state.access === "None" ? (
+              <p className="text-sm text-type-secondary">
+                SyncPlay is unavailable for this account.
+              </p>
+            ) : null}
             {state.access === "CreateAndJoinGroups" ? (
-              <>
+              <div className="pt-3 space-y-3 border-t border-video-context-border">
+                <Menu.FieldTitle>Create a group</Menu.FieldTitle>
                 <input
                   aria-label="SyncPlay group name"
                   placeholder="Group name"
@@ -344,9 +432,10 @@ export function SyncPlaySettingsView() {
                     );
                   }}
                 >
+                  <Icon icon={Icons.PLUS} className="mr-3" />
                   Create group and watch this title
                 </Menu.Link>
-              </>
+              </div>
             ) : null}
           </>
         )}
