@@ -17,6 +17,7 @@ function NavButton({ direction, onClick }: NavButtonProps) {
   return (
     <button
       type="button"
+      aria-label={direction === "left" ? "Previous items" : "Next items"}
       className={`absolute ${direction === "left" ? "left-12" : "right-12"} top-1/2 transform -translate-y-3/4 z-10`}
       onClick={onClick}
     >
@@ -47,29 +48,32 @@ export function CarouselNavButtons({
     const carousel = carouselRefs.current[categorySlug];
     if (!carousel) return;
 
-    const movieElements = carousel.getElementsByTagName("a");
-    if (movieElements.length === 0) return;
-
-    // Wait for next frame to ensure measurements are available
     requestAnimationFrame(() => {
-      const movieWidth = movieElements[0].getBoundingClientRect().width;
-
+      // Cards can be anchors, person/trailer buttons, or wrappers around either.
+      // Measure direct card children so decorative spacers and overlay arrows
+      // cannot become the paging unit.
+      const card = Array.from(carousel.children).find(
+        (child) =>
+          (child.matches("a, button, [role=button]") ||
+            child.querySelector("a, button, [role=button]")) &&
+          child.getBoundingClientRect().width > 0,
+      );
+      if (!card) return;
+      const cardWidth = card.getBoundingClientRect().width;
       const carouselWidth = carousel.getBoundingClientRect().width;
-
-      if (movieWidth === 0 || carouselWidth === 0) {
-        return;
-      }
-
-      const visibleMovies = Math.floor(carouselWidth / movieWidth);
-      const scrollAmount = movieWidth * (visibleMovies > 5 ? 4 : 2);
-
-      const newScrollPosition =
-        carousel.scrollLeft +
-        (direction === "left" ? -scrollAmount : scrollAmount);
-
+      if (!cardWidth || !carouselWidth) return;
+      const gap = parseFloat(getComputedStyle(carousel).columnGap) || 0;
+      const stride = cardWidth + gap;
+      const visibleCards = Math.floor(carouselWidth / stride);
+      const scrollAmount = stride * (visibleCards > 5 ? 4 : 2);
       carousel.scrollTo({
-        left: newScrollPosition,
-        behavior: "smooth",
+        left:
+          carousel.scrollLeft +
+          (direction === "left" ? -scrollAmount : scrollAmount),
+        behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)")
+          .matches
+          ? "auto"
+          : "smooth",
       });
     });
   };

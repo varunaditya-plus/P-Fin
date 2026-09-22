@@ -23,6 +23,7 @@ import {
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { matchesSeerrSession, useSeerrConnection } from "@/stores/seerr";
 
+import { ExpandableBiography } from "./ExpandableBiography";
 import { JellyfinMediaCard } from "./JellyfinMediaCarousel";
 
 export interface PersonSelection {
@@ -56,7 +57,6 @@ function PersonContent({
     acting: [],
     directing: [],
   });
-  const [expandedBio, setExpandedBio] = useState(false);
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
   const [creditsLimit, setCreditsLimit] = useState(24);
@@ -208,25 +208,7 @@ function PersonContent({
               {remotePerson?.deathday ? (
                 <p className="mt-1 text-sm">Died {remotePerson.deathday}</p>
               ) : null}
-              {biography ? (
-                <div className="mt-3">
-                  <p
-                    className={`whitespace-pre-line text-sm text-type-text leading-relaxed ${expandedBio ? "" : "line-clamp-6"}`}
-                  >
-                    {biography}
-                  </p>
-                  {biography.length > 400 ? (
-                    <button
-                      type="button"
-                      className="tabbable mt-2 text-sm text-type-link"
-                      aria-expanded={expandedBio}
-                      onClick={() => setExpandedBio((value) => !value)}
-                    >
-                      {expandedBio ? "Show less" : "Read more"}
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
+              {biography ? <ExpandableBiography text={biography} /> : null}
             </div>
           </div>
           <button
