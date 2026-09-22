@@ -91,7 +91,11 @@ export function Dropdown(props: DropdownProps) {
 
   return (
     <div className={`relative my-4 w-fit max-w-[25rem] ${props.className}`}>
-      <Listbox value={props.selectedItem} onChange={props.setSelectedItem}>
+      <Listbox
+        by="id"
+        value={props.selectedItem}
+        onChange={props.setSelectedItem}
+      >
         {({ open }) => (
           <>
             {customButton ? (

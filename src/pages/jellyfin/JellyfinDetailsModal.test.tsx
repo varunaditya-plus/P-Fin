@@ -388,7 +388,18 @@ describe("Jellyfin series details integration", () => {
       `/jellyfin/Items/${alternateId}/Download`,
     );
     expect(link().download).toBe("alternate.mp4");
-    await selectValue("Version", originalId);
+    const version = dialog()!.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="listbox"]',
+    );
+    expect(version?.textContent).toContain("Alternate version");
+    await act(async () => version!.click());
+    await settle();
+    const originalOption = [
+      ...dialog()!.querySelectorAll('[role="option"]'),
+    ].find((option) => option.textContent?.trim().startsWith("Original"));
+    expect(originalOption).toBeDefined();
+    await act(async () => (originalOption as HTMLElement).click());
+    await settle();
     expect(new URL(link().href).pathname).toBe(
       `/jellyfin/Items/${originalId}/Download`,
     );
