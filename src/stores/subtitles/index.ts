@@ -54,6 +54,8 @@ export interface SubtitleStyling {
 
   /** Multiplier applied to each subtitle line. */
   lineHeight: number;
+  letterSpacing: number;
+  backgroundRadius: number;
 }
 
 export interface SubtitleStore {
@@ -95,6 +97,8 @@ export const useSubtitleStore = create(
         fontStyle: "default",
         borderThickness: 1,
         lineHeight: 1.5,
+        letterSpacing: 0,
+        backgroundRadius: 4,
       },
       showDelayIndicator: false,
 
@@ -133,6 +137,22 @@ export const useSubtitleStore = create(
               20,
               Math.max(0, newStyling.verticalPosition),
             );
+          if (
+            newStyling.letterSpacing !== undefined &&
+            Number.isFinite(newStyling.letterSpacing)
+          )
+            s.styling.letterSpacing = Math.max(
+              -2,
+              Math.min(8, newStyling.letterSpacing),
+            );
+          if (
+            newStyling.backgroundRadius !== undefined &&
+            Number.isFinite(newStyling.backgroundRadius)
+          )
+            s.styling.backgroundRadius = Math.max(
+              0,
+              Math.min(16, newStyling.backgroundRadius),
+            );
           if (newStyling.fontStyle !== undefined)
             s.styling.fontStyle = newStyling.fontStyle;
           if (newStyling.borderThickness !== undefined)
@@ -155,6 +175,8 @@ export const useSubtitleStore = create(
             fontStyle: "default",
             borderThickness: 1,
             lineHeight: 1.5,
+            letterSpacing: 0,
+            backgroundRadius: 4,
           };
         });
       },

@@ -99,6 +99,8 @@ export function CaptionCue({
       style={{
         color: styling.color,
         lineHeight: styling.lineHeight,
+        letterSpacing: `${styling.letterSpacing ?? 0}px`,
+        borderRadius: `${styling.backgroundRadius ?? 4}px`,
         fontSize: `${(1.5 * styling.size).toFixed(2)}em`,
         backgroundColor: `rgba(0,0,0,${styling.backgroundOpacity.toFixed(2)})`,
         backdropFilter:

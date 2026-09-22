@@ -21,6 +21,8 @@ export function ColorOption(props: {
   return (
     <button
       type="button"
+      aria-label={`Subtitle colour ${props.color}`}
+      aria-pressed={Boolean(props.active)}
       className={classNames(
         "tabbable p-1.5 bg-video-context-buttonFocus rounded transition-colors duration-100",
         props.active ? "bg-opacity-100" : "bg-opacity-0 cursor-pointer",
@@ -211,6 +213,7 @@ export function CaptionDelay(props: {
 }
 
 export function CaptionSetting(props: {
+  titleClassName?: string;
   textTransformer?: (s: string) => string;
   value: number;
   onChange?: (val: number) => void;
@@ -263,7 +266,7 @@ export function CaptionSetting(props: {
 
   return (
     <div>
-      <Menu.FieldTitle>{props.label}</Menu.FieldTitle>
+      <p className={props.titleClassName ?? "font-medium"}>{props.label}</p>
       <div className="grid items-center grid-cols-[1fr,auto] gap-4">
         <div ref={ref}>
           <div
@@ -306,6 +309,7 @@ export function CaptionSetting(props: {
           {isFocused ? (
             <input
               className={inputClasses}
+              aria-label={props.label}
               value={inputValue}
               autoFocus
               onFocus={(e) => {
@@ -341,6 +345,7 @@ export function CaptionSetting(props: {
                   props.controlButtons ? "relative" : undefined,
                 )}
                 type="button"
+                aria-label={`Edit ${props.label.toLowerCase()}`}
                 tabIndex={0}
               >
                 {textTransformer(
@@ -392,31 +397,56 @@ export function CaptionSetting(props: {
 export function SubtitleLayoutControls({
   styling,
   onChange,
+  settings = false,
 }: {
   styling: SubtitleStyling;
   onChange: (styling: SubtitleStyling) => void;
+  settings?: boolean;
 }) {
+  const titleClassName = settings ? "text-white font-bold" : undefined;
   return (
     <div className="space-y-6">
       <CaptionSetting
-        label="Line height"
-        min={0.8}
-        max={3}
+        titleClassName={titleClassName}
+        label="Line spacing"
+        min={1}
+        max={2.5}
         decimalsAllowed={1}
         value={styling.lineHeight}
-        onChange={(lineHeight) => onChange({ ...styling, lineHeight })}
+        onChange={(lineHeight) =>
+          onChange({ ...styling, lineHeight: Math.round(lineHeight * 10) / 10 })
+        }
         textTransformer={(value) => `${value}×`}
       />
       <CaptionSetting
+        titleClassName={titleClassName}
+        label="Letter spacing"
+        min={settings ? -2 : -1.5}
+        max={settings ? 8 : 4}
+        decimalsAllowed={1}
+        value={styling.letterSpacing ?? 0}
+        onChange={(letterSpacing) =>
+          onChange({
+            ...styling,
+            letterSpacing: Math.round(letterSpacing * 10) / 10,
+          })
+        }
+        textTransformer={(value) => `${value}px`}
+      />
+      <CaptionSetting
+        titleClassName={titleClassName}
         label="Vertical position"
         min={0}
-        max={20}
+        max={8}
         decimalsAllowed={1}
         value={styling.verticalPosition}
         onChange={(verticalPosition) =>
-          onChange({ ...styling, verticalPosition })
+          onChange({
+            ...styling,
+            verticalPosition: Math.round(verticalPosition * 10) / 10,
+          })
         }
-        textTransformer={(value) => `${value} rem`}
+        textTransformer={(value) => `${value}rem`}
       />
     </div>
   );
@@ -479,6 +509,7 @@ export function CaptionSettingsView({
               </Menu.FieldTitle>
               <div className="flex justify-center items-center">
                 <Toggle
+                  label={t("player.menus.subtitles.useNativeSubtitles")}
                   enabled={enableNativeSubtitles}
                   onClick={() =>
                     preferencesStore.setEnableNativeSubtitles(
@@ -506,6 +537,7 @@ export function CaptionSettingsView({
               </Menu.FieldTitle>
               <div className="flex justify-center items-center">
                 <Toggle
+                  label={t("player.menus.subtitles.settings.fixCapitals")}
                   enabled={overrideCasing}
                   onClick={() => setOverrideCasing(!overrideCasing)}
                 />
@@ -528,6 +560,7 @@ export function CaptionSettingsView({
               </Menu.FieldTitle>
               <div className="flex justify-center items-center">
                 <Toggle
+                  label={t("settings.subtitles.backgroundBlurEnabledLabel")}
                   enabled={styling.backgroundBlurEnabled}
                   onClick={() =>
                     handleStylingChange({
@@ -554,6 +587,16 @@ export function CaptionSettingsView({
               />
             )}
             <CaptionSetting
+              label="Corner rounding"
+              min={0}
+              max={16}
+              value={styling.backgroundRadius ?? 4}
+              onChange={(backgroundRadius) =>
+                handleStylingChange({ ...styling, backgroundRadius })
+              }
+              textTransformer={(value) => `${value}px`}
+            />
+            <CaptionSetting
               label={t("settings.subtitles.textSizeLabel")}
               max={200}
               min={1}
@@ -562,6 +605,10 @@ export function CaptionSettingsView({
                 handleStylingChange({ ...styling, size: v / 100 })
               }
               value={styling.size * 100}
+            />
+            <SubtitleLayoutControls
+              styling={styling}
+              onChange={handleStylingChange}
             />
             <div className="flex justify-between items-center">
               <Menu.FieldTitle>
@@ -623,6 +670,7 @@ export function CaptionSettingsView({
               </Menu.FieldTitle>
               <div className="flex justify-center items-center">
                 <Toggle
+                  label={t("settings.subtitles.textBoldLabel")}
                   enabled={styling.bold}
                   onClick={() =>
                     handleStylingChange({ ...styling, bold: !styling.bold })
@@ -646,6 +694,7 @@ export function CaptionSettingsView({
                 <div className="relative inline-block">
                   <input
                     type="color"
+                    aria-label="Custom subtitle colour"
                     value={styling.color}
                     onChange={(e) => {
                       const color = e.target.value;
@@ -659,10 +708,6 @@ export function CaptionSettingsView({
                 </div>
               </div>
             </div>
-            <SubtitleLayoutControls
-              styling={styling}
-              onChange={handleStylingChange}
-            />
             <Button
               className="w-full md:w-auto"
               theme="secondary"
@@ -682,6 +727,7 @@ export function CaptionSettingsView({
               </Menu.FieldTitle>
               <div className="flex justify-center items-center">
                 <Toggle
+                  label={t("player.menus.subtitles.useNativeSubtitles")}
                   enabled={enableNativeSubtitles}
                   onClick={() =>
                     preferencesStore.setEnableNativeSubtitles(
