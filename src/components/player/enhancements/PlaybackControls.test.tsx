@@ -6,8 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SelectableLink } from "@/components/player/internals/ContextMenu/Links";
 
+import { AudioBoostControls } from "./AudioBoostSettingsView";
 import { PlaybackSlider } from "./PlaybackSlider";
 import { PlaybackSpeedControl } from "./PlaybackSpeedControl";
+import { usePlaybackEnhancements } from "./preferences";
 
 let root: ReturnType<typeof createRoot>;
 let container: HTMLDivElement;
@@ -119,4 +121,32 @@ describe("player setting interactions", () => {
     key(input("250"), "Escape");
     expect(change).toHaveBeenCalledTimes(1);
   });
+});
+
+it("updates the named boost switch when playback changes to a title with different remembered boost", () => {
+  usePlaybackEnhancements.setState({
+    activeItem: "first",
+    activeTitle: "first",
+    boost: 100,
+    boostByTitle: { second: 240 },
+    rememberBoost: false,
+  });
+  act(() => root.render(<AudioBoostControls />));
+  const toggle = () =>
+    container.querySelector<HTMLButtonElement>(
+      '[role="switch"][aria-label="Volume boost"]',
+    )!;
+  expect(toggle().getAttribute("aria-checked")).toBe("false");
+  act(() =>
+    usePlaybackEnhancements.getState().bindPlayback("second", "second"),
+  );
+  expect(toggle().getAttribute("aria-checked")).toBe("true");
+  expect(
+    container.querySelector<HTMLInputElement>('input[type="range"]')?.value,
+  ).toBe("240");
+  act(() => usePlaybackEnhancements.getState().bindPlayback("third", "third"));
+  expect(toggle().getAttribute("aria-checked")).toBe("false");
+  expect(container.querySelector('input[type="range"]')).toBeNull();
+  act(() => toggle().click());
+  expect(toggle().getAttribute("aria-checked")).toBe("true");
 });

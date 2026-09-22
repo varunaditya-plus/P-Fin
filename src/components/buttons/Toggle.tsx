@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
 export function Toggle(props: {
+  label?: string;
   onClick?: () => void;
   enabled?: boolean;
   disabled?: boolean;
@@ -8,6 +9,9 @@ export function Toggle(props: {
   return (
     <button
       type="button"
+      role="switch"
+      aria-label={props.label}
+      aria-checked={Boolean(props.enabled)}
       onClick={props.disabled ? undefined : props.onClick}
       disabled={props.disabled}
       className={classNames(

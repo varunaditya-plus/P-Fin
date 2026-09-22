@@ -177,6 +177,7 @@ export function GamepadSettings() {
       <div className="flex items-center justify-between gap-4">
         <span className="text-sm text-white">Enable controller input</span>
         <Toggle
+          label="Enable controller input"
           enabled={enabled}
           onClick={() => useGamepadStore.setState({ enabled: !enabled })}
         />

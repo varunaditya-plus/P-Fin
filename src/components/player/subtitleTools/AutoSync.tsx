@@ -208,6 +208,7 @@ export function SubtitleSyncView() {
         <Menu.Link
           rightSide={
             <Toggle
+              label="Automatically synchronise subtitles"
               enabled={enabled}
               onClick={() => useSubtitleTools.setState({ autoSync: !enabled })}
             />

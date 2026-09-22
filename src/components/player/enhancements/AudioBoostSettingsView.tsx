@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Toggle } from "@/components/buttons/Toggle";
 import { Menu } from "@/components/player/internals/ContextMenu";
@@ -21,11 +21,18 @@ export function AudioBoostControls() {
     setRememberBoost,
   } = usePlaybackEnhancements();
   const [enabled, setEnabled] = useState(boost > 100);
+  const previousTitle = useRef(activeTitle);
+  useEffect(() => {
+    if (previousTitle.current === activeTitle) return;
+    previousTitle.current = activeTitle;
+    setEnabled(boost > 100);
+  }, [activeTitle, boost]);
   return (
     <>
       <Menu.Link
         rightSide={
           <Toggle
+            label="Volume boost"
             enabled={enabled}
             onClick={() => {
               setEnabled(!enabled);
@@ -68,6 +75,8 @@ export function AudioBoostControls() {
           <Menu.Link
             rightSide={
               <Toggle
+                label="Remember volume boost for this title"
+                disabled={!activeTitle}
                 enabled={rememberBoost}
                 onClick={() => {
                   if (activeTitle) setRememberBoost(!rememberBoost);

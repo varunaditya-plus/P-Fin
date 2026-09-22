@@ -167,7 +167,14 @@ function JellyfinPlaybackSettings() {
       </Menu.Section>
       <Menu.Section>
         <Menu.Link
-          rightSide={<Toggle enabled={autoplay} onClick={toggleAutoplay} />}
+          rightSide={
+            <Toggle
+              label="Autoplay next episode"
+              disabled={saving}
+              enabled={autoplay}
+              onClick={toggleAutoplay}
+            />
+          }
         >
           Autoplay next episode
         </Menu.Link>
