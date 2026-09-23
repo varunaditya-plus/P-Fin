@@ -35,24 +35,29 @@ afterEach(async () => {
   host.remove();
   vi.useRealTimers();
 });
-describe("random discovery countdown", () => {
-  it("opens the picked title's details only after five seconds", async () => {
+describe("immediate random discovery", () => {
+  it("opens the picked title as soon as the request resolves without a countdown", async () => {
     await act(async () => host.querySelector("button")!.click());
-    expect(host.textContent).toContain("A film");
-    for (let second = 0; second < 4; second += 1)
-      await act(async () => vi.advanceTimersByTime(1000));
-    expect(select).not.toHaveBeenCalled();
-    await act(async () => vi.advanceTimersByTime(1000));
     expect(select).toHaveBeenCalledWith(expect.objectContaining({ id: 42 }));
+    expect(vi.getTimerCount()).toBe(0);
+    expect(host.textContent).not.toContain("A film");
   });
-  it("cancels a pick with the same button", async () => {
-    await act(async () => host.querySelector("button")!.click());
-    await act(async () => host.querySelector("button")!.click());
-    await act(async () => vi.advanceTimersByTime(6000));
-    expect(select).not.toHaveBeenCalled();
-    expect(host.querySelector("button")?.getAttribute("aria-label")).toBe(
-      "Random movie",
+  it("starts only one request during repeated clicks while loading", async () => {
+    let resolve: (value: Awaited<ReturnType<typeof randomSeerrMedia>>) => void;
+    vi.mocked(randomSeerrMedia).mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      }),
     );
+    await act(async () => {
+      host.querySelector("button")!.click();
+      host.querySelector("button")!.click();
+    });
+    expect(randomSeerrMedia).toHaveBeenCalledTimes(1);
+    expect(host.querySelector("button")?.disabled).toBe(true);
+    await act(async () => resolve!({ id: 42, mediaType: "movie" }));
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(host.querySelector("button")?.disabled).toBe(false);
   });
   it("aborts pending work when the media category changes", async () => {
     let resolve: (value: Awaited<ReturnType<typeof randomSeerrMedia>>) => void;
@@ -76,7 +81,13 @@ describe("random discovery countdown", () => {
     expect(select).not.toHaveBeenCalled();
     expect(host.textContent).not.toContain("A film");
   });
-  it("cancels an active countdown while replacement discovery filters are resolving", async () => {
+  it("ignores a pending result after the button becomes disabled", async () => {
+    let resolve: (value: Awaited<ReturnType<typeof randomSeerrMedia>>) => void;
+    vi.mocked(randomSeerrMedia).mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      }),
+    );
     await act(async () => host.querySelector("button")!.click());
     await act(async () =>
       root.render(
@@ -88,8 +99,16 @@ describe("random discovery countdown", () => {
         />,
       ),
     );
-    await act(async () => vi.advanceTimersByTime(6000));
+    await act(async () => resolve!({ id: 42, mediaType: "movie" }));
     expect(select).not.toHaveBeenCalled();
     expect(host.textContent).not.toContain("A film");
+  });
+  it("reports a failed selection and allows retrying", async () => {
+    vi.mocked(randomSeerrMedia).mockRejectedValueOnce(new Error("Unavailable"));
+    await act(async () => host.querySelector("button")!.click());
+    expect(error).toHaveBeenCalledWith("Unavailable");
+    expect(select).not.toHaveBeenCalled();
+    await act(async () => host.querySelector("button")!.click());
+    expect(select).toHaveBeenCalledTimes(1);
   });
 });
