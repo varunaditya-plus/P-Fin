@@ -171,6 +171,9 @@ describe("Seerr related content", () => {
         .find((button) => button.textContent === "Official trailer")!
         .click(),
     );
+    expect(
+      document.querySelector("iframe")?.getAttribute("referrerpolicy"),
+    ).toBe("strict-origin-when-cross-origin");
     expect(document.querySelector("iframe")?.src).toBe(
       "https://www.youtube-nocookie.com/embed/abcdefghijk?autoplay=1&rel=0",
     );

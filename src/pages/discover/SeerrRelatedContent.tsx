@@ -388,6 +388,7 @@ export function SeerrRelatedContent({
           {trailer ? (
             <iframe
               title={trailer.name}
+              referrerPolicy="strict-origin-when-cross-origin"
               src={`https://www.youtube-nocookie.com/embed/${trailer.key}?autoplay=1&rel=0`}
               className="aspect-video w-full rounded-lg bg-black"
               allow="autoplay; encrypted-media; picture-in-picture"
