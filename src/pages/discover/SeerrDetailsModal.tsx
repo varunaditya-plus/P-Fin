@@ -586,16 +586,16 @@ function SeerrDetailsContent({
             </div>
           </Flare.Base>
         </div>
+        <PersonModal
+          person={open ? selectedPerson : undefined}
+          onClose={() => setPerson(undefined)}
+          onSelectJellyfin={(id) => {
+            setLibraryId(id);
+            setShowLibrary(true);
+          }}
+          onSelectSeerr={(selected) => onSelectMedia?.(selected)}
+        />
       </DetailsModalFrame>
-      <PersonModal
-        person={open ? selectedPerson : undefined}
-        onClose={() => setPerson(undefined)}
-        onSelectJellyfin={(id) => {
-          setLibraryId(id);
-          setShowLibrary(true);
-        }}
-        onSelectSeerr={(selected) => onSelectMedia?.(selected)}
-      />
       <JellyfinDetailsModal
         itemId={open && showLibrary ? libraryId : undefined}
         onClose={() => setShowLibrary(false)}
