@@ -98,6 +98,63 @@ describe("validated app preference groups", () => {
       }),
     ).toThrow("verticalPosition");
   });
+  it("round-trips customised subtitle spacing and corners through backup validation", () => {
+    const preferences = {
+      styling: {
+        ...useSubtitleStore.getInitialState().styling,
+        lineHeight: 2.1,
+        verticalPosition: 12,
+        letterSpacing: -1.4,
+        backgroundRadius: 11,
+      },
+      overrideCasing: false,
+    };
+    const backup = JSON.stringify(validateSubtitlePreferences(preferences));
+    expect(validateSubtitlePreferences(JSON.parse(backup))).toEqual(
+      preferences,
+    );
+  });
+  it.each([
+    ["letterSpacing", -2.1],
+    ["letterSpacing", 8.1],
+    ["letterSpacing", Infinity],
+    ["letterSpacing", "2"],
+    ["backgroundRadius", -1],
+    ["backgroundRadius", 17],
+    ["backgroundRadius", NaN],
+    ["backgroundRadius", null],
+  ])("rejects invalid subtitle %s values (%s)", (key, value) => {
+    expect(() =>
+      validateSubtitlePreferences({
+        styling: {
+          ...useSubtitleStore.getInitialState().styling,
+          [key]: value,
+        },
+        overrideCasing: false,
+      }),
+    ).toThrow(key);
+  });
+  it("restores old subtitle backups with new defaults while preserving their existing appearance", () => {
+    const {
+      letterSpacing: _spacing,
+      backgroundRadius: _radius,
+      ...oldStyling
+    } = useSubtitleStore.getInitialState().styling;
+    const restored = validateSubtitlePreferences({
+      styling: { ...oldStyling, lineHeight: 2.8, verticalPosition: 15 },
+      overrideCasing: true,
+    });
+    expect(restored).toEqual({
+      styling: {
+        ...oldStyling,
+        lineHeight: 2.8,
+        verticalPosition: 15,
+        letterSpacing: 0,
+        backgroundRadius: 4,
+      },
+      overrideCasing: true,
+    });
+  });
   it("validates library ordering and layout without exporting other profiles", () => {
     expect(
       validateHomePreferences({

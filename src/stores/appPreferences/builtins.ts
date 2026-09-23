@@ -228,6 +228,8 @@ export function validateSubtitlePreferences(
     verticalPosition: [0, 20],
     borderThickness: [0, 10],
     lineHeight: [0.8, 3],
+    letterSpacing: [-2, 8],
+    backgroundRadius: [0, 16],
   };
   for (const [key, [min, max]] of Object.entries(bounds)) {
     if (styling[key] === undefined) continue;
