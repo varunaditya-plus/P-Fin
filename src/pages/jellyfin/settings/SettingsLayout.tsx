@@ -131,18 +131,18 @@ export function SettingsLayout({ children }: { children: ReactNode }) {
         />
       </div>
       <div
-        className="grid gap-8 lg:gap-12 lg:grid-cols-[280px,minmax(0,1fr)] pb-12"
+        className="grid grid-cols-1 gap-8 lg:gap-12 lg:grid-cols-[280px,minmax(0,1fr)] pb-12"
         data-settings-content
       >
         <nav
           aria-label="Settings categories"
-          className="text-settings-sidebar-type-inactive"
+          className="min-w-0 text-settings-sidebar-type-inactive"
         >
           <div className="lg:sticky lg:top-32">
             <p className="mb-2 text-sm font-bold uppercase text-settings-sidebar-type-secondary">
               Settings
             </p>
-            <div className="flex gap-1 overflow-x-auto pb-2 lg:block lg:overflow-visible lg:pb-0">
+            <div className="flex max-w-full gap-1 overflow-x-auto pb-2 lg:block lg:overflow-visible lg:pb-0">
               {[
                 { id: "", label: "All settings", icon: Icons.GEAR },
                 ...settingsCategories,

@@ -106,8 +106,8 @@ function CaptionRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex justify-between items-center gap-4 py-1">
-      <div>
+    <div className="flex flex-wrap justify-between items-center gap-4 py-1">
+      <div className="min-w-0">
         <p className="text-white font-bold">{title}</p>
         {description ? (
           <p className="text-type-secondary text-sm mt-0.5 max-w-[24rem]">
@@ -115,7 +115,7 @@ function CaptionRow({
           </p>
         ) : null}
       </div>
-      <div className="flex justify-center items-center shrink-0">
+      <div className="ml-auto flex justify-center items-center shrink-0">
         {children}
       </div>
     </div>
