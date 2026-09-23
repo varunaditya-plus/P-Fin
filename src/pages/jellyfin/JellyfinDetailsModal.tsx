@@ -22,7 +22,6 @@ import {
   getCollectionItems,
   getPlaylistItems,
 } from "@/backend/jellyfin/library";
-import { tasteMediaFromJellyfin } from "@/backend/personalisation/catalog";
 import { Button } from "@/components/buttons/Button";
 import { IconPatch } from "@/components/buttons/IconPatch";
 import { Dropdown } from "@/components/form/Dropdown";
@@ -35,7 +34,6 @@ import {
 } from "@/components/overlays/DetailsModalFrame";
 import { Flare } from "@/components/utils/Flare";
 import { PeopleCarousel } from "@/pages/jellyfin/PeopleCarousel";
-import { RatingCapsule } from "@/pages/taste/RatingCapsule";
 import { usePreferencesStore } from "@/stores/preferences";
 
 import { ContentContainerManagement } from "./ContentContainerManagement";
@@ -554,11 +552,6 @@ function JellyfinDetailsContent({
                                     : ""}
                                 </span>
                               </Button>
-                            ) : null}
-                            {["Movie", "Series"].includes(item.Type) ? (
-                              <RatingCapsule
-                                media={tasteMediaFromJellyfin(item)}
-                              />
                             ) : null}
                             <div className="flex items-center gap-1 flex-shrink-0">
                               {playbackItem &&

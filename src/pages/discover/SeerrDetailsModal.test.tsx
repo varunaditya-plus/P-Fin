@@ -47,7 +47,6 @@ vi.mock("@/backend/seerr/browse", async (original) => ({
   }),
   getSeerrPersonCredits: async () => ({ acting: [], directing: [] }),
 }));
-vi.mock("@/pages/taste/RatingCapsule", () => ({ RatingCapsule: () => null }));
 vi.mock("@/pages/jellyfin/JellyfinDetailsModal", () => ({
   JellyfinDetailsModal: () => null,
 }));

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { findItemByProviderId } from "@/backend/jellyfin/client";
-import { tasteMediaFromSeerr } from "@/backend/personalisation/catalog";
 import {
   canRequestMedia,
   getSeerrDetails,
@@ -32,7 +31,6 @@ import { ContentProviderLinks } from "@/pages/jellyfin/ContentProviderLinks";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { PeopleCarousel } from "@/pages/jellyfin/PeopleCarousel";
 import { PersonModal, PersonSelection } from "@/pages/jellyfin/PersonModal";
-import { RatingCapsule } from "@/pages/taste/RatingCapsule";
 
 import {
   SeerrCollectionButton,
@@ -306,9 +304,6 @@ function SeerrDetailsContent({
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-4 mb-4">
-                        <RatingCapsule
-                          media={tasteMediaFromSeerr(details ?? media)}
-                        />
                         {libraryId ? (
                           <Button
                             theme="purple"
