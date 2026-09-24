@@ -47,7 +47,7 @@ export const settingsCategories = [
     label: "Connections",
     icon: Icons.LINK,
     keywords:
-      "integrations simkl trakt letterboxd watchlist lists history import",
+      "integrations simkl trakt letterboxd watched history import",
   },
   {
     id: "backup",

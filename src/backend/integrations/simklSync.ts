@@ -3,14 +3,7 @@ import {
   getJellyfinSession,
   jellyfinRequest,
 } from "@/backend/jellyfin/client";
-import { getSeerrDetails } from "@/backend/seerr/api";
-import {
-  WatchlistEntry,
-  useIntegrationWatchlist,
-} from "@/stores/integrations/watchlist";
-import { matchesSeerrSession, useSeerrConnection } from "@/stores/seerr";
 
-import { candidateWatchlistEntry } from "./letterboxd";
 import {
   integrationIdentity,
   integrationLibrary,
@@ -42,17 +35,12 @@ export interface SimklLists {
   shows?: SimklListItem[];
   anime?: SimklListItem[];
 }
-export type SimklSyncMode =
-  | "import-watchlist"
-  | "export-watchlist"
-  | "import-watched"
-  | "export-watched";
+export type SimklSyncMode = "import-watched" | "export-watched";
 export interface SimklSyncRow {
   key: string;
   title: string;
   detail: string;
   itemId?: string;
-  watchlist?: WatchlistEntry;
   bucket?: "movies" | "shows";
   payload?: Record<string, unknown>;
 }
@@ -136,10 +124,7 @@ export async function previewSimklSync(
     skipped: [],
   };
   const [library, remote] = await Promise.all([
-    integrationLibrary(
-      mode.includes("watched") ? "Movie,Series,Episode" : "Movie,Series",
-      signal,
-    ),
+    integrationLibrary("Movie,Series,Episode", signal),
     readLists(signal),
   ]);
   requireIntegrationIdentity(identity);
@@ -149,12 +134,10 @@ export async function previewSimklSync(
   const series = library.filter((item) => item.Type === "Series");
   const remoteMovies = remote.movies ?? [];
   const remoteShows = [...(remote.shows ?? []), ...(remote.anime ?? [])];
-  const watchlist =
-    useIntegrationWatchlist.getState().profiles[identity.scope] ?? [];
   const skip = (title: string, reason: string) =>
     plan.skipped.push({ title, reason });
 
-  if (mode === "import-watchlist" || mode === "import-watched") {
+  if (mode === "import-watched") {
     const entries = [
       ...remoteMovies.map((entry) => ({
         entry,
@@ -179,8 +162,6 @@ export async function previewSimklSync(
       const media = remoteTitle(entry);
       if (!media) continue;
       const title = media.title || "Untitled";
-      if (mode === "import-watchlist" && entry.status !== "plantowatch")
-        continue;
       const candidates = (type === "movie" ? films : series).filter((item) =>
         sameProvider(item, media.ids),
       );
@@ -189,57 +170,7 @@ export async function previewSimklSync(
         continue;
       }
       const item = candidates[0];
-      if (mode === "import-watchlist") {
-        let tmdbId = item
-          ? Number(providerId(item, "tmdb")) || undefined
-          : Number(media.ids.tmdb) || undefined;
-        if (!item) {
-          const seerr = useSeerrConnection.getState().connection;
-          if (!tmdbId || !matchesSeerrSession(seerr, getJellyfinSession())) {
-            skip(title, "No accessible Jellyfin match or enabled Seerr match.");
-            continue;
-          }
-          try {
-            const details = await getSeerrDetails(tmdbId, type, signal);
-            tmdbId = details.id;
-          } catch (error) {
-            signal.throwIfAborted();
-            skip(
-              title,
-              error instanceof Error
-                ? error.message
-                : "Seerr match unavailable.",
-            );
-            continue;
-          }
-        }
-        const candidate = candidateWatchlistEntry(
-          {
-            title: item?.Name || title,
-            year: item?.ProductionYear || media.year,
-            jellyfinId: item?.Id,
-            tmdbId,
-            imdbId: item
-              ? providerId(item, "imdb")
-              : typeof media.ids.imdb === "string"
-                ? media.ids.imdb
-                : undefined,
-          },
-          type,
-        );
-        if (watchlist.some((existing) => existing.key === candidate.key)) {
-          skip(title, "Already in your watchlist.");
-          continue;
-        }
-        plan.rows.push({
-          key: candidate.key,
-          title,
-          detail: item
-            ? "Add library title to watchlist"
-            : "Add Seerr title to watchlist",
-          watchlist: candidate,
-        });
-      } else if (type === "movie") {
+      if (type === "movie") {
         if (entry.status !== "completed") continue;
         if (!item) {
           skip(title, "No accessible Jellyfin match.");
@@ -293,40 +224,6 @@ export async function previewSimklSync(
         });
       }
     }
-  } else if (mode === "export-watchlist") {
-    watchlist.forEach((entry) => {
-      const ids = { tmdb: entry.tmdbId, imdb: entry.imdbId };
-      if (!ids.tmdb && !ids.imdb) {
-        skip(entry.title, "No TMDB or IMDb ID available.");
-        return;
-      }
-      const existing = (
-        entry.type === "movie" ? remoteMovies : remoteShows
-      ).some((row) =>
-        Object.entries(ids).some(
-          ([key, value]) =>
-            value && String(remoteTitle(row)?.ids[key]) === String(value),
-        ),
-      );
-      if (existing) {
-        skip(
-          entry.title,
-          "Already tracked by Simkl; existing status is preserved.",
-        );
-        return;
-      }
-      plan.rows.push({
-        key: entry.key,
-        title: entry.title,
-        detail: "Add to Simkl Plan to Watch",
-        bucket: entry.type === "movie" ? "movies" : "shows",
-        payload: {
-          ids,
-          type: entry.type === "movie" ? "movie" : "show",
-          to: "plantowatch",
-        },
-      });
-    });
   } else {
     films
       .filter((item) => item.UserData?.Played)
@@ -428,23 +325,18 @@ export async function applySimklSync(
       try {
         const result = await simklRequest<{
           not_found?: { movies?: { ids?: Ids }[]; shows?: { ids?: Ids }[] };
-        }>(
-          plan.mode === "export-watchlist"
-            ? "/sync/add-to-list"
-            : "/sync/history",
-          {
-            method: "POST",
-            signal,
-            body: JSON.stringify({
-              movies: batch
-                .filter((row) => row.bucket === "movies")
-                .map((row) => row.payload),
-              shows: batch
-                .filter((row) => row.bucket === "shows")
-                .map((row) => row.payload),
-            }),
-          },
-        );
+        }>("/sync/history", {
+          method: "POST",
+          signal,
+          body: JSON.stringify({
+            movies: batch
+              .filter((row) => row.bucket === "movies")
+              .map((row) => row.payload),
+            shows: batch
+              .filter((row) => row.bucket === "shows")
+              .map((row) => row.payload),
+          }),
+        });
         check();
         for (const row of batch) {
           const missing = row.bucket
@@ -487,11 +379,7 @@ export async function applySimklSync(
     check();
     const row = rows[index];
     try {
-      if (row.watchlist)
-        useIntegrationWatchlist
-          .getState()
-          .merge(plan.identity.scope, [row.watchlist]);
-      else if (row.itemId) {
+      if (row.itemId) {
         const userId = getJellyfinSession().userId;
         const item = await jellyfinRequest<JellyfinItem>(
           `Users/${userId}/Items/${row.itemId}`,

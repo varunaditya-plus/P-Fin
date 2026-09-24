@@ -3,17 +3,10 @@ import {
   getJellyfinSession,
   jellyfinRequest,
 } from "@/backend/jellyfin/client";
-import { getSeerrPage } from "@/backend/seerr/api";
-import {
-  WatchlistEntry,
-  useIntegrationWatchlist,
-  validateWatchlist,
-} from "@/stores/integrations/watchlist";
 
 import {
   integrationIdentity,
   integrationLibrary,
-  providerId,
   requireIntegrationIdentity,
 } from "./library";
 
@@ -26,15 +19,12 @@ export interface ImportCandidate {
   title: string;
   year?: number;
   jellyfinId?: string;
-  tmdbId?: number;
-  imdbId?: string;
   played?: boolean;
 }
 export interface ImportRow extends ImportTitle {
   id: number;
   candidates: ImportCandidate[];
   selected?: ImportCandidate;
-  error?: string;
 }
 export const normaliseImportTitle = (value: string) =>
   value
@@ -81,7 +71,7 @@ export function parseLetterboxdCsv(source: string) {
   const yearIndex = headers.indexOf("year");
   if (nameIndex < 0 || yearIndex < 0)
     throw new Error(
-      "Choose a Letterboxd CSV with Name and Year columns, such as watchlist.csv or watched.csv.",
+      "Choose a Letterboxd CSV with Name and Year columns, such as watched.csv.",
     );
   if (records.length > 10000)
     throw new Error("Import up to 10,000 films at a time.");
@@ -130,15 +120,12 @@ export function matchLibraryTitle(
       year: item.ProductionYear,
       jellyfinId: item.Id,
       played: item.UserData?.Played,
-      tmdbId: Number(providerId(item, "Tmdb")) || undefined,
-      imdbId: providerId(item, "Imdb"),
     }));
 }
 
 export async function previewLetterboxd(
   titles: ImportTitle[],
   options: {
-    seerr: boolean;
     signal: AbortSignal;
     progress(rows: ImportRow[]): void;
   },
@@ -155,32 +142,6 @@ export async function previewLetterboxd(
       id: index,
       candidates: matchLibraryTitle(title, library),
     };
-    if (!row.candidates.length && options.seerr) {
-      try {
-        const page = await getSeerrPage(
-          `/search?query=${encodeURIComponent(title.title)}&page=1`,
-          options.signal,
-        );
-        row.candidates = page.results
-          .filter(
-            (item) =>
-              item.mediaType === "movie" &&
-              normaliseImportTitle(item.title ?? "") ===
-                normaliseImportTitle(title.title) &&
-              (!title.year ||
-                Number(item.releaseDate?.slice(0, 4)) === title.year),
-          )
-          .map((item) => ({
-            title: item.title ?? title.title,
-            year: Number(item.releaseDate?.slice(0, 4)) || undefined,
-            tmdbId: item.id,
-          }));
-      } catch (error) {
-        if (options.signal.aborted) throw error;
-        row.error =
-          error instanceof Error ? error.message : "Seerr lookup failed.";
-      }
-    }
     if (row.candidates.length === 1) [row.selected] = row.candidates;
     rows.push(row);
     options.progress([...rows]);
@@ -189,33 +150,13 @@ export async function previewLetterboxd(
   return rows;
 }
 
-export function candidateWatchlistEntry(
-  candidate: ImportCandidate,
-  type: "movie" | "tv" = "movie",
-): WatchlistEntry {
-  return {
-    ...candidate,
-    type,
-    key: candidate.tmdbId
-      ? `tmdb:${type}:${candidate.tmdbId}`
-      : `jellyfin:${type}:${candidate.jellyfinId}`,
-    addedAt: new Date().toISOString(),
-  };
-}
-
 export async function applyLetterboxd(
   rows: ImportRow[],
-  mode: "watchlist" | "watched",
   signal: AbortSignal,
   progress: (completed: number) => void,
 ) {
   const identity = integrationIdentity();
   const session = getJellyfinSession();
-  const existing = new Set(
-    (useIntegrationWatchlist.getState().profiles[identity.scope] ?? []).map(
-      (item) => item.key,
-    ),
-  );
   let added = 0;
   let skipped = 0;
   const failures: { title: string; error: string }[] = [];
@@ -223,34 +164,24 @@ export async function applyLetterboxd(
     signal.throwIfAborted();
     requireIntegrationIdentity(identity);
     const { selected, title } = rows[index];
-    if (!selected || (mode === "watched" && !selected.jellyfinId)) {
+    if (!selected?.jellyfinId) {
       skipped += 1;
       progress(index + 1);
       continue;
     }
     try {
-      if (mode === "watchlist") {
-        const [entry] = validateWatchlist([candidateWatchlistEntry(selected)]);
-        if (!entry || existing.has(entry.key)) skipped += 1;
-        else {
-          useIntegrationWatchlist.getState().merge(identity.scope, [entry]);
-          existing.add(entry.key);
-          added += 1;
-        }
-      } else {
-        const item = await jellyfinRequest<JellyfinItem>(
-          `Users/${session.userId}/Items/${selected.jellyfinId}`,
-          { signal },
+      const item = await jellyfinRequest<JellyfinItem>(
+        `Users/${session.userId}/Items/${selected.jellyfinId}`,
+        { signal },
+      );
+      requireIntegrationIdentity(identity);
+      if (item.UserData?.Played) skipped += 1;
+      else {
+        await jellyfinRequest(
+          `Users/${session.userId}/PlayedItems/${selected.jellyfinId}`,
+          { method: "POST", signal },
         );
-        requireIntegrationIdentity(identity);
-        if (item.UserData?.Played) skipped += 1;
-        else {
-          await jellyfinRequest(
-            `Users/${session.userId}/PlayedItems/${selected.jellyfinId}`,
-            { method: "POST", signal },
-          );
-          added += 1;
-        }
+        added += 1;
       }
     } catch (error) {
       signal.throwIfAborted();
@@ -263,17 +194,4 @@ export async function applyLetterboxd(
     progress(index + 1);
   }
   return { added, skipped, failures };
-}
-
-export function watchlistCsv(entries: WatchlistEntry[]) {
-  const cell = (value: unknown) =>
-    `"${String(value ?? "").replace(/"/g, '""')}"`;
-  return [
-    "Name,Year,Type,TMDB ID,Jellyfin ID",
-    ...entries.map((entry) =>
-      [entry.title, entry.year, entry.type, entry.tmdbId, entry.jellyfinId]
-        .map(cell)
-        .join(","),
-    ),
-  ].join("\r\n");
 }

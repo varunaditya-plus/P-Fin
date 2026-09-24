@@ -24,8 +24,6 @@ import { useJellyfinAuth } from "@/stores/jellyfin";
 import { homePreferenceScope } from "@/stores/jellyfin/home";
 
 const labels: Record<SimklSyncMode, string> = {
-  "import-watchlist": "Simkl Plan to Watch → your watchlist",
-  "export-watchlist": "Your watchlist → Simkl Plan to Watch",
   "import-watched": "Simkl watched → Jellyfin",
   "export-watched": "Jellyfin watched → Simkl",
 };
@@ -56,7 +54,7 @@ export function SimklSettings() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
-  const [mode, setMode] = useState<SimklSyncMode>("import-watchlist");
+  const [mode, setMode] = useState<SimklSyncMode>("import-watched");
   const [plan, setPlan] = useState<SimklSyncPlan>();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [failures, setFailures] = useState<{ title: string; reason: string }[]>(
@@ -211,8 +209,8 @@ export function SimklSettings() {
     <SettingsCard className="space-y-4 h-full">
       <h2 className="font-bold text-xl text-white">Simkl</h2>
       <p className="text-sm text-type-secondary">
-        Import or export your watchlist and watched state. Preview the changes
-        before applying them.
+        Import or export your watched state. Preview the changes before applying
+        them.
       </p>
       {!connection ? (
         <div className="space-y-4">

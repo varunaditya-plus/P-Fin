@@ -2,7 +2,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { JellyfinItem, jellyfinRequest } from "@/backend/jellyfin/client";
-import { useIntegrationWatchlist } from "@/stores/integrations/watchlist";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 
 import { integrationIdentity, integrationLibrary } from "./library";
@@ -52,7 +51,6 @@ const episode: JellyfinItem = {
 beforeEach(() => {
   vi.resetAllMocks();
   useJellyfinAuth.getState().setSession(session);
-  useIntegrationWatchlist.setState({ profiles: {} });
   vi.mocked(requireSimklConnection).mockReturnValue({
     accessToken: "simkl-test",
   } as ReturnType<typeof requireSimklConnection>);
@@ -61,7 +59,7 @@ beforeEach(() => {
 describe("Simkl mapping and additive sync", () => {
   it("keeps movie and show export failures separate when TMDB numbers overlap", async () => {
     const plan: SimklSyncPlan = {
-      mode: "export-watchlist",
+      mode: "export-watched",
       identity: integrationIdentity(),
       connectionToken: "simkl-test",
       skipped: [],
@@ -71,14 +69,14 @@ describe("Simkl mapping and additive sync", () => {
           title: "Movie",
           detail: "",
           bucket: "movies",
-          payload: { ids: { tmdb: 100 }, to: "plantowatch" },
+          payload: { ids: { tmdb: 100 }, type: "movie" },
         },
         {
           key: "show:100",
           title: "Series",
           detail: "",
           bucket: "shows",
-          payload: { ids: { tmdb: 100 }, to: "plantowatch" },
+          payload: { ids: { tmdb: 100 }, type: "show" },
         },
       ],
     };
@@ -138,31 +136,6 @@ describe("Simkl mapping and additive sync", () => {
     });
     expect(plan.rows[0].payload).not.toHaveProperty("status");
   });
-  it("never downgrades Simkl watched/watching entries when exporting the watchlist", async () => {
-    vi.mocked(integrationLibrary).mockResolvedValue([]);
-    useIntegrationWatchlist.getState().merge(integrationIdentity().scope, [
-      {
-        key: "tmdb:tv:100",
-        title: "A show",
-        type: "tv",
-        tmdbId: 100,
-        addedAt: new Date().toISOString(),
-      },
-    ]);
-    vi.mocked(simklRequest)
-      .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({
-        shows: [
-          { status: "watching", show: { title: "A show", ids: { tmdb: 100 } } },
-        ],
-      });
-    const plan = await previewSimklSync(
-      "export-watchlist",
-      new AbortController().signal,
-    );
-    expect(plan.rows).toEqual([]);
-    expect(plan.skipped[0].reason).toContain("existing status is preserved");
-  });
   it("does not import whole-series completion without recorded episodes", async () => {
     vi.mocked(integrationLibrary).mockResolvedValue([
       show,
@@ -185,9 +158,63 @@ describe("Simkl mapping and additive sync", () => {
     expect(plan.rows).toEqual([]);
     expect(jellyfinRequest).not.toHaveBeenCalled();
   });
+  it("imports only completed matched movies and individually recorded episodes", async () => {
+    const film: JellyfinItem = {
+      Id: "d".repeat(32),
+      Type: "Movie",
+      Name: "Film",
+      ProviderIds: { Tmdb: "300" },
+      UserData: { Played: false },
+    };
+    vi.mocked(integrationLibrary).mockResolvedValue([
+      film,
+      show,
+      { ...episode, UserData: { Played: false } },
+    ]);
+    vi.mocked(simklRequest)
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({
+        movies: [
+          { status: "completed", movie: { title: "Film", ids: { tmdb: 300 } } },
+          {
+            status: "plantowatch",
+            movie: { title: "Unwatched", ids: { tmdb: 400 } },
+          },
+        ],
+        shows: [
+          {
+            status: "watching",
+            show: { title: show.Name, ids: { tmdb: 100 } },
+            seasons: [{ number: 2, episodes: [{ number: 2 }] }],
+          },
+        ],
+      });
+    const signal = new AbortController().signal;
+    const plan = await previewSimklSync("import-watched", signal);
+    expect(plan.rows.map((row) => row.itemId)).toEqual([film.Id, episode.Id]);
+    vi.mocked(jellyfinRequest).mockResolvedValue({
+      UserData: { Played: false },
+    });
+    const result = await applySimklSync(
+      plan,
+      new Set(plan.rows.map((row) => row.key)),
+      signal,
+      vi.fn(),
+    );
+    expect(result).toEqual({ applied: 2, failures: [] });
+    expect(
+      vi
+        .mocked(jellyfinRequest)
+        .mock.calls.filter(([, init]) => init?.method === "POST")
+        .map(([path]) => path),
+    ).toEqual([
+      `Users/${session.userId}/PlayedItems/${film.Id}`,
+      `Users/${session.userId}/PlayedItems/${episode.Id}`,
+    ]);
+  });
   it("batches exports and treats HTTP-success not_found records as failures", async () => {
     const plan: SimklSyncPlan = {
-      mode: "export-watchlist",
+      mode: "export-watched",
       identity: integrationIdentity(),
       connectionToken: "simkl-test",
       skipped: [],
@@ -196,7 +223,7 @@ describe("Simkl mapping and additive sync", () => {
         title: `Film ${index + 1}`,
         detail: "",
         bucket: "movies",
-        payload: { ids: { tmdb: index + 1 }, to: "plantowatch" },
+        payload: { ids: { tmdb: index + 1 }, type: "movie" },
       })),
     };
     vi.mocked(simklRequest)
@@ -209,6 +236,11 @@ describe("Simkl mapping and additive sync", () => {
       vi.fn(),
     );
     expect(simklRequest).toHaveBeenCalledTimes(2);
+    expect(
+      vi
+        .mocked(simklRequest)
+        .mock.calls.every(([path]) => path === "/sync/history"),
+    ).toBe(true);
     expect(result.applied).toBe(50);
     expect(result.failures[0].title).toBe("Film 2");
   });

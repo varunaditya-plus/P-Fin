@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import "@/components/player/subtitleTools/preferences";
 import "@/pages/taste/viewPreferences";
 import "@/stores/integrations/simkl";
-import "@/stores/integrations/watchlist";
 import "@/stores/taste";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 

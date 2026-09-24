@@ -418,8 +418,8 @@ export default function JellyfinSettings() {
           <Heading1 border>Connections</Heading1>
           <SettingGroup title="Connections" icon={Icons.LINK}>
             <SettingRow
-              title="Lists and watch history"
-              description="Import Letterboxd lists and manage optional external service connections."
+              title="Watch history"
+              description="Import Letterboxd watched films and manage optional external service connections."
             >
               <Button theme="secondary" href="/settings/integrations">
                 Manage integrations

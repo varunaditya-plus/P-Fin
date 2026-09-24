@@ -56,7 +56,7 @@ it("shows matching progress and cancels without applying server changes", async 
     });
     return [];
   });
-  const file = new File([""], "watchlist.csv", { type: "text/csv" });
+  const file = new File([""], "watched.csv", { type: "text/csv" });
   Object.defineProperty(file, "text", {
     value: async () => "Name,Year\nFilm,2020\nAnother,2021",
   });
@@ -89,4 +89,50 @@ it("shows matching progress and cancels without applying server changes", async 
     "Stopped",
   );
   expect(applyLetterboxd).not.toHaveBeenCalled();
+});
+
+it("previews and applies watched films without a watchlist destination", async () => {
+  const row = {
+    id: 0,
+    title: "Film",
+    year: 2020,
+    candidates: [{ title: "Film", year: 2020, jellyfinId: "film" }],
+    selected: { title: "Film", year: 2020, jellyfinId: "film" },
+  };
+  vi.mocked(previewLetterboxd).mockImplementation(async (_titles, options) => {
+    options.progress([row]);
+    return [row];
+  });
+  vi.mocked(applyLetterboxd).mockResolvedValue({
+    added: 1,
+    skipped: 0,
+    failures: [],
+  });
+  const file = new File([""], "watched.csv", { type: "text/csv" });
+  Object.defineProperty(file, "text", {
+    value: async () => "Name,Year\nFilm,2020",
+  });
+  const input = host.querySelector<HTMLInputElement>('input[type="file"]')!;
+  Object.defineProperty(input, "files", { value: [file] });
+  await act(async () =>
+    input.dispatchEvent(new Event("change", { bubbles: true })),
+  );
+  await act(async () =>
+    [...host.querySelectorAll("button")]
+      .find((button) => button.textContent === "Preview matches")!
+      .click(),
+  );
+  await act(async () =>
+    [...host.querySelectorAll("button")]
+      .find((button) => button.textContent === "Mark 1 matched films watched")!
+      .click(),
+  );
+  expect(applyLetterboxd).toHaveBeenCalledWith(
+    [row],
+    expect.any(AbortSignal),
+    expect.any(Function),
+  );
+  expect(host.textContent).toContain("1 marked watched");
+  expect(host.textContent?.toLowerCase()).not.toContain("watchlist");
+  expect(host.textContent).not.toContain("Import as");
 });
