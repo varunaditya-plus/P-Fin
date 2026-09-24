@@ -26,7 +26,11 @@ import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { SubPageLayout } from "@/pages/layouts/SubPageLayout";
 import { useJellyfinAuth } from "@/stores/jellyfin";
 import { useSeerrConnection } from "@/stores/seerr";
-import { useTasteProfile, useTasteStore } from "@/stores/taste";
+import {
+  useTasteDashboardEnabled,
+  useTasteProfile,
+  useTasteStore,
+} from "@/stores/taste";
 
 import { RatingCapsule } from "./RatingCapsule";
 import { TasteChart } from "./TasteChart";
@@ -154,7 +158,7 @@ function TasteRecommendations({
     </section>
   );
 }
-export default function TastePage() {
+function TasteDashboard() {
   const session = useJellyfinAuth((state) => state.session);
   const connection = useSeerrConnection((state) => state.connection);
   const profile = useTasteProfile();
@@ -400,6 +404,45 @@ export default function TastePage() {
               }
             />
           ) : null}
+        </div>
+      </WideContainer>
+    </SubPageLayout>
+  );
+}
+
+export default function TastePage() {
+  const dashboardEnabled = useTasteDashboardEnabled();
+  if (dashboardEnabled) return <TasteDashboard />;
+  return (
+    <SubPageLayout>
+      <WideContainer>
+        <div className="max-w-xl space-y-5 pb-12">
+          <Heading1>Your taste</Heading1>
+          <p className="text-type-secondary">
+            Enable the optional taste profile to rate titles and take the quiz.
+            Discover recommendations also work without it, using your Jellyfin
+            activity.
+          </p>
+          <Button
+            theme="purple"
+            onClick={() =>
+              useTasteStore
+                .getState()
+                .setPreferences({ dashboardEnabled: true })
+            }
+          >
+            Enable taste profile
+          </Button>
+          <p className="text-sm text-type-secondary">
+            You can turn this off in{" "}
+            <Link
+              className="tabbable text-type-link"
+              to="/settings?category=settings-preferences"
+            >
+              Settings
+            </Link>
+            . Your saved ratings and quiz preferences will be kept.
+          </p>
         </div>
       </WideContainer>
     </SubPageLayout>

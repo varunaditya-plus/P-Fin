@@ -19,6 +19,7 @@ import { homePreferenceScope } from "@/stores/jellyfin/home";
 export const defaultTasteProfile: TasteProfile = {
   ratings: {},
   preferences: {
+    dashboardEnabled: false,
     favoriteGenres: [],
     moods: [],
     franchises: [],
@@ -121,6 +122,7 @@ export function validateTasteProfile(value: unknown): TasteProfile {
   return {
     ratings,
     preferences: {
+      dashboardEnabled: preferences.dashboardEnabled === true,
       favoriteGenres: strings(preferences.favoriteGenres ?? []).filter(
         (genre) => GENRES.includes(genre),
       ),
@@ -237,6 +239,9 @@ export function useTasteProfile() {
     (state) =>
       state.profiles[homePreferenceScope(session)] ?? defaultTasteProfile,
   );
+}
+export function useTasteDashboardEnabled() {
+  return useTasteProfile().preferences.dashboardEnabled === true;
 }
 registerAppPreferenceSection("taste", {
   label: "Ratings and taste preferences",

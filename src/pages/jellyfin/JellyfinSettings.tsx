@@ -21,6 +21,7 @@ import { useJellyfinAuth } from "@/stores/jellyfin";
 import { useLanguageStore } from "@/stores/language";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useSubtitleStore } from "@/stores/subtitles";
+import { useTasteDashboardEnabled, useTasteStore } from "@/stores/taste";
 import { getLocaleInfo } from "@/utils/language";
 
 import { SettingGroup, SettingRow, SettingToggle } from "./settings/SettingRow";
@@ -33,6 +34,7 @@ export default function JellyfinSettings() {
   const showModal = useOverlayStack((state) => state.showModal);
   const subtitles = useSubtitleStore();
   const preferences = usePreferencesStore();
+  const tasteDashboardEnabled = useTasteDashboardEnabled();
   const session = useJellyfinAuth((state) => state.session);
   const [configuration, setConfiguration] =
     useState<JellyfinUserConfiguration | null>(null);
@@ -176,6 +178,23 @@ export default function JellyfinSettings() {
                 setSelectedItem={(item) => language.setLanguage(item.id)}
               />
             </SettingRow>
+          </SettingGroup>
+          <SettingGroup title="Recommendations" icon={Icons.HEART}>
+            <SettingToggle
+              title="Taste profile and quiz"
+              description="Enable optional title ratings and the taste quiz. Turning this off keeps your saved ratings and preferences."
+              enabled={tasteDashboardEnabled}
+              onChange={(dashboardEnabled) =>
+                useTasteStore.getState().setPreferences({ dashboardEnabled })
+              }
+            />
+            {tasteDashboardEnabled ? (
+              <SettingRow title="Your taste">
+                <Button theme="secondary" href="/taste">
+                  Open taste profile
+                </Button>
+              </SettingRow>
+            ) : null}
           </SettingGroup>
           <div className="grid gap-8 xl:grid-cols-2">
             <SettingGroup title="Player controls" icon={Icons.TACHOMETER}>

@@ -17,6 +17,7 @@ export interface RatedTasteMedia extends TasteMedia {
   ratedAt: number;
 }
 export interface TastePreferences {
+  dashboardEnabled: boolean;
   favoriteGenres: string[];
   moods: string[];
   franchises: string[];

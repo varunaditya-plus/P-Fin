@@ -52,6 +52,45 @@ describe("account taste ratings", () => {
     useJellyfinAuth.setState({ session });
     expect(getTasteProfile().ratings[movie.key].rating).toBe("loved");
   });
+  it("requires account-specific opt-in and preserves taste data when disabled", () => {
+    expect(getTasteProfile().preferences.dashboardEnabled).toBe(false);
+    useTasteStore.getState().rate(movie, "liked");
+    useTasteStore.getState().setPreferences({
+      dashboardEnabled: true,
+      favoriteGenres: ["Comedy"],
+      completedQuiz: true,
+    });
+    expect(getTasteProfile().preferences.dashboardEnabled).toBe(true);
+    expect(exportAppPreferences(["taste"])).toContain(
+      '"dashboardEnabled": true',
+    );
+    useJellyfinAuth.setState({ session: { ...session, userId: "second" } });
+    expect(getTasteProfile().preferences.dashboardEnabled).toBe(false);
+    useJellyfinAuth.setState({ session });
+    useTasteStore.getState().setPreferences({ dashboardEnabled: false });
+    expect(getTasteProfile().ratings[movie.key].rating).toBe("liked");
+    expect(getTasteProfile().preferences).toMatchObject({
+      dashboardEnabled: false,
+      favoriteGenres: ["Comedy"],
+      completedQuiz: true,
+    });
+  });
+  it("defaults legacy profiles to disabled without discarding saved ratings", () => {
+    useTasteStore.getState().rate(movie, "loved");
+    const legacy = validateTasteProfile({
+      ratings: getTasteProfile().ratings,
+      preferences: { completedQuiz: true, favoriteGenres: ["Comedy"] },
+    });
+    expect(legacy.preferences.dashboardEnabled).toBe(false);
+    expect(legacy.preferences.completedQuiz).toBe(true);
+    expect(legacy.ratings[movie.key].rating).toBe("loved");
+    expect(
+      validateTasteProfile({
+        ...legacy,
+        preferences: { ...legacy.preferences, dashboardEnabled: "true" },
+      }).preferences.dashboardEnabled,
+    ).toBe(false);
+  });
   it("toggle clears a rating; editing through Seerr retains Jellyfin metadata", () => {
     useTasteStore.getState().rate(movie, "loved");
     useTasteStore

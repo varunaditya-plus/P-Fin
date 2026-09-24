@@ -19,7 +19,7 @@ export const settingsCategories = [
     label: "Preferences",
     icon: Icons.SETTINGS,
     keywords:
-      "language interface controls keyboard shortcuts game controller gamepad performance hold boost double click seek number keys",
+      "language interface controls keyboard shortcuts game controller gamepad performance hold boost double click seek number keys recommendations taste profile quiz ratings",
   },
   {
     id: "appearance",
