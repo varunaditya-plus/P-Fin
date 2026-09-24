@@ -142,14 +142,14 @@ describe("taste quiz", () => {
     expect(getTasteProfile().ratings).toEqual({});
   });
   it("can skip movies, rate a TV title and finish with saved preferences", async () => {
-    await act(async () => button("Stop for now").click());
+    await act(async () => button("Next").click());
     expect(host.querySelector("h3")?.textContent).toContain("tv-");
     await act(async () => button("Loved it!").click());
     expect(Object.values(getTasteProfile().ratings)[0]).toMatchObject({
       type: "tv",
       rating: "loved",
     });
-    await act(async () => button("Stop for now").click());
+    await act(async () => button("Next").click());
     await act(async () => button("Comedy").click());
     await act(async () => button("Next").click());
     await act(async () => button("Comedy and laughs").click());
@@ -171,7 +171,7 @@ describe("taste quiz", () => {
     await act(async () => button("See my taste profile").click());
     expect(finish).toHaveBeenCalledOnce();
   });
-  it("moves focus into the stopping reminder and restores the quiz on Escape", async () => {
+  it("keeps rating past 25 without a reminder and offers an ordinary Finish button", async () => {
     vi.mocked(getSeerrTastePage).mockResolvedValue({
       totalPages: 1,
       items: Array.from({ length: 40 }, (_, index) => ({
@@ -197,30 +197,16 @@ describe("taste quiz", () => {
     );
     for (let count = 0; count < 25; count += 1)
       await act(async () => button("Loved it!").click());
-    await act(
-      async () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 40);
-        }),
-    );
-    const dialog = document.querySelector('[role="dialog"]')!;
-    expect(dialog).not.toBeNull();
-    expect(dialog.contains(document.activeElement)).toBe(true);
-    expect(host.getAttribute("aria-hidden")).toBe("true");
-    expect(dialog.textContent).toContain("You have rated 25");
-    await act(async () =>
-      document.activeElement!.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
-      ),
-    );
-    await act(
-      async () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 600);
-        }),
-    );
+    expect(Object.keys(getTasteProfile().ratings)).toHaveLength(25);
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(host.hasAttribute("aria-hidden")).toBe(false);
-    expect(getTasteProfile().preferences.completedQuiz).toBe(false);
+    expect(host.textContent).toContain("Rated 25");
+    expect(button("Finish")).toBeDefined();
+    await act(async () => button("Loved it!").click());
+    expect(Object.keys(getTasteProfile().ratings)).toHaveLength(26);
+    await act(async () => button("Finish").click());
+    expect(getTasteProfile().preferences.completedQuiz).toBe(true);
+    expect(host.textContent).toContain("Your taste profile is ready!");
+    await act(async () => button("See my taste profile").click());
+    expect(finish).toHaveBeenCalledOnce();
   });
 });

@@ -17,7 +17,6 @@ import {
   TasteType,
 } from "@/backend/personalisation/types";
 import { Button } from "@/components/buttons/Button";
-import { DetailsModalFrame } from "@/components/overlays/DetailsModalFrame";
 import { getTasteProfile, useTasteStore } from "@/stores/taste";
 
 export function TasteQuiz({ onFinish }: { onFinish: () => void }) {
@@ -29,7 +28,6 @@ export function TasteQuiz({ onFinish }: { onFinish: () => void }) {
     ...getTasteProfile().preferences,
   }));
   const [rated, setRated] = useState({ movie: 0, tv: 0 });
-  const [reminder, setReminder] = useState(false);
   const [queue, setQueue] = useState<TasteCandidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -113,7 +111,6 @@ export function TasteQuiz({ onFinish }: { onFinish: () => void }) {
   };
   const nextStage = () => {
     generation.current += 1;
-    setReminder(false);
     if (step === "movies") {
       setType("tv");
       setQueue([]);
@@ -133,7 +130,6 @@ export function TasteQuiz({ onFinish }: { onFinish: () => void }) {
         useTasteStore.getState().rate(media, rating, false);
         const count = rated[type] + 1;
         setRated((counts) => ({ ...counts, [type]: count }));
-        if (count % 25 === 0) setReminder(true);
       }
       if (currentGeneration === generation.current)
         setQueue((items) => items.slice(1));
@@ -260,36 +256,13 @@ export function TasteQuiz({ onFinish }: { onFinish: () => void }) {
                 Load more titles
               </Button>
             ) : null}
-            <Button theme="secondary" disabled={saving} onClick={nextStage}>
-              Stop for now
+            <Button theme="secondary" disabled={saving} onClick={finish}>
+              Finish
+            </Button>
+            <Button theme="purple" disabled={saving} onClick={nextStage}>
+              Next
             </Button>
           </div>
-          <DetailsModalFrame
-            open={reminder}
-            onClose={() => setReminder(false)}
-            afterLeave={() => undefined}
-            label="Continue rating"
-          >
-            <div className="pointer-events-auto fixed inset-x-4 top-1/2 mx-auto max-w-lg -translate-y-1/2 rounded-xl bg-background-main p-6 text-center">
-              <div>
-                <h3 className="mb-2 text-lg font-semibold text-white">
-                  You have rated {rated[type]}
-                </h3>
-                <p className="mb-6 text-sm text-type-secondary">
-                  That is plenty to work with. Feel free to stop here, or keep
-                  going if you are having fun.
-                </p>
-                <div className="flex justify-center gap-3">
-                  <Button theme="secondary" onClick={() => setReminder(false)}>
-                    Keep going
-                  </Button>
-                  <Button theme="purple" onClick={nextStage}>
-                    Finish for now
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </DetailsModalFrame>
         </div>
       ) : group ? (
         <div>
