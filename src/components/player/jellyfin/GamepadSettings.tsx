@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/buttons/Button";
 import { Toggle } from "@/components/buttons/Toggle";
@@ -9,6 +9,7 @@ import {
   useRetainedModalValue,
 } from "@/components/overlays/DetailsModalFrame";
 import { Flare } from "@/components/utils/Flare";
+import { useConnectedGamepads } from "@/hooks/useConnectedGamepads";
 import {
   GamepadAction,
   defaultGamepadMapping,
@@ -154,24 +155,9 @@ export function GamepadMappingEditor({
 
 export function GamepadSettings() {
   const enabled = useGamepadStore((state) => state.enabled);
-  const [controllers, setControllers] = useState<string[]>([]);
+  const controllers = useConnectedGamepads();
   const [open, setOpen] = useState(false);
   const presence = useRetainedModalValue(open || undefined);
-  useEffect(() => {
-    const update = () =>
-      setControllers(
-        Array.from(navigator.getGamepads?.() ?? [])
-          .filter((pad): pad is Gamepad => !!pad)
-          .map((pad) => pad.id),
-      );
-    update();
-    window.addEventListener("gamepadconnected", update);
-    window.addEventListener("gamepaddisconnected", update);
-    return () => {
-      window.removeEventListener("gamepadconnected", update);
-      window.removeEventListener("gamepaddisconnected", update);
-    };
-  }, []);
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
@@ -184,7 +170,7 @@ export function GamepadSettings() {
       </div>
       <p className="text-xs text-type-secondary">
         {controllers.length
-          ? controllers.join(", ")
+          ? controllers.map((pad) => pad.id).join(", ")
           : "Connect a controller and press a button to let your browser detect it."}
       </p>
       <Button theme="secondary" onClick={() => setOpen(true)}>
@@ -220,7 +206,7 @@ export function GamepadSettings() {
                   </button>
                 </div>
                 <GamepadMappingEditor
-                  controllerId={controllers[0]}
+                  controllerId={controllers[0]?.id}
                   onClose={() => setOpen(false)}
                 />
               </Flare.Child>

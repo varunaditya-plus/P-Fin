@@ -28,6 +28,7 @@ import { SubtitleSyncView } from "@/components/player/subtitleTools/AutoSync";
 import { TranscriptView } from "@/components/player/subtitleTools/TranscriptView";
 import { TranslationView } from "@/components/player/subtitleTools/TranslationView";
 import { Transition } from "@/components/utils/Transition";
+import { useConnectedGamepads } from "@/hooks/useConnectedGamepads";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { JellyfinDetailsModal } from "@/pages/jellyfin/JellyfinDetailsModal";
 import { usePlayerStore } from "@/stores/player/store";
@@ -39,6 +40,10 @@ import { useJellyfinPlayback } from "./JellyfinPlaybackContext";
 
 function JellyfinSettingsMenu() {
   const casting = useChromecastState((state) => state.casting);
+  const castAvailable = useChromecastState(
+    (state) => state.available || state.connected,
+  );
+  const controllers = useConnectedGamepads();
   const router = useOverlayRouter("settings");
   const { t } = useTranslation();
   const { playback, subtitleIndex, maxBitrate } = useJellyfinPlayback();
@@ -104,20 +109,21 @@ function JellyfinSettingsMenu() {
         <Menu.ChevronLink onClick={() => router.navigate("/playback")}>
           {t("player.menus.settings.playbackItem")}
         </Menu.ChevronLink>
-        <Menu.ChevronLink onClick={() => router.navigate("/captions/settings")}>
-          Subtitle appearance
-        </Menu.ChevronLink>
-        <Menu.ChevronLink onClick={() => router.navigate("/cast")}>
-          <Icon icon={Icons.CASTING} className="mr-3" />
-          Google Cast
-        </Menu.ChevronLink>
+        {castAvailable ? (
+          <Menu.ChevronLink onClick={() => router.navigate("/cast")}>
+            <Icon icon={Icons.CASTING} className="mr-3" />
+            Google Cast
+          </Menu.ChevronLink>
+        ) : null}
         <Menu.ChevronLink onClick={() => router.navigate("/syncplay")}>
           <Icon icon={Icons.WATCH_PARTY} className="mr-3" />
           SyncPlay
         </Menu.ChevronLink>
-        <Menu.ChevronLink onClick={() => router.navigate("/controller")}>
-          Controller
-        </Menu.ChevronLink>
+        {controllers.length ? (
+          <Menu.ChevronLink onClick={() => router.navigate("/controller")}>
+            Controller
+          </Menu.ChevronLink>
+        ) : null}
       </Menu.Section>
     </Menu.Card>
   );
@@ -227,25 +233,6 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
       </Menu.BackLink>
       <Menu.Section className="pb-4">
         {kind === "Subtitle" ? (
-          <Menu.ChevronLink
-            onClick={() => router.navigate("/captions/transcript")}
-          >
-            Transcript
-          </Menu.ChevronLink>
-        ) : null}
-        {kind === "Subtitle" ? (
-          <Menu.ChevronLink
-            onClick={() => router.navigate("/captions/translate")}
-          >
-            Translate subtitles
-          </Menu.ChevronLink>
-        ) : null}
-        {kind === "Subtitle" ? (
-          <Menu.ChevronLink onClick={() => router.navigate("/captions/sync")}>
-            Synchronise subtitles
-          </Menu.ChevronLink>
-        ) : null}
-        {kind === "Subtitle" ? (
           <SelectableLink
             selected={subtitleIndex === -1}
             onClick={() => choose(-1)}
@@ -275,6 +262,23 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
           </p>
         ) : null}
       </Menu.Section>
+      {kind === "Subtitle" ? (
+        <Menu.Section className="pb-4">
+          <Menu.ChevronLink
+            onClick={() => router.navigate("/captions/transcript")}
+          >
+            Transcript
+          </Menu.ChevronLink>
+          <Menu.ChevronLink
+            onClick={() => router.navigate("/captions/translate")}
+          >
+            Translate subtitles
+          </Menu.ChevronLink>
+          <Menu.ChevronLink onClick={() => router.navigate("/captions/sync")}>
+            Synchronise subtitles
+          </Menu.ChevronLink>
+        </Menu.Section>
+      ) : null}
     </Menu.CardWithScrollable>
   );
 }
