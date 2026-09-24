@@ -75,14 +75,7 @@ vi.mock("@/backend/seerr/api", async (original) => ({
 vi.mock("@/backend/seerr/browse", async (original) => ({
   ...(await original<typeof import("@/backend/seerr/browse")>()),
   cachedSeerrPage: () => undefined,
-  cachedSeerrPopularPicks: () => undefined,
   getCachedSeerrPage: async () => ({
-    page: 1,
-    totalPages: 2,
-    totalResults: 2,
-    results: [{ id: 1, mediaType: "movie", title: "Film" }],
-  }),
-  getSeerrPopularPicks: async () => ({
     page: 1,
     totalPages: 2,
     totalResults: 2,

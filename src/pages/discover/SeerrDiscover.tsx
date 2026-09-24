@@ -11,10 +11,7 @@ import {
 } from "@/backend/seerr/api";
 import {
   cachedSeerrPage,
-  cachedSeerrPopularPicks,
   getCachedSeerrPage,
-  getSeerrPopularPicks,
-  popularPicksPath,
   uniqueSeerrMedia,
 } from "@/backend/seerr/browse";
 import {
@@ -26,7 +23,6 @@ import {
 import {
   SeerrDetails,
   SeerrMedia,
-  SeerrMediaType,
   SeerrPage,
   SeerrUser,
 } from "@/backend/seerr/types";
@@ -271,7 +267,6 @@ function SeerrCarousel({
   onShowDetails,
   onUnauthorized,
   refresh,
-  popularPicksType,
   expanded = false,
   onMore,
 }: {
@@ -280,14 +275,11 @@ function SeerrCarousel({
   onShowDetails: (item: SeerrMedia) => void;
   onUnauthorized: () => void;
   refresh: number;
-  popularPicksType?: SeerrMediaType;
   expanded?: boolean;
   onMore?: (title: string, endpoint: string) => void;
 }) {
   const [page, setPage] = useState<SeerrPage | undefined>(() =>
-    popularPicksType
-      ? cachedSeerrPopularPicks(popularPicksType)
-      : cachedSeerrPage(endpoint),
+    cachedSeerrPage(endpoint),
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -317,9 +309,7 @@ function SeerrCarousel({
     setError("");
     const force =
       refresh !== lastRead.current.refresh || retry !== lastRead.current.retry;
-    const read = popularPicksType
-      ? getSeerrPopularPicks(popularPicksType, controller.signal, force)
-      : getCachedSeerrPage(endpoint, controller.signal, force);
+    const read = getCachedSeerrPage(endpoint, controller.signal, force);
     read
       .then((value) => {
         if (!controller.signal.aborted) {
@@ -346,7 +336,7 @@ function SeerrCarousel({
       moreController.current?.abort();
       generation.current += 1;
     };
-  }, [endpoint, onUnauthorized, refresh, retry, active, popularPicksType]);
+  }, [endpoint, onUnauthorized, refresh, retry, active]);
 
   const loadMore = async () => {
     if (!page || loading || page.page >= page.totalPages) return;
@@ -395,18 +385,6 @@ function SeerrCarousel({
           </h2>
         </div>
         <div className="flex items-center gap-3 mr-4 md:mr-8">
-          {popularPicksType ? (
-            <button
-              type="button"
-              aria-label="Shuffle popular picks"
-              title="Shuffle popular picks"
-              disabled={loading && active}
-              className="tabbable p-2 text-type-secondary transition-colors hover:text-white disabled:opacity-50"
-              onClick={() => setRetry((value) => value + 1)}
-            >
-              <Icon icon={Icons.REPEAT} />
-            </button>
-          ) : null}
           {!expanded && Boolean(page?.results.length) && onMore ? (
             <button
               type="button"
@@ -1062,16 +1040,6 @@ function SeerrLibraryDiscover() {
                                   ? "/discover/movies"
                                   : "/discover/tv"
                               }
-                              onShowDetails={setSelected}
-                              onUnauthorized={unauthorized}
-                              onMore={openMore}
-                              refresh={refresh}
-                            />
-                            <SeerrCarousel
-                              key={`popular-picks-${category}`}
-                              title="Popular Picks"
-                              endpoint={popularPicksPath(category)}
-                              popularPicksType={category}
                               onShowDetails={setSelected}
                               onUnauthorized={unauthorized}
                               onMore={openMore}
