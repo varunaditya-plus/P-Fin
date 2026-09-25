@@ -27,6 +27,7 @@ export function Navigation(props: NavigationProps) {
   const bannerHeight = useBannerSize();
   const location = useLocation();
   const session = useJellyfinAuth((state) => state.session);
+  const onDiscover = location.pathname === "/discover";
   const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
@@ -142,32 +143,33 @@ export function Navigation(props: NavigationProps) {
               </Link>
               {session ? (
                 <>
-                  <Link
-                    to="/"
-                    aria-label="Library"
-                    title="Library"
-                    onClick={() => window.scrollTo(0, 0)}
+                  <a
+                    href={`${(session.serverAddress ?? session.serverUrl).replace(/\/+$/, "")}/web/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open Jellyfin in a new tab"
+                    title="Jellyfin"
                     className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
                   >
                     <IconPatch
-                      icon={Icons.SEARCH}
+                      icon={Icons.JELLYFIN}
                       clickable
                       downsized
                       navigation
                     />
-                  </Link>
+                  </a>
                   <Link
-                    to="/discover"
-                    aria-label="Discover"
-                    title="Discover"
+                    to={onDiscover ? "/" : "/discover"}
+                    aria-label={onDiscover ? "Search" : "Discover"}
+                    title={onDiscover ? "Search" : "Discover"}
                     onClick={() => window.scrollTo(0, 0)}
-                    aria-current={
-                      location.pathname === "/discover" ? "page" : undefined
-                    }
-                    className="text-xl text-white tabbable rounded-full backdrop-blur-lg"
+                    className={classNames(
+                      "text-white tabbable rounded-full backdrop-blur-lg",
+                      onDiscover ? "text-lg" : "text-xl",
+                    )}
                   >
                     <IconPatch
-                      icon={Icons.RISING_STAR}
+                      icon={onDiscover ? Icons.SEARCH : Icons.RISING_STAR}
                       clickable
                       downsized
                       navigation
