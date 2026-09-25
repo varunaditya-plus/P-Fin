@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { locales } from "@/assets/languages";
 import {
@@ -30,6 +31,7 @@ import { SettingsTransfer } from "./settings/SettingsTransfer";
 import { ThemeSettingsSection } from "./settings/ThemeSettingsSection";
 
 export default function JellyfinSettings() {
+  const navigate = useNavigate();
   const language = useLanguageStore();
   const showModal = useOverlayStack((state) => state.showModal);
   const subtitles = useSubtitleStore();
@@ -190,7 +192,7 @@ export default function JellyfinSettings() {
             />
             {tasteDashboardEnabled ? (
               <SettingRow title="Your taste">
-                <Button theme="secondary" href="/taste">
+                <Button theme="secondary" onClick={() => navigate("/taste")}>
                   Open taste profile
                 </Button>
               </SettingRow>
