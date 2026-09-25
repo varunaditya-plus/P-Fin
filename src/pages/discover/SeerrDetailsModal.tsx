@@ -45,6 +45,7 @@ function SeerrDetailsContent({
   onClose,
   onRequested,
   onSelectMedia,
+  focusRequest,
 }: {
   media: SeerrMedia;
   user: SeerrUser;
@@ -53,6 +54,7 @@ function SeerrDetailsContent({
   onClose: () => void;
   onRequested: (details: SeerrDetails) => void;
   onSelectMedia?: (media: SeerrMedia) => void;
+  focusRequest?: boolean;
 }) {
   const [selectedPerson, setPerson] = useState<PersonSelection>();
   const [details, setDetails] = useState<SeerrDetails>();
@@ -68,6 +70,9 @@ function SeerrDetailsContent({
   const [retry, setRetry] = useState(0);
   const submitting = useRef(false);
   const mounted = useRef(true);
+  const requestActions = useRef<HTMLDivElement>(null);
+  const seasonSelection = useRef<HTMLDivElement>(null);
+  const requestFocusHandled = useRef(false);
 
   useEffect(() => {
     mounted.current = true;
@@ -156,6 +161,52 @@ function SeerrDetailsContent({
     !requestQuota?.restricted &&
     !libraryLoading &&
     (media.mediaType === "movie" ? movieUnavailable : seasons.length > 0);
+
+  useEffect(() => {
+    if (!open) requestFocusHandled.current = false;
+    if (
+      !focusRequest ||
+      !open ||
+      !details ||
+      !settings ||
+      !quota ||
+      libraryLoading ||
+      showLibrary ||
+      selectedPerson ||
+      requestFocusHandled.current
+    )
+      return;
+    const frame = requestAnimationFrame(() => {
+      const season =
+        media.mediaType === "tv" && canRequest
+          ? seasonSelection.current?.querySelector<HTMLInputElement>(
+              'input[type="checkbox"]:not(:disabled)',
+            )
+          : undefined;
+      const target =
+        season ??
+        requestActions.current?.querySelector<HTMLButtonElement>(
+          "button:not(:disabled)",
+        ) ??
+        requestActions.current;
+      if (!target) return;
+      requestFocusHandled.current = true;
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ block: "center", behavior: "auto" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [
+    focusRequest,
+    open,
+    details,
+    settings,
+    quota,
+    libraryLoading,
+    showLibrary,
+    selectedPerson,
+    media.mediaType,
+    canRequest,
+  ]);
 
   const sendRequest = async () => {
     if (!canRequest || !details || submitting.current) return;
@@ -303,7 +354,13 @@ function SeerrDetailsContent({
                           </span>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-4 mb-4">
+                      <div
+                        ref={requestActions}
+                        tabIndex={-1}
+                        role="group"
+                        aria-label="Request and availability"
+                        className="flex flex-wrap items-center gap-4 mb-4"
+                      >
                         {libraryId ? (
                           <Button
                             theme="purple"
@@ -453,7 +510,7 @@ function SeerrDetailsContent({
                       </div>
                       {media.mediaType === "tv" &&
                         availableSeasons.length > 0 && (
-                          <div className="mt-8">
+                          <div ref={seasonSelection} className="mt-8">
                             <div className="flex items-center justify-between gap-4 mb-4">
                               <h4 className="text-xl font-bold text-white">
                                 Seasons
@@ -608,12 +665,14 @@ export function SeerrDetailsModal({
   onClose,
   onRequested,
   onSelectMedia,
+  focusRequest,
 }: {
   media?: SeerrMedia;
   user: SeerrUser;
   onClose: () => void;
   onRequested: (details: SeerrDetails) => void;
   onSelectMedia?: (media: SeerrMedia) => void;
+  focusRequest?: boolean;
 }) {
   const presence = useRetainedModalValue(media);
   return presence.value ? (
@@ -626,6 +685,7 @@ export function SeerrDetailsModal({
       onClose={onClose}
       onRequested={onRequested}
       onSelectMedia={onSelectMedia}
+      focusRequest={focusRequest}
     />
   ) : null;
 }
