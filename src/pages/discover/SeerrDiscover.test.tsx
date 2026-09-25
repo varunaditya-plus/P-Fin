@@ -16,16 +16,26 @@ vi.mock("@/stores/seerr", () => ({
     select({ connection: { userId: 1, apiUrl: "/seerr" } }),
   matchesSeerrSession: () => true,
 }));
-vi.mock("@/pages/taste/viewPreferences", () => ({
-  useTasteView: Object.assign(() => ({ seerr: false }), { setState: vi.fn() }),
-  resolveTasteView: () => false,
-}));
+const recommendations = vi.hoisted(() => ({ enabled: false }));
 vi.mock("@/pages/taste/usePersonalRecommendations", () => ({
-  usePersonalRecommendations: () => ({
+  usePersonalRecommendations: (_source: string, type: string) => ({
     rows: [],
-    ranked: [],
+    ranked: recommendations.enabled
+      ? [
+          {
+            candidate: {
+              item: {
+                id: 42,
+                mediaType: type,
+                title:
+                  type === "movie" ? "Recommended film" : "Recommended show",
+              },
+            },
+          },
+        ]
+      : [],
     hero: [],
-    hasSignals: false,
+    hasSignals: recommendations.enabled,
     loading: false,
     error: "",
   }),
@@ -142,6 +152,7 @@ async function settleSearch() {
   });
 }
 beforeEach(() => {
+  recommendations.enabled = false;
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   vi.stubGlobal(
     "IntersectionObserver",
@@ -176,6 +187,41 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 describe("Discover URL navigation", () => {
+  it("shows For You as one category-specific row alongside the normal feeds", async () => {
+    recommendations.enabled = true;
+    await render("/discover");
+    expect(host.querySelectorAll('section[aria-label="For You"]')).toHaveLength(
+      1,
+    );
+    expect(
+      [...host.querySelectorAll("button")].some(
+        (button) => button.textContent?.trim() === "For You",
+      ),
+    ).toBe(false);
+    expect(
+      host.querySelector('section[aria-label="For You"]')?.textContent,
+    ).toContain("Recommended film");
+    expect(
+      host.querySelector('section[aria-label="Popular movies"]'),
+    ).not.toBeNull();
+    expect(host.querySelector('section[aria-label="Trending"]')).not.toBeNull();
+    expect(
+      host.querySelector('section[aria-label="Popular Picks"]'),
+    ).toBeNull();
+    await click("TV shows");
+    expect(
+      host.querySelector('section[aria-label="For You"]')?.textContent,
+    ).toContain("Recommended show");
+    expect(
+      host.querySelector('section[aria-label="Popular TV shows"]'),
+    ).not.toBeNull();
+  });
+  it("keeps ordinary browsing available without personalisation signals", async () => {
+    await render("/discover");
+    expect(host.querySelector('section[aria-label="For You"]')).toBeNull();
+    expect(host.querySelector('section[aria-label="Trending"]')).not.toBeNull();
+    expect(host.querySelector('a[href="/taste"]')).toBeNull();
+  });
   it("returns from More through history without inserting a duplicate browse entry", async () => {
     await render("/discover");
     await click("More");

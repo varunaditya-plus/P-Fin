@@ -13,7 +13,7 @@ it("registers optional feature preferences before direct settings hydration and 
   expect(sections.has("simklApplication")).toBe(true);
   expect(sections.has("watchlist")).toBe(false);
   expect(sections.has("subtitleTools")).toBe(true);
-  expect(sections.has("recommendationView")).toBe(true);
+  expect(sections.has("recommendationView")).toBe(false);
   const exported = JSON.stringify(snapshotAppPreferences());
   expect(exported).not.toContain("accessToken");
   expect(exported).not.toContain("jellyfinToken");
