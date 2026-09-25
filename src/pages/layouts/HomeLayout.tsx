@@ -26,7 +26,6 @@ export function HomeLayout(props: {
     <div className="min-h-screen">
       <Navigation
         hideMobileNavigation
-        lightbarAtTop
         bg={props.hasFeaturedBackdrop || props.showBg}
         clearBackground={clearBackground}
         noLightbar={props.hasFeaturedBackdrop}
