@@ -92,15 +92,6 @@ vi.mock("@/backend/seerr/browse", async (original) => ({
     results: [{ id: 1, mediaType: "movie", title: "Film" }],
   }),
 }));
-vi.mock("@/backend/seerr/filters", async (original) => ({
-  ...(await original<typeof import("@/backend/seerr/filters")>()),
-  getSeerrDiscoveryChoices: async () => ({
-    genres: [{ id: 28, name: "Action" }],
-    regions: [],
-    languages: [],
-  }),
-  filteredSeerrPath: async () => "/discover/movies?genre=28",
-}));
 
 let host: HTMLDivElement;
 let root: Root;
@@ -249,14 +240,27 @@ describe("Discover URL navigation", () => {
     await click("History forward");
     expect(host.querySelector("input")?.value).toBe("second");
   });
-  it("keeps filters when returning from a directly opened results grid", async () => {
+  it("returns from an old filtered grid to normal browsing without hidden filters", async () => {
     await render(
       "/discover?genre=28&view=Action&feed=%2Fdiscover%2Fmovies%3Fgenre%3D28",
     );
     await click("Back");
     expect(host.querySelector("[data-location]")?.textContent).toBe(
-      "/discover?genre=28",
+      "/discover",
     );
-    expect(host.querySelector('[aria-label="Genre: Action"]')).not.toBeNull();
+    expect(host.querySelector('[aria-label="Discovery filters"]')).toBeNull();
+    expect(
+      host.querySelector('section[aria-label="Popular movies"]'),
+    ).not.toBeNull();
+  });
+  it("discards legacy filters while preserving the selected category and search", async () => {
+    await render(
+      "/discover?kind=tv&lang=en&region=US&genre=28&sort=vote_average.desc&q=first",
+    );
+    expect(host.querySelector("[data-location]")?.textContent).toBe(
+      "/discover?kind=tv&q=first",
+    );
+    expect(host.querySelector("input")?.value).toBe("first");
+    expect(host.querySelector('[aria-label="Discovery filters"]')).toBeNull();
   });
 });
