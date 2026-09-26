@@ -233,6 +233,11 @@ export function KeyboardEvents() {
         }
         return;
       }
+      if (
+        useOverlayStack.getState().getTopModal() ||
+        document.querySelector('[role="dialog"][aria-modal="true"]')
+      )
+        return;
       if (evt.target instanceof HTMLElement) {
         if (
           ["INPUT", "TEXTAREA", "SELECT"].includes(evt.target.nodeName) ||
@@ -656,12 +661,35 @@ export function KeyboardEvents() {
       }
     };
 
+    const cancelBoost = () => {
+      const data = dataRef.current;
+      clearTimeout(data.boostTimeoutRef.current);
+      clearTimeout(data.speedIndicatorTimeoutRef.current);
+      data.isPendingBoostRef.current = false;
+      if (data.isSpaceHeldRef.current)
+        data.display?.setPlaybackRate(data.previousRateRef.current);
+      data.isSpaceHeldRef.current = false;
+      data.setSpeedBoosted(false);
+      data.setShowSpeedIndicator(false);
+      if (useOverlayStack.getState().currentOverlay === "speed")
+        data.setCurrentOverlay(null);
+    };
+    const onVisibilityChange = () => {
+      if (document.hidden) cancelBoost();
+    };
+    window.addEventListener("blur", cancelBoost);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("keydown", keydownEventHandler);
     window.addEventListener("keyup", keyupEventHandler);
 
     return () => {
       window.removeEventListener("keydown", keydownEventHandler);
       window.removeEventListener("keyup", keyupEventHandler);
+      window.removeEventListener("blur", cancelBoost);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      cancelBoost();
+      clearTimeout(volumeDebounce.current);
+      clearTimeout(subtitleDebounce.current);
     };
   }, []);
 

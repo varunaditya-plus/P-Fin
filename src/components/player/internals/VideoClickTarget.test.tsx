@@ -95,3 +95,25 @@ describe("player tap arbitration", () => {
     expect(pause).not.toHaveBeenCalled();
   });
 });
+
+it("restores speed when a touch hold is cancelled without pointerup", () => {
+  const rate = vi.fn();
+  act(() => {
+    usePreferencesStore.setState({ enableHoldToBoost: true });
+    usePlayerStore.setState((state) => {
+      state.display!.setPlaybackRate = rate;
+      state.mediaPlaying.playbackRate = 1.5;
+    });
+  });
+  const target = container.lastElementChild!;
+  const down = new MouseEvent("pointerdown", { bubbles: true, button: 0 });
+  Object.defineProperty(down, "pointerType", { value: "touch" });
+  act(() => target.dispatchEvent(down));
+  act(() => vi.advanceTimersByTime(350));
+  expect(rate).toHaveBeenLastCalledWith(2);
+  act(() =>
+    target.dispatchEvent(new Event("pointercancel", { bubbles: true })),
+  );
+  expect(rate).toHaveBeenLastCalledWith(1.5);
+  expect(pause).not.toHaveBeenCalled();
+});

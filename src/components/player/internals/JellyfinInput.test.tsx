@@ -106,6 +106,7 @@ afterEach(() => {
   act(() => root.unmount());
   container.remove();
   usePlayerStore.setState(usePlayerStore.getInitialState(), true);
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -205,4 +206,42 @@ describe("Jellyfin player input", () => {
     expect(metadataCreated).toHaveBeenCalledTimes(2);
     expect(navigator.mediaSession.metadata).not.toBe(initialMetadata);
   });
+});
+
+it("restores hold-to-boost speed on window blur and cancels delayed activation", () => {
+  vi.useFakeTimers();
+  const setPlaybackRate = vi.fn();
+  usePreferencesStore.setState({ enableHoldToBoost: true });
+  usePlayerStore.setState((state) => {
+    state.display!.setPlaybackRate = setPlaybackRate;
+    state.mediaPlaying.playbackRate = 1.5;
+    state.mediaPlaying.isPaused = false;
+  });
+  render();
+  key(" ");
+  act(() => vi.advanceTimersByTime(350));
+  expect(setPlaybackRate).toHaveBeenLastCalledWith(2);
+  act(() => window.dispatchEvent(new Event("blur")));
+  expect(setPlaybackRate).toHaveBeenLastCalledWith(1.5);
+  setPlaybackRate.mockClear();
+  key(" ");
+  act(() => window.dispatchEvent(new Event("blur")));
+  act(() => vi.advanceTimersByTime(350));
+  expect(setPlaybackRate).not.toHaveBeenCalled();
+});
+it("does not seek or change subtitles behind an open modal", () => {
+  render();
+  const modal = document.createElement("div");
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  document.body.append(modal);
+  key("ArrowRight");
+  key("c");
+  key("k");
+  expect(setTime).not.toHaveBeenCalled();
+  expect(controls.changeSubtitle).not.toHaveBeenCalled();
+  expect(play).not.toHaveBeenCalled();
+  modal.remove();
+  key("ArrowRight");
+  expect(setTime).toHaveBeenCalledWith(105);
 });
