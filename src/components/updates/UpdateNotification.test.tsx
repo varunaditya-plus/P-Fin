@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 import { act } from "react";
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
+import { DetailsModalFrame } from "@/components/overlays/DetailsModalFrame";
 import { offerAppUpdate, useAppUpdateStore } from "@/setup/appUpdates";
 
 import { UpdateNotification } from "./UpdateNotification";
@@ -30,8 +32,9 @@ afterEach(() => {
   container.remove();
   localStorage.clear();
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
-it("keeps focus on the current action, dismisses by version, and refreshes only on a click", async () => {
+it("keeps focus on the current action and offers only an explicit Refresh button", async () => {
   const apply = vi.fn().mockResolvedValue(undefined);
   await act(async () =>
     root.render(
@@ -45,24 +48,74 @@ it("keeps focus on the current action, dismisses by version, and refreshes only 
   const focused = document.activeElement;
   await act(async () => offerAppUpdate("one", apply));
   expect(document.activeElement).toBe(focused);
-  expect(container.textContent).toContain("stops playback");
+  const toast = document.querySelector('[aria-label="App update"]')!;
+  expect(toast.textContent).toContain("stops playback");
+  expect(toast.querySelectorAll("button")).toHaveLength(1);
+  expect(toast.querySelector("button")!.textContent).toBe("Refresh");
+  expect(
+    document.querySelector('[aria-label="Dismiss this update"]'),
+  ).toBeNull();
   expect(apply).not.toHaveBeenCalled();
-  await act(async () =>
-    container
-      .querySelector<HTMLButtonElement>('[aria-label="Dismiss this update"]')!
-      .click(),
-  );
-  await act(async () => vi.advanceTimersByTimeAsync(400));
-  expect(container.querySelector('[aria-label="App update"]')).toBeNull();
-  await act(async () => offerAppUpdate("one", apply));
-  expect(container.querySelector('[aria-label="App update"]')).toBeNull();
-  await act(async () => offerAppUpdate("two", apply));
-  const refresh = [...container.querySelectorAll("button")].find(
-    (button) => button.textContent === "Refresh",
-  )!;
+  const refresh = toast.querySelector("button")!;
   await act(async () => refresh.click());
   expect(apply).toHaveBeenCalledOnce();
 });
+it.each([true, false])(
+  "keeps Refresh reachable with a details modal open (update offered first: %s)",
+  async (offerFirst) => {
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe = vi.fn();
+
+        disconnect = vi.fn();
+      },
+    );
+    const apply = vi.fn().mockResolvedValue(undefined);
+    const close = vi.fn();
+    if (offerFirst) offerAppUpdate("one", apply);
+    await act(async () =>
+      root.render(
+        <HelmetProvider>
+          <UpdateNotification />
+          <DetailsModalFrame
+            open
+            onClose={close}
+            afterLeave={() => {}}
+            label="Film"
+          >
+            <button type="button">Play</button>
+          </DetailsModalFrame>
+        </HelmetProvider>,
+      ),
+    );
+    await act(async () => vi.advanceTimersByTimeAsync(650));
+    const focused = document.activeElement;
+    if (!offerFirst) await act(async () => offerAppUpdate("one", apply));
+    expect(document.activeElement).toBe(focused);
+    const toast = document.querySelector('[aria-label="App update"]')!;
+    expect(container.getAttribute("aria-hidden")).toBe("true");
+    expect(container.inert).toBe(true);
+    expect(toast.closest('[aria-hidden="true"], [inert]')).toBeNull();
+    for (
+      let ancestor = toast.parentElement;
+      ancestor;
+      ancestor = ancestor.parentElement
+    ) {
+      expect(ancestor.inert).not.toBe(true);
+    }
+    const refresh = toast.querySelector("button")!;
+    await act(async () => {
+      refresh.focus();
+      refresh.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+      refresh.click();
+    });
+    expect(document.activeElement).toBe(refresh);
+    expect(apply).toHaveBeenCalledOnce();
+    expect(close).not.toHaveBeenCalled();
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+  },
+);
 it("shows an update activation failure and keeps the page available", async () => {
   await act(async () => root.render(<UpdateNotification />));
   await act(async () =>
@@ -70,11 +123,11 @@ it("shows an update activation failure and keeps the page available", async () =
       throw new Error("Update still downloading");
     }),
   );
-  const refresh = [...container.querySelectorAll("button")].find(
+  const refresh = [...document.querySelectorAll("button")].find(
     (button) => button.textContent === "Refresh",
   )!;
   await act(async () => refresh.click());
-  expect(container.querySelector('[role="alert"]')?.textContent).toBe(
+  expect(document.querySelector('[role="alert"]')?.textContent).toBe(
     "Update still downloading",
   );
   expect(refresh.disabled).toBe(false);

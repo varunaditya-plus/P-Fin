@@ -1,17 +1,15 @@
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { createPortal } from "react-dom";
 
-import { Icon, Icons } from "@/components/Icon";
-import {
-  applyAppUpdate,
-  dismissAppUpdate,
-  useAppUpdateStore,
-} from "@/setup/appUpdates";
+import { applyAppUpdate, useAppUpdateStore } from "@/setup/appUpdates";
 
 export function UpdateNotification() {
   const { available, dismissed, applying, error } = useAppUpdateStore();
   const show = Boolean(available && !dismissed.includes(available.version));
-  return (
+  // Detail dialogs make the app root inert. Keep this action in a separate
+  // body-level portal so it stays reachable while a dialog is open.
+  return createPortal(
     <Transition
       show={show}
       as={Fragment}
@@ -44,15 +42,6 @@ export function UpdateNotification() {
             >
               {applying ? "Refreshing…" : "Refresh"}
             </button>
-            <button
-              type="button"
-              aria-label="Dismiss this update"
-              disabled={applying}
-              onClick={dismissAppUpdate}
-              className="tabbable flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-type-secondary transition-colors hover:bg-dropdown-hoverBackground hover:text-white disabled:opacity-50"
-            >
-              <Icon icon={Icons.X} className="text-base" />
-            </button>
           </div>
           {error ? (
             <p role="alert" className="mt-2 text-xs text-type-danger">
@@ -61,6 +50,7 @@ export function UpdateNotification() {
           ) : null}
         </div>
       </section>
-    </Transition>
+    </Transition>,
+    document.body,
   );
 }
