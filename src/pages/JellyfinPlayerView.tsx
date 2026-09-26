@@ -15,6 +15,7 @@ import {
   JellyfinPlayback,
   PlaybackOptions,
   getPlayback,
+  localSubtitleFormat,
   reportPlayback,
   stopTranscode,
 } from "@/backend/jellyfin/playback";
@@ -40,7 +41,7 @@ import {
 } from "@/components/player/remote/playbackCommands";
 import { useSyncPlayState } from "@/components/player/remote/syncplay";
 import { PlayerPart } from "@/pages/parts/player/PlayerPart";
-import { playerStatus } from "@/stores/player/slices/source";
+import { Caption, playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 import { useSubtitleStore } from "@/stores/subtitles";
@@ -48,7 +49,15 @@ import { useVolumeStore } from "@/stores/volume";
 
 let playbackReportQueue = Promise.resolve();
 
-function JellyfinSessionReporter({ playback }: { playback: JellyfinPlayback }) {
+function JellyfinSessionReporter({
+  playback,
+  subtitleIndex,
+}: {
+  playback: JellyfinPlayback;
+  subtitleIndex: number;
+}) {
+  const selectedSubtitle = useRef(subtitleIndex);
+  selectedSubtitle.current = subtitleIndex;
   useEffect(() => {
     let started = false;
     let stopped = false;
@@ -59,6 +68,7 @@ function JellyfinSessionReporter({ playback }: { playback: JellyfinPlayback }) {
       paused: true,
       muted: false,
       volume: 1,
+      playbackRate: 1,
       subtitleIndex: -1,
     };
     const send = (event: "Playing" | "Progress" | "Stopped") => {
@@ -77,9 +87,8 @@ function JellyfinSessionReporter({ playback }: { playback: JellyfinPlayback }) {
         paused: store.mediaPlaying.isPaused,
         muted: store.mediaPlaying.volume === 0,
         volume: store.mediaPlaying.volume,
-        subtitleIndex: store.caption.selected
-          ? Number(store.caption.selected.id.replace("jellyfin-", ""))
-          : playback.subtitleIndex,
+        playbackRate: store.mediaPlaying.playbackRate,
+        subtitleIndex: selectedSubtitle.current,
       };
       if (!store.mediaPlaying.hasPlayedOnce) return;
       if (!started) {
@@ -141,6 +150,8 @@ export function JellyfinPlayerView() {
   const [episodes, setEpisodes] = useState<JellyfinItem[]>([]);
   const [playback, setPlayback] = useState<JellyfinPlayback | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [subtitleError, setSubtitleError] = useState<string | null>(null);
+  const nativePresentation = usePlayerStore((state) => state.caption.asTrack);
   const [busy, setBusy] = useState(true);
   const [subtitleIndex, setSubtitleIndex] = useState(-1);
   const [maxBitrate, setMaxBitrate] = useState(120_000_000);
@@ -156,6 +167,17 @@ export function JellyfinPlayerView() {
     Awaited<ReturnType<typeof getUserConfiguration>>
   >({});
   const rememberedTracks = useRef<ReturnType<typeof rememberTrackSelection>>();
+
+  const subtitleFailed = useCallback((caption: Caption) => {
+    if (usePlayerStore.getState().caption.selected !== caption) return;
+    usePlayerStore.getState().setCaption(null);
+    useSubtitleStore.getState().setSubtitle(false);
+    subtitleSelection.current = -1;
+    setSubtitleIndex(-1);
+    setSubtitleError(
+      "Could not load this subtitle track. Choose another track or select it again to retry.",
+    );
+  }, []);
 
   const load = useCallback(
     async (
@@ -176,17 +198,28 @@ export function JellyfinPlayerView() {
         preservePause && previousState.mediaPlaying.hasPlayedOnce;
       setBusy(true);
       setError(null);
+      setSubtitleError(null);
       try {
         const result = await getPlayback(target.Id, options);
-        if (request !== generation.current) return;
+        if (request !== generation.current) {
+          stopTranscode(result).catch(() => {});
+          return;
+        }
         lastOptions.current = {
           ...options,
           mediaSourceId: result.mediaSource.Id,
         };
         const store = usePlayerStore.getState();
+        const resumeAt =
+          preservePause && autoplay === undefined
+            ? store.progress.time
+            : startAt;
+        const resumePaused = preservePause
+          ? store.mediaPlaying.isPaused
+          : wasPaused;
         store.setCaption(null);
         usePlayerStore.setState((state) => {
-          state.progress.time = startAt;
+          state.progress.time = resumeAt;
           state.progress.duration = (target.RunTimeTicks ?? 0) / 10_000_000;
           state.progress.buffered = 0;
           state.mediaPlaying.hasPlayedOnce = previouslyPlayed;
@@ -195,9 +228,9 @@ export function JellyfinPlayerView() {
         store.setSource(
           result.source,
           result.captions,
-          startAt,
+          resumeAt,
           autoplay ??
-            (!wasPaused &&
+            (!resumePaused &&
               !useSyncPlayState.getState().group &&
               !useChromecastState.getState().casting),
         );
@@ -209,16 +242,34 @@ export function JellyfinPlayerView() {
         if (caption && result.subtitleIndex < 0) {
           const controller = new AbortController();
           subtitleDownload.current = controller;
-          const srtData = await downloadCaption(caption, controller.signal);
-          if (
-            request !== generation.current ||
-            subtitleRequest !== subtitleGeneration.current
-          )
-            return;
-          store.setCaption({ ...caption, srtData });
-          useSubtitleStore
-            .getState()
-            .setSubtitle(true, caption.language, caption.id);
+          try {
+            const srtData =
+              caption.type === "sup"
+                ? ""
+                : await downloadCaption(caption, controller.signal);
+            if (
+              request !== generation.current ||
+              subtitleRequest !== subtitleGeneration.current
+            )
+              return;
+            store.setCaption({ ...caption, srtData });
+            useSubtitleStore
+              .getState()
+              .setSubtitle(true, caption.language, caption.id);
+          } catch {
+            if (
+              controller.signal.aborted ||
+              request !== generation.current ||
+              subtitleRequest !== subtitleGeneration.current
+            )
+              return;
+            subtitleSelection.current = -1;
+            setSubtitleIndex(-1);
+            useSubtitleStore.getState().setSubtitle(false);
+            setSubtitleError(
+              "Could not load this subtitle track. Choose another track or select it again to retry.",
+            );
+          }
         }
       } catch (cause) {
         if (cause instanceof DOMException && cause.name === "AbortError")
@@ -246,6 +297,7 @@ export function JellyfinPlayerView() {
     setEpisodes([]);
     setPlayback(null);
     setError(null);
+    setSubtitleError(null);
     setSubtitleIndex(-1);
     subtitleSelection.current = -1;
     setBusy(true);
@@ -393,7 +445,7 @@ export function JellyfinPlayerView() {
               source?.MediaStreams?.find((track) => track.Type === "Audio")
                 ?.Index,
             subtitleIndex:
-              subtitle && !subtitle.IsTextSubtitleStream ? subtitle.Index : -1,
+              subtitle && !localSubtitleFormat(subtitle) ? subtitle.Index : -1,
           },
           startAt,
           false,
@@ -490,64 +542,98 @@ export function JellyfinPlayerView() {
 
   const changeSubtitle = useCallback(
     async (index: number) => {
-      if (!playback) return;
-      subtitleGeneration.current += 1;
-      subtitleDownload.current?.abort();
-      const request = subtitleGeneration.current;
+      if (!playback || busy || index === subtitleSelection.current) return;
       const track = playback.mediaSource.MediaStreams?.find(
         (stream) => stream.Type === "Subtitle" && stream.Index === index,
       );
-      const wasBurnedIn = playback.subtitleIndex >= 0;
-      const nextBurnedIn = track && !track.IsTextSubtitleStream;
-      usePlayerStore.getState().setCaption(null);
-      setSubtitleIndex(index);
+      if (index !== -1 && !track) return;
+      subtitleGeneration.current += 1;
+      subtitleDownload.current?.abort();
+      const request = subtitleGeneration.current;
+      const previousIndex = subtitleIndex;
+      const nextBurnedIn =
+        track &&
+        (!localSubtitleFormat(track) ||
+          (localSubtitleFormat(track) === "sup" &&
+            usePlayerStore.getState().caption.asTrack));
       subtitleSelection.current = index;
-      rememberedTracks.current = rememberTrackSelection(
-        playback.mediaSource,
-        playback.audioIndex,
-        index,
-      );
-      if (wasBurnedIn || nextBurnedIn) {
+      setSubtitleError(null);
+      const commit = () => {
+        setSubtitleIndex(index);
+        rememberedTracks.current = rememberTrackSelection(
+          playback.mediaSource,
+          playback.audioIndex,
+          index,
+        );
+        if (index === -1) useSubtitleStore.getState().setSubtitle(false);
+      };
+      if (playback.subtitleIndex >= 0 || nextBurnedIn) {
         if (!item) return;
+        commit();
         await load(
           item,
-          {
-            ...lastOptions.current,
-            subtitleIndex: nextBurnedIn ? index : -1,
-            forceTranscode: lastOptions.current.forceTranscode,
-          },
+          { ...lastOptions.current, subtitleIndex: nextBurnedIn ? index : -1 },
           usePlayerStore.getState().progress.time,
           true,
         );
         return;
       }
-      if (!track || nextBurnedIn || request !== subtitleGeneration.current)
+      if (!track) {
+        usePlayerStore.getState().setCaption(null);
+        commit();
         return;
+      }
       const caption = playback.captions.find(
         (entry) => entry.id === `jellyfin-${index}`,
       );
-      if (!caption) return;
+      const controller = new AbortController();
+      subtitleDownload.current = controller;
       try {
-        const controller = new AbortController();
-        subtitleDownload.current = controller;
-        const srtData = await downloadCaption(caption, controller.signal);
-        if (request !== subtitleGeneration.current) return;
+        if (!caption) throw new Error("Subtitle track unavailable");
+        const srtData =
+          caption.type === "sup"
+            ? ""
+            : await downloadCaption(caption, controller.signal);
+        if (request !== subtitleGeneration.current || controller.signal.aborted)
+          return;
         usePlayerStore.getState().setCaption({ ...caption, srtData });
         useSubtitleStore
           .getState()
           .setSubtitle(true, caption.language, caption.id);
+        commit();
       } catch {
-        if (request === subtitleGeneration.current) {
-          setSubtitleIndex(-1);
-          subtitleSelection.current = -1;
-          setError(
-            "Jellyfin could not load this subtitle track. Choose another track or retry playback.",
-          );
-        }
+        if (request !== subtitleGeneration.current || controller.signal.aborted)
+          return;
+        subtitleSelection.current = previousIndex;
+        setSubtitleError(
+          "Could not load this subtitle track. Choose another track or select it again to retry.",
+        );
       }
     },
-    [playback, item, load],
+    [playback, item, load, busy, subtitleIndex],
   );
+
+  // A native video-only presentation cannot display a canvas. Burn PGS in only
+  // while PiP/iOS fullscreen needs it, then return to the local subtitle layer.
+  useEffect(() => {
+    if (!item || !playback || busy || error || casting || castSuspended) return;
+    const track = playback.mediaSource.MediaStreams?.find(
+      (stream) => stream.Type === "Subtitle" && stream.Index === subtitleIndex,
+    );
+    if (!track || localSubtitleFormat(track) !== "sup") return;
+    const desired = nativePresentation ? subtitleIndex : -1;
+    if (playback.subtitleIndex !== desired) reload({ subtitleIndex: desired });
+  }, [
+    item,
+    playback,
+    busy,
+    error,
+    casting,
+    castSuspended,
+    subtitleIndex,
+    nativePresentation,
+    reload,
+  ]);
 
   const controls = useMemo(
     () => ({
@@ -559,6 +645,7 @@ export function JellyfinPlayerView() {
       busy,
       subtitleIndex,
       maxBitrate,
+      subtitleFailed,
       playItem: (id: string, fromStart = false) => {
         if (casting || castSuspended) return;
         if (selectRemoteItem(id, fromStart ? 0 : undefined)) return;
@@ -571,7 +658,8 @@ export function JellyfinPlayerView() {
         );
       },
       changeAudio: (index: number) => {
-        if (casting || castSuspended) return;
+        if (casting || castSuspended || busy || index === playback?.audioIndex)
+          return;
         if (playback)
           rememberedTracks.current = rememberTrackSelection(
             playback.mediaSource,
@@ -581,7 +669,7 @@ export function JellyfinPlayerView() {
         reload({ audioIndex: index });
       },
       changeSource: (sourceId: string) => {
-        if (casting || castSuspended) return;
+        if (casting || castSuspended || busy) return;
         const source = item?.MediaSources?.find(
           (entry) => entry.Id === sourceId,
         );
@@ -612,7 +700,7 @@ export function JellyfinPlayerView() {
               source.MediaStreams?.find((track) => track.Type === "Audio")
                 ?.Index,
             subtitleIndex:
-              subtitle && !subtitle.IsTextSubtitleStream ? subtitle.Index : -1,
+              subtitle && !localSubtitleFormat(subtitle) ? subtitle.Index : -1,
             maxBitrate,
             forceTranscode: maxBitrate < 120_000_000,
           },
@@ -625,7 +713,13 @@ export function JellyfinPlayerView() {
         changeSubtitle(index);
       },
       changeQuality: (bitrate: number) => {
-        if (casting || castSuspended) return;
+        if (
+          casting ||
+          castSuspended ||
+          busy ||
+          bitrate === selectedBitrate.current
+        )
+          return;
         selectedBitrate.current = bitrate;
         setMaxBitrate(bitrate);
         reload({
@@ -647,6 +741,7 @@ export function JellyfinPlayerView() {
       shuffleSeason,
       reload,
       changeSubtitle,
+      subtitleFailed,
       load,
       casting,
       castSuspended,
@@ -687,9 +782,27 @@ export function JellyfinPlayerView() {
           }}
         >
           {playback && !casting && !castSuspended ? (
-            <JellyfinSessionReporter playback={playback} />
+            <JellyfinSessionReporter
+              playback={playback}
+              subtitleIndex={subtitleIndex}
+            />
           ) : null}
           <PlayerPart backUrl="/" localPlaybackSuspended={castSuspended}>
+            {subtitleError && !casting && !castSuspended ? (
+              <div
+                role="alert"
+                className="absolute top-20 inset-x-4 z-[60] mx-auto flex max-w-lg items-center gap-4 rounded-lg bg-video-context-background p-4 text-sm text-white shadow-lg"
+              >
+                <p>{subtitleError}</p>
+                <button
+                  type="button"
+                  className="tabbable rounded px-2 py-1 hover:bg-video-context-hoverColor"
+                  onClick={() => setSubtitleError(null)}
+                >
+                  Dismiss
+                </button>
+              </div>
+            ) : null}
             {!casting && (busy || (!castSuspended && error)) ? (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-background-main/90 p-8">
                 <div className="max-w-lg text-center space-y-5">

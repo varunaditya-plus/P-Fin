@@ -174,7 +174,7 @@ export function SubtitleAutoSyncRuntime() {
     if (
       !enabled ||
       !played ||
-      !caption ||
+      !caption?.srtData ||
       busy ||
       (attempted.current?.caption === caption &&
         matchesSubtitleToolIdentity(attempted.current.identity))

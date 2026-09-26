@@ -8,6 +8,7 @@ import {
   authenticatedStreamUrl,
   getPlayback,
   getTranscodingUrl,
+  localSubtitleFormat,
   reportPlayback,
   stopTranscode,
 } from "./playback";
@@ -189,7 +190,7 @@ describe("Jellyfin playback", () => {
     expect(url.pathname).toBe("/jellyfin/Videos/item/master.m3u8");
   });
 
-  it("extracts text subtitles locally and leaves image subtitles for burn-in", async () => {
+  it("extracts text and PGS subtitles for local rendering", async () => {
     vi.mocked(jellyfinRequest).mockResolvedValue({
       PlaySessionId: "session",
       MediaSources: [
@@ -217,7 +218,11 @@ describe("Jellyfin playback", () => {
       ],
     });
     const result = await getPlayback("item", { mediaSourceId: "source" });
-    expect(result.captions).toHaveLength(1);
+    expect(result.captions).toHaveLength(2);
+    expect(result.captions[1]).toMatchObject({ id: "jellyfin-5", type: "sup" });
+    expect(new URL(result.captions[1].url).pathname).toBe(
+      "/jellyfin/Videos/item/source/Subtitles/5/0/Stream.pgssub",
+    );
     expect(result.captions[0]).toMatchObject({
       id: "jellyfin-4",
       language: "en",
@@ -299,3 +304,20 @@ describe("Jellyfin playback", () => {
     });
   });
 });
+
+it.each([
+  ["subrip", "vtt"],
+  ["WEBVTT", "vtt"],
+  ["ass", "vtt"],
+  ["PGSSUB", "sup"],
+  ["dvdsub", null],
+  ["dvbsub", null],
+  ["unknown", null],
+])(
+  "recognises subtitle codec %s without the legacy text flag",
+  (Codec, expected) => {
+    expect(
+      localSubtitleFormat({ Index: 2, Type: "Subtitle", Codec: Codec! }),
+    ).toBe(expected);
+  },
+);

@@ -190,7 +190,7 @@ export function SubtitleView(props: { controlsShown: boolean }) {
   // Hide custom captions when native subtitles are enabled
   const shouldUseNativeTrack =
     (enableNativeSubtitles || needsNativeTrack) && source !== null;
-  if (shouldUseNativeTrack || !caption) return null;
+  if (shouldUseNativeTrack || !caption || caption.type === "sup") return null;
 
   if (isTTML(caption.srtData))
     return (

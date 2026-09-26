@@ -48,6 +48,31 @@ export interface JellyfinPlayback {
   playMethod: "DirectPlay" | "DirectStream" | "Transcode";
 }
 
+/** Jellyfin can omit the text flag; recognise extractable formats by codec too. */
+export function localSubtitleFormat(
+  stream: JellyfinMediaStream,
+): "vtt" | "sup" | null {
+  if (stream.Type !== "Subtitle") return null;
+  const codec = stream.Codec?.toLowerCase();
+  if (codec === "pgssub" || codec === "pgs") return "sup";
+  if (
+    stream.IsTextSubtitleStream ||
+    [
+      "vtt",
+      "webvtt",
+      "srt",
+      "subrip",
+      "ass",
+      "ssa",
+      "mov_text",
+      "text",
+      "ttml",
+    ].includes(codec ?? "")
+  )
+    return "vtt";
+  return null;
+}
+
 function isCurrentSession(owner?: JellyfinSession) {
   if (!owner) return true;
   try {
@@ -72,7 +97,11 @@ export interface PlaybackOptions {
   maxBitrate?: number;
 }
 
-function browserProfile(maxBitrate: number, forceCompatible: boolean) {
+function browserProfile(
+  maxBitrate: number,
+  forceCompatible: boolean,
+  burnSubtitles: boolean,
+) {
   const video = document.createElement("video");
   const hevcType = 'video/mp4; codecs="hvc1.1.6.L93.B0"';
   const hevc =
@@ -131,6 +160,7 @@ function browserProfile(maxBitrate: number, forceCompatible: boolean) {
         Format,
         Method: "External",
       })),
+      ...(!burnSubtitles ? [{ Format: "pgssub", Method: "External" }] : []),
       ...["pgssub", "dvdsub", "dvbsub"].map((Format) => ({
         Format,
         Method: "Encode",
@@ -230,7 +260,11 @@ export async function getPlayback(
       AllowVideoStreamCopy: !options.forceTranscode,
       AllowAudioStreamCopy: !options.forceTranscode,
       MaxStreamingBitrate: maxBitrate,
-      DeviceProfile: browserProfile(maxBitrate, !!options.forceTranscode),
+      DeviceProfile: browserProfile(
+        maxBitrate,
+        !!options.forceTranscode,
+        subtitleIndex >= 0,
+      ),
     }),
   });
   if (!isCurrentSession(session))
@@ -278,9 +312,7 @@ export async function getPlayback(
     );
 
   const captions = (mediaSource.MediaStreams ?? [])
-    .filter(
-      (stream) => stream.Type === "Subtitle" && stream.IsTextSubtitleStream,
-    )
+    .filter((stream) => localSubtitleFormat(stream) !== null)
     .map(
       (stream): CaptionListItem => ({
         id: `jellyfin-${stream.Index}`,
@@ -288,10 +320,10 @@ export async function getPlayback(
         display:
           stream.DisplayTitle ?? stream.Title ?? stream.Language ?? "Subtitle",
         url: jellyfinUrl(
-          `/Videos/${itemId}/${mediaSource.Id}/Subtitles/${stream.Index}/0/Stream.vtt`,
+          `/Videos/${itemId}/${mediaSource.Id}/Subtitles/${stream.Index}/0/Stream.${localSubtitleFormat(stream) === "sup" ? "pgssub" : "vtt"}`,
           { ApiKey: session.accessToken },
         ),
-        type: "vtt",
+        type: localSubtitleFormat(stream)!,
         source: "Jellyfin",
         isHearingImpaired: stream.IsHearingImpaired,
       }),
@@ -318,6 +350,7 @@ export function reportPlayback(
     muted: boolean;
     volume: number;
     subtitleIndex?: number;
+    playbackRate?: number;
   },
 ) {
   if (!isCurrentSession(playback.owner)) return Promise.resolve();
@@ -339,7 +372,7 @@ export function reportPlayback(
       PlayMethod: playback.playMethod,
       AudioStreamIndex: playback.audioIndex,
       SubtitleStreamIndex: state.subtitleIndex ?? playback.subtitleIndex,
-      PlaybackRate: 1,
+      PlaybackRate: state.playbackRate ?? 1,
     }),
   });
 }

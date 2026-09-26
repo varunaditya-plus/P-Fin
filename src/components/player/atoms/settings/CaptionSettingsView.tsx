@@ -9,7 +9,6 @@ import { Icon, Icons } from "@/components/Icon";
 import { Menu } from "@/components/player/internals/ContextMenu";
 import { useOverlayRouter } from "@/hooks/useOverlayRouter";
 import { useProgressBar } from "@/hooks/useProgressBar";
-import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 import { SubtitleStyling, useSubtitleStore } from "@/stores/subtitles";
 
@@ -471,17 +470,11 @@ export function CaptionSettingsView({
   const setOverrideCasing = subtitleStore.setOverrideCasing;
   const setDelay = subtitleStore.setDelay;
   const updateStyling = subtitleStore.updateStyling;
-  const setCaptionAsTrack = usePlayerStore((s) => s.setCaptionAsTrack);
   const enableNativeSubtitles = preferencesStore.enableNativeSubtitles;
 
   useEffect(() => {
     subtitleStore.updateStyling(styling);
   }, [styling, subtitleStore]);
-
-  // Sync preferences with player store
-  useEffect(() => {
-    setCaptionAsTrack(enableNativeSubtitles);
-  }, [enableNativeSubtitles, setCaptionAsTrack]);
 
   const handleStylingChange = (newStyling: SubtitleStyling) => {
     updateStyling(newStyling);

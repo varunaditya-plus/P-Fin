@@ -36,6 +36,7 @@ export interface PlayerMeta {
 }
 
 export interface Caption {
+  type?: string;
   id: string;
   language: string;
   url?: string;

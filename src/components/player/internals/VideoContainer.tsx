@@ -6,6 +6,8 @@ import { playerStatus } from "@/stores/player/slices/source";
 import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 
+import { BitmapCaptions } from "./BitmapCaptions";
+
 // initialize display interface
 function useDisplayInterface() {
   const display = usePlayerStore((s) => s.display);
@@ -66,6 +68,9 @@ function VideoElement() {
   const display = usePlayerStore((s) => s.display);
   const srtData = usePlayerStore((s) => s.caption.selected?.srtData);
   const language = usePlayerStore((s) => s.caption.selected?.language);
+  const bitmapCaption = usePlayerStore((s) =>
+    s.caption.selected?.type === "sup" ? s.caption.selected : null,
+  );
   const source = usePlayerStore((s) => s.source);
   const needsNativeTrack = usePlayerStore((s) => s.caption.asTrack);
   const enableNativeSubtitles = usePreferencesStore(
@@ -92,7 +97,7 @@ function VideoElement() {
     if (trackEl.current) {
       trackEl.current.track.mode = shouldUseNativeTrack ? "showing" : "hidden";
     }
-  }, [shouldUseNativeTrack, trackEl]);
+  }, [shouldUseNativeTrack, trackObjectUrl, trackEl]);
 
   // Attach track when native subtitles are enabled
   // SubtitleView handles showing custom captions when native subtitles are disabled
@@ -111,17 +116,22 @@ function VideoElement() {
   }
 
   return (
-    <video
-      id="video-element"
-      className="absolute inset-0 w-full h-screen bg-black"
-      autoPlay
-      playsInline
-      ref={videoEl}
-      preload="metadata"
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      {subtitleTrack}
-    </video>
+    <>
+      <video
+        id="video-element"
+        className="absolute inset-0 w-full h-screen bg-black"
+        autoPlay
+        playsInline
+        ref={videoEl}
+        preload="metadata"
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        {subtitleTrack}
+      </video>
+      {bitmapCaption ? (
+        <BitmapCaptions video={videoEl} caption={bitmapCaption} />
+      ) : null}
+    </>
   );
 }
 

@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 
 import { JellyfinItem, JellyfinMediaSource } from "@/backend/jellyfin/client";
 import { JellyfinPlayback } from "@/backend/jellyfin/playback";
+import { Caption } from "@/stores/player/slices/source";
 
 export interface JellyfinPlaybackControls {
   playback: JellyfinPlayback | null;
@@ -16,6 +17,7 @@ export interface JellyfinPlaybackControls {
   changeAudio: (index: number) => void;
   changeSource: (sourceId: string) => void;
   changeSubtitle: (index: number) => void;
+  subtitleFailed?: (caption: Caption) => void;
   changeQuality: (bitrate: number) => void;
 }
 

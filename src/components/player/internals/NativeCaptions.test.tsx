@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import type { VideoSubtitleOptions } from "libbitsub";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -12,6 +13,13 @@ import { usePreferencesStore } from "@/stores/preferences";
 
 import { VideoContainer } from "./VideoContainer";
 
+const bitmap = vi.hoisted(() => ({ create: vi.fn(), dispose: vi.fn() }));
+vi.mock("libbitsub", () => ({
+  PgsRenderer: vi.fn((options: VideoSubtitleOptions) => {
+    bitmap.create(options);
+    return { timeOffset: 0, dispose: bitmap.dispose };
+  }),
+}));
 vi.mock("@/components/utils/Transition", () => ({
   Transition: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -81,4 +89,36 @@ it("switches custom captions to a native track for PiP/fullscreen and restores c
   expect(container.querySelector("track")).toBeNull();
   expect(container.textContent).toContain("A subtitle");
   expect(usePreferencesStore.getState().enableNativeSubtitles).toBe(false);
+});
+
+it("adds and disposes bitmap captions without remounting or reprocessing the video", async () => {
+  bitmap.create.mockClear();
+  bitmap.dispose.mockClear();
+  const video = container.querySelector("video");
+  const display = usePlayerStore.getState().display!;
+  vi.mocked(display.processVideoElement).mockClear();
+  await act(async () =>
+    usePlayerStore.getState().setCaption({
+      id: "jellyfin-5",
+      type: "sup",
+      url: "/subtitle.pgssub",
+      language: "en",
+      srtData: "",
+    }),
+  );
+  expect(bitmap.create).toHaveBeenCalledOnce();
+  expect(bitmap.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      video,
+      subUrl: "/subtitle.pgssub",
+      streamingLoad: true,
+    }),
+  );
+  expect(container.querySelector("canvas")).not.toBeNull();
+  expect(container.querySelector("video")).toBe(video);
+  expect(display.processVideoElement).not.toHaveBeenCalled();
+  act(() => usePlayerStore.getState().setCaption(null));
+  expect(bitmap.dispose).toHaveBeenCalledOnce();
+  expect(container.querySelector("canvas")).toBeNull();
+  expect(container.querySelector("video")).toBe(video);
 });
