@@ -139,3 +139,58 @@ describe("player source lifecycle", () => {
     display.destroy();
   });
 });
+
+it("retains playback speed across stream replacement and video remounts", () => {
+  const display = makeVideoElementDisplayInterface();
+  const video = document.createElement("video");
+  display.processVideoElement(video);
+  display.setPlaybackRate(1.5);
+  display.load({
+    source: file,
+    startAt: 42,
+    autoplay: false,
+    automaticQuality: true,
+    preferredQuality: null,
+  });
+  expect(video.defaultPlaybackRate).toBe(1.5);
+  expect(video.playbackRate).toBe(1.5);
+  const replacement = document.createElement("video");
+  display.processVideoElement(replacement);
+  expect(replacement.playbackRate).toBe(1.5);
+  display.destroy();
+});
+it("clears the spinner when playback recovers and when a paused video can start", () => {
+  const display = makeVideoElementDisplayInterface();
+  const video = document.createElement("video");
+  display.processVideoElement(video);
+  display.load({
+    source: file,
+    startAt: 0,
+    autoplay: false,
+    automaticQuality: true,
+    preferredQuality: null,
+  });
+  const loading = vi.fn();
+  display.on("loading", loading);
+  video.dispatchEvent(new Event("waiting"));
+  expect(loading).toHaveBeenLastCalledWith(true);
+  video.dispatchEvent(new Event("playing"));
+  expect(loading).toHaveBeenLastCalledWith(false);
+  video.dispatchEvent(new Event("waiting"));
+  video.dispatchEvent(new Event("canplay"));
+  expect(loading).toHaveBeenLastCalledWith(false);
+  display.destroy();
+});
+it("keeps a blocked play attempt paused without an unhandled rejection", async () => {
+  const display = makeVideoElementDisplayInterface();
+  const video = document.createElement("video");
+  display.processVideoElement(video);
+  const pause = vi.fn();
+  display.on("pause", pause);
+  vi.mocked(video.play).mockRejectedValueOnce(
+    new DOMException("Blocked", "NotAllowedError"),
+  );
+  display.play();
+  await vi.waitFor(() => expect(pause).toHaveBeenCalledOnce());
+  display.destroy();
+});

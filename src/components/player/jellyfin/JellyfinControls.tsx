@@ -234,6 +234,7 @@ function JellyfinTracks({ kind }: { kind: "Audio" | "Subtitle" }) {
       <Menu.Section className="pb-4">
         {kind === "Subtitle" ? (
           <SelectableLink
+            disabled={busy}
             selected={subtitleIndex === -1}
             onClick={() => choose(-1)}
           >
@@ -575,6 +576,7 @@ export function JellyfinNextEpisode({
   compact?: boolean;
 }) {
   const { episodes, itemId, playItem } = useJellyfinPlayback();
+  const display = usePlayerStore((state) => state.display);
   const time = usePlayerStore((state) => state.progress.time);
   const duration = usePlayerStore((state) => state.progress.duration);
   const status = usePlayerStore((state) => state.status);
@@ -587,19 +589,16 @@ export function JellyfinNextEpisode({
     advanced.current = false;
   }, [itemId]);
   useEffect(() => {
-    if (
-      !compact &&
-      !syncGroup &&
-      autoplay &&
-      next &&
-      duration > 0 &&
-      time >= duration - 0.5 &&
-      !advanced.current
-    ) {
+    if (!display || compact || syncGroup || !autoplay || !next) return;
+    const advance = () => {
+      if (advanced.current) return;
       advanced.current = true;
       playItem(next.Id, true);
-    }
-  }, [compact, autoplay, next, time, duration, playItem, syncGroup]);
+    };
+    display.on("ended", advance);
+    return () => display.off("ended", advance);
+  }, [display, compact, autoplay, next, playItem, syncGroup]);
+
   if (!next || syncGroup) return null;
   if (compact)
     return (

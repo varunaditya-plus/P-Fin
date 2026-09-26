@@ -34,6 +34,7 @@ export type DisplayError = {
 export type DisplayInterfaceEvents = {
   play: void;
   pause: void;
+  ended: void;
   fullscreen: boolean;
   volumechange: number;
   time: number;

@@ -50,6 +50,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
   let automaticQuality = false;
   let preferenceQuality: SourceQuality | null = null;
   let lastVolume = 1;
+  let lastPlaybackRate = 1;
   let videoAppearance: VideoAppearance = { ...DEFAULT_VIDEO_APPEARANCE };
   let lastValidDuration = 0; // Store the last valid duration to prevent reset during source switches
   let lastValidTime = 0; // Store the last valid time to prevent reset during source switches
@@ -166,15 +167,6 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
               type: "hls",
               hls: hlsErrorInfo,
             });
-          } else if (data.details === "manifestLoadError") {
-            // Handle manifest load errors specifically
-            emit("error", {
-              message: "Failed to load HLS manifest",
-              stackTrace: data.error?.stack || "",
-              errorName: data.error?.name || "ManifestLoadError",
-              type: "hls",
-              hls: hlsErrorInfo,
-            });
           }
         });
         hls.on(Hls.Events.MANIFEST_LOADED, () => {
@@ -230,7 +222,9 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     videoSourceEvents?.abort();
     videoSourceEvents = new AbortController();
     videoElement.autoplay = shouldAutoplayAfterLoad;
+    videoElement.defaultPlaybackRate = lastPlaybackRate;
     setupSource(videoElement, source);
+    videoElement.playbackRate = lastPlaybackRate;
 
     addVideoListener("play", () => {
       emit("play", undefined);
@@ -245,33 +239,14 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         type: "htmlvideo",
       });
     });
-    addVideoListener("playing", () => emit("play", undefined));
+    addVideoListener("playing", () => {
+      emit("play", undefined);
+      emit("loading", false);
+    });
     addVideoListener("pause", () => emit("pause", undefined));
+    addVideoListener("ended", () => emit("ended", undefined));
     addVideoListener("canplay", () => {
-      // Check if video has enough buffered data to play smoothly (at least 5 seconds ahead)
-      const hasEnoughBuffer = (() => {
-        if (!videoElement) return false;
-        const currentTime = videoElement.currentTime ?? 0;
-        const buffered = videoElement.buffered;
-        if (buffered.length === 0) return false;
-
-        // Find the buffered range that contains current time
-        for (let i = 0; i < buffered.length; i += 1) {
-          if (
-            currentTime >= buffered.start(i) &&
-            currentTime <= buffered.end(i)
-          ) {
-            const bufferedAhead = buffered.end(i) - currentTime;
-            return bufferedAhead >= 5; // At least 5 seconds buffered ahead
-          }
-        }
-        return false;
-      })();
-
-      // Only set loading to false if we have enough buffer or if we're not at the start
-      if (hasEnoughBuffer || (videoElement?.currentTime ?? 0) > 0) {
-        emit("loading", false);
-      }
+      emit("loading", false);
 
       // Attempt autoplay if this was an autoplay transition (startAt = 0)
       if (shouldAutoplayAfterLoad && startAt === 0 && videoElement) {
@@ -516,7 +491,10 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     },
     play() {
       if (interceptPlayback("play")) return;
-      videoElement?.play();
+      const video = videoElement;
+      video?.play()?.catch(() => {
+        if (video === videoElement) emit("pause", undefined);
+      });
     },
     setSeeking(active) {
       if (active === isSeeking) return;
@@ -548,7 +526,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       volume = Math.max(0, volume);
 
       // actually set
-      lastVolume = v;
+      lastVolume = volume;
       if (!videoElement) return;
       videoElement.muted = volume === 0; // Muted attribute is always supported
 
@@ -556,10 +534,10 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       const isChangeable = await canChangeVolume();
       if (!videoElement) return;
       if (isChangeable) {
-        videoElement.volume = volume;
+        videoElement.volume = lastVolume;
       } else {
         // For browsers where it can't be changed
-        emit("volumechange", volume === 0 ? 0 : 1);
+        emit("volumechange", lastVolume === 0 ? 0 : 1);
       }
     },
     toggleFullscreen() {
@@ -620,7 +598,12 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         videoElement.style.filter = videoAppearanceFilter(videoAppearance);
     },
     setPlaybackRate(rate) {
-      if (videoElement) videoElement.playbackRate = rate;
+      if (!Number.isFinite(rate) || rate <= 0) return;
+      lastPlaybackRate = rate;
+      if (videoElement) {
+        videoElement.defaultPlaybackRate = rate;
+        videoElement.playbackRate = rate;
+      }
     },
   };
 }

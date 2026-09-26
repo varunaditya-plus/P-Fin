@@ -10,7 +10,10 @@ interface TestHls {
   currentLevel: number;
   loadLevel: number;
   startLevel: number;
-  handlers: Map<string, () => void>;
+  handlers: Map<
+    string,
+    (event?: string, data?: { fatal: boolean; details: string }) => void
+  >;
 }
 
 vi.mock("hls.js", () => ({
@@ -111,4 +114,16 @@ describe("HLS quality integration", () => {
     expect(changed).toHaveBeenLastCalledWith("720");
     display.destroy();
   });
+});
+
+it("allows nonfatal manifest retries and reports exhausted retries", () => {
+  const { display, hls } = setup(true);
+  const error = vi.fn();
+  display.on("error", error);
+  const handle = hls.handlers.get(Hls.Events.ERROR)!;
+  handle("error", { details: "manifestLoadError", fatal: false });
+  expect(error).not.toHaveBeenCalled();
+  handle("error", { details: "manifestLoadError", fatal: true });
+  expect(error).toHaveBeenCalledOnce();
+  display.destroy();
 });
