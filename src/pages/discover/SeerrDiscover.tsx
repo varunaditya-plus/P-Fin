@@ -21,7 +21,6 @@ import {
   SeerrUser,
 } from "@/backend/seerr/types";
 import { Button } from "@/components/buttons/Button";
-import { SearchBarInput } from "@/components/form/SearchBar";
 import { Icon, Icons } from "@/components/Icon";
 import { Spinner } from "@/components/layout/Spinner";
 import { WideContainer } from "@/components/layout/WideContainer";
@@ -44,9 +43,15 @@ import { SeerrSetup } from "./SeerrSetup";
 function SeerrFeatured({
   media,
   onShowDetails,
+  onRequest,
+  category,
+  onRandomError,
 }: {
   media: SeerrMedia[];
   onShowDetails: (item: SeerrMedia) => void;
+  onRequest: (item: SeerrMedia) => void;
+  category: "movie" | "tv";
+  onRandomError: (message: string) => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -100,22 +105,6 @@ function SeerrFeatured({
           />
         ))}
       </div>
-      <button
-        type="button"
-        onClick={() => move(-1)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
-        aria-label="Previous slide"
-      >
-        <Icon icon={Icons.CHEVRON_LEFT} className="text-white w-8 h-8" />
-      </button>
-      <button
-        type="button"
-        onClick={() => move(1)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors"
-        aria-label="Next slide"
-      >
-        <Icon icon={Icons.CHEVRON_RIGHT} className="text-white w-8 h-8" />
-      </button>
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[19] flex gap-2">
         {items.map((item, itemIndex) => (
           <button
@@ -132,8 +121,8 @@ function SeerrFeatured({
         style={{ opacity: contentOpacity }}
       >
         <div className="container mx-auto px-8 lg:px-4 flex justify-between items-end w-full">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+          <div className="w-full">
+            <h1 className="max-w-3xl text-4xl md:text-6xl font-bold text-white mb-4">
               {current.title || current.name}
             </h1>
             <div className="flex items-center gap-2 text-sm text-white/80 mb-4">
@@ -156,18 +145,33 @@ function SeerrFeatured({
                 </>
               )}
             </div>
-            <p className="text-lg text-white mb-6 line-clamp-3 md:line-clamp-4">
+            <p className="max-w-3xl text-lg text-white mb-6 line-clamp-3 md:line-clamp-4">
               {current.overview}
             </p>
-            <div className="flex gap-4 justify-center items-center sm:justify-start">
+            <div className="flex gap-3 sm:gap-4 items-center">
               <Button
                 theme="secondary"
-                className="w-full sm:w-auto text-base"
+                className="flex-1 sm:flex-none text-base"
+                onClick={() => onRequest(current)}
+              >
+                <Icon icon={Icons.PLUS} />
+                Request
+              </Button>
+              <Button
+                theme="secondary"
+                className="flex-1 sm:flex-none text-base"
                 onClick={() => onShowDetails(current)}
               >
                 <Icon icon={Icons.CIRCLE_QUESTION} />
                 More info
               </Button>
+              <div className="lg:ml-auto">
+                <SeerrRandomButton
+                  type={category}
+                  onSelect={onShowDetails}
+                  onError={onRandomError}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -370,24 +374,20 @@ function SeerrCarousel({
 
   return (
     <section ref={sectionRef} className="mb-8" aria-label={title}>
-      <div className="flex items-center justify-between ml-2 md:ml-8 mt-2">
-        <div className="flex flex-col pl-2 lg:pl-[68px]">
-          <h2 className="text-2xl cursor-default font-bold text-white md:text-2xl pl-0 text-balance">
-            {title}
-          </h2>
-        </div>
-        <div className="flex items-center gap-3 mr-4 md:mr-8">
-          {!expanded && Boolean(page?.results.length) && onMore ? (
-            <button
-              type="button"
-              onClick={() => onMore(title, endpoint)}
-              className="tabbable flex items-center gap-2 text-sm text-type-secondary hover:text-white"
-            >
-              More
-              <Icon icon={Icons.ARROW_RIGHT} />
-            </button>
-          ) : null}
-        </div>
+      <div className="flex flex-col ml-2 md:ml-8 mt-2 pl-2 lg:pl-[68px]">
+        <h2 className="text-2xl cursor-default font-bold text-white md:text-2xl pl-0 text-balance">
+          {title}
+        </h2>
+        {!expanded && Boolean(page?.results.length) && onMore ? (
+          <button
+            type="button"
+            onClick={() => onMore(title, endpoint)}
+            className="tabbable flex w-fit items-center gap-1 text-sm text-type-secondary hover:text-white"
+          >
+            View more
+            <Icon icon={Icons.ARROW_RIGHT} />
+          </button>
+        ) : null}
       </div>
       {error && (
         <div className="px-8 py-4">
@@ -450,7 +450,7 @@ function SeerrCarousel({
                           icon={Icons.ARROW_RIGHT}
                           className="text-4xl mb-2"
                         />
-                        <span className="text-sm">More</span>
+                        <span className="text-sm">View more</span>
                       </div>
                     </div>
                   </Flare.Child>
@@ -488,13 +488,10 @@ function SeerrLibraryDiscover() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const urlQuery = searchParams.get("q") || "";
+  const query = searchParams.get("q")?.trim() || "";
   const [user, setUser] = useState<SeerrUser>();
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
-  const [query, setQuery] = useState(urlQuery);
-  useEffect(() => setQuery(urlQuery), [urlQuery]);
-  const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [category, setCategory] = useState<"movie" | "tv">(
     searchParams.get("kind") === "tv" ? "tv" : "movie",
   );
@@ -518,6 +515,11 @@ function SeerrLibraryDiscover() {
   }, [searchParams, setSearchParams, location.state]);
   const [featured, setFeatured] = useState<SeerrMedia[]>([]);
   const [selected, setSelected] = useState<SeerrMedia>();
+  const [focusRequest, setFocusRequest] = useState(false);
+  const showDetails = (item: SeerrMedia) => {
+    setFocusRequest(false);
+    setSelected(item);
+  };
   const [randomError, setRandomError] = useState("");
   const feed = searchParams.get("feed");
   const expandedFeed =
@@ -551,6 +553,7 @@ function SeerrLibraryDiscover() {
   }, [searchParams]);
   const closeDetails = () => {
     setSelected(undefined);
+    setFocusRequest(false);
     setSearchParams(
       (previous) => {
         const next = new URLSearchParams(previous);
@@ -609,23 +612,6 @@ function SeerrLibraryDiscover() {
   }, [authRetry]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setDebouncedQuery(query.trim());
-      if (query.trim() === urlQuery) return;
-      setSearchParams(
-        (previous) => {
-          const next = new URLSearchParams(previous);
-          if (query.trim()) next.set("q", query.trim());
-          else next.delete("q");
-          return next;
-        },
-        { replace: true, state: location.state },
-      );
-    }, 350);
-    return () => window.clearTimeout(timer);
-  }, [query, urlQuery, setSearchParams, location.state]);
-
-  useEffect(() => {
     if (!user) return undefined;
     const controller = new AbortController();
     const generation = featuredGeneration.current;
@@ -654,7 +640,7 @@ function SeerrLibraryDiscover() {
   const recommendations = usePersonalRecommendations(
     "seerr",
     category,
-    Boolean(user) && !debouncedQuery && !expandedFeed,
+    Boolean(user) && !query && !expandedFeed,
     refresh,
   );
   const requested = (details: SeerrDetails) => {
@@ -702,9 +688,18 @@ function SeerrLibraryDiscover() {
         </div>
       ) : (
         <>
-          {!debouncedQuery && !expandedFeed && (
+          {!query && !expandedFeed && (
             <div className="!mt-[-170px]">
-              <SeerrFeatured media={featured} onShowDetails={setSelected} />
+              <SeerrFeatured
+                media={featured}
+                onShowDetails={showDetails}
+                onRequest={(item) => {
+                  setFocusRequest(true);
+                  setSelected(item);
+                }}
+                category={category}
+                onRandomError={setRandomError}
+              />
             </div>
           )}
           <div className="relative z-20 px-4 md:px-10 min-h-screen">
@@ -737,44 +732,25 @@ function SeerrLibraryDiscover() {
                   title={expandedFeed.title}
                   endpoint={expandedFeed.endpoint}
                   expanded
-                  onShowDetails={setSelected}
+                  onShowDetails={showDetails}
                   onUnauthorized={unauthorized}
                   refresh={refresh}
                 />
               </>
             ) : (
               <>
-                <div className="mx-auto max-w-xl mb-8 px-4">
-                  <SearchBarInput
-                    value={query}
-                    onChange={setQuery}
-                    onUnFocus={() => undefined}
-                    placeholder="Search movies and TV shows to request"
-                    hideTooltip
-                  />
-                </div>
-                {debouncedQuery ? (
-                  <div className="flex justify-center pb-6">
-                    <Button
-                      theme="secondary"
-                      href={`/browse/${encodeURIComponent(query.trim())}`}
-                    >
-                      Search my library
-                    </Button>
-                  </div>
-                ) : null}
                 {randomError ? (
                   <p role="alert" className="pb-4 text-center">
                     {randomError}
                   </p>
                 ) : null}
-                {debouncedQuery ? (
+                {query ? (
                   <WideContainer ultraWide classNames="!px-0">
                     <SeerrCarousel
-                      key={debouncedQuery}
-                      title={`Results for “${debouncedQuery}”`}
-                      endpoint={`/search?query=${encodeURIComponent(debouncedQuery)}`}
-                      onShowDetails={setSelected}
+                      key={query}
+                      title={`Results for “${query}”`}
+                      endpoint={`/search?query=${encodeURIComponent(query)}`}
+                      onShowDetails={showDetails}
                       onUnauthorized={unauthorized}
                       onMore={openMore}
                       refresh={refresh}
@@ -795,11 +771,6 @@ function SeerrLibraryDiscover() {
                               {value === "movie" ? "Movies" : "TV shows"}
                             </button>
                           ))}
-                          <SeerrRandomButton
-                            type={category}
-                            onSelect={setSelected}
-                            onError={setRandomError}
-                          />
                         </div>
                       </div>
                     </div>
@@ -810,7 +781,7 @@ function SeerrLibraryDiscover() {
                           items={recommendations.ranked
                             .slice(0, 20)
                             .map((entry) => entry.candidate.item)}
-                          onSelect={setSelected}
+                          onSelect={showDetails}
                         />
                       </WideContainer>
                     ) : null}
@@ -818,7 +789,7 @@ function SeerrLibraryDiscover() {
                       <SeerrCarousel
                         title="Trending"
                         endpoint="/discover/trending"
-                        onShowDetails={setSelected}
+                        onShowDetails={showDetails}
                         onUnauthorized={unauthorized}
                         onMore={openMore}
                         refresh={refresh}
@@ -835,7 +806,7 @@ function SeerrLibraryDiscover() {
                             ? "/discover/movies"
                             : "/discover/tv"
                         }
-                        onShowDetails={setSelected}
+                        onShowDetails={showDetails}
                         onUnauthorized={unauthorized}
                         onMore={openMore}
                         refresh={refresh}
@@ -852,7 +823,7 @@ function SeerrLibraryDiscover() {
                             ? "/discover/movies/upcoming"
                             : "/discover/tv/upcoming"
                         }
-                        onShowDetails={setSelected}
+                        onShowDetails={showDetails}
                         onUnauthorized={unauthorized}
                         onMore={openMore}
                         refresh={refresh}
@@ -866,10 +837,11 @@ function SeerrLibraryDiscover() {
           </div>
           <SeerrDetailsModal
             media={selected}
+            focusRequest={focusRequest}
             user={user}
             onClose={closeDetails}
             onRequested={requested}
-            onSelectMedia={setSelected}
+            onSelectMedia={showDetails}
           />
         </>
       )}

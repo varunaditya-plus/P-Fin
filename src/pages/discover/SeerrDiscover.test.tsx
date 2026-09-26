@@ -46,7 +46,27 @@ vi.mock("@/pages/layouts/SubPageLayout", () => ({
   ),
 }));
 vi.mock("@/pages/parts/util/PageTitle", () => ({ PageTitle: () => null }));
-vi.mock("./SeerrDetailsModal", () => ({ SeerrDetailsModal: () => null }));
+vi.mock("./SeerrDetailsModal", () => ({
+  SeerrDetailsModal: ({
+    media,
+    focusRequest,
+    onClose,
+  }: {
+    media?: { title: string };
+    focusRequest?: boolean;
+    onClose: () => void;
+  }) =>
+    media ? (
+      <div
+        data-selected-title={media.title}
+        data-request-focused={focusRequest}
+      >
+        <button type="button" onClick={onClose}>
+          Close details
+        </button>
+      </div>
+    ) : null,
+}));
 vi.mock("./SeerrCardMenu", () => ({ SeerrCardMenu: () => null }));
 vi.mock("./SeerrSetup", () => ({ SeerrSetup: () => null }));
 vi.mock("./components/CarouselNavButtons", () => ({
@@ -61,21 +81,6 @@ vi.mock("@/components/media/MediaCard", () => ({
   ),
   MediaCardSkeleton: () => <div />,
 }));
-vi.mock("@/components/form/SearchBar", () => ({
-  SearchBarInput: ({
-    value,
-    onChange,
-  }: {
-    value: string;
-    onChange: (value: string) => void;
-  }) => (
-    <input
-      aria-label="Discovery search"
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-    />
-  ),
-}));
 vi.mock("@/backend/seerr/api", async (original) => ({
   ...(await original<typeof import("@/backend/seerr/api")>()),
   getSeerrUser: async () => ({ id: 1, permissions: 0 }),
@@ -89,7 +94,14 @@ vi.mock("@/backend/seerr/browse", async (original) => ({
     page: 1,
     totalPages: 2,
     totalResults: 2,
-    results: [{ id: 1, mediaType: "movie", title: "Film" }],
+    results: [
+      {
+        id: 1,
+        mediaType: "movie",
+        title: "Film",
+        backdropPath: "/backdrop.jpg",
+      },
+    ],
   }),
 }));
 
@@ -135,13 +147,6 @@ async function click(label: string) {
       .click(),
   );
 }
-async function settleSearch() {
-  await act(async () => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 380);
-    });
-  });
-}
 beforeEach(() => {
   recommendations.enabled = false;
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -178,6 +183,22 @@ afterEach(async () => {
   vi.unstubAllGlobals();
 });
 describe("Discover URL navigation", () => {
+  it("opens Request at the existing request flow and More info at normal details", async () => {
+    await render("/discover");
+    await click("Request");
+    expect(
+      host
+        .querySelector('[data-selected-title="Film"]')
+        ?.getAttribute("data-request-focused"),
+    ).toBe("true");
+    await click("Close details");
+    await click("More info");
+    expect(
+      host
+        .querySelector('[data-selected-title="Film"]')
+        ?.getAttribute("data-request-focused"),
+    ).toBe("false");
+  });
   it("shows For You as one category-specific row alongside the normal feeds", async () => {
     recommendations.enabled = true;
     await render("/discover");
@@ -215,8 +236,7 @@ describe("Discover URL navigation", () => {
   });
   it("returns from More through history without inserting a duplicate browse entry", async () => {
     await render("/discover");
-    await click("More");
-    await settleSearch();
+    await click("View more");
     expect(host.querySelector("[data-location]")?.textContent).toContain(
       "feed=",
     );
@@ -229,16 +249,20 @@ describe("Discover URL navigation", () => {
       "feed=",
     );
   });
-  it("restores the search input when navigating backward and forward", async () => {
+  it("restores linked search results when navigating backward and forward", async () => {
     await render("/discover?q=first");
     await click("Second query");
-    await settleSearch();
-    expect(host.querySelector("input")?.value).toBe("second");
+    expect(
+      host.querySelector('section[aria-label="Results for “second”"]'),
+    ).not.toBeNull();
     await click("History back");
-    await settleSearch();
-    expect(host.querySelector("input")?.value).toBe("first");
+    expect(
+      host.querySelector('section[aria-label="Results for “first”"]'),
+    ).not.toBeNull();
     await click("History forward");
-    expect(host.querySelector("input")?.value).toBe("second");
+    expect(
+      host.querySelector('section[aria-label="Results for “second”"]'),
+    ).not.toBeNull();
   });
   it("returns from an old filtered grid to normal browsing without hidden filters", async () => {
     await render(
@@ -260,7 +284,9 @@ describe("Discover URL navigation", () => {
     expect(host.querySelector("[data-location]")?.textContent).toBe(
       "/discover?kind=tv&q=first",
     );
-    expect(host.querySelector("input")?.value).toBe("first");
+    expect(
+      host.querySelector('section[aria-label="Results for “first”"]'),
+    ).not.toBeNull();
     expect(host.querySelector('[aria-label="Discovery filters"]')).toBeNull();
   });
 });
