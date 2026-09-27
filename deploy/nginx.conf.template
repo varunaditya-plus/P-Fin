@@ -1,53 +1,104 @@
-map $http_upgrade $connection_upgrade {
-    default upgrade;
-    '' close;
-}
+worker_processes auto;
+pid /tmp/p-fin/nginx.pid;
+error_log /dev/stderr warn;
 
-server {
-    listen 80;
-    server_name _;
-    root /usr/share/nginx/html;
-    index index.html;
+events { worker_connections 1024; }
 
-    location = /server-config.json {
-        default_type application/json;
-        add_header Cache-Control "no-store";
-        return 200 '{"jellyfinUrl":"${JELLYFIN_URL}","seerrUrl":"${SEERR_URL}"}';
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    access_log off;
+    sendfile on;
+    client_body_temp_path /tmp/p-fin/client_temp;
+    proxy_temp_path /tmp/p-fin/proxy_temp;
+    fastcgi_temp_path /tmp/p-fin/fastcgi_temp;
+    uwsgi_temp_path /tmp/p-fin/uwsgi_temp;
+    scgi_temp_path /tmp/p-fin/scgi_temp;
+    resolver ${PFIN_DNS_RESOLVERS} valid=30s;
+    resolver_timeout 5s;
+
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        '' close;
+    }
+    map $http_x_forwarded_proto $forwarded_proto {
+        default $scheme;
+        https https;
+        http http;
+    }
+    # Preserve encoded paths and query strings, including Jellyfin playback tokens.
+    map $request_uri $jellyfin_path {
+        default /;
+        ~^/jellyfin(?<jellyfin_suffix>/.*)$ $jellyfin_suffix;
+    }
+    map $request_uri $seerr_path {
+        default /;
+        ~^/seerr(?<seerr_suffix>/.*)$ $seerr_suffix;
+    }
+    map $http_x_seerr_upstream $seerr_base {
+        default "${PFIN_SEERR_URL}";
+        "~^https?://(\[[0-9a-fA-F:]+\]|[a-zA-Z0-9_.-]+)(:[0-9]+)?(/[a-zA-Z0-9._~!$&'()*+,;=:@%/-]*)?$" $http_x_seerr_upstream;
     }
 
-    # Both services are fixed upstreams; credentials remain scoped to this client.
-    location /jellyfin/ {
-        proxy_pass ${JELLYFIN_URL}/;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-        proxy_http_version 1.1;
-        # Image and subtitle uploads are sent as base64 payloads.
+    server {
+        listen 8080;
+        listen [::]:8080;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+        # Jellyfin image and subtitle uploads use base64 request bodies.
         client_max_body_size 30m;
-        proxy_connect_timeout 5s;
-        proxy_set_header Host $proxy_host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_buffering off;
-        proxy_read_timeout 3600s;
-        # Access URLs contain user tokens for video and subtitles.
-        access_log off;
-    }
-    # Browser calls stay on this origin. X-Seerr-Upstream selects the Seerr
-    # server; otherwise the configured SEERR_URL is used.
-    location /seerr/ {
-        resolver 1.1.1.1 8.8.8.8 ipv6=off valid=30s;
-        set $seerr_base "${SEERR_URL}";
-        if ($http_x_seerr_upstream ~* "^https?://[A-Za-z0-9._:-]+(/[A-Za-z0-9._~!$&'()*+,;=%/-]*)?$") {
-            set $seerr_base $http_x_seerr_upstream;
+
+        location = /health {
+            default_type text/plain;
+            return 200 'ok\n';
         }
-        rewrite ^/seerr/?(.*)$ /$1 break;
-        proxy_http_version 1.1;
-        proxy_connect_timeout 5s;
-        proxy_read_timeout 60s;
-        proxy_set_header Host $proxy_host;
-        proxy_cookie_path / /seerr/;
-        proxy_pass $seerr_base$uri$is_args$args;
-    }
-    location / {
-        try_files $uri $uri/ /index.html;
+        location = /server-config.json {
+            alias /tmp/p-fin/server-config.json;
+            default_type application/json;
+            add_header Cache-Control "no-store" always;
+        }
+        location /jellyfin/ {
+            set $jellyfin_base "${PFIN_JELLYFIN_URL}";
+            if ($jellyfin_base = "") { return 503; }
+            # Defer DNS lookup so Jellyfin need not be online during NAS startup.
+            proxy_pass $jellyfin_base$jellyfin_path;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-Proto $forwarded_proto;
+            proxy_ssl_server_name on;
+            proxy_connect_timeout 5s;
+            proxy_read_timeout 3600s;
+            proxy_buffering off;
+            proxy_request_buffering off;
+        }
+        location /seerr/ {
+            if ($seerr_base = "") { return 503; }
+            proxy_pass $seerr_base$seerr_path;
+            proxy_http_version 1.1;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-Proto $forwarded_proto;
+            proxy_set_header X-Seerr-Upstream "";
+            proxy_ssl_server_name on;
+            proxy_connect_timeout 5s;
+            proxy_read_timeout 60s;
+            proxy_cookie_domain ~.+ $host;
+            proxy_cookie_path ~.* /seerr/;
+        }
+        location /assets/ {
+            try_files $uri =404;
+            add_header Cache-Control "public, max-age=31536000, immutable";
+        }
+        location = /index.html {
+            add_header Cache-Control "no-cache";
+        }
+        location = /sw.js {
+            add_header Cache-Control "no-cache";
+        }
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
     }
 }
