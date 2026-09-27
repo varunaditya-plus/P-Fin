@@ -11,13 +11,13 @@
     "title": "Hem trobat un error!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Quant a",
       "legal": "Legal / DMCA",
       "login": "Inicia sessió",
       "onboarding": "Configura",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registra",
       "settings": "Configuració"
     }
@@ -104,10 +104,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copia l'enllaç de la llista HLS",
-        "disclaimer": "Les baixades s'obtenen directament del proveïdor. P-Stream no té control sobre com es proporcionen les baixades.",
+        "disclaimer": "Les baixades s'obtenen directament del proveïdor. {{serverName}} no té control sobre com es proporcionen les baixades.",
         "downloadSubtitle": "Baixa els subtítols actuals",
         "downloadVideo": "Baixa el vídeo",
-        "hlsDisclaimer": "Les baixades s'obtenen directament del proveïdor. P-Stream no té control sobre com es proporcionen les baixades. <br /><br />Tingueu en compte que esteu baixant una llista de reproducció HLS, <bold>no es recomana baixar-la si no esteu familiaritzat amb formats de transmissió avançats</bold>. Proveu diferents fonts per a diferents formats.",
+        "hlsDisclaimer": "Les baixades s'obtenen directament del proveïdor. {{serverName}} no té control sobre com es proporcionen les baixades. <br /><br />Tingueu en compte que esteu baixant una llista de reproducció HLS, <bold>no es recomana baixar-la si no esteu familiaritzat amb formats de transmissió avançats</bold>. Proveu diferents fonts per a diferents formats.",
         "onAndroid": {
           "1": "Per a baixar-lo a Android, feu clic al botó de baixada i, a la pàgina nova, <bold>manteniu premut</bold> el vídeo i, a continuació, seleccioneu <bold>Desa</bold>.",
           "shortTitle": "Baixa / Android",
@@ -249,7 +249,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Verifiqueu que sou humà completant el Captcha de la dreta. Ho fem per a mantenir segura P-Stream!",
+      "description": "Verifiqueu que sou humà completant el Captcha de la dreta. Ho fem per a mantenir segura {{serverName}}!",
       "error": "No s'ha pogut verificar la humanitat. Torneu-ho a provar.",
       "title": "Necessitem verificar que sou humà.",
       "verifyingHumanity": "Verificant la vostra humanitat…"

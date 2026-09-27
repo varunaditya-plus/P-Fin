@@ -11,13 +11,13 @@
     "title": "我們遇到了一個錯誤！"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "關於",
       "legal": "Legal / DMCA",
       "login": "登入",
       "onboarding": "設定",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "註冊",
       "settings": "設定"
     }
@@ -103,10 +103,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "複製 HLS 播放清單鏈接",
-        "disclaimer": "視頻直接從供應商處獲取。P-Stream 無法控制下載的提供方式。",
+        "disclaimer": "視頻直接從供應商處獲取。{{serverName}} 無法控制下載的提供方式。",
         "downloadSubtitle": "下載當前字幕",
         "downloadVideo": "下載視頻",
-        "hlsDisclaimer": "下載直接從供應商處獲取。P-Stream 無法控制下載的提供方式。<br /><br /> 請注意，您正在下載 HLS 播放清單， <bold>如果您不熟悉高級流媒體格式，則不建議下載 </bold> 。嘗試使用不同格式的不同來源。",
+        "hlsDisclaimer": "下載直接從供應商處獲取。{{serverName}} 無法控制下載的提供方式。<br /><br /> 請注意，您正在下載 HLS 播放清單， <bold>如果您不熟悉高級流媒體格式，則不建議下載 </bold> 。嘗試使用不同格式的不同來源。",
         "onAndroid": {
           "1": "要在 Android 上下載，請按下下載按鈕，然後在新頁面上<bold>點擊並按住 </bold>視頻，然後選擇 <bold>保存</bold>。",
           "shortTitle": "下載 / Android",
@@ -257,7 +257,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "請通過右側的驗證碼來確認您是人類。這是為了保護 P-Stream 的安全！",
+      "description": "請通過右側的驗證碼來確認您是人類。這是為了保護 {{serverName}} 的安全！",
       "error": "無法驗證您是一個人類。請再試一次。",
       "title": "我們需要驗證您是否為人類。",
       "verifyingHumanity": "正在驗證您是不是一個人類..."

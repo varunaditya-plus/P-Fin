@@ -11,13 +11,13 @@
     "title": "Napotkaliśmy błąd!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Informacje oraz FAQ",
       "legal": "Legal / DMCA",
       "login": "Zaloguj sie",
       "onboarding": "Konfiguracja",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Zarejestruj się",
       "settings": "Ustawienia",
       "discover": "Odkrywaj",
@@ -47,11 +47,11 @@
           "Na co masz ochotę?",
           "Czy mamy usunąć Twoją historię wyszukiwania?",
           "Co chcesz streamować?",
-          "P-Stream to najlepsza strona!",
+          "{{serverName}} to najlepsza strona!",
           "Co jest dzisiaj na Twojej liście Do Obejrzenia?",
           "Jak Ci minął dzień?",
           "Mój błąd, ta strona nigdy nie działa...",
-          "Czy P-Stream nie jest najlepszy?",
+          "Czy {{serverName}} nie jest najlepszy?",
           ">ᴗ<"
         ]
       },
@@ -71,15 +71,15 @@
     "titles": {
       "day": {
         "default": "Co chciałbyś obejrzeć dziś po południu?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "morning": {
         "default": "Co chciałbyś obejrzeć dziś rano?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "night": {
         "default": "Co chciałbyś obejrzeć dziś wieczorem?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "69": {
         "default": "Masz ochotę na coś pikantnego?",
@@ -141,10 +141,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Kopiuj link do listy odtwarzania HLS",
-        "disclaimer": "Pliki do pobrania są pobierane bezpośrednio od dostawcy. P-Stream nie ma kontroli nad sposobem dostarczania plików do pobrania.",
+        "disclaimer": "Pliki do pobrania są pobierane bezpośrednio od dostawcy. {{serverName}} nie ma kontroli nad sposobem dostarczania plików do pobrania.",
         "downloadSubtitle": "Pobierz aktualne napisy",
         "downloadVideo": "Pobierz wideo",
-        "hlsDisclaimer": "Pliki do pobrania są pobierane bezpośrednio od dostawcy. P-Stream nie ma kontroli nad sposobem dostarczania plików do pobrania.<br /><br />Należy pamiętać, że pobierasz playlistę HLS, <bold>nie zaleca się pobierania, jeśli nie jesteś zaznajomiony z zaawansowanymi formatami przesyłania strumieniowego</bold>. Wypróbuj różne źródła dla innych formatów.",
+        "hlsDisclaimer": "Pliki do pobrania są pobierane bezpośrednio od dostawcy. {{serverName}} nie ma kontroli nad sposobem dostarczania plików do pobrania.<br /><br />Należy pamiętać, że pobierasz playlistę HLS, <bold>nie zaleca się pobierania, jeśli nie jesteś zaznajomiony z zaawansowanymi formatami przesyłania strumieniowego</bold>. Wypróbuj różne źródła dla innych formatów.",
         "onAndroid": {
           "1": "Aby pobrać na Androidzie, kliknij przycisk pobierania, a następnie na nowej stronie <bold>dotknij i przytrzymaj</bold> na filmie, a następnie wybierz <bold>zapisz</bold>.",
           "shortTitle": "Pobierz / Android",
@@ -314,7 +314,7 @@
         "discoverButton": "Odkryj więcej"
       },
       "extensionFailure": {
-        "text": "Zainstalowałeś rozszerzenie P-Stream. Aby zaczęło działać musisz włączyć dla tej strony.",
+        "text": "Zainstalowałeś rozszerzenie {{serverName}}. Aby zaczęło działać musisz włączyć dla tej strony.",
         "badge": "Rozszerzenie wyłączone",
         "homeButton": "Wróć na stronę główną",
         "enableExtension": "Włącz rozszerzenie",
@@ -350,7 +350,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Proszę potwierdź, że jesteś człowiekiem, wypełniając Captcha po prawej stronie. Ma to zapewnić bezpieczeństwo P-Stream.",
+      "description": "Proszę potwierdź, że jesteś człowiekiem, wypełniając Captcha po prawej stronie. Ma to zapewnić bezpieczeństwo {{serverName}}.",
       "error": "Nie udało się zweryfikować. Proszę spróbuj ponownie. Wyczyść pamięć cache i spróbuj ponownie, lub zmień źródło (kliknij w zębatkę).",
       "title": "Czy jesteś robocikiem 🤖?",
       "verifyingHumanity": "Weryfikacja... (^▽^)👍"
@@ -406,7 +406,7 @@
       "title": "Konto",
       "admin": {
         "title": "Panel administracyjny",
-        "text": "Korzystaj z narzędzi stworzonych do sprawdzania stanu P-Stream.",
+        "text": "Korzystaj z narzędzi stworzonych do sprawdzania stanu {{serverName}}.",
         "button": "Sprawdź to"
       }
     },

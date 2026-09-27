@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import {
@@ -37,6 +38,7 @@ import { usePreferencesStore } from "@/stores/preferences";
 type HomeSection = Awaited<ReturnType<typeof getHomeSections>>[number];
 
 export function HomePage() {
+  const { t } = useTranslation();
   const [showBg, setShowBg] = useState(false);
   const searchParams = useSearchQuery();
   const [search] = searchParams;
@@ -277,7 +279,7 @@ export function HomePage() {
         <style type="text/css">
           {"html, body { scrollbar-gutter: stable; }"}
         </style>
-        <title>P-Stream · Jellyfin</title>
+        <title>{t("global.name")} · Jellyfin</title>
       </Helmet>
       <div className="mb-2">
         {showFeatured ? (

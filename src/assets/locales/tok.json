@@ -11,13 +11,13 @@
     "title": "mi kama pakala a!"
   },
   "global": {
-    "name": "ilo Muwi-We",
+    "name": "{{serverName}}",
     "pages": {
       "about": "o sona",
       "legal": "Legal / DMCA",
       "login": "o open",
       "onboarding": "o pali",
-      "pagetitle": "{{title}} - ilo Muwi-We",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "o pali open",
       "settings": "o ante"
     }
@@ -101,10 +101,10 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "sina kama jo e sitelen tawa ilo sina tan lipu mama. ilo Muwi-We li lawa ala e nasin jo",
+        "disclaimer": "sina kama jo e sitelen tawa ilo sina tan lipu mama. {{serverName}} li lawa ala e nasin jo",
         "downloadSubtitle": "o jo e nimi toki",
         "downloadVideo": "o jo e sitelen",
-        "hlsDisclaimer": "jo li tan mama. ilo Muwi-We li lawa ala e nasin jo. o sona e ni: sina jo e lipu sitelen HLS. ni li tawa jan pi sona sitelen",
+        "hlsDisclaimer": "jo li tan mama. {{serverName}} li lawa ala e nasin jo. o sona e ni: sina jo e lipu sitelen HLS. ni li tawa jan pi sona sitelen",
         "onAndroid": {
           "1": "ilo Android la o luka e nena 'o jo'. lon lipu sin la <bold>o luka wawa</bold> e sitelen. o luka e nena 'o jo'",
           "shortTitle": "Android ) o jo",
@@ -239,7 +239,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "sina jan la o pali e ilo Captcha lon poka ni. mi wile awen e ilo Muwi-We a!",
+      "description": "sina jan la o pali e ilo Captcha lon poka ni. mi wile awen e {{serverName}} a!",
       "error": "mi lukin e ni: ken la sina jan ala. o alasa sin",
       "title": "sina o jan",
       "verifyingHumanity": "sina jan ala jan?"

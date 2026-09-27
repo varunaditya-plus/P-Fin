@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 
+import { APP_NAME } from "@/setup/branding";
 import { useJellyfinAuth, useJellyfinServers } from "@/stores/jellyfin";
 
 export interface JellyfinMediaStream {
@@ -145,7 +146,7 @@ export async function jellyfinRequest<T>(
   const headers = new Headers(init.headers);
   headers.set(
     "Authorization",
-    `MediaBrowser Client="P-Stream", Device="Web browser", DeviceId="${session?.deviceId ?? "p-stream-web"}", Version="1.0.0"${session ? `, Token="${session.accessToken}"` : ""}`,
+    `MediaBrowser Client="${APP_NAME}", Device="Web browser", DeviceId="${session?.deviceId ?? "p-fin-web"}", Version="1.0.0"${session ? `, Token="${session.accessToken}"` : ""}`,
   );
   if (init.body && !headers.has("Content-Type"))
     headers.set("Content-Type", "application/json");
@@ -191,7 +192,7 @@ export async function loginJellyfin(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `MediaBrowser Client="P-Stream", Device="Web browser", DeviceId="${deviceId}", Version="1.0.0"`,
+      Authorization: `MediaBrowser Client="${APP_NAME}", Device="Web browser", DeviceId="${deviceId}", Version="1.0.0"`,
     },
     body: JSON.stringify({ Username: username, Pw: password }),
     signal: AbortSignal.timeout(30000),

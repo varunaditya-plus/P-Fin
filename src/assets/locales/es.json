@@ -11,13 +11,13 @@
     "title": "¡Encontramos un error!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Acerca de",
       "legal": "Legal / DMCA",
       "login": "Iniciar sesión",
       "onboarding": "Configurar",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registrarse",
       "settings": "Configuración",
       "discover": "Descubrir",
@@ -50,7 +50,7 @@
           "¿Qué hay en tu lista de seguimiento hoy?",
           "¿Cómo estuvo su día?",
           "Mala mia este sitio nunca funciona...",
-          "¿No es P-Stream lo mejor?",
+          "¿No es {{serverName}} lo mejor?",
           ">ᴗ<"
         ]
       },
@@ -142,10 +142,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copiar enlace de reproducción HLS",
-        "disclaimer": "Las descargas se realizan directamente desde el proveedor. P-Stream no tiene control sobre cómo se proporcionan las descargas.",
+        "disclaimer": "Las descargas se realizan directamente desde el proveedor. {{serverName}} no tiene control sobre cómo se proporcionan las descargas.",
         "downloadSubtitle": "Descargar subtítulo actual",
         "downloadVideo": "Descargar vídeo",
-        "hlsDisclaimer": "Las descargas se realizan directamente del proveedor. P-Stream no tiene control sobre cómo se proporcionan las descargas. <br /><br />Tenga en cuenta que está descargando una lista de reproducción HLS, <bold>dirigida a usuarios familiarizados con la transmisión multimedia avanzada.</bold> Prueba con diferentes fuentes para diferentes formatos.",
+        "hlsDisclaimer": "Las descargas se realizan directamente del proveedor. {{serverName}} no tiene control sobre cómo se proporcionan las descargas. <br /><br />Tenga en cuenta que está descargando una lista de reproducción HLS, <bold>dirigida a usuarios familiarizados con la transmisión multimedia avanzada.</bold> Prueba con diferentes fuentes para diferentes formatos.",
         "onAndroid": {
           "1": "Para descargar en Android, haz clic en el botón de descarga y luego, en la nueva página, <bold>mantén presionado</bold> el vídeo y selecciona <bold>guardar</bold>.",
           "shortTitle": "Descargar / Android",
@@ -303,7 +303,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Por favor, confirma que eres humano completando el Captcha. ¡Esto es para mantener P-Stream seguro!",
+      "description": "Por favor, confirma que eres humano completando el Captcha. ¡Esto es para mantener {{serverName}} seguro!",
       "error": "Ha habido un error al verificar tu humanidad. Por favor, prueba de nuevo.",
       "title": "Necesitamos verificar que eres humano.",
       "verifyingHumanity": "Verificando tu hunanidad…"

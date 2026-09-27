@@ -11,7 +11,7 @@
     "title": "Hiba lépett fel!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Rólunk",
       "legal": "Legal / DMCA",
@@ -19,7 +19,7 @@
       "support": "Szupport",
       "login": "Bejelentkezés",
       "onboarding": "Előkészítés",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "settings": "Beállítások",
       "migration": "Fiók átvitele",
       "jip": "Jip",
@@ -43,11 +43,11 @@
           "Mihez van kedved?",
           "Kitöröljük a böngészési előzményeidet?",
           "Mit akarsz streamelni?",
-          "P-Stream mindenidők legjobb oldala!",
+          "{{serverName}} mindenidők legjobb oldala!",
           "Mi van a nézési listádon ma?",
           "Milyen volt a napod?",
           "A francba, bocsi, az én hibám, hogy soha se működik az oldal...",
-          "Ugye, hogy a P-Stream a legjobb?",
+          "Ugye, hogy a {{serverName}} a legjobb?",
           "UwU"
         ]
       },
@@ -72,16 +72,16 @@
     },
     "titles": {
       "day": {
-        "extra": ["Viva la P-Stream!"],
+        "extra": ["Viva la {{serverName}}!"],
         "default": "Mit szeretnél nézni e délután?"
       },
       "morning": {
         "default": "Mit szeretnél nézni e reggelen?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "night": {
         "default": "Mit szeretnél nézni ezen az estén?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "420": {
         "extra": ["Boldog 4/20-át!"],
@@ -141,7 +141,7 @@
     "menus": {
       "downloads": {
         "button": "Letöltés megpróbálása",
-        "disclaimer": "A letöltések közvetlen a szolgáltatótól jönnek. P-Stream-nek nincs befolyása, hogy a letöltés hogyan van kínálva.",
+        "disclaimer": "A letöltések közvetlen a szolgáltatótól jönnek. {{serverName}}-nek nincs befolyása, hogy a letöltés hogyan van kínálva.",
         "copyHlsPlaylist": "HLS lejátszási lista link másolása",
         "downloadSubtitle": "Jelenlegi felirat letöltése",
         "downloadVideo": "Videó letöltése",
@@ -162,7 +162,7 @@
         },
         "title": "Letöltés",
         "hlsDownloader": "Vagy, menj ide <0>hls downloader website</0> és illeszd be az alábbi lejátszási lista URL-t.",
-        "hlsDisclaimer": "A letöltések közvetlen a tartalomszolgáltatótól vannak.P-Stream-nek nincsen semmi befolyása, hogy a letöltések hogyan vannak szolgáltatva.<br /><br />Vedd figyelembe, hogy egy HLS lejátszási listát töltesz le, <bold>nem ajánlott letölteni, ha nem vagy ismerős a haladó sztreaming formátumokkal</bold>. Próbálj különböző forrásokat más formátumokért."
+        "hlsDisclaimer": "A letöltések közvetlen a tartalomszolgáltatótól vannak.{{serverName}}-nek nincsen semmi befolyása, hogy a letöltések hogyan vannak szolgáltatva.<br /><br />Vedd figyelembe, hogy egy HLS lejátszási listát töltesz le, <bold>nem ajánlott letölteni, ha nem vagy ismerős a haladó sztreaming formátumokkal</bold>. Próbálj különböző forrásokat más formátumokért."
       },
       "episodes": {
         "button": "Részek",
@@ -312,7 +312,7 @@
         "homeButton": "Kezdőlapra",
         "enableExtension": "Engedélyezd a bővítményt",
         "title": "Kérlek engedélyezd a bővítményt",
-        "text": "Telepítetted a P-Stream bővitményt. Hogy használni tudd, engedélyezned kell a bővítményt ennek az oldalnak."
+        "text": "Telepítetted a {{serverName}} bővitményt. Hogy használni tudd, engedélyezned kell a bővítményt ennek az oldalnak."
       },
       "tips": {
         "1": "Nyomj a fogaskerékre, hogy forrásokat válts!",
@@ -347,7 +347,7 @@
     "turnstile": {
       "title": "Robot vagy?",
       "verifyingHumanity": "Emberiség megerősítése...",
-      "description": "Kérlek bízonyitsd emberi léteted ezzel az egyszerű feladattal, hogy biztonsága tartsuk P-Stream-et.",
+      "description": "Kérlek bízonyitsd emberi léteted ezzel az egyszerű feladattal, hogy biztonsága tartsuk {{serverName}}-et.",
       "error": "Nem sikerült bizonyítani emberiséged - sztreamnek nem sikerült betöltenie. Töröld a cache-ed és próbáld újra vagy válts forrást (nyomd a fogaskereket)."
     }
   },
@@ -362,7 +362,7 @@
       "admin": {
         "title": "Adminisztrátor panel",
         "button": "Nézd meg",
-        "text": "Használd az eszközöket, amik P-Stream állapotának felmérésére lettek tervezve."
+        "text": "Használd az eszközöket, amik {{serverName}} állapotának felmérésére lettek tervezve."
       },
       "actions": {
         "delete": {

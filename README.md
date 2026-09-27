@@ -1,6 +1,8 @@
-# P-Stream for Jellyfin
+# P-Fin
 
 P-Stream's interface and player, connected to Jellyfin for the library and playback and Seerr for discovery and requests.
+
+The client and installed app are named P-Fin. Interface labels and translated text use the selected Jellyfin server's name, with P-Fin as the fallback before selecting a server.
 
 ## Run locally
 

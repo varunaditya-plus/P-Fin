@@ -11,13 +11,13 @@
     "title": "En Fehler esch uftaucht!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Öber",
       "legal": "Legal / DMCA",
       "login": "Amälde",
       "onboarding": "Irechte",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Regischtriere",
       "settings": "Ischtelige",
       "discover": "Entdecke",
@@ -47,11 +47,11 @@
           "I was för nere Stemig besch grad?",
           "Sölle mer dini Browser-Historie lösche?",
           "Was möchtisch gern luege?",
-          "P-Stream esch die bescht Site ever!",
+          "{{serverName}} esch die bescht Site ever!",
           "Was esch of dim Felm ToDo Zetteli?",
           "Wie esch din Tag gse?",
           "Min Fähler, t’Site fonktioniert nie…",
-          "P-Stream esch die bescht Site, oder?",
+          "{{serverName}} esch die bescht Site, oder?",
           ">ᴗ<"
         ]
       },
@@ -71,11 +71,11 @@
     "titles": {
       "day": {
         "default": "Was möchtisch a däm schöne nomitag aluege?",
-        "extra": ["Viva la P-Stream e ciao Svizzera"]
+        "extra": ["Viva la {{serverName}} e ciao Svizzera"]
       },
       "morning": {
         "default": "Was welsch a däm morge aluege?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "night": {
         "default": "Besch no wach? Was möchtisch luege?",
@@ -141,10 +141,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Kopier HLS-Playlist Link",
-        "disclaimer": "Downloads chömed direkt vom Anbieter. P-Stream het kei Kontroll drüber, wie die Downloads zur Verfüegig gstellt werde.",
+        "disclaimer": "Downloads chömed direkt vom Anbieter. {{serverName}} het kei Kontroll drüber, wie die Downloads zur Verfüegig gstellt werde.",
         "downloadSubtitle": "Aktuelle Untertitel ablade",
         "downloadVideo": "Video abelade",
-        "hlsDisclaimer": "Downloads chömed direkt vom Anbieter. P-Stream het kei Kontroll drüber, wie die Downloads zur Verfüegig gstellt werde. <br /><br />Bitte beachte, dass du e HLS-Playlist abeladsch, <bold>es wird nöd empfohle zum abelade, wenn du dich mit fortgschrittliche Streaming-Formate nöd uskennsch</bold>. Versuech anderi Quellen für anderi Formate.",
+        "hlsDisclaimer": "Downloads chömed direkt vom Anbieter. {{serverName}} het kei Kontroll drüber, wie die Downloads zur Verfüegig gstellt werde. <br /><br />Bitte beachte, dass du e HLS-Playlist abeladsch, <bold>es wird nöd empfohle zum abelade, wenn du dich mit fortgschrittliche Streaming-Formate nöd uskennsch</bold>. Versuech anderi Quellen für anderi Formate.",
         "onAndroid": {
           "1": "Om of Android abezlade, klick ofe abelad chnopf, <bold>Klick ond halt</bold> ofs Video, den wählsch <bold>save</bold>us.",
           "shortTitle": "Abelade / Android",
@@ -300,7 +300,7 @@
         "badge": "Erwiterig deaktiviert",
         "enableExtension": "Erwiterig aktiviere",
         "homeButton": "Gang heime",
-        "text": "Du hescht P-Stream Erwiterig installiert. Demet du si chasch benotze, muesch si aktiviere.",
+        "text": "Du hescht {{serverName}} Erwiterig installiert. Demet du si chasch benotze, muesch si aktiviere.",
         "title": "Bitte aktivier t Erwiterig"
       },
       "items": {
@@ -347,7 +347,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Halt, stop. Besch du en Mönsch? Bewis dini Mönschlechkeit indem du schnell en Challenge abschliesch – das dient zor Sicherheit vo P-Stream.",
+      "description": "Halt, stop. Besch du en Mönsch? Bewis dini Mönschlechkeit indem du schnell en Challenge abschliesch – das dient zor Sicherheit vo {{serverName}}.",
       "error": "Du hesch der Tescht net gschaft- Stream het net chöne lade. Ler din Cache und versuech’s nomol, oder wechsle zue ere andere Quelle (tipp uf s’Zahnrad).",
       "title": "Besch du en Roboter?",
       "verifyingHumanity": "Verifizier dini Mönschlechkeit… (^▽^)👍"
@@ -403,7 +403,7 @@
       "title": "Account",
       "admin": {
         "title": "Admin-Zentrale",
-        "text": "Notz d‘Wärchzüg wo deför do si, der zuestand vo P-Stream z öberprüefe.",
+        "text": "Notz d‘Wärchzüg wo deför do si, der zuestand vo {{serverName}} z öberprüefe.",
         "button": "Check es us"
       }
     },

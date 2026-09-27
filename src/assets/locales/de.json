@@ -11,13 +11,13 @@
     "title": "Ein Fehler ist aufgetreten!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Über",
       "legal": "Legal / DMCA",
       "login": "Anmelden",
       "onboarding": "Einrichtung",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registrieren",
       "settings": "Einstellungen",
       "discover": "Entdecken",
@@ -51,7 +51,7 @@
           "Was willst du heute schauen?",
           "Wie war dein Tag?",
           "Mein Fehler die Seite funktioniert nie...",
-          "Ist P-Stream nicht das beste?",
+          "Ist {{serverName}} nicht das beste?",
           ">ᴗ<"
         ]
       },
@@ -143,10 +143,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "HLS-Playlist Link kopieren",
-        "disclaimer": "Videos werden direkt vom Provider heruntergeladen. P-Stream hat keinen Einfluss darauf, wie Downloads bereitgestellt werden.",
+        "disclaimer": "Videos werden direkt vom Provider heruntergeladen. {{serverName}} hat keinen Einfluss darauf, wie Downloads bereitgestellt werden.",
         "downloadSubtitle": "Aktuelle Untertitel herunterladen",
         "downloadVideo": "Video herunterladen",
-        "hlsDisclaimer": "P-Stream hat keinen Einfluss darauf, wie Downloads bereitgestellt werden. Downloads werden direkt vom Anbieter bezogen. <br /><br />Bitte beachte, dass du eine HLS-Wiedergabeliste herunterlädst, <bold>dies ist nicht empfohlen für Nutzer die nicht mit Erweiterten Streaming Formaten vertraut sind</bold>. Probiere andere Anbieter für andere Formate.",
+        "hlsDisclaimer": "{{serverName}} hat keinen Einfluss darauf, wie Downloads bereitgestellt werden. Downloads werden direkt vom Anbieter bezogen. <br /><br />Bitte beachte, dass du eine HLS-Wiedergabeliste herunterlädst, <bold>dies ist nicht empfohlen für Nutzer die nicht mit Erweiterten Streaming Formaten vertraut sind</bold>. Probiere andere Anbieter für andere Formate.",
         "onAndroid": {
           "1": "Um auf Android Herunterzuladen, tippe auf den Download-Button, <bold>tippe und halte</bold> auf der neuen Seite auf das Video und wähle <bold>Speichern</bold> aus.",
           "shortTitle": "Download / Android",
@@ -289,7 +289,7 @@
         "badge": "Erweiterung deaktiviert",
         "enableExtension": "Erweiterung aktivieren",
         "homeButton": "Zur Startseite",
-        "text": "Du hast die P-Streame Erweiterung installiert. Um die Erweiterung zu benutzen, musst du sie für diese Seite aktivieren.",
+        "text": "Du hast die {{serverName}}e Erweiterung installiert. Um die Erweiterung zu benutzen, musst du sie für diese Seite aktivieren.",
         "title": "Bitte aktiviere die Erweiterung"
       },
       "items": {
@@ -330,7 +330,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Bitte verifiziere deine Menschlichkeit mit dem Captcha auf der Rechten Seite. Dies ist um P-Stream sicher zu halten!",
+      "description": "Bitte verifiziere deine Menschlichkeit mit dem Captcha auf der Rechten Seite. Dies ist um {{serverName}} sicher zu halten!",
       "error": "Menschlichkeit konnte nicht verifiziert werden. Bitte versuche es erneut.",
       "title": "Wir müssen sicherstellen, dass du Menschlich bist.",
       "verifyingHumanity": "Verifiziere deine Menschlichkeit..."
@@ -381,7 +381,7 @@
       "title": "Konto",
       "admin": {
         "title": "Admin-Bereich",
-        "text": "Nutzen Sie Tools zum Testen des P-Stream-Zustands."
+        "text": "Nutzen Sie Tools zum Testen des {{serverName}}-Zustands."
       }
     },
     "appearance": {

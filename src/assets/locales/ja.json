@@ -4,7 +4,7 @@
     "copy": "コピー"
   },
   "global": {
-    "name": "映画ウェブ",
+    "name": "{{serverName}}",
     "pages": {
       "about": "概要",
       "login": "ログイン",

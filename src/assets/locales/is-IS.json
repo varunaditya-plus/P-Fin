@@ -11,13 +11,13 @@
     "title": "Við lentum í villu!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Um",
       "legal": "Legal / DMCA",
       "login": "Skrá inn",
       "onboarding": "Setja upp",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Skrá",
       "settings": "Stillingar"
     }
@@ -104,10 +104,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Afrita HLS spilalista hlekk",
-        "disclaimer": "Niðurhalningar eru teknar beint frá heimildini. P-Stream hefur engan kraft yfir hvernig niðurhalningarnar eru gefnar.",
+        "disclaimer": "Niðurhalningar eru teknar beint frá heimildini. {{serverName}} hefur engan kraft yfir hvernig niðurhalningarnar eru gefnar.",
         "downloadSubtitle": "Hlaða niður nú verandi texta",
         "downloadVideo": "Hlaða niður myndbandi",
-        "hlsDisclaimer": "Niðurhalningar eru teknar beint frá heimildini. P-Stream hefur engan kraft yfir hvernig niðurhalningarnar eru gefnar.<br /><br />Vinsamlegast fattaðu að þú ert að niðurhala HLS spilunarlista, <bold>það er ekki mælt með að niðurhala ef þú kannt ekki mikið á háþróað streymis sniði.</bold>. Reyndu aðrar heimildir fyrir önnur sniði.",
+        "hlsDisclaimer": "Niðurhalningar eru teknar beint frá heimildini. {{serverName}} hefur engan kraft yfir hvernig niðurhalningarnar eru gefnar.<br /><br />Vinsamlegast fattaðu að þú ert að niðurhala HLS spilunarlista, <bold>það er ekki mælt með að niðurhala ef þú kannt ekki mikið á háþróað streymis sniði.</bold>. Reyndu aðrar heimildir fyrir önnur sniði.",
         "onAndroid": {
           "1": "Til þess að niðurhala á Android, ýttu á niðurhalningar takkan síðan, á nýju síðunni, <bold>smelltu og haltu niðri</bold> á myndbandinu, veldu síðan <bold>vista</bold>.",
           "shortTitle": "Hlaða niður / Android",
@@ -249,7 +249,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Vinsamlegast sannreyndu að þú sért manneskja með því að klára Captcha-ið til hægri. Þetta er til þess að halda P-Stream öruggu!",
+      "description": "Vinsamlegast sannreyndu að þú sért manneskja með því að klára Captcha-ið til hægri. Þetta er til þess að halda {{serverName}} öruggu!",
       "error": "Mistókst að sannreyna að þú sért manneskja. Vinsamlegast reyndu aftur.",
       "title": "Við þurfum að sannræna að þú ert manneskja.",
       "verifyingHumanity": "Að sannræna að þú sért manneskja..."

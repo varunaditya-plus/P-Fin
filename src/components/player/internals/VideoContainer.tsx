@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 import { makeVideoElementDisplayInterface } from "@/components/player/display/base";
 import { convertSubtitlesToObjectUrl } from "@/components/player/utils/captions";
@@ -63,6 +64,7 @@ function useObjectUrl(cb: () => string | null, deps: any[]) {
 }
 
 function VideoElement() {
+  const { t } = useTranslation();
   const videoEl = useRef<HTMLVideoElement>(null);
   const trackEl = useRef<HTMLTrackElement>(null);
   const display = usePlayerStore((s) => s.display);
@@ -106,7 +108,7 @@ function VideoElement() {
     subtitleTrack = (
       <track
         ref={trackEl}
-        label="P-Stream Captions"
+        label={`${t("global.name")} Captions`}
         kind="subtitles"
         srcLang={language}
         src={trackObjectUrl}

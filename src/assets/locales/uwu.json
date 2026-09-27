@@ -13,7 +13,7 @@
     "title": "We encountewed an ewwow!!11"
   },
   "global": {
-    "name": "uwu-flix",
+    "name": "{{serverName}}",
     "pages": {
       "about": "About",
       "legal": "Legal / DMCA",
@@ -21,7 +21,7 @@
       "support": "Support",
       "login": "Login",
       "onboarding": "Setup",
-      "pagetitle": "{{title}} - uwu-flix",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Register",
       "settings": "Settings",
       "migration": "m-migwate account",
@@ -49,11 +49,11 @@
           "What awe you in the mood >w< f-f-fow?",
           "Shouwd we *notices buldge* dewete youw bwowsew histowy? ;;w;;",
           "What do you w-want t-to stweam?",
-          "uwu-flix is the best *starts twerking* site e-e-evew!",
+          "{{serverName}} is the best *starts twerking* site e-e-evew!",
           "What's on youw watchwist today?",
           "How was youw day?",
           "My bad >w< the site nyevew wowks...",
-          "Isn't uwu-flix just *whispers to self* the best?",
+          "Isn't {{serverName}} just *whispers to self* the best?",
           ">ᴗ<"
         ]
       },
@@ -142,7 +142,7 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "Downwoads awe taken diwectwy fwom the x3 pwovidew. uwu-flix does nyot have contwow uvw how the downwoads awe pwovided.",
+        "disclaimer": "Downwoads awe taken diwectwy fwom the x3 pwovidew. {{serverName}} does nyot have contwow uvw how the downwoads awe pwovided.",
         "copyHlsPlaylist": "Copy H-HWS pwaywist wink",
         "downloadSubtitle": "Downwoad cuwwent subtitwe",
         "downloadVideo": "Downwoad v-v-video",
@@ -321,7 +321,7 @@
         "homeButton": "Go home",
         "enableExtension": "Enyabwe extension",
         "title": "Pwease enyabwe the extension",
-        "text": "You've instawwed the s-P-Stream e-extension. To stawt u-using it, you nyeed t-to enyabwe the extension fow this site."
+        "text": "You've instawwed the s-{{serverName}} e-extension. To stawt u-using it, you nyeed t-to enyabwe the extension fow this site."
       },
       "tips": {
         "7": "Hold SHIFT and twap the twitle to copy the wink with time!",
@@ -354,7 +354,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Pwease pwuv youw humanyity by compweting the Captcha on the wight. This is t-to k-k-keep uwu-flix safe!?",
+      "description": "Pwease pwuv youw humanyity by compweting the Captcha on the wight. This is t-to k-k-keep {{serverName}} safe!?",
       "error": "Faiwed t-to vewify youw humanyity?!! Pwease twy again.",
       "title": "Awe You a Wobot 🤖?",
       "verifyingHumanity": "Vewifying youw humanyity... (^▽^)👍"
@@ -370,7 +370,7 @@
       },
       "admin": {
         "title": "Admin panyew",
-        "text": "Utiwize toows made fow testing uwu-flix's condition.",
+        "text": "Utiwize toows made fow testing {{serverName}}'s condition.",
         "button": "Check i-it out"
       },
       "actions": {

@@ -13,12 +13,12 @@
     "title": "Vi stötte på ett fel!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Om oss",
       "legal": "Legal / DMCA",
       "login": "Logga in",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registrera",
       "settings": "Inställningar",
       "discover": "Upptäck",
@@ -67,11 +67,11 @@
           "Vad har du lust med?",
           "Ska vi radera din webbläsarhistorik?",
           "Vad vill du streama?",
-          "P-Stream är den bästa sidan någonsin!",
+          "{{serverName}} är den bästa sidan någonsin!",
           "Vad är på din titta-lista idag?",
           "Hur var din dag?",
           "Ingen fara, sidan fungerar tydligen aldrig…",
-          "Är inte P-Stream bara det bästa?",
+          "Är inte {{serverName}} bara det bästa?",
           ">ᴗ<"
         ]
       },
@@ -91,7 +91,7 @@
     "titles": {
       "day": {
         "default": "Vad vill du titta på i eftermiddag?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "morning": {
         "default": "Vad vill du titta på den här morgonen?",
@@ -162,7 +162,7 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "Nedladdningar görs direkt från leverantören. P-Stream har ingen kontroll över hur nedladdningarna tillhandahålls.",
+        "disclaimer": "Nedladdningar görs direkt från leverantören. {{serverName}} har ingen kontroll över hur nedladdningarna tillhandahålls.",
         "downloadVideo": "Ladda ner video",
         "onAndroid": {
           "1": "För att ladda ner på Android, klicka på nedladdningsknappen och på den nya sidan <bold>trycker och håller</bold> på videon, välj sedan <bold>spara</bold>.",
@@ -185,7 +185,7 @@
         "iina": "IINA",
         "outplayer": "Outplayer",
         "hlsOpenInDisclaimer": "Att öppna HLS-strömmar i en extern spelare KANSKE INTE FUNGERAR!",
-        "hlsDisclaimer": "Nedladdningar hämtas direkt från leverantören. P-Stream har ingen kontroll över hur nedladdningarna tillhandahålls.<br /><br />Observera att du laddar ner en HLS-spellista, <bold>det rekommenderas inte att ladda ner om du inte är bekant med avancerade strömningsformat</bold>. Prova olika källor för olika format.",
+        "hlsDisclaimer": "Nedladdningar hämtas direkt från leverantören. {{serverName}} har ingen kontroll över hur nedladdningarna tillhandahålls.<br /><br />Observera att du laddar ner en HLS-spellista, <bold>det rekommenderas inte att ladda ner om du inte är bekant med avancerade strömningsformat</bold>. Prova olika källor för olika format.",
         "button": "Försök nedladdning",
         "hlsDownloader": "Eller gå till <0>hls downloader website</0> och klistra in spelliste-URL\\:en från nedan.",
         "copyHlsPlaylist": "Kopiera länk till HLS spellista",
@@ -347,7 +347,7 @@
       "extensionFailure": {
         "enableExtension": "Aktivera tillägget",
         "title": "Vänligen aktivera tillägget",
-        "text": "Du har installerat P-Stream-tillägget. För att börja använda det måste du aktivera tillägget för denna webbplats.",
+        "text": "Du har installerat {{serverName}}-tillägget. För att börja använda det måste du aktivera tillägget för denna webbplats.",
         "badge": "Tillägget inaktiverat",
         "homeButton": "Gå till startsidan"
       },
@@ -388,7 +388,7 @@
       "restart": "Starta om"
     },
     "turnstile": {
-      "description": "Vänligen bevisa att din mänsklighet genom att genomföra den snabba utmaningen; detta görs för att hålla P-Stream säkert."
+      "description": "Vänligen bevisa att din mänsklighet genom att genomföra den snabba utmaningen; detta görs för att hålla {{serverName}} säkert."
     }
   },
   "settings": {

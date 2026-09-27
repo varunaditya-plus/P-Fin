@@ -11,13 +11,13 @@
     "title": "我们遇到了一个错误！"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "关于",
       "legal": "Legal / DMCA",
       "login": "登录",
       "onboarding": "设定",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "注册",
       "settings": "设置",
       "support": "支持",
@@ -47,11 +47,11 @@
           "您想探索些什么？",
           "您的片单上都有啥？",
           "您最喜欢的影片是什么？",
-          "P-Stream 是最好的网站！",
+          "{{serverName}} 是最好的网站！",
           "您今天的片单上有什么？",
           "今天过得怎么样？",
           "是我的错，网站总是无法正常运行…",
-          "P-Stream 不就是最棒的吗？",
+          "{{serverName}} 不就是最棒的吗？",
           ">ᴗ<"
         ]
       },
@@ -66,15 +66,15 @@
     "titles": {
       "day": {
         "default": "您今天下午想看什么？",
-        "extra": ["P-Stream 万岁！"]
+        "extra": ["{{serverName}} 万岁！"]
       },
       "morning": {
         "default": "您今早想看什么？",
-        "extra": ["P-Stream 万岁！"]
+        "extra": ["{{serverName}} 万岁！"]
       },
       "night": {
         "default": "您今晚想看什么？",
-        "extra": ["P-Stream 万岁！"]
+        "extra": ["{{serverName}} 万岁！"]
       },
       "420": {
         "default": "这个 4/20 你想看什么？",
@@ -128,10 +128,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "复制 HLS 播放列表链接",
-        "disclaimer": "下载内容是直接从内容提供者获取的。P-Stream 无法控制下载内容如何被提供。",
+        "disclaimer": "下载内容是直接从内容提供者获取的。{{serverName}} 无法控制下载内容如何被提供。",
         "downloadSubtitle": "下载当前字幕",
         "downloadVideo": "下载视频",
-        "hlsDisclaimer": "下载内容是直接从内容提供者获取的。P-Stream 无法控制下载内容如何被提供。<br /><br />请注意，您正在下载 HLS 播放列表，<bold>如您不熟悉高级流媒体格式，我们不推荐此操作</bold>。如需下载其他格式，请尝试切换视频源。",
+        "hlsDisclaimer": "下载内容是直接从内容提供者获取的。{{serverName}} 无法控制下载内容如何被提供。<br /><br />请注意，您正在下载 HLS 播放列表，<bold>如您不熟悉高级流媒体格式，我们不推荐此操作</bold>。如需下载其他格式，请尝试切换视频源。",
         "onAndroid": {
           "1": "要从 Android 下载，先点击下载按钮，之后在新的页面上， <bold>点击并按住</bold>视频，然后选择 <bold>保存</bold>。",
           "shortTitle": "下载 / Android",
@@ -269,7 +269,7 @@
         "badge": "扩展程序已禁用",
         "enableExtension": "启用扩展程序",
         "homeButton": "返回首页",
-        "text": "您已经安装 P-Stream 扩展程序。要开始使用，您需要为此站点启用扩展。",
+        "text": "您已经安装 {{serverName}} 扩展程序。要开始使用，您需要为此站点启用扩展。",
         "title": "请启用扩展程序"
       },
       "items": {
@@ -293,7 +293,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "请完成简短的挑战来证明你是人类，这是为了确保 P-Stream 的安全。",
+      "description": "请完成简短的挑战来证明你是人类，这是为了确保 {{serverName}} 的安全。",
       "error": "人类验证失败 - 流媒体加载失败。清除缓存后重试，或切换到其他片源。",
       "title": "您是机器人吗？",
       "verifyingHumanity": "正在验证您是否为人类…"
@@ -349,7 +349,7 @@
       "title": "账户",
       "admin": {
         "title": "管理面板",
-        "text": "用于测试 P-Stream 状态的工具。",
+        "text": "用于测试 {{serverName}} 状态的工具。",
         "button": "看看这个"
       }
     },

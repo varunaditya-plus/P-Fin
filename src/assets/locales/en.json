@@ -13,7 +13,7 @@
     "title": "We encountered an error!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "About and FAQ",
       "legal": "Legal / DMCA",
@@ -21,7 +21,7 @@
       "support": "Support",
       "login": "Login",
       "onboarding": "Setup",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Register",
       "settings": "Settings",
       "migration": "Migrate Account",
@@ -168,11 +168,11 @@
           "What are you in the mood for?",
           "Should we delete your browser history?",
           "What do you want to stream?",
-          "P-Stream is the best site ever!",
+          "{{serverName}} is the best site ever!",
           "What's on your watchlist today?",
           "How was your day?",
           "My bad the site never works...",
-          "Isn't P-Stream just the best?",
+          "Isn't {{serverName}} just the best?",
           ">ᴗ<"
         ]
       },
@@ -197,15 +197,15 @@
     "titles": {
       "day": {
         "default": "What would you like to watch this afternoon?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "morning": {
         "default": "What would you like to watch this morning?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "night": {
         "default": "What would you like to watch tonight?",
-        "extra": ["Viva la P-Stream!"]
+        "extra": ["Viva la {{serverName}}!"]
       },
       "420": {
         "default": "What would you like to watch this 4/20?",
@@ -226,10 +226,10 @@
       }
     },
     "support": {
-      "title": "P-Stream needs your help!",
-      "description": "P-Stream is run at a loss, and we need help to keep it ad free! If you enjoy using P-Stream, please consider donating to help us cover our costs.",
+      "title": "{{serverName}} needs your help!",
+      "description": "{{serverName}} is run at a loss, and we need help to keep it ad free! If you enjoy using {{serverName}}, please consider donating to help us cover our costs.",
       "moreInfo": "More info",
-      "explanation": "If you aren't using the extension or don't have FED API set up, it may be harder to find content! We want to fix this, but it's a lot harder to provide content without expensive servers. So please, if you enjoy using P-Stream, please consider donating to help us cover our growing costs.",
+      "explanation": "If you aren't using the extension or don't have FED API set up, it may be harder to find content! We want to fix this, but it's a lot harder to provide content without expensive servers. So please, if you enjoy using {{serverName}}, please consider donating to help us cover our growing costs.",
       "explanation2": "If you want more info, please join our ",
       "discord": "Discord",
       "thankYou": "Thank you for your support!",
@@ -289,7 +289,7 @@
       "downloads": {
         "button": "Attempt download",
         "hlsDownloader": "Or, go to the <0>hls downloader website</0> and paste the playlist URL from below.",
-        "disclaimer": "Downloads are taken directly from the provider. P-Stream does not have control over how the downloads are provided.",
+        "disclaimer": "Downloads are taken directly from the provider. {{serverName}} does not have control over how the downloads are provided.",
         "copyHlsPlaylist": "Copy HLS playlist link",
         "downloadSubtitle": "Download current subtitle",
         "downloadVideo": "Download video",
@@ -300,7 +300,7 @@
         "iina": "IINA",
         "outplayer": "Outplayer",
         "hlsOpenInDisclaimer": "Opening HLS streams in an external player MAY NOT WORK!",
-        "hlsDisclaimer": "Downloads are taken directly from the provider. P-Stream does not have control over how the downloads are provided.<br /><br />Please note you are downloading an HLS playlist, <bold>it is not recommended to download if you are not familiar with advanced streaming formats</bold>. Try different sources for different formats.",
+        "hlsDisclaimer": "Downloads are taken directly from the provider. {{serverName}} does not have control over how the downloads are provided.<br /><br />Please note you are downloading an HLS playlist, <bold>it is not recommended to download if you are not familiar with advanced streaming formats</bold>. Try different sources for different formats.",
         "onAndroid": {
           "1": "To download on Android, click the download button then, on the new page, <bold>tap and hold</bold> on the video, then select <bold>save</bold>.",
           "shortTitle": "Download / Android",
@@ -499,7 +499,7 @@
         "homeButton": "Go home",
         "enableExtension": "Enable extension",
         "title": "Please enable the extension",
-        "text": "You've installed the P-Stream extension. To start using it, you need to enable the extension for this site."
+        "text": "You've installed the {{serverName}} extension. To start using it, you need to enable the extension for this site."
       },
       "tips": {
         "1": "Tap the gear icon to switch sources!",
@@ -646,7 +646,7 @@
       },
       "admin": {
         "title": "Admin panel",
-        "text": "Test P-Stream's condition."
+        "text": "Test {{serverName}}'s condition."
       },
       "actions": {
         "delete": {

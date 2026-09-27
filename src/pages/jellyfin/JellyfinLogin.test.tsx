@@ -23,6 +23,7 @@ import {
   useJellyfinServers,
 } from "@/stores/jellyfin";
 import { useSeerrConnection } from "@/stores/seerr";
+import "@/setup/i18n";
 
 import { JellyfinLogin } from "./JellyfinLogin";
 

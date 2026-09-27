@@ -88,7 +88,7 @@ function fingerprint(text: string) {
 
 async function fetchFreshText(url: string, signal: AbortSignal) {
   const fresh = new URL(url, window.location.origin);
-  fresh.searchParams.set("__pstream_update_check", String(Date.now()));
+  fresh.searchParams.set("__pfin_update_check", String(Date.now()));
   const response = await fetch(fresh, { cache: "no-store", signal });
   if (!response.ok) throw new Error("Could not check the current app version.");
   return response.text();

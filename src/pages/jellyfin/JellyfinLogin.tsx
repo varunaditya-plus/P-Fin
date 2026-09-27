@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { loginJellyfin } from "@/backend/jellyfin/client";
@@ -27,6 +28,7 @@ import {
 import { useSeerrConnection } from "@/stores/seerr";
 
 export function JellyfinLogin() {
+  const { t } = useTranslation();
   const [stage, setStage] = useState<"server" | "users" | "login" | "seerr">(
     "server",
   );
@@ -183,7 +185,7 @@ export function JellyfinLogin() {
     return (
       <SubPageLayout>
         <Helmet>
-          <title>Set up Seerr · P-Stream</title>
+          <title>Set up Seerr · {t("global.name")}</title>
         </Helmet>
         <div className="px-4 pb-12">
           <SeerrSetup
@@ -200,7 +202,8 @@ export function JellyfinLogin() {
     <SubPageLayout>
       <Helmet>
         <title>
-          {stage === "server" ? "Connect to a server" : "Sign in"} · P-Stream
+          {stage === "server" ? "Connect to a server" : "Sign in"} ·{" "}
+          {t("global.name")}
         </title>
       </Helmet>
       <div className="px-4 pb-12">

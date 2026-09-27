@@ -11,13 +11,13 @@
     "title": "Encontramos um erro!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Sobre",
       "legal": "Legal / DMCA",
       "login": "Entrar",
       "onboarding": "Configuração",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registrar",
       "settings": "Configurações",
       "discover": "Descubra",
@@ -51,7 +51,7 @@
           "O que tem na sua watchlist hoje?",
           "Como foi o teu dia?",
           "Foi mal, o site nunca funciona...",
-          "A P-Stream não é a melhor?",
+          "A {{serverName}} não é a melhor?",
           ">ᴗ<"
         ]
       },
@@ -143,10 +143,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copiar link da playlist HLS",
-        "disclaimer": "Os downloads são feitos diretamente do provedor. P-Stream não tem controle sobre como os downloads são fornecidos.",
+        "disclaimer": "Os downloads são feitos diretamente do provedor. {{serverName}} não tem controle sobre como os downloads são fornecidos.",
         "downloadSubtitle": "Baixar legenda atual",
         "downloadVideo": "Baixar vídeo",
-        "hlsDisclaimer": "Os downloads são feitos diretamente do provedor. P-Stream não tem controle sobre como os downloads são fornecidos.<br /><br />Por favor, note que você está baixando uma playlist HLS, <bold>isso é destinado para usuários familiarizados com streaming multimídia avançado.</bold>. Experimente outras fontes para formatos diferentes.",
+        "hlsDisclaimer": "Os downloads são feitos diretamente do provedor. {{serverName}} não tem controle sobre como os downloads são fornecidos.<br /><br />Por favor, note que você está baixando uma playlist HLS, <bold>isso é destinado para usuários familiarizados com streaming multimídia avançado.</bold>. Experimente outras fontes para formatos diferentes.",
         "onAndroid": {
           "1": "Para baixar no Android, clique no botão de download e, na nova página, <bold>toque e segure</bold> no vídeo, depois selecione <bold>salvar</bold>.",
           "shortTitle": "Baixar / Android",
@@ -285,7 +285,7 @@
         "badge": "Extensão desativada",
         "enableExtension": "Ativar extensão",
         "homeButton": "Ir para o início",
-        "text": "Você instalou a extensão P-Stream. Para começar a usá-la, você precisa ativar a extensão neste site.",
+        "text": "Você instalou a extensão {{serverName}}. Para começar a usá-la, você precisa ativar a extensão neste site.",
         "title": "Por favor, ative a extensão"
       },
       "items": {
@@ -308,7 +308,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Por favor, confirme que você é um humano completando o Captcha à direita. Isso é para manter P-Stream seguro!",
+      "description": "Por favor, confirme que você é um humano completando o Captcha à direita. Isso é para manter {{serverName}} seguro!",
       "error": "Falha ao verificar sua humanidade. Por favor, tente novamente.",
       "title": "Precisamos verificar se você é humano.",
       "verifyingHumanity": "Verificando sua humanidade..."

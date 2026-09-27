@@ -11,13 +11,13 @@
     "title": "Si è verificato un errore!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
-      "about": "Su P-Stream",
+      "about": "Su {{serverName}}",
       "legal": "Legal / DMCA",
       "login": "Accedi",
       "onboarding": "Configura",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registrati",
       "settings": "Impostazioni",
       "discover": "Scopri",
@@ -46,11 +46,11 @@
           "Di cosa hai voglia?",
           "Dovremmo eliminare la cronologia del browser?",
           "Cosa vuoi trasmettere in streaming?",
-          "P-Stream è il sito migliore di sempre!",
+          "{{serverName}} è il sito migliore di sempre!",
           "Cosa c'è nella tua lista oggi?",
           "Com'è stata la tua giornata?",
           "Colpa mia, il sito non funziona mai...",
-          "P-Stream non è semplicemente il migliore?",
+          "{{serverName}} non è semplicemente il migliore?",
           ">ᴗ<"
         ]
       },
@@ -70,15 +70,15 @@
     "titles": {
       "day": {
         "default": "Cosa vorresti guardare questo pomeriggio?",
-        "extra": ["Viva P-Stream!"]
+        "extra": ["Viva {{serverName}}!"]
       },
       "morning": {
         "default": "Cosa vorresti guardare questa mattina?",
-        "extra": ["Viva P-Stream!"]
+        "extra": ["Viva {{serverName}}!"]
       },
       "night": {
         "default": "Cosa vorresti guardare questa sera?",
-        "extra": ["Viva P-Stream!"]
+        "extra": ["Viva {{serverName}}!"]
       },
       "420": {
         "default": "Cosa ti piacerebbe guardare questo 20/4?",
@@ -110,7 +110,7 @@
       "offline": "Controlla la tua connessione internet, stupida oca! 🦢"
     },
     "menu": {
-      "about": "Su di P-Stream",
+      "about": "Su di {{serverName}}",
       "logout": "Esci",
       "register": "Sincronizza al Cloud",
       "settings": "Impostazioni",
@@ -139,10 +139,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copia link playlist HLS",
-        "disclaimer": "I download vengono effettuati direttamente dal provider. P-Stream non ha il controllo sulle modalità di fornitura dei download.",
+        "disclaimer": "I download vengono effettuati direttamente dal provider. {{serverName}} non ha il controllo sulle modalità di fornitura dei download.",
         "downloadSubtitle": "Scarica sottotitolo attuale",
         "downloadVideo": "Scarica video",
-        "hlsDisclaimer": "I download vengono effettuati direttamente dal provider. P-Stream non ha il controllo sul modo in cui vengono forniti i download.<br /><br />Tieni presente che stai scaricando una playlist HLS, <bold>non è consigliabile scaricarla se non hai familiarità con i formati di streaming avanzati</bold>. Prova diverse fonti per diversi formati.",
+        "hlsDisclaimer": "I download vengono effettuati direttamente dal provider. {{serverName}} non ha il controllo sul modo in cui vengono forniti i download.<br /><br />Tieni presente che stai scaricando una playlist HLS, <bold>non è consigliabile scaricarla se non hai familiarità con i formati di streaming avanzati</bold>. Prova diverse fonti per diversi formati.",
         "onAndroid": {
           "1": "Per scaricare su Android, fai clic sul pulsante di download quindi, nella nuova pagina, <bold>tocca e tieni premuto</bold> sul video, quindi seleziona <bold>salva</bold>.",
           "shortTitle": "Scarica / Android",
@@ -276,7 +276,7 @@
         "badge": "L'estensione è disabilitata",
         "enableExtension": "Abilita l'estensione",
         "homeButton": "Torna alla pagina iniziale",
-        "text": "Hai installato l'estensione P-Stream. Per iniziare a usarla, devi abilitare l'estensione per questo sito.",
+        "text": "Hai installato l'estensione {{serverName}}. Per iniziare a usarla, devi abilitare l'estensione per questo sito.",
         "title": "Abilita l'estensione"
       },
       "items": {
@@ -300,7 +300,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Per favore dimostra la tua umanità completando il Captcha a destra. Questo serve a mantenere P-Stream.lol al sicuro!",
+      "description": "Per favore dimostra la tua umanità completando il Captcha a destra. Questo serve a mantenere {{serverName}}.lol al sicuro!",
       "error": "Impossibile verificare la vostra umanità! Riprova.",
       "title": "Sei un Robot 🤖?",
       "verifyingHumanity": "Verificando la tua umanità... (^▽^)👍"
@@ -351,7 +351,7 @@
       "title": "Account",
       "admin": {
         "title": "Pannello di Amministrazione",
-        "text": "Utilizza strumenti realizzati per testare le condizioni di P-Stream.",
+        "text": "Utilizza strumenti realizzati per testare le condizioni di {{serverName}}.",
         "button": "Controlla"
       }
     },

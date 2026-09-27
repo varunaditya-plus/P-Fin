@@ -5,6 +5,7 @@ import {
   jellyfinRequest,
   jellyfinUrl,
 } from "@/backend/jellyfin/client";
+import { APP_NAME } from "@/setup/branding";
 import { JellyfinSession } from "@/stores/jellyfin";
 import { CaptionListItem } from "@/stores/player/slices/source";
 import { SourceSliceSource } from "@/stores/player/utils/qualities";
@@ -111,7 +112,7 @@ function browserProfile(
       MediaSource.isTypeSupported(hevcType));
   const videoCodecs = hevc ? "h264,hevc" : "h264";
   return {
-    Name: "P-Stream Web",
+    Name: `${APP_NAME} Web`,
     MaxStreamingBitrate: maxBitrate,
     MaxStaticBitrate: maxBitrate,
     DirectPlayProfiles: [

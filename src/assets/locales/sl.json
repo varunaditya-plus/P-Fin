@@ -11,13 +11,13 @@
     "title": "Prišlo je do napake!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "O projektu",
       "legal": "Legal / DMCA",
       "login": "Prijava",
       "onboarding": "Nastavitev",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registriraj se",
       "settings": "Nastavitve"
     }
@@ -107,10 +107,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Kopiranje povezave do seznama predvajanja HLS",
-        "disclaimer": "Prenosi se opravijo neposredno pri ponudniku vsebin. P-Stream nima nadzora nad načinom zagotavljanja prenosov.",
+        "disclaimer": "Prenosi se opravijo neposredno pri ponudniku vsebin. {{serverName}} nima nadzora nad načinom zagotavljanja prenosov.",
         "downloadSubtitle": "Prenesi trenutne podnapise",
         "downloadVideo": "Prenesi video",
-        "hlsDisclaimer": "Prenosi se opravijo neposredno pri ponudniku vsebin. P-Stream nima nadzora nad načinom zagotavljanja prenosov. Upoštevajte, da prenašate seznam predvajanja tipa \"HLS\" namenjen uporabnikom, ki poznajo napredno pretakanje večpredstavnostnih vsebin.",
+        "hlsDisclaimer": "Prenosi se opravijo neposredno pri ponudniku vsebin. {{serverName}} nima nadzora nad načinom zagotavljanja prenosov. Upoštevajte, da prenašate seznam predvajanja tipa \"HLS\" namenjen uporabnikom, ki poznajo napredno pretakanje večpredstavnostnih vsebin.",
         "onAndroid": {
           "1": "Če želite prenesti v sistemu Android, kliknite gumb za prenos, nato na novi strani <bold>tipnite in držite</bold> videoposnetek ter izberite <bold>shrani</bold>.",
           "shortTitle": "Prenesi / Android",
@@ -238,7 +238,7 @@
         "badge": "Razširitev brskalnika je onemogočena",
         "enableExtension": "Vklopi razširitev brskalnika",
         "homeButton": "Pojdi domov",
-        "text": "Namestili ste razširitev P-Stream. Če jo želite začeti uporabljati, morate razširitev omogočiti za to spletno mesto.",
+        "text": "Namestili ste razširitev {{serverName}}. Če jo želite začeti uporabljati, morate razširitev omogočiti za to spletno mesto.",
         "title": "Prosim vklopite razširitev brskalnika"
       },
       "items": {

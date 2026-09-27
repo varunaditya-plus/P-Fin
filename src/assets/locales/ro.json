@@ -11,13 +11,13 @@
     "title": "Am intampinat o eroare!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Despre",
       "legal": "Legal / DMCA",
       "login": "Log in",
       "onboarding": "Configurație",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Inregistreaza-te",
       "settings": "Setări",
       "discover": "Descoperă",
@@ -50,7 +50,7 @@
           "Ce ai vrea să vizionezi azi?",
           "Cum a fost ziua de azi?",
           "Vina mea că site-ul nu funcționează niciodată...",
-          "Nu-i așa că P-Stream e cel mai tare?",
+          "Nu-i așa că {{serverName}} e cel mai tare?",
           ">ᴗ<"
         ]
       },
@@ -136,10 +136,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copiere link către lista de redare HLS",
-        "disclaimer": "Descărcările sunt luate direct de la furnizor. P-Stream nu are control cum descărcările sunt furnizate.",
+        "disclaimer": "Descărcările sunt luate direct de la furnizor. {{serverName}} nu are control cum descărcările sunt furnizate.",
         "downloadSubtitle": "Descărcați subtitlul curente",
         "downloadVideo": "Descarcă video",
-        "hlsDisclaimer": "Descărcările sunt preluate direct de la furnizor. P-Stream nu are control asupra modului în care sunt furnizate descărcările.<br /><br />Vă rugăm să rețineți că descărcați o listă de redare HLS, <bold>nu este recomandat să o descărcați dacă nu sunteți familiari cu formate avasate de streaming</bold>. Încercați surse diferite pentru formate diferte.",
+        "hlsDisclaimer": "Descărcările sunt preluate direct de la furnizor. {{serverName}} nu are control asupra modului în care sunt furnizate descărcările.<br /><br />Vă rugăm să rețineți că descărcați o listă de redare HLS, <bold>nu este recomandat să o descărcați dacă nu sunteți familiari cu formate avasate de streaming</bold>. Încercați surse diferite pentru formate diferte.",
         "onAndroid": {
           "1": "Pentru a descărca pe android, apăsați butonul de descărcare apoi în pagina nouă,<bold>apăsați și țineți</bold> pe video, apoi selectați <bold>salvează</bold>.",
           "shortTitle": "Descărcare / Android",
@@ -281,7 +281,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Vă rog să vă verificați umanitatea completând acest captcha in partea dreapta. Asta este pentru a pastra P-Stream sigur!",
+      "description": "Vă rog să vă verificați umanitatea completând acest captcha in partea dreapta. Asta este pentru a pastra {{serverName}} sigur!",
       "error": "Verificarea umanității tale a eșuat. Încercați din nou.",
       "title": "Noi trebuie să verificăm dacă sunteți un om.",
       "verifyingHumanity": "Verificați-vă umanitatea voastră..."

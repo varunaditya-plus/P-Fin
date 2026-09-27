@@ -54,6 +54,9 @@ describe("Jellyfin request boundaries", () => {
     expect(new Headers(init?.headers).get("Authorization")).toContain(
       `Token="${session.accessToken}"`,
     );
+    expect(new Headers(init?.headers).get("Authorization")).toContain(
+      'Client="P-Fin"',
+    );
     expect(new Headers(init?.headers).get("Content-Type")).toBe(
       "application/json",
     );
@@ -91,6 +94,9 @@ describe("Jellyfin request boundaries", () => {
       }),
     );
     await loginJellyfin("Example", "example-password");
+    expect(
+      new Headers(fetchMock.mock.calls[0][1]?.headers).get("Authorization"),
+    ).toContain('Client="P-Fin"');
     expect(timeout).toHaveBeenCalledWith(30000);
     expect(fetchMock.mock.calls[0][1]?.signal).toBe(timeoutSignal);
   });

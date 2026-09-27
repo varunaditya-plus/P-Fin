@@ -13,13 +13,13 @@
     "title": "Nous avons rencontré une erreur !"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "À propos",
       "legal": "Legal / DMCA",
       "login": "Se connecter",
       "onboarding": "Mise en place",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Créer un compte",
       "settings": "Paramètres",
       "discover": "Découvrir",
@@ -66,11 +66,11 @@
           "Que voulez-vous explorer ?",
           "Qu'y a-t-il dans votre liste de lecture ?",
           "Quel est votre film préféré ?",
-          "P-Stream est le meilleur site au monde !",
+          "{{serverName}} est le meilleur site au monde !",
           "Qu'est-ce que tu as prévu de regarder aujourd'hui ?",
           "Comment s'est passée ta journée ?",
           "C'est ma faute, le site ne fonctionne jamais...",
-          "Est-ce que P-Stream n'est pas tout simplement le meilleur ?",
+          "Est-ce que {{serverName}} n'est pas tout simplement le meilleur ?",
           ">ᴗ<"
         ]
       },
@@ -90,7 +90,7 @@
     "titles": {
       "day": {
         "default": "Que voulez-vous regarder cet après-midi ?",
-        "extra": ["Viva la P-Stream !"]
+        "extra": ["Viva la {{serverName}} !"]
       },
       "morning": {
         "default": "Que voulez-vous regarder ce matin ?",
@@ -164,10 +164,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "Copier le lien de la playlist HLS",
-        "disclaimer": "Les téléchargements sont effectués directement par le fournisseur. P-Stream n'a aucun contrôle sur la manière dont les téléchargements sont effectués.",
+        "disclaimer": "Les téléchargements sont effectués directement par le fournisseur. {{serverName}} n'a aucun contrôle sur la manière dont les téléchargements sont effectués.",
         "downloadSubtitle": "Télécharger les sous-titres",
         "downloadVideo": "Télécharger la vidéo",
-        "hlsDisclaimer": "Les téléchargements sont effectués directement auprès du fournisseur. P-Stream n'a aucun contrôle sur la façon dont les téléchargements sont fournis.<br /><br />Veuillez noter que vous téléchargez une liste de lecture HLS, <bold>il n'est pas recommandé de la télécharger si vous n'êtes pas familier avec les formats de streaming avancés</bold>. Essayez différentes sources pour différents formats.",
+        "hlsDisclaimer": "Les téléchargements sont effectués directement auprès du fournisseur. {{serverName}} n'a aucun contrôle sur la façon dont les téléchargements sont fournis.<br /><br />Veuillez noter que vous téléchargez une liste de lecture HLS, <bold>il n'est pas recommandé de la télécharger si vous n'êtes pas familier avec les formats de streaming avancés</bold>. Essayez différentes sources pour différents formats.",
         "onAndroid": {
           "1": "Pour télécharger sur Android, cliquez sur le bouton de téléchargement, puis, sur la nouvelle page, <bold>tapez et maintenez</bold> sur la vidéo, et sélectionnez <bold>enregistrer</bold>.",
           "shortTitle": "Télécharger / Android",
@@ -317,7 +317,7 @@
         "badge": "Extension désactivée",
         "enableExtension": "Activer l'extension",
         "homeButton": "Revenir à l'accueil",
-        "text": "Vous avez installé l'extension P-Stream. Pour commencer à l'utiliser, vous devez activer l'extension pour ce site.",
+        "text": "Vous avez installé l'extension {{serverName}}. Pour commencer à l'utiliser, vous devez activer l'extension pour ce site.",
         "title": "Veuillez activer l'extension"
       },
       "items": {
@@ -345,7 +345,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Veuillez vérifier que vous êtes bien humain en complétant le Captcha à droite. C'est pour assurer la sécurité de P-Stream !",
+      "description": "Veuillez vérifier que vous êtes bien humain en complétant le Captcha à droite. C'est pour assurer la sécurité de {{serverName}} !",
       "error": "Échec de la vérification de votre humanité. Veuillez réessayer.",
       "title": "Nous devons vérifier que vous êtes un humain.",
       "verifyingHumanity": "Vérification de votre humanité..."

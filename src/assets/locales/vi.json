@@ -11,13 +11,13 @@
     "title": "Đã xảy ra lỗi!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Thông tin",
       "legal": "Legal / DMCA",
       "login": "Đăng nhập",
       "onboarding": "Cài đặt",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Đăng ký",
       "settings": "Cài đặt",
       "migration": "Chuyển tài khoản",
@@ -47,11 +47,11 @@
           "Bạn đang muốn làm gì?",
           "Chúng tôi có nên xóa trình duyệt web của bạn không?",
           "Ban muốn xem gì?",
-          "P-Stream là trang web tuyệt nhất!",
+          "{{serverName}} là trang web tuyệt nhất!",
           "Có gì trong danh sách phim của bạn hôm nay?",
           "Hôm nay bạn thế nào?",
           "Xin lỗi nha, trang này hay hỏng lắm...",
-          "Không phải P-Stream là tuyệt nhất sao?",
+          "Không phải {{serverName}} là tuyệt nhất sao?",
           ">ᴗ<"
         ]
       },
@@ -221,7 +221,7 @@
         "vlc": "VLC",
         "iina": "IINA",
         "hlsOpenInDisclaimer": "Mở luồng HLS với trình phát bên ngoài CÓ THỂ KHÔNG HOẠT ĐỘNG!",
-        "hlsDisclaimer": "Tải xuống được lấy trực tiếp từ nhà cung cấp. P-Stream không kiểm soát cách cung cấp tải xuống.<br /><br />Xin lưu ý rằng bạn đang tải xuống danh sách phát HLS, <bold>không nên tải xuống nếu bạn không quen với các định dạng phát trực tuyến nâng cao</bold>. Hãy thử các nguồn khác nhau cho các định dạng khác nhau.",
+        "hlsDisclaimer": "Tải xuống được lấy trực tiếp từ nhà cung cấp. {{serverName}} không kiểm soát cách cung cấp tải xuống.<br /><br />Xin lưu ý rằng bạn đang tải xuống danh sách phát HLS, <bold>không nên tải xuống nếu bạn không quen với các định dạng phát trực tuyến nâng cao</bold>. Hãy thử các nguồn khác nhau cho các định dạng khác nhau.",
         "onAndroid": {
           "1": "Để tải xuống trên Android, hãy nhấp vào nút tải xuống, sau đó trên trang mới, <bold>nhấn và giữ</bold> vào video, sau đó chọn <bold>lưu</bold>.",
           "shortTitle": "Tải xuống / Android",
@@ -240,7 +240,7 @@
         "title": "Tải xuống",
         "button": "Lượt tải xuống",
         "hlsDownloader": "Hoặc, hãy truy cập <0>trang web tải xuống hls</0> và dán URL danh sách phát bên dưới.",
-        "disclaimer": "Tải xuống được lấy trực tiếp từ nhà cung cấp. P-Stream không kiểm soát cách cung cấp tải xuống.",
+        "disclaimer": "Tải xuống được lấy trực tiếp từ nhà cung cấp. {{serverName}} không kiểm soát cách cung cấp tải xuống.",
         "copyHlsPlaylist": "Sao chép liên kết danh sách phát HLS",
         "downloadSubtitle": "Tải xuống phụ đề hiện tại",
         "downloadVideo": "Tải xuống video"
@@ -289,7 +289,7 @@
       "extensionFailure": {
         "homeButton": "Về trang chính",
         "badge": "Tiện ích mở rộng đã bị vô hiệu hóa",
-        "text": "Bạn đã cài đặt tiện ích mở rộng P-Stream. Để bắt đầu sử dụng, bạn cần bật tiện ích mở rộng cho trang web này.",
+        "text": "Bạn đã cài đặt tiện ích mở rộng {{serverName}}. Để bắt đầu sử dụng, bạn cần bật tiện ích mở rộng cho trang web này.",
         "enableExtension": "Bật tiện ích mở rộng",
         "title": "Vui lòng bật tiện ích mở rộng"
       },

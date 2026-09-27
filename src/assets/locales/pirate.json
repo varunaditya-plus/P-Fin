@@ -11,13 +11,13 @@
     "title": "That be an error, Captain"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "About",
       "legal": "Legal / DMCA",
       "login": "Login",
       "onboarding": "Setup",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Forge yer account, matey!",
       "settings": "Settings"
     }
@@ -101,10 +101,10 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "Downloads be taken directly from the provider. P-Stream does not have control over how the downloads be provided.",
+        "disclaimer": "Downloads be taken directly from the provider. {{serverName}} does not have control over how the downloads be provided.",
         "downloadSubtitle": "Download current subtitle",
         "downloadVideo": "Download film",
-        "hlsDisclaimer": "Loot are taken directly from the provider. P-Stream does nah 'ave control o'er how the loot are provided. <br /><br />Please note that ye be downloadin' an HLS playlist, <bold>'tisn't recommended t' download if ye be nah familiar wit' advanced streamin' formats</bold>. Try different sources fer different formats.",
+        "hlsDisclaimer": "Loot are taken directly from the provider. {{serverName}} does nah 'ave control o'er how the loot are provided. <br /><br />Please note that ye be downloadin' an HLS playlist, <bold>'tisn't recommended t' download if ye be nah familiar wit' advanced streamin' formats</bold>. Try different sources fer different formats.",
         "onAndroid": {
           "1": "To download on Android, <bold>tap and hold</bold> on the film, then select <bold>save</bold>.",
           "shortTitle": "Download / Android",
@@ -199,7 +199,7 @@
       "failed": {
         "badge": "Failed",
         "homeButton": "Go home port",
-        "text": "Oh, me apologies, sweetie! The itty-bitty P-Stream did its utmost bestest, but alas, no wucky videos to be spotted anywhere (´⊙ω⊙`) Please don't be angwy, wittle P-Stream ish twying so hard. Can ye find it in yer heart to forgive? UwU 💖",
+        "text": "Oh, me apologies, sweetie! The itty-bitty {{serverName}} did its utmost bestest, but alas, no wucky videos to be spotted anywhere (´⊙ω⊙`) Please don't be angwy, wittle {{serverName}} ish twying so hard. Can ye find it in yer heart to forgive? UwU 💖",
         "title": "Failed to load meta data"
       },
       "notFound": {
@@ -222,7 +222,7 @@
         "errorNotSupported": "The associated resource or media provider object has been found to be unsuitable."
       },
       "homeButton": "Go home port",
-      "text": "Oh, me apologies, sweetie! The itty-bitty P-Stream did its utmost bestest, but alas, no wucky videos to be spotted anywhere (´⊙ω⊙`) Please don't be angwy, wittle P-Stream ish twying so hard. Can ye find it in yer heart to forgive? UwU 💖",
+      "text": "Oh, me apologies, sweetie! The itty-bitty {{serverName}} did its utmost bestest, but alas, no wucky videos to be spotted anywhere (´⊙ω⊙`) Please don't be angwy, wittle {{serverName}} ish twying so hard. Can ye find it in yer heart to forgive? UwU 💖",
       "title": "Whoops, it broke!"
     },
     "scraping": {
@@ -235,7 +235,7 @@
         "badge": "Not found",
         "detailsButton": "Show details",
         "homeButton": "Go home port",
-        "text": "Oh, me apologies, sweetie! The itty-bitty P-Stream did its utmost bestest, but alas, no wucky videos to be spotted anywhere (´⊙ω⊙`) Please don't be angwy, wittle P-Stream ish twying so hard. Can ye find it in yer heart to forgive? UwU 💖",
+        "text": "Oh, me apologies, sweetie! The itty-bitty {{serverName}} did its utmost bestest, but alas, no wucky videos to be spotted anywhere (´⊙ω⊙`) Please don't be angwy, wittle {{serverName}} ish twying so hard. Can ye find it in yer heart to forgive? UwU 💖",
         "title": "Goo goo gaa gaa"
       }
     },
@@ -246,7 +246,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Please verify that ye be human by completin' the Captcha on right. 'tis t' keep P-Stream safe!",
+      "description": "Please verify that ye be human by completin' the Captcha on right. 'tis t' keep {{serverName}} safe!",
       "error": "Failed t' verify yer piracy. Please try again.",
       "title": "We needs t' verify that ye're real pirate.",
       "verifyingHumanity": "Verifyin' yer piracy..."

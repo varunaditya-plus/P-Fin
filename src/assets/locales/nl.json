@@ -11,13 +11,13 @@
     "title": "Er is iets fout gegaan!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Over",
       "legal": "Legal / DMCA",
       "login": "Login",
       "onboarding": "Instellen",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registreren",
       "settings": "Instellingen",
       "discover": "Ondek",
@@ -51,7 +51,7 @@
           "Wat staat er vandaag op jouw kijklijst?",
           "Hoe was je dag?",
           "Mijn fout, de site werkt nooit...",
-          "Is P-Stream niet gewoon de beste?",
+          "Is {{serverName}} niet gewoon de beste?",
           ">ᴗ<"
         ]
       },
@@ -71,11 +71,11 @@
     "titles": {
       "day": {
         "default": "Wat wil je vanmiddag kijken?",
-        "extra": ["Lang leven P-Stream!"]
+        "extra": ["Lang leven {{serverName}}!"]
       },
       "morning": {
         "default": "Waar wil je deze ochtend naar kijken?",
-        "extra": ["Lang leven P-Stream!"]
+        "extra": ["Lang leven {{serverName}}!"]
       },
       "night": {
         "default": "Wat wil je vanavond bekijken?",
@@ -133,10 +133,10 @@
     "menus": {
       "downloads": {
         "copyHlsPlaylist": "HLS-afspeellijstlink kopiëren",
-        "disclaimer": "Downloads worden direct bij de bron opgehaald. P-Stream heeft geen controle over het bestand dat je ontvangt.",
+        "disclaimer": "Downloads worden direct bij de bron opgehaald. {{serverName}} heeft geen controle over het bestand dat je ontvangt.",
         "downloadSubtitle": "Download huidige ondertiteling",
         "downloadVideo": "Download filmpje",
-        "hlsDisclaimer": "Downloads worden rechtstreeks van de aanbieder gehaald. P-Stream heeft geen controle over de manier waarop de downloads worden aangeboden.<br /><br />Houd er rekening mee dat u nu een HLS-afspeellijst downloadt, het wordt <bold>afgeraden deze te downloaden als u niet bekend bent met geavanceerde streamingbestandstypen</bold>. Probeer verschillende bronnen voor verschillende streamingbestandstypen.",
+        "hlsDisclaimer": "Downloads worden rechtstreeks van de aanbieder gehaald. {{serverName}} heeft geen controle over de manier waarop de downloads worden aangeboden.<br /><br />Houd er rekening mee dat u nu een HLS-afspeellijst downloadt, het wordt <bold>afgeraden deze te downloaden als u niet bekend bent met geavanceerde streamingbestandstypen</bold>. Probeer verschillende bronnen voor verschillende streamingbestandstypen.",
         "onAndroid": {
           "1": "Om te downloaden op Android, klik je op de downloadknop en vervolgens, op de nieuwe pagina, <bold>tap and hold</bold> op de video en selecteer <bold>save</bold>.",
           "shortTitle": "Download / Android",
@@ -274,7 +274,7 @@
         "badge": "Extensie uitgeschakeld",
         "enableExtension": "Extensie inschakelen",
         "homeButton": "Naar hoofdpagina",
-        "text": "Je hebt de P-Stream extensie geïnstalleerd. Om deze te gebruiken, moet je de extensie inschakelen voor deze site.",
+        "text": "Je hebt de {{serverName}} extensie geïnstalleerd. Om deze te gebruiken, moet je de extensie inschakelen voor deze site.",
         "title": "Activeer alstublieft de extensie"
       },
       "items": {
@@ -298,7 +298,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Bevestig dat u een mens bent door de Captcha aan de rechterkant in te vullen. Dit is om P-Stream veilig te houden!",
+      "description": "Bevestig dat u een mens bent door de Captcha aan de rechterkant in te vullen. Dit is om {{serverName}} veilig te houden!",
       "error": "Kan uw menselijkheid niet verifiëren. Probeer het opnieuw.",
       "title": "We moeten verifiëren dat u een mens bent.",
       "verifyingHumanity": "Je menselijkheid verifiëren..."
@@ -354,7 +354,7 @@
       "title": "Account",
       "admin": {
         "title": "Beheerderspaneel",
-        "text": "Gebruik de tools om de status van P‑Stream te testen.",
+        "text": "Gebruik de tools om de status van {{serverName}} te testen.",
         "button": "Bekijk het"
       }
     },

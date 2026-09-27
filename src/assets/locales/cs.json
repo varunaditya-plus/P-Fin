@@ -11,13 +11,13 @@
     "title": "Narazili jsme na chybu!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "O nás",
       "legal": "Legal / DMCA",
       "login": "Přihlásit se",
       "onboarding": "Nastavení",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Zaregistrovat se",
       "settings": "Nastavení"
     }
@@ -101,10 +101,10 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "Stahování probíhá přímo u poskytovatele. P-Stream nemá kontrolu nad tím, jak jsou stahování poskytovány.",
+        "disclaimer": "Stahování probíhá přímo u poskytovatele. {{serverName}} nemá kontrolu nad tím, jak jsou stahování poskytovány.",
         "downloadSubtitle": "Stáhnout aktuální titulky",
         "downloadVideo": "Stáhnout video",
-        "hlsDisclaimer": "Stahování probíhá přímo u poskytovatele. P-Stream nemá kontrolu nad tím, jak jsou stahování poskytovány.<br /><br />Vezměte prosím na vědomí, že stahujete HLS playlist,<bold> který není doporučen stahovat pokud nejste obeznámeni s pokročilým streamováním médií</bold>. Raději skuste jiný zdroj pro jiný formát.",
+        "hlsDisclaimer": "Stahování probíhá přímo u poskytovatele. {{serverName}} nemá kontrolu nad tím, jak jsou stahování poskytovány.<br /><br />Vezměte prosím na vědomí, že stahujete HLS playlist,<bold> který není doporučen stahovat pokud nejste obeznámeni s pokročilým streamováním médií</bold>. Raději skuste jiný zdroj pro jiný formát.",
         "onAndroid": {
           "1": "Na Androidu klikněte na tlačítko stahování, poté na nové stránce <bold>klepněte a podržte</bold> na videu a poté vyberte <bold>uložit</bold>.",
           "shortTitle": "Stahování / Android",
@@ -246,7 +246,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Ověřte, prosím, že jste člověk, vyplněním Captchy napravo. Toto je pro zajištění bezpečnosti P-Stream!",
+      "description": "Ověřte, prosím, že jste člověk, vyplněním Captchy napravo. Toto je pro zajištění bezpečnosti {{serverName}}!",
       "error": "Nepodařilo se ověřit vaši lidskost. Zkuste to prosím znovu.",
       "title": "Potřebujeme ověřit, zda jste člověk.",
       "verifyingHumanity": "Ověřování vaši lidskosti..."

@@ -11,13 +11,13 @@
     "title": "Havaitsimme virheen!"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Tietoja",
       "legal": "Legal / DMCA",
       "login": "Kirjaudu sisään",
       "onboarding": "asetus",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Rekisteröidy",
       "settings": "Asetukset",
       "migration": "Siirrä käyttäjätili",
@@ -47,11 +47,11 @@
           "Mitä tekisi mieli?",
           "Poistetaanko selaushistoriasi?",
           "Mitä haluat striimata?",
-          "P-Stream on paras sivusto ikinä!",
+          "{{serverName}} on paras sivusto ikinä!",
           "Mitä katselulistallasi on tänään?",
           "Miten päiväsi sujui?",
           "Pahoittelut, sivusto ei toimi koskaan...",
-          "Eikö P-Stream olekin paras?",
+          "Eikö {{serverName}} olekin paras?",
           ">ᴗ<"
         ]
       },

@@ -11,14 +11,14 @@
     "badge": "Noget gik galt 💀"
   },
   "global": {
-    "name": "P-Stream",
+    "name": "{{serverName}}",
     "pages": {
       "about": "Om os",
       "legal": "Legal / DMCA",
       "support": "Support",
       "login": "Log ind",
       "onboarding": "Opsætning",
-      "pagetitle": "{{title}} - P-Stream",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Registrer",
       "settings": "Indstillinger",
       "discover": "Opdag",
@@ -42,11 +42,11 @@
           "Hvad har du lyst til?",
           "Skal vi slette din browserhistorik?",
           "Hvad ønsker du at streame?",
-          "P-Stream er den bedste side nogensinde!",
+          "{{serverName}} er den bedste side nogensinde!",
           "Hvad er der på din favoritliste i dag?",
           "Hvordan har din dag været?",
           "Min fejl, siden virker aldrig...",
-          "Er P-Stream ikke bare det bedste?",
+          "Er {{serverName}} ikke bare det bedste?",
           ">ᴗ<"
         ],
         "default": "Hvad har du lyst til at se?"
@@ -70,14 +70,14 @@
     "titles": {
       "day": {
         "default": "Hvad vil du gerne se i eftermiddag?",
-        "extra": ["Længe leve P-Stream!"]
+        "extra": ["Længe leve {{serverName}}!"]
       },
       "morning": {
         "default": "Hvad vil du gerne se her til morgen?",
-        "extra": ["Længe leve P-Stream!"]
+        "extra": ["Længe leve {{serverName}}!"]
       },
       "night": {
-        "extra": ["Længe leve P-Stream!"],
+        "extra": ["Længe leve {{serverName}}!"],
         "default": "Hvad vil du gerne se i aften?"
       },
       "420": {
@@ -150,8 +150,8 @@
           "1": "På PC skal du klikke på download-knappen og derefter højreklikke på videoen på den nye side og vælge <bold>Gem video som</bold>"
         },
         "title": "Download",
-        "hlsDisclaimer": "Downloads tages direkte fra udbyderen. P-Stream har ikke kontrol over, hvordan downloads leveres.<br /><br />Vær opmærksom på, at du downloader en HLS-playliste, <bold>det anbefales ikke at downloade, hvis du ikke er bekendt med avancerede streamingformater</bold>. Prøv forskellige kilder til forskellige formater.",
-        "disclaimer": "Downloads tages direkte fra udbyderen. P-Stream har ikke kontrol over, hvordan downloads leveres."
+        "hlsDisclaimer": "Downloads tages direkte fra udbyderen. {{serverName}} har ikke kontrol over, hvordan downloads leveres.<br /><br />Vær opmærksom på, at du downloader en HLS-playliste, <bold>det anbefales ikke at downloade, hvis du ikke er bekendt med avancerede streamingformater</bold>. Prøv forskellige kilder til forskellige formater.",
+        "disclaimer": "Downloads tages direkte fra udbyderen. {{serverName}} har ikke kontrol over, hvordan downloads leveres."
       },
       "episodes": {
         "button": "Episoder",
@@ -271,7 +271,7 @@
       "extensionFailure": {
         "homeButton": "Gå til hjem",
         "badge": "Udvidelse deaktiveret",
-        "text": "Du har installeret P-Stream-udvidelsen. For at begynde at bruge den skal du aktivere udvidelsen for dette websted.",
+        "text": "Du har installeret {{serverName}}-udvidelsen. For at begynde at bruge den skal du aktivere udvidelsen for dette websted.",
         "enableExtension": "Aktiver udvidelse",
         "title": "Aktiver venligst udvidelsen"
       },
@@ -293,7 +293,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Bevis at du er et menneske ved at udføre den hurtige opgave, det er for at holde P-Stream sikker.",
+      "description": "Bevis at du er et menneske ved at udføre den hurtige opgave, det er for at holde {{serverName}} sikker.",
       "verifyingHumanity": "Bekræfter at du er et menneske... (^▽^)👍",
       "title": "Er du en robot 🤖?",
       "error": "Kunne ikke bekræfte at du er et menneske! Prøv venligst igen."
@@ -315,7 +315,7 @@
       },
       "admin": {
         "title": "Administratorpanel",
-        "text": "Brug værktøjer, der er lavet til at teste P-Stream' tilstand.",
+        "text": "Brug værktøjer, der er lavet til at teste {{serverName}}' tilstand.",
         "button": "Tjek det ud"
       },
       "actions": {

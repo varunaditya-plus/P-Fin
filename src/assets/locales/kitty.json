@@ -11,12 +11,12 @@
     "title": "We encountered a meow!"
   },
   "global": {
-    "name": "meow-flix",
+    "name": "{{serverName}}",
     "pages": {
       "about": "About meow",
       "legal": "Legal / DMCA",
       "login": "Meow Login",
-      "pagetitle": "{{title}} - meow-flix",
+      "pagetitle": "{{title}} - {{serverName}}",
       "register": "Meow Register",
       "settings": "Meow Settings"
     }
@@ -94,10 +94,10 @@
     },
     "menus": {
       "downloads": {
-        "disclaimer": "Downloads are taken directly from the meow. meow-flix does not have meow over how the meow are meow.",
+        "disclaimer": "Downloads are taken directly from the meow. {{serverName}} does not have meow over how the meow are meow.",
         "downloadSubtitle": "Download current meow",
         "downloadVideo": "Meow",
-        "hlsDisclaimer": "Downloads are taken directly from the meow. Meow-flix does not have control over how the downloads are meow. please note that you are downloading Meow playlist, this is intended for minions familiar with advanced multimedia meow.",
+        "hlsDisclaimer": "Downloads are taken directly from the meow. {{serverName}} does not have control over how the downloads are meow. please note that you are downloading Meow playlist, this is intended for minions familiar with advanced multimedia meow.",
         "onAndroid": {
           "1": "To meow on Meow, click the meow meow then, on the new meow, <bold>tap and hold</bold> on the meow, then select <bold>meow</bold>.",
           "shortTitle": "Meow / Meow",
@@ -228,7 +228,7 @@
       "shortRemaining": "-{{timeLeft}}"
     },
     "turnstile": {
-      "description": "Please verify that you are meow by completing the meow on the right. This is to keep meow-flix meow!",
+      "description": "Please verify that you are meow by completing the meow on the right. This is to keep {{serverName}} meow!",
       "error": "Failed to verify your meowness. Please try meow.",
       "title": "We meow to verify that you're meow",
       "verifyingHumanity": "Verifying your meow..."
