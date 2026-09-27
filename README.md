@@ -34,17 +34,64 @@ A brand new web client for Jellyfin, built using the P-Stream (or movie-web) int
 - **Watch history:** Import a Letterboxd export into Jellyfin, sync watched status with Simkl in either direction, and check whether the Jellyfin Trakt plugin is linked.
 - **Themes and settings:** Switch themes or build a custom palette, set caption appearance and interface language, and export settings or sync them with the Jellyfin account.
 
-<!-- ## Installation
+## Installation
 
-### First make sure you have these prerequisites:
-- ...
+P-Fin runs as one Docker container. It needs an existing Jellyfin server; Seerr is optional. No media folders, database, GPU access or persistent container volume are needed. Playback progress is stored in Jellyfin, and preferences are stored in the browser or synced to the Jellyfin account.
 
-### Install using docker
-1. ...
-2. ...
+### Docker Compose
+
+The publishing workflow targets `varunadityaaga/p-fin` for Intel/AMD (`amd64`), ARM64 and ARMv7 NAS devices. The image must be published once before the pull-based instructions below will work. Until then, use the local build instructions below.
+
+1. Download [docker-compose.yaml](docker-compose.yaml) and [example.env](example.env) into a folder on your NAS. Rename `example.env` to `.env`.
+2. Set `JELLYFIN_URL` to your Jellyfin address, for example `http://192.168.1.10:8096`. Optionally set `SEERR_URL` to `http://192.168.1.10:5055`.
+3. Start the stack:
+
+```sh
+docker compose up -d
+```
+
+Open `http://YOUR-NAS-IP:8080`, select your server and sign in. Each user can enable or skip Seerr during setup.
+
+In [Synology Container Manager](https://kb.synology.com/en-global/DSM/help/ContainerManager/docker_project), import the Compose file as a Project. In [Portainer](https://docs.portainer.io/user/docker/stacks/add), paste it into a Stack and set the environment variables. In a NAS container UI such as QNAP Container Station or Unraid, use the same image, map host port `8080` to container port `8080`, and add the server URL variables. The NAS must support Docker and one of the listed CPU architectures.
 
 ### Configuration
-... -->
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `JELLYFIN_URL` | Empty | Suggested Jellyfin server and the container's Jellyfin proxy target. |
+| `SEERR_URL` | Empty | Suggested Seerr server. Users can also choose Seerr in the interface. |
+| `PFIN_PORT` | `8080` | Published host port when using Compose. |
+| `PFIN_IMAGE` | `varunadityaaga/p-fin:latest` | Image/tag used by Compose; set a version tag to pin a release. |
+
+Settings are read when the container starts; changing server URLs does not require rebuilding the image. With no server URLs configured, the client starts at the server selection screen. Set `JELLYFIN_URL` when the site needs to proxy Jellyfin over the same origin, especially when P-Fin uses HTTPS and Jellyfin uses HTTP.
+
+Use addresses reachable from the container. `localhost` means the P-Fin container, not your NAS. A NAS IP/domain reachable by both the container and your browser also makes the “Open Jellyfin” link work. Docker service names work when the services share a Docker network. URLs may include a server base path. Do not put passwords or API keys in these variables; sign in through the interface.
+
+For HTTPS, point your NAS reverse proxy at port `8080` and enable WebSocket forwarding. Serve P-Fin at the root of its own hostname, such as `https://watch.example.com`, rather than under a URL subdirectory. The container already proxies Jellyfin and Seerr API requests and supports playback ranges and WebSockets.
+
+Update an installed image with:
+
+```sh
+docker compose pull
+docker compose up -d
+```
+
+### Build locally
+
+From a checkout of this repository:
+
+```sh
+docker build -t p-fin:local .
+PFIN_IMAGE=p-fin:local docker compose up -d --pull never
+```
+
+To verify a built image, run `node --test deploy/docker.test.mjs` with Node.js 22 or newer. The tests start temporary containers and check startup, health, routing, Docker DNS, Jellyfin playback requests and Seerr authentication forwarding.
+
+### Publish images
+
+The [Docker publishing workflow](.github/workflows/docker-publish.yml) runs the application checks and container tests, then builds all three architectures. It runs manually from GitHub Actions or when a `v`-prefixed semantic version tag is pushed, such as `v1.0.0`. Stable releases get a version tag, a major/minor tag and `latest`; prereleases do not replace `latest`. A manual run on `main` updates `latest`.
+
+Create the public `p-fin` repository in Docker Hub and add a write-enabled Docker Hub access token to GitHub Actions as the `DOCKERHUB_TOKEN` repository secret. The default Docker Hub username is `varunadityaaga`; set the `DOCKERHUB_USERNAME` repository variable to use another account, and adjust `PFIN_IMAGE` accordingly. Signing in to Docker Hub in a browser does not authenticate GitHub Actions.
 
 <!-- ## Screenshots
 <table>
