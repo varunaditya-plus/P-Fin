@@ -38,8 +38,6 @@ A brand new web client for Jellyfin, built using the P-Stream (or movie-web) int
 
 P-Fin runs in a contatiner alongsideo an existing Jellyfin server with optional Seerr integration. It needs Docker but no media mounts, database, GPU access or persistent volume. The images P-Fin currently supports are AMD64, ARM64 and ARMv7.
 
-> These instructions help you set up a `varunadityaaga/p-fin:latest` Docker image. Until it is available, use [Build locally](#build-locally).
-
 ### General guide
 
 1. Install your NAS's container manager or [Docker with Compose](https://docs.docker.com/engine/install/).
@@ -68,9 +66,7 @@ services:
 
 If port `8080` is occupied, use `"8088:8080"` and open port `8088`. Keep the container port at `8080`. Do not enter your credentials through the YAML. Enter them in P-Fin.
 
-Alternatively, download `docker-compose.yaml` and `example.env`, rename the `example.env` to `.env`, and edit the settings there.
-
-To update, pull the image and redeploy through your manager, or run:
+Alternatively, download `docker-compose.yaml` and `example.env`, rename the `example.env` to `.env`, and edit the settings there. To update, pull the image and redeploy through your manager, or run:
 
 ```sh
 docker compose pull
@@ -303,12 +299,6 @@ docker compose up -d --pull never
 ```
 
 The image stays local to that Docker engine. To run the container tests, use `node --test deploy/docker.test.mjs` with Node.js 22 or newer.
-
-### Publish images
-
-Create `p-fin` on Docker Hub and add a write-enabled token to GitHub Actions as `DOCKERHUB_TOKEN`. The default account is `varunadityaaga`; override it with the `DOCKERHUB_USERNAME` repository variable if needed.
-
-The [publishing workflow](.github/workflows/docker-publish.yml) tests the app and builds all three architectures. Run it manually on `main` to update `latest`, or push a version tag such as `v1.0.0` for a release. Stable releases publish version, major/minor and `latest` tags; prereleases leave `latest` unchanged.
 
 <!-- ## Screenshots
 <table>
