@@ -34,6 +34,18 @@ A brand new web client for Jellyfin, built using the P-Stream (or movie-web) int
 - **Watch history:** Import a Letterboxd export into Jellyfin, sync watched status with Simkl in either direction, and check whether the Jellyfin Trakt plugin is linked.
 - **Themes and settings:** Switch themes or build a custom palette, set caption appearance and interface language, and export settings or sync them with the Jellyfin account.
 
+## Screenshots
+<table>
+  <tr>
+    <td><img width="1720" height="720" alt="" src="https://github.com/user-attachments/assets/0c8b8186-a121-4bf9-b619-74ab0c7f8f9e" /></td>
+    <td><img width="1720" height="720" alt="" src="https://github.com/user-attachments/assets/5f67c509-068a-435c-9de4-b6f8ac3502b1" /></td>
+  </tr>
+  <tr>
+    <td><img width="1720" height="720" alt="" src="https://github.com/user-attachments/assets/37a58c09-7419-4abb-8a5c-546ae5f6256f" /></td>
+    <td><img width="1720" height="720" alt="" src="https://github.com/user-attachments/assets/a7801251-137a-43b6-9cb5-4edebd61d1a9" /></td>
+  </tr>
+</table>
+
 ## Installation
 
 P-Fin runs in a container alongside an existing Jellyfin server with optional Seerr integration. It needs Docker but no media mounts, database, GPU access or persistent volume. The images P-Fin currently supports are AMD64, ARM64 and ARMv7.
@@ -299,20 +311,6 @@ docker compose up -d --pull never
 ```
 
 The image stays local to that Docker engine. To run the container tests, use `node --test deploy/docker.test.mjs` with Node.js 22 or newer.
-
-<!-- ## Screenshots
-<table>
-  <tr>
-    <td><img width="1720" height="720" alt="" src="..." /></td>
-  </tr>
-  <tr>
-	  <td><img width="1720" height="720" alt="" src="..." /></td>
-  </tr>
-  <tr>
-    <td><img width="1720" height="720" alt="" src="..." /></td>
-    <td><img width="1720" height="720" alt="" src="..." /></td>
-  </tr>
-</table> -->
 
 <!-- ## Downloads
 
