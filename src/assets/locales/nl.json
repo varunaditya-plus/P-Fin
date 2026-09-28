@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Gekopieerd",
-    "copy": "Kopieer"
+    "copied": "Gekopieerd"
   },
   "errors": {
     "badge": "Tis kapot",
@@ -13,34 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Over",
-      "legal": "Legal / DMCA",
-      "login": "Login",
-      "onboarding": "Instellen",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Registreren",
-      "settings": "Instellingen",
-      "discover": "Ondek",
-      "support": "Steun",
-      "migration": "Account migreren",
-      "jip": "Jipy"
+      "discover": "Ondek"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Opgeslagen"
-    },
-    "continueWatching": {
-      "sectionTitle": "Kijk verder"
-    },
-    "mediaList": {
-      "stopEditing": "Stoppen met bewerken"
-    },
     "search": {
-      "allResults": "Dat is het!",
-      "failed": "Het is niet gelukt de media te laden, probeer het nog eens!",
       "loading": "Aan het zoeken...",
-      "noResults": "We konden helaas niets vinden!",
       "placeholder": {
         "default": "Wat wil je graag kijken?",
         "extra": [
@@ -54,21 +32,17 @@
           "Is {{serverName}} niet gewoon de beste?",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "Zoekresultaten",
-      "empty": {
-        "default": "Welkom, hier vindt je de media om te bekijken!",
-        "extra": [
-          "Hier is niks :(",
-          "Zo leeg...",
-          "Wat een leegte.",
-          "Hallo nieuwe gebruiker :3"
-        ]
-      },
-      "discoverMore": "Ondek meer",
-      "discover": "Ondek"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Zin in iets pittigs?",
+        "extra": ["Gelukkige 69e dag 😘!"]
+      },
+      "420": {
+        "default": "Wat wil je deze 4/20 bekijken?",
+        "extra": ["Happy 4/20 🥳"]
+      },
       "day": {
         "default": "Wat wil je vanmiddag kijken?",
         "extra": ["Lang leven {{serverName}}!"]
@@ -80,14 +54,6 @@
       "night": {
         "default": "Wat wil je vanavond bekijken?",
         "extra": ["Moe? Ik hoor dat The Exorcist goed is."]
-      },
-      "420": {
-        "default": "Wat wil je deze 4/20 bekijken?",
-        "extra": ["Happy 4/20 🥳"]
-      },
-      "69": {
-        "default": "Zin in iets pittigs?",
-        "extra": ["Gelukkige 69e dag 😘!"]
       }
     }
   },
@@ -102,14 +68,6 @@
   "navigation": {
     "banner": {
       "offline": "Controleer je internetverbinding"
-    },
-    "menu": {
-      "about": "Over ons",
-      "logout": "Log uit",
-      "register": "Synchroniseren met de Cloud",
-      "settings": "Instellingen",
-      "support": "Ondersteuning",
-      "discover": "Ontdek"
     }
   },
   "notFound": {
@@ -127,168 +85,33 @@
       "default": "Naar de home-pagina",
       "short": "Terug"
     },
-    "casting": {
-      "enabled": "Aan het casten... 🎬"
-    },
     "menus": {
-      "downloads": {
-        "copyHlsPlaylist": "HLS-afspeellijstlink kopiëren",
-        "disclaimer": "Downloads worden direct bij de bron opgehaald. {{serverName}} heeft geen controle over het bestand dat je ontvangt.",
-        "downloadSubtitle": "Download huidige ondertiteling",
-        "downloadVideo": "Download filmpje",
-        "hlsDisclaimer": "Downloads worden rechtstreeks van de aanbieder gehaald. {{serverName}} heeft geen controle over de manier waarop de downloads worden aangeboden.<br /><br />Houd er rekening mee dat u nu een HLS-afspeellijst downloadt, het wordt <bold>afgeraden deze te downloaden als u niet bekend bent met geavanceerde streamingbestandstypen</bold>. Probeer verschillende bronnen voor verschillende streamingbestandstypen.",
-        "onAndroid": {
-          "1": "Om te downloaden op Android, klik je op de downloadknop en vervolgens, op de nieuwe pagina, <bold>tap and hold</bold> op de video en selecteer <bold>save</bold>.",
-          "shortTitle": "Download / Android",
-          "title": "Downloaden op Android"
-        },
-        "onIos": {
-          "1": "Als je wilt downloaden op iOS, klik je op de downloadknop en vervolgens op de nieuwe pagina op <bold><ios_share /></bold> en vervolgens op <bold>Save to Files <ios_files /></bold>.",
-          "shortTitle": "Download / iOS",
-          "title": "Downloaden op iOS"
-        },
-        "onPc": {
-          "1": "Klik op de downloadknop op de pc en klik op de nieuwe pagina met de rechtermuisknop op de video en selecteer <bold>Video opslaan als</bold>",
-          "shortTitle": "Download / PC",
-          "title": "Downloaden op PC"
-        },
-        "title": "Download"
-      },
       "episodes": {
-        "button": "Afleveringen",
-        "emptyState": "Er zijn in dit seizoen geen afleveringen, kijk over een paar jaar nog eens!",
-        "episodeBadge": "A{{episode}}",
-        "loadingError": "Er ging iets mis bij het laden van dit seizoen",
-        "loadingList": "Aan het laden...",
-        "loadingTitle": "Aan het zoeken...",
-        "unairedEpisodes": "Een of meer afleveringen van dit seizoen zijn uitgeschakeld omdat ze nog niet zijn uitgezonden.",
-        "seasons": "Seizoenen"
-      },
-      "playback": {
-        "speedLabel": "Afspeelsnelheid",
-        "title": "Afspeel instellingen"
-      },
-      "quality": {
-        "automaticLabel": "Automatische kwaliteit",
-        "hint": "Je kunt <0>bron omschakelen</0> proberen om verschillende kwaliteitsopties te krijgen.",
-        "iosNoQuality": "Vanwege door Apple gedefinieerde beperkingen is kwaliteitsselectie niet beschikbaar op iOS voor deze bron. U kunt <0>omschakelen naar een andere bron</0> proberen om andere kwaliteitsopties te krijgen.",
-        "title": "Kwaliteit"
+        "button": "Afleveringen"
       },
       "settings": {
         "audioItem": "Audio",
-        "downloadItem": "Download",
-        "enableSubtitles": "Ondertitels inschakelen",
-        "experienceSection": "Kijk-ervaring",
         "playbackItem": "Afspeel instellingen",
         "qualityItem": "Kwaliteit",
         "sourceItem": "Video-bron",
-        "subtitleItem": "Instellingen ondertiteling",
-        "videoSection": "Video instellingen"
-      },
-      "sources": {
-        "failed": {
-          "text": "Er ging iets mis bij het zoeken naar videos, probeer een andere bron.",
-          "title": "Het is niet gelukt dit op te halen"
-        },
-        "noEmbeds": {
-          "text": "We konden geen embeds vinden, probeer een andere bron.",
-          "title": "Geen embeds gevonden"
-        },
-        "noStream": {
-          "text": "Deze bron heeft geen links voor deze film of serie.",
-          "title": "Geen bron"
-        },
-        "title": "Bronnen",
-        "unknownOption": "Onbekend",
-        "editOrder": "Bewerk volgorde"
+        "subtitleItem": "Instellingen ondertiteling"
       },
       "subtitles": {
-        "customChoice": "Sleep of upload bestand",
-        "customizeLabel": "Aanpassen",
-        "dropSubtitleFile": "Sleep ondertitelbestand naar hier",
         "offChoice": "Uit",
         "settings": {
           "backlink": "Aangepaste ondertiteling",
           "delay": "Ondertiteling vertraging",
           "fixCapitals": "Hoofdlettergebruik corrigeren"
-        },
-        "title": "Ondertiteling",
-        "unknownLanguage": "Onbekend",
-        "onChoice": "Aan",
-        "OpenSubtitlesChoice": "OpenOndertitels",
-        "SourceChoice": "Bronondertitels",
-        "scrapeButton": "Onder titels ophalen",
-        "empty": "Er zijn geen ondertitels beschikbaar voor dit.",
-        "notFound": "Geen van de beschikbare opties komt overeen met je zoekopdracht"
+        }
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "Kan API-metagegevens niet laden. Controleer uw internetverbinding.",
-        "title": "Kan API-metagegevens niet laden"
-      },
-      "legal": {
-        "badge": "Weggehaald",
-        "text": "Deze media is niet langer beschikbaar vanwege een verwijderingsverzoek of auteursrechtenclaim.",
-        "title": "Media is weggehaald"
-      },
-      "extensionPermission": {
-        "badge": "Toestemming ontbreekt",
-        "button": "Gebruik de extensie",
-        "text": "Je hebt de browserextensie, maar we hebben jouw toestemming nodig om gebruik te maken van de extensie.",
-        "title": "Configureer de extensie"
-      },
-      "failed": {
-        "badge": "Mislukt",
-        "homeButton": "Ga naar de home-pagina",
-        "text": "We konden geen informatie over deze media ophalen bij TMDB. Kijk even na of TMDB te bereiken is op dit netwerk.",
-        "title": "Metadata ophalen mislukt"
-      },
-      "notFound": {
-        "badge": "Pagina niet gevonden",
-        "homeButton": "Naar de home-pagina",
-        "text": "We konden dit stukje media niet vinden. Het is mogelijk verwijderd, of jij hebt zelf de URL aangepast.",
-        "title": "We konden deze media niet vinden."
-      }
-    },
-    "nextEpisode": {
-      "next": "Volgende aflevering",
-      "replay": "Opnieuw afspelen",
-      "nextSeason": "Volgend seizoen"
     },
     "playbackError": {
-      "badge": "Afspeelfout",
       "errors": {
         "errorAborted": "Het laden van de media is stopgezet omdat de gebruiker daar om vroeg.",
         "errorDecode": "Ondanks het feit dat we eerder dachten dat deze bron beschikbaar, was dat toch niet zo en is er een decode error ontstaan.",
         "errorGenericMedia": "Onbekende media foutmelding.",
         "errorNetwork": "Er ging iets mis waardoor de media niet langer beschikbaar is, al was hij dat eerst wel.",
         "errorNotSupported": "Deze media or media provider wordt niet ondersteund."
-      },
-      "homeButton": "Naar de home-pagina",
-      "text": "Er ging iets mis bij het afspelen. Probeer het nog eens.",
-      "title": "Oeps, hier ging iets mis!"
-    },
-    "scraping": {
-      "extensionFailure": {
-        "badge": "Extensie uitgeschakeld",
-        "enableExtension": "Extensie inschakelen",
-        "homeButton": "Naar hoofdpagina",
-        "text": "Je hebt de {{serverName}} extensie geïnstalleerd. Om deze te gebruiken, moet je de extensie inschakelen voor deze site.",
-        "title": "Activeer alstublieft de extensie"
-      },
-      "items": {
-        "failure": "Daar ging iets mis",
-        "notFound": "Er is geen video gevonden",
-        "pending": "Naar videos aan het zoeken..."
-      },
-      "notFound": {
-        "badge": "Niet gevonden",
-        "detailsButton": "Meer informatie",
-        "homeButton": "Naar de home-pagina",
-        "text": "We hebben al onze providers lief aangekeken maar we hebben niets kunnen vinden. Wij beheersen de media niet, en bepalen dus niet wat er beschikbaar is. Klik op \"meer informatie over foutmelding\" voor meer informatie.",
-        "title": "Dat konden we niet vinden",
-        "discoverButton": "Ontdek meer"
       }
     },
     "time": {
@@ -296,68 +119,9 @@
       "remaining": "Nog {{timeLeft}} • Klaar om {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "Bevestig dat u een mens bent door de Captcha aan de rechterkant in te vullen. Dit is om {{serverName}} veilig te houden!",
-      "error": "Kan uw menselijkheid niet verifiëren. Probeer het opnieuw.",
-      "title": "We moeten verifiëren dat u een mens bent.",
-      "verifyingHumanity": "Je menselijkheid verifiëren..."
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Apparaatnaam",
-        "deviceNamePlaceholder": "Persoonlijke telefoon",
-        "editProfile": "Bewerken",
-        "logoutButton": "Uitloggen"
-      },
-      "actions": {
-        "delete": {
-          "button": "Account verwijderen",
-          "confirmButton": "Account verwijderen",
-          "confirmDescription": "Weet je zeker dat je je account wilt verwijderen? Al je gegevens zullen verloren gaan!",
-          "confirmTitle": "Weet je het zeker?",
-          "text": "Deze actie is onomkeerbaar. Alle gegevens worden verwijderd en er kan niets worden hersteld.",
-          "title": "Account verwijderen"
-        },
-        "title": "Acties",
-        "logoutAllDevices": {
-          "title": "Eindig alle sessies",
-          "text": "Dit zal je afmelden van alle apparaten die gekoppeld zijn aan je account.",
-          "button": "Log uit van alle apparaten"
-        },
-        "migration": {
-          "text": "Zet je account over naar een nieuwe server of download je gegevens.",
-          "title": "Accountmigratie",
-          "button": "Account overzetten"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Apparaatnaam",
-        "failed": "Sessies niet geladen",
-        "removeDevice": "Verwijder",
-        "title": "Apparaten"
-      },
-      "profile": {
-        "finish": "Bewerken voltooien",
-        "firstColor": "Profielkleur 1",
-        "secondColor": "Profielkleur 2",
-        "title": "Profielfoto bewerken",
-        "userIcon": "Gebruikerspictogram"
-      },
-      "register": {
-        "cta": "Aan de slag",
-        "text": "Deel uw kijkvoortgang tussen apparaten en houd ze gesynchroniseerd.",
-        "title": "Synchroniseren met de Cloud"
-      },
-      "title": "Account",
-      "admin": {
-        "title": "Beheerderspaneel",
-        "text": "Gebruik de tools om de status van {{serverName}} te testen.",
-        "button": "Bekijk het"
-      }
-    },
     "appearance": {
       "activeTheme": "Actief",
       "themes": {
@@ -370,92 +134,9 @@
         "green": "Groen",
         "mocha": "Mokka",
         "pink": "Roze"
-      },
-      "title": "Uiterlijk",
-      "options": {
-        "discoverDescription": "Toon de Ontdek sectie op de startpagina onder je gebookmarkte media. Standaard ingeschakeld.",
-        "discover": "Ontdek sectie",
-        "discoverLabel": "Ontdek sectie",
-        "modal": "Details pop-up",
-        "modalDescription": "Toon de details pop-up wanneer je op een media kaart klikt in plaats van naar de kijkpagina te gaan. Proxy of extensie vereist voor trailer. Standaard uitgeschakeld.",
-        "modalLabel": "Details pop-up"
       }
-    },
-    "connections": {
-      "server": {
-        "description": "Als je verbinding wilt maken met een eigen backend om je gegevens op te slaan, schakel dan deze optie in en geef de URL op. <0>Instructies.</0>",
-        "label": "Eigen server",
-        "urlLabel": "Eigen server URL",
-        "migration": {
-          "link": "Migreer mijn gegevens",
-          "description": "<0>Migreer mijn gegevens</0> naar een nieuwe server."
-        }
-      },
-      "setup": {
-        "doSetup": "Instellen",
-        "errorStatus": {
-          "description": "Het lijkt erop dat één of meer items in deze configuratie jouw aandacht nodig hebben.",
-          "title": "Iets vereist jouw aandacht"
-        },
-        "itemError": "Er is iets mis met deze instelling. Klik op opnieuw instellen om op te lossen.",
-        "items": {
-          "default": "Standaard installatie",
-          "extension": "Extensie",
-          "proxy": "Eigen proxy"
-        },
-        "redoSetup": "Opnieuw instellen",
-        "successStatus": {
-          "description": "In alles is ingesteld, je kunt nu je favoriete media bekijken.",
-          "title": "Alles is ingesteld!"
-        },
-        "unsetStatus": {
-          "description": "Klik op de knop aan de rechterkant om het installatieproces te starten.",
-          "title": "Je hebt de installatieprocedure nog niet doorlopen"
-        }
-      },
-      "title": "Verbindingen",
-      "workers": {
-        "addButton": "Nieuwe worker toevoegen",
-        "description": "Om de applicatie te laten werken, wordt al het verkeer omgeleid via proxies. Schakel dit in als je je eigen workers wilt gebruiken. <0>Instructies.</0>",
-        "emptyState": "Nog geen workers, voeg er hieronder een toe",
-        "label": "Eigen proxy werker gebruiken",
-        "urlLabel": "Worker URLs",
-        "urlPlaceholder": "https://"
-      }
-    },
-    "preferences": {
-      "language": "Applicatietaal",
-      "languageDescription": "Taal toegepast op de gehele applicatie.",
-      "thumbnail": "Genereer miniaturen",
-      "thumbnailDescription": "Meestal hebben video's geen miniaturen. Je kunt deze instelling inschakelen om ze dynamisch te genereren, maar dit kan je video vertragen.",
-      "thumbnailLabel": "Genereer miniaturen",
-      "title": "Voorkeuren",
-      "autoplay": "Automatisch afspelen",
-      "skipCreditsDescription": "Wanneer ingeschakeld, wordt automatisch de volgende aflevering afgespeeld bij 99% voltooiing om de eindcredits over te slaan. Wanneer uitgeschakeld, wacht je totdat de aflevering volledig af is.",
-      "sourceOrderDescription": "Sleep om de volgorde van de bronnen te herordenen. Dit bepaalt de volgorde waarin de bronnen worden gecontroleerd voor de media die je probeert te bekijken. Als een bron grijs is, betekent dit dat de <bold>extensie</bold> vereist is voor die bron. <br><br> <strong>(De standaardvolgorde is het beste voor de meeste gebruikers)</strong>",
-      "autoplayDescription": "Speel automatisch de volgende aflevering in een serie af nadat het einde is bereikt. Kan ingeschakeld worden door gebruikers met de browserextensie, een eigen proxy, of met de standaardinstellingen als dit toegestaan is door de host.",
-      "autoplayLabel": "Automatisch afspelen",
-      "skipCredits": "Sla eindcredits over",
-      "skipCreditsLabel": "Sla eindcredits over",
-      "sourceOrder": "Volgorde van bronnen",
-      "sourceOrderEnableLabel": "Aangepaste bronvolgorde"
     },
     "reset": "Resetten",
-    "save": "Wijzigingen opslaan",
-    "sidebar": {
-      "info": {
-        "appVersion": "App versie",
-        "backendUrl": "Backend URL",
-        "backendVersion": "Backend versie",
-        "hostname": "hostnaam",
-        "insecure": "Onveilig",
-        "notLoggedIn": "U bent niet ingelogd",
-        "secure": "Veilig",
-        "title": "App informatie",
-        "unknownVersion": "Onbekend",
-        "userId": "Gebruiker ID"
-      }
-    },
     "subtitles": {
       "backgroundBlurLabel": "Achtergrondvervaging",
       "backgroundLabel": "Achtergrond dekking",
@@ -464,34 +145,9 @@
       "textSizeLabel": "Tekengrootte",
       "title": "Ondertiteling",
       "textBoldLabel": "Vetgedrukte tekst"
-    },
-    "unsaved": "U heeft niet-opgeslagen wijzigingen"
+    }
   },
   "discover": {
-    "randomMovie": {
-      "button": "Kijk iets willekeurigs",
-      "cancel": "Annuleer aftelling",
-      "countdown": "{{countdown}}s",
-      "nowPlaying": "Nu aan het afspelen",
-      "in": "in"
-    },
-    "tabs": {
-      "movies": "Films",
-      "tvshows": "Televisieshows",
-      "editorpicks": "Aanbevolen door ons"
-    },
-    "carousel": {
-      "title": {
-        "movies": "{{category}} Films",
-        "tvshows": "{{category}} Shows",
-        "inCinemas": "In de bioscoop",
-        "popularOn": "Populair {{type}} op {{provider}}"
-      }
-    },
-    "page": {
-      "title": "Ontdek Films & TV",
-      "subtitle": "Ontdek de nieuwste hits en tijdloze klassiekers."
-    },
     "scrollToTop": "Terug naar boven"
   }
 }

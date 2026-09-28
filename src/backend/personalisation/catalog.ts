@@ -1,5 +1,4 @@
 import { matchesSettingsSession } from "@/backend/jellyfin/appSettings";
-import { cachedHomeSnapshot } from "@/backend/jellyfin/browse";
 import {
   JellyfinItem,
   JellyfinItems,
@@ -169,32 +168,27 @@ export async function getTasteLibrary(signal?: AbortSignal, force = false) {
             : page.Items.length === 500);
       }
       const value = [...items.values()].map(libraryCandidate);
-      const home = cachedHomeSnapshot();
-      const activeItems = home
-        ? home.sections
-            .filter((section) => ["resume", "next-up"].includes(section.id))
-            .flatMap((section) => section.items)
-        : (
-            await Promise.allSettled([
-              jellyfinRequest<JellyfinItems>(
-                `Users/${session.userId}/Items/Resume`,
-                {},
-                { Limit: 100, EnableUserData: true },
-              ),
-              jellyfinRequest<JellyfinItems>(
-                "Shows/NextUp",
-                {},
-                {
-                  UserId: session.userId,
-                  Limit: 100,
-                  EnableResumable: false,
-                  EnableRewatching: false,
-                },
-              ),
-            ])
-          ).flatMap((result) =>
-            result.status === "fulfilled" ? (result.value?.Items ?? []) : [],
-          );
+      const activeItems = (
+        await Promise.allSettled([
+          jellyfinRequest<JellyfinItems>(
+            `Users/${session.userId}/Items/Resume`,
+            {},
+            { Limit: 100, EnableUserData: true },
+          ),
+          jellyfinRequest<JellyfinItems>(
+            "Shows/NextUp",
+            {},
+            {
+              UserId: session.userId,
+              Limit: 100,
+              EnableResumable: false,
+              EnableRewatching: false,
+            },
+          ),
+        ])
+      ).flatMap((result) =>
+        result.status === "fulfilled" ? (result.value?.Items ?? []) : [],
+      );
       if (!matchesSettingsSession(session))
         throw new Error("Your Jellyfin account changed.");
       const active = new Set(

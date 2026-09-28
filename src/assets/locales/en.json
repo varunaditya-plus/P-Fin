@@ -1,9 +1,6 @@
 {
   "actions": {
-    "copied": "Copied",
-    "copy": "Copy",
-    "cancel": "Cancel",
-    "confirm": "Confirm"
+    "copied": "Copied"
   },
   "errors": {
     "badge": "It broke 💀",
@@ -15,22 +12,11 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "About and FAQ",
-      "legal": "Legal / DMCA",
       "discover": "Discover",
-      "support": "Support",
-      "login": "Login",
-      "onboarding": "Setup",
-      "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Register",
-      "settings": "Settings",
-      "migration": "Migrate Account",
-      "jip": "Jip",
-      "pas": "Pas"
+      "pagetitle": "{{title}} - {{serverName}}"
     },
     "keyboardShortcuts": {
       "title": "Keyboard Shortcuts",
-      "subtitle": "Hold ` to show this help anytime",
       "groups": {
         "videoPlayback": "Video Playback",
         "jumpToPosition": "Jump to Position",
@@ -52,7 +38,6 @@
         "increaseVolume": "Increase volume",
         "decreaseVolume": "Decrease volume",
         "mute": "Mute/unmute",
-        "changeSpeed": "Increase/decrease playback speed",
         "toggleFullscreen": "Toggle fullscreen",
         "toggleCaptions": "Toggle captions",
         "randomCaption": "Select random caption from last used language",
@@ -62,12 +47,9 @@
         "barrelRoll": "Do a barrel roll! 🌀",
         "closeOverlay": "Close overlay/modal",
         "nextEpisode": "Next episode",
-        "previousEpisode": "Previous episode",
-        "widescreenMode": "to toggle the widescreen button visibility",
-        "copyLinkWithTime": "+ click the title to copy the link with time"
+        "previousEpisode": "Previous episode"
       },
       "conditions": {
-        "notInWatchParty": "Not in watch party",
         "showsOnly": "Shows only"
       },
       "editInSettings": "Edit keyboard commands from settings",
@@ -87,81 +69,8 @@
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Bookmarks",
-      "showAll": "Show all",
-      "groups": {
-        "dropdown": {
-          "placeholderButton": "Add to group",
-          "empty": "No groups yet",
-          "removeFromGroup": "Remove from group",
-          "removeAll": "Remove all"
-        },
-        "reorder": {
-          "button": "Reorder",
-          "done": "Done",
-          "title": "Edit Group Order",
-          "description": "Drag and drop to reorder your bookmark groups",
-          "cancel": "Cancel",
-          "save": "Save"
-        },
-        "editGroup": {
-          "title": "Edit Group",
-          "description": "Edit the name and icon of your bookmark group",
-          "cancel": "Cancel",
-          "save": "Save",
-          "affectsBookmarks": "This will affect {{count}} bookmark(s)",
-          "nameLabel": "Group name",
-          "namePlaceholder": "Enter a name for your group"
-        }
-      },
-      "edit": {
-        "title": "Edit Bookmark",
-        "description": "Edit the details for this bookmark",
-        "cancel": "Cancel",
-        "save": "Save",
-        "groupsLabel": "Groups",
-        "titleLabel": "Title",
-        "titlePlaceholder": "Enter a title for your bookmark",
-        "yearLabel": "Year",
-        "yearPlaceholder": "Enter a year for your bookmark"
-      },
-      "sorting": {
-        "label": "Sort by",
-        "options": {
-          "date": "Default (Date added)",
-          "titleAsc": "Title A-Z",
-          "titleDesc": "Title Z-A",
-          "yearAsc": "Release Date Oldest-Newest",
-          "yearDesc": "Release Date Newest-Oldest"
-        }
-      }
-    },
-    "continueWatching": {
-      "sectionTitle": "Continue Watching...",
-      "sorting": {
-        "label": "Sort by",
-        "options": {
-          "date": "Default (Date added)",
-          "titleAsc": "Title A-Z",
-          "titleDesc": "Title Z-A",
-          "yearAsc": "Release Date Oldest-Newest",
-          "yearDesc": "Release Date Newest-Oldest"
-        }
-      }
-    },
-    "mediaList": {
-      "stopEditing": "Stop editing"
-    },
-    "watchHistory": {
-      "sectionTitle": "Watch History",
-      "recentlyWatched": "Recently Watched"
-    },
     "search": {
-      "allResults": "That's all we have...",
-      "failed": "Failed to find media, try again!",
       "loading": "Loading...",
-      "noResults": "We couldn't find anything :(",
       "placeholder": {
         "default": "What do you want to watch?",
         "extra": [
@@ -175,26 +84,17 @@
           "Isn't {{serverName}} just the best?",
           ">ᴗ<"
         ]
-      },
-      "empty": {
-        "default": "Welcome, find media to watch here!",
-        "extra": [
-          "There's nothing here :(",
-          "So empty...",
-          "Such emptiness.",
-          "Hi new user :3"
-        ]
-      },
-      "sectionTitle": "Search results",
-      "discoverMore": "Discover more",
-      "discover": "Discover"
-    },
-    "mediaCard": {
-      "moreInfo": "More Info",
-      "copyLink": "Copy Link",
-      "close": "Close"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Up for something spicy?",
+        "extra": ["Happy 69 day 😘!"]
+      },
+      "420": {
+        "default": "What would you like to watch this 4/20?",
+        "extra": ["Happy 4/20 🥳!"]
+      },
       "day": {
         "default": "What would you like to watch this afternoon?",
         "extra": ["Viva la {{serverName}}!"]
@@ -207,14 +107,6 @@
         "default": "What would you like to watch tonight?",
         "extra": ["Viva la {{serverName}}!"]
       },
-      "420": {
-        "default": "What would you like to watch this 4/20?",
-        "extra": ["Happy 4/20 🥳!"]
-      },
-      "69": {
-        "default": "Up for something spicy?",
-        "extra": ["Happy 69 day 😘!"]
-      },
       "halloween": {
         "default": "What spooky movie would you like to watch this Halloween?",
         "extra": [
@@ -224,18 +116,6 @@
           "It's the Great Pumpkin, Charlie Brown!"
         ]
       }
-    },
-    "support": {
-      "title": "{{serverName}} needs your help!",
-      "description": "{{serverName}} is run at a loss, and we need help to keep it ad free! If you enjoy using {{serverName}}, please consider donating to help us cover our costs.",
-      "moreInfo": "More info",
-      "explanation": "If you aren't using the extension or don't have FED API set up, it may be harder to find content! We want to fix this, but it's a lot harder to provide content without expensive servers. So please, if you enjoy using {{serverName}}, please consider donating to help us cover our growing costs.",
-      "explanation2": "If you want more info, please join our ",
-      "discord": "Discord",
-      "thankYou": "Thank you for your support!",
-      "donate": "Donate",
-      "label": "Project Funding: ${{current}} / ${{goal}}",
-      "complete": "complete"
     }
   },
   "media": {
@@ -244,25 +124,11 @@
     "types": {
       "movie": "Movie",
       "show": "Show"
-    },
-    "episodeShort": "E",
-    "seasonShort": "S",
-    "seasonWatched": "Are you sure you want to mark the season as watched?",
-    "seasonUnwatched": "Are you sure you want to mark the season as unwatched?"
+    }
   },
   "navigation": {
     "banner": {
       "offline": "Check your internet connection, silly goose! 🦢"
-    },
-    "menu": {
-      "about": "About and FAQ",
-      "logout": "Log out",
-      "register": "Sync to Cloud",
-      "settings": "Settings",
-      "support": "Support",
-      "discover": "Discover",
-      "development": "Development",
-      "desktop": "App Settings"
     }
   },
   "notFound": {
@@ -280,189 +146,35 @@
       "default": "Back to home",
       "short": "Back"
     },
-    "casting": {
-      "to": "Casting to {{device}} 📺",
-      "device": "device",
-      "enabled": "Casting to device 🎬"
-    },
     "menus": {
-      "downloads": {
-        "button": "Attempt download",
-        "hlsDownloader": "Or, go to the <0>hls downloader website</0> and paste the playlist URL from below.",
-        "disclaimer": "Downloads are taken directly from the provider. {{serverName}} does not have control over how the downloads are provided.",
-        "copyHlsPlaylist": "Copy HLS playlist link",
-        "downloadSubtitle": "Download current subtitle",
-        "downloadVideo": "Download video",
-        "desktopDisclaimer": "Download this video directly to your app for offline playback.",
-        "offlineButton": "Download for Offline Use",
-        "openIn": "Open in...",
-        "vlc": "VLC",
-        "iina": "IINA",
-        "outplayer": "Outplayer",
-        "hlsOpenInDisclaimer": "Opening HLS streams in an external player MAY NOT WORK!",
-        "hlsDisclaimer": "Downloads are taken directly from the provider. {{serverName}} does not have control over how the downloads are provided.<br /><br />Please note you are downloading an HLS playlist, <bold>it is not recommended to download if you are not familiar with advanced streaming formats</bold>. Try different sources for different formats.",
-        "onAndroid": {
-          "1": "To download on Android, click the download button then, on the new page, <bold>tap and hold</bold> on the video, then select <bold>save</bold>.",
-          "shortTitle": "Download / Android",
-          "title": "Downloading on Android"
-        },
-        "onIos": {
-          "1": "To download on iOS, click the download button then, on the new page, click <bold><ios_share /></bold>, then <bold>Save to Files <ios_files /></bold>.",
-          "shortTitle": "Download / iOS",
-          "title": "Downloading on iOS"
-        },
-        "onPc": {
-          "1": "On PC, click the download button then, on the new page, right click the video and select <bold>Save video as</bold>",
-          "shortTitle": "Download / PC",
-          "title": "Downloading on PC"
-        },
-        "title": "Download"
-      },
       "episodes": {
-        "button": "Episodes",
-        "emptyState": "There are no episodes in this season, check back later (sorry :3)...",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Error loading season",
-        "loadingList": "Loading...",
-        "loadingTitle": "Loading...",
-        "unairedEpisodes": "One or more episodes in this season have been disabled because they haven't been aired yet.",
-        "seasons": "Seasons",
-        "showMore": "Show more",
-        "showLess": "Show less",
-        "markAsWatched": "Mark as watched",
-        "markAsUnwatched": "Mark as unwatched",
-        "markAsFavorite": "Mark as favorite",
-        "favorites": "Favorites",
-        "noFavorites": "No favorite episodes yet. Star episodes to add them to your favorites!"
+        "button": "Episodes"
       },
       "playback": {
-        "speedLabel": "Playback speed",
-        "title": "Playback settings",
-        "disabled": "(Disabled in watch party)",
         "speedBoosted": "2x",
         "speedUnboosted": "{{speed}}x"
       },
-      "quality": {
-        "automaticLabel": "Automatic quality",
-        "hint": "You can try <0>switching source</0> to get different quality options.",
-        "iosNoQuality": "Due to Apple-defined (common IOS L) limitations, quality selection is not available on iOS for this source. You can try <0>switching to another source</0> to get different quality options.",
-        "title": "Quality",
-        "auto": "Auto"
-      },
       "settings": {
-        "downloadItem": "Download",
-        "enableSubtitles": "Enable Subtitles",
-        "experienceSection": "Viewing experience",
         "playbackItem": "Playback settings",
         "audioItem": "Audio",
         "qualityItem": "Quality",
         "sourceItem": "Source",
-        "subtitleItem": "Subtitles",
-        "videoSection": "Video settings"
-      },
-      "sources": {
-        "failed": {
-          "text": "There was an error while trying to find any videos... Try a different source?",
-          "title": "Failed to scrape"
-        },
-        "noEmbeds": {
-          "text": "We were unable to find any embeds, please try a different source.",
-          "title": "No embeds found"
-        },
-        "noStream": {
-          "text": "This source has no streams for this movie or show. /ᐠ - ˕ -マ Ⳋ",
-          "title": "No stream :("
-        },
-        "title": "Sources",
-        "unknownOption": "Unknown",
-        "findNextSource": "Find next source"
+        "subtitleItem": "Subtitles"
       },
       "subtitles": {
-        "customChoice": "Drop or upload file",
-        "pasteChoice": "Paste subtitle data",
-        "doubleClickToCopy": "Double click to copy subtitle data",
-        "customizeLabel": "Customize",
-        "previewLabel": "Subtitle preview:",
         "offChoice": "Off",
-        "onChoice": "On",
-        "autoSelectChoice": "Auto select",
-        "autoSelectDifferentChoice": "Tap again to auto select different subtitle",
-        "SourceChoice": "Source Subtitles",
-        "OpenSubtitlesChoice": "External Subtitles",
-        "loadingExternal": "Loading external subtitles...",
-        "transcriptChoice": "Transcript",
         "settings": {
           "backlink": "Custom subtitles",
           "delay": "Subtitle delay",
           "fixCapitals": "Fix capitalization"
         },
-        "title": "Subtitles",
-        "unknownLanguage": "Unknown",
-        "dropSubtitleFile": "Drop subtitle file here! >_<",
-        "scrapeButton": "Scrape subtitles",
-        "refresh": "Refresh External Subtitles",
-        "refreshing": "Refreshing...",
-        "empty": "There are no provided subtitles for this.",
-        "notFound": "None of the available options match your query",
         "useNativeSubtitles": "Native video subtitles",
         "useNativeSubtitlesDescription": "Broadcast subtitles for native fullscreen and PiP",
         "delayLate": "Heard audio",
-        "delayEarly": "Saw caption",
-        "translate": {
-          "title": "Translate from {{language}}"
-        }
-      },
-      "watchparty": {
-        "watchpartyItem": "Watch Party",
-        "notice": "Legacy Watch Party might not be available for some sources",
-        "legacyWatchparty": "Use legacy Watch Party"
-      },
-      "audio": {
-        "default": "Default"
+        "delayEarly": "Saw caption"
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "Could not load API metadata, please check your internet connection.",
-        "title": "Failed to load API metadata"
-      },
-      "legal": {
-        "badge": "Removed",
-        "text": "This media is no longer available due to a takedown notice or copyright claim. 😨",
-        "title": "Media has been removed"
-      },
-      "extensionPermission": {
-        "badge": "Permission Missing",
-        "button": "Use extension",
-        "text": "You have the browser extension, but we need your permission to get started using the extension. (¬_¬)",
-        "title": "Configure the extension"
-      },
-      "failed": {
-        "badge": "Failed",
-        "homeButton": "Go home",
-        "text": "Could not load the media's metadata from TMDB. Please check whether TMDB is down or blocked on your internet connection.",
-        "title": "Failed to load metadata"
-      },
-      "notFound": {
-        "badge": "Not found",
-        "homeButton": "Back to home",
-        "text": "We couldn't find the media you requested. Either it's been removed or you tampered with the URL (naughty, naughty).",
-        "title": "Couldn't find that media."
-      }
-    },
-    "nextEpisode": {
-      "replay": "Replay",
-      "next": "Next episode",
-      "nextSeason": "Next season"
-    },
-    "resume": {
-      "title": "Continue watching?",
-      "description": "This episode is {{percentage}}% watched",
-      "resume": "Resume",
-      "restart": "Restart"
     },
     "playbackError": {
-      "badge": "Playback error",
       "errors": {
         "errorAborted": "The fetching of the media was aborted by the user's request.",
         "errorDecode": "Despite having previously been determined to be usable, an error occurred while trying to decode the media resource, resulting in an error.",
@@ -470,226 +182,16 @@
         "errorNetwork": "Some kind of network error occurred which prevented the media from being successfully fetched, despite having previously been available.",
         "errorNotSupported": "The media or media provider object is not supported."
       },
-      "autoResumeText": "There was an error trying to play the media 😖. Automatically trying the other sources...",
-      "copyDebugInfo": "Copy debug info",
-      "debugInfo": "Check console for more details.",
-      "homeButton": "Go home",
-      "resumeButton": "Try next sources",
-      "text": "There was an error trying to play the media 😖. Please try again or try a different source!",
-      "title": "Failed to play video!"
-    },
-    "scraping": {
-      "items": {
-        "failure": "Error occurred",
-        "notFound": "Doesn't have the video (╥﹏╥)",
-        "pending": "Checking for videos..."
-      },
-      "notFound": {
-        "badge": "Not found",
-        "detailsButton": "Show details",
-        "homeButton": "Go home",
-        "discoverButton": "Discover more",
-        "text": "We have searched through our providers and cannot find the media you are looking for! We do not host the media and have no control over what is available. Please click 'Show details' below for more details.",
-        "title": "We couldn't find that",
-        "onboarding": "More sources might be avalible using the extension or febbox token!",
-        "onboardingButton": "Do setup again"
-      },
-      "extensionFailure": {
-        "badge": "Extension disabled",
-        "homeButton": "Go home",
-        "enableExtension": "Enable extension",
-        "title": "Please enable the extension",
-        "text": "You've installed the {{serverName}} extension. To start using it, you need to enable the extension for this site."
-      },
-      "tips": {
-        "1": "Tap the gear icon to switch sources!",
-        "2": "Tap the title to copy the link!",
-        "3": "Tap and hold or hold SHIFT to show widescreen button instead of fullscreen!",
-        "4": "Some sources work better than others!",
-        "5": "Get the extension for more sources!",
-        "6": "Hold bookmarks to edit or delete them!",
-        "7": "Hold SHIFT and tap the title to copy the link with time!",
-        "8": "Set a custom subtitle color!",
-        "9": "Migrate your account to a new backend in settings!",
-        "10": "Join the Discord!",
-        "11": "Hold ` to view keyboard shortcuts!"
-      }
+      "copyDebugInfo": "Copy debug info"
     },
     "time": {
       "regular": "{{timeWatched}} / {{duration}}",
       "remaining": "{{timeLeft}} left • Finish at {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "segment": {
-      "intro": "Intro",
-      "recap": "Recap",
-      "credits": "Credits",
-      "preview": "Preview"
-    },
-    "skipTime": {
-      "intro": "Skip Intro",
-      "recap": "Skip Recap",
-      "credits": "Skip Credits",
-      "preview": "Skip Preview",
-      "skipSegments": "Skip Segments",
-      "submitSegment": "Submit Segment",
-      "noSegments": "No skip segments available",
-      "startsAt": "Starts at {{time}}",
-      "endsAt": "Ends at {{time}}",
-      "timeUnknown": "Time unknown",
-      "confidence": "confidence",
-      "submissions": "{{count}} submissions",
-      "connectApiKeyMessage": "To submit new segments, enter your TheIntroDB API key in the connections settings",
-      "endOfVideo": "End",
-      "feedback": {
-        "title": "Was this skip correct?",
-        "modal": {
-          "title": "Submit Timestamps to TheIntroDB",
-          "description": "Contribute to TheIntroDB by submitting accurate segment timestamps. All submissions are accepted by the community before being published.",
-          "segmentType": "Segment Type",
-          "types": {
-            "intro": "Intro",
-            "recap": "Recap",
-            "credits": "Credits",
-            "preview": "Preview"
-          },
-          "startTimeLabel": "Start (s)",
-          "endTimeLabel": "End (s)",
-          "placeholders": {
-            "start": {
-              "intro": "2:30 or 150 (leave empty for start at beginning)",
-              "recap": "2:30 or 150 (leave empty for start at beginning)",
-              "credits": "2:30 or 150 (required)",
-              "preview": "2:30 or 150 (required)"
-            },
-            "end": {
-              "intro": "3:30 or 210 (required)",
-              "recap": "3:30 or 210 (required)",
-              "credits": "3:30 or 210 (leave empty for end of media)",
-              "preview": "3:30 or 210 (leave empty for end of media)"
-            }
-          },
-          "whenToTitle": "Timestamps guide:",
-          "whenToDesc": "Enter timestamps in seconds (e.g. 150), mm:ss format (e.g. 2:30), or hh:mm:ss format (e.g. 1:42:20). We'll automatically convert the format for you.",
-          "guide": {
-            "startLabel": "Start:",
-            "startDesc": "Required - when credits begin rolling",
-            "endLabel": "End:",
-            "endDesc": "Optional - empty if extends to end",
-            "durationLabel": "Duration:",
-            "durationDesc": "Min 5s if end provided",
-            "excludeLabel": "Exclude:",
-            "excludeDesc": "Post-credits scenes",
-            "intro": {
-              "whenToTitle": "Intro timestamps guide:",
-              "startDesc": "Optional - leave empty if the intro starts at the beginning of the episode.",
-              "endDesc": "Required - when the intro ends (usually when the title card or main episode begins).",
-              "durationDesc": "Most intros are 30–90 seconds. Minimum 5s if both start and end are set.",
-              "excludeDesc": "Do not include cold opens or pre-intro scenes; only the main title sequence."
-            },
-            "recap": {
-              "whenToTitle": "Recap timestamps guide:",
-              "startDesc": "Optional - leave empty if the recap starts at the beginning of the episode.",
-              "endDesc": "Required - when the recap ends and the new content begins.",
-              "durationDesc": "Recaps vary in length. Minimum 5s if both start and end are set.",
-              "excludeDesc": "Only the \"previously on\" or recap segment; do not include the intro or new scenes."
-            },
-            "credits": {
-              "whenToTitle": "Credits timestamps guide:",
-              "startDesc": "Required - when the closing credits begin (e.g. when the first credit text appears).",
-              "endDesc": "Optional - leave empty if credits run to the end of the file.",
-              "durationDesc": "Minimum 5s if end is provided. Can extend to end of media.",
-              "excludeDesc": "Exclude mid-credits or post-credits scenes; only the main credit roll."
-            },
-            "preview": {
-              "whenToTitle": "Preview timestamps guide:",
-              "startDesc": "Required - when the preview starts (e.g. when the preview text appears).",
-              "endDesc": "Optional - leave empty if the preview ends at the end of the media.",
-              "durationDesc": "Preview varies in length. Minimum 5s.",
-              "excludeDesc": "Preview is usually 15-90 seconds at the end of the episode previewing the next episode."
-            }
-          },
-          "cancel": "Cancel",
-          "submit": "Submit",
-          "submitting": "Submitting...",
-          "error": {
-            "tidbKey": "TIDB API key is not set",
-            "mediaInfo": "Media information is not available",
-            "endTime": "End time is required",
-            "startTime": "Start time is required",
-            "submission": "Error submitting timestamps",
-            "segment": "No segment selected"
-          },
-          "success": {
-            "title": "Submission Successful! Thanks!"
-          }
-        }
-      }
     }
   },
   "settings": {
-    "search": {
-      "placeholder": "Search settings..."
-    },
-    "all": {
-      "title": "All Settings"
-    },
-    "account": {
-      "accountDetails": {
-        "nicknameLabel": "Nickname",
-        "nicknamePlaceholder": "Enter your nickname",
-        "deviceNameLabel": "Device name",
-        "deviceNamePlaceholder": "Personal phone",
-        "editProfile": "Edit",
-        "logoutButton": "Log out"
-      },
-      "admin": {
-        "title": "Admin panel",
-        "text": "Test {{serverName}}'s condition."
-      },
-      "actions": {
-        "delete": {
-          "button": "Delete account",
-          "confirmButton": "Delete account",
-          "confirmDescription": "Are you sure you want to delete your account? All your data will be lost! ૮₍˶Ó﹏Ò ⑅₎ა",
-          "confirmTitle": "Are you sure?",
-          "text": "This action is irreversible. All data will be deleted and nothing can be recovered.",
-          "title": "Delete account"
-        },
-        "migration": {
-          "title": "Account migration",
-          "text": "Migrate your account to a new server or download your data.",
-          "button": "Migrate account"
-        },
-        "title": "Actions",
-        "logoutAllDevices": {
-          "title": "End All Sessions",
-          "text": "This will sign you out from all devices linked to your account.",
-          "button": "Log Out of All Devices"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Device name",
-        "unknownDevice": "Unknown device, error decrypting name",
-        "failed": "Failed to load sessions",
-        "removeDevice": "Remove",
-        "title": "Devices"
-      },
-      "profile": {
-        "finish": "Finish editing",
-        "firstColor": "Profile color one",
-        "secondColor": "Profile color two",
-        "title": "Edit profile picture",
-        "userIcon": "User icon"
-      },
-      "register": {
-        "cta": "Get started",
-        "text": "Share your watch progress between devices and keep them synced. ( ̧⸝⸝⍢⸝⸝)ෆ",
-        "title": "Sync to the Cloud"
-      },
-      "title": "Account"
-    },
     "appearance": {
       "activeTheme": "Active",
       "themes": {
@@ -717,180 +219,9 @@
         "cobalt": "Cobalt",
         "frost": "Frost",
         "christmas": "Christmas"
-      },
-      "customParts": {
-        "primary": "Primary",
-        "secondary": "Secondary",
-        "tertiary": "Tertiary"
-      },
-      "title": "Appearance",
-      "options": {
-        "discover": "Discover section",
-        "discoverDescription": "Show the Discover section on the Homepage below your bookmarked media. Enabled by default.",
-        "discoverLabel": "Discover section",
-        "featured": "Featured media",
-        "featuredDescription": "Show a carousel of featured movies and shows at the top of your homepage! Disabled by default.",
-        "featuredLabel": "Featured media",
-        "modal": "Details modal",
-        "modalDescription": "Show the details modal when you click on a media card instead of going to the watch page. Proxy or Extension required for trailer. Disabled by default.",
-        "modalLabel": "Details modal",
-        "logos": "Image logos",
-        "logosDescription": "Show image logos instead of text titles in the details modal and featured section. Enabled by default.",
-        "logosNotice": "Most of the time, logos are English only. Other languages might want to disable this!",
-        "logosLabel": "Image logos",
-        "carouselView": "Carousel view",
-        "carouselViewDescription": "Display your currently watching and bookmark sections as carousels instead of a grid. Disabled by default.",
-        "carouselViewLabel": "Carousel view",
-        "minimalCards": "Minimal cards",
-        "minimalCardsDescription": "Hide text content (title, type, year) on media cards, showing only the poster image.",
-        "minimalCardsLabel": "Minimal cards",
-        "forceCompactEpisodeView": "Force compact episode view",
-        "forceCompactEpisodeViewDescription": "Force the episode carousel in the player to use the \"classic\" compact vertical view. Disabled by default.",
-        "homeSectionOrder": "Home section order",
-        "homeSectionOrderDescription": "Drag and drop to reorder the watching and bookmarks sections on your homepage. Group order can be editied from the home page.",
-        "forceCompactEpisodeViewLabel": "Compact episodes",
-        "homeSectionOrderGroups": "Reorder bookmark groups",
-        "pauseOverlay": "Pause overlay",
-        "pauseOverlayDescription": "Show a title/logo and description overlay when the player is paused and idle.",
-        "pauseOverlayLabel": "Pause overlay"
-      },
-      "sections": {
-        "watching": "Currently Watching",
-        "bookmarks": "Bookmarks"
       }
-    },
-    "connections": {
-      "server": {
-        "description": "If you would like to connect to a custom backend to store your data, enable this and provide the URL. <0>Instructions.</0>",
-        "label": "Backend Server",
-        "urlLabel": "Custom server URL",
-        "selectBackend": "Select Backend Server",
-        "currentBackend": "Current Backend",
-        "changeWarning": "Changing backend server will log you out. Continue?",
-        "confirm": "Log out and change server",
-        "cancel": "Cancel",
-        "changeWarningTitle": "Change Backend Server",
-        "migration": {
-          "description": "<0>Migrate my data</0> to a new server.",
-          "link": "Migrate my data"
-        },
-        "documentation": "Backend documentation",
-        "error": "Error connecting to backend",
-        "notice": "Your account does NOT sync between backends, so remember which one you use!"
-      },
-      "setup": {
-        "doSetup": "Do setup",
-        "errorStatus": {
-          "description": "It seems that one or more items in this setup need your attention.",
-          "title": "Something needs your attention 😱"
-        },
-        "itemError": "There is something wrong with this setting. Go through setup again to fix it. (ᴗ_ ᴗ。)",
-        "items": {
-          "default": "Default setup",
-          "extension": "Extension",
-          "proxy": "Custom proxy",
-          "desktopapp": "Native app"
-        },
-        "redoSetup": "Redo setup",
-        "successStatus": {
-          "description": "All things are in place for you to start watching your favorite media. (๑>◡<๑)",
-          "title": "Everything is set up!"
-        },
-        "unsetStatus": {
-          "description": "Please click the button to the right to start the setup process.",
-          "title": "You haven't gone through setup"
-        }
-      },
-      "title": "Connections",
-      "workers": {
-        "addButton": "Add new worker",
-        "description": "To make the application function, all traffic is routed through proxies. Enable this if you want to bring your own workers. <0>Instructions.</0>",
-        "documentation": "Proxy documentation",
-        "emptyState": "No workers yet (｡•́︿•̀｡), add one below",
-        "label": "Use custom proxy workers",
-        "urlLabel": "Worker URLs",
-        "urlPlaceholder": "https://",
-        "proxyTMDB": {
-          "title": "Proxy TMDB",
-          "description": "Only needed if you can't access TheMovieDB directly, such as if your ISP blocks it. It is recomended to disable the Discover section to improve performance with this."
-        }
-      },
-      "tidb": {
-        "description": "Contribute to TheIntroDB by leaving feedback on intro, recap, and credits segments. <0>Learn more.</0>",
-        "tokenLabel": "API Key"
-      },
-      "trakt": {
-        "title": "Trakt",
-        "description": "Sync your watchlist and history with Trakt.",
-        "details": "Syncing might take a few minutes to complete. Changes on Trakt may conflict with local changes, so local items are prioritized.",
-        "connect": "Connect Trakt",
-        "syncing": "Syncing...",
-        "disconnect": "Disconnect"
-      }
-    },
-    "preferences": {
-      "title": "Preferences",
-      "language": "Application language",
-      "languageDescription": "Language applied to the entire application, only English has silly stuff 🙁.",
-      "thumbnail": "Generate thumbnails",
-      "thumbnailDescription": "Most of the time, videos don't have thumbnails. You can enable this setting to generate them on the fly but they can make your video slower.",
-      "thumbnailLabel": "Generate thumbnails",
-      "autoplay": "Autoplay",
-      "autoplayDescription": "Automatically play the next episode in a series after reaching the end. Can be enabled by users with the browser extension, a custom proxy, or with the default setup if allowed by the host.",
-      "autoplayLabel": "Autoplay",
-      "skipCredits": "Skip End Credits",
-      "skipCreditsDescription": "When enabled, automatically play the next episode at 99% completion to skip end credits. When disabled, wait until the episode is fully completed.",
-      "skipCreditsLabel": "Skip end credits",
-      "autoSkipSegments": "Auto Skip Segments",
-      "autoSkipSegmentsDescription": "When enabled, automatically skip intro, recap, and preview segments while watching.",
-      "autoSkipSegmentsLabel": "Auto skip segments",
-      "lowPerformanceMode": "Low performance/bandwidth mode",
-      "lowPerformanceModeDescription": "Optimizes the application for slower connections and devices by disabling bandwidth-heavy features. This mode reduces data usage and improves performance while keeping the core search and watch functionality intact. ",
-      "lowPerformanceModeLabel": "Low performance mode",
-      "holdToBoost": "Hold to boost speed",
-      "holdToBoostDescription": "Hold spacebar or touch and hold the screen to temporarily increase playback speed to 2x. Release to return to previous speed.",
-      "holdToBoostLabel": "Enable hold to boost",
-      "doubleClickToSeek": "Double tap to seek",
-      "doubleClickToSeekDescription": "Double tap on the left or right side of the player to seek 10 seconds forward or backward.",
-      "doubleClickToSeekLabel": "Enable double tap to seek",
-      "keyboardShortcuts": "Keyboard Shortcuts",
-      "keyboardShortcutsDescription": "Customize the keyboard shortcuts for the application. Hold ` to show this help anytime",
-      "keyboardShortcutsLabel": "Customize Keyboard Shortcuts",
-      "sourceOrder": "Reordering sources",
-      "sourceOrderDescription": "Drag and drop to reorder sources. This will determine the order in which sources are checked for the media you are trying to watch. If a source is greyed out, it means the <bold>extension</bold> is required for that source. <br><br> <strong>(The default order is best for most users)</strong>",
-      "sourceOrderEnableLabel": "Custom source order",
-      "showLess": "Show less",
-      "showMore": "Show more",
-      "embedOrder": "Reordering embeds",
-      "embedOrderDescription": "Drag and drop to reorder embeds. This will determine the order in which embeds are checked for the media you are trying to watch. <br><br> <strong>(The default order is best for most users)</strong>",
-      "embedOrderEnableLabel": "Custom embed order",
-      "manualSource": "Manual source selection",
-      "manualSourceDescription": "Require picking a source before scraping. Disables automatic source selection and opens the source picker when starting playback.",
-      "manualSourceLabel": "Manual source selection",
-      "autoResumeOnPlaybackError": "Auto resume on playback error",
-      "autoResumeOnPlaybackErrorDescription": "Automatically continue searching for other sources when the current source fails during playback. If disabled, you'll see an error screen with a manual resume option.",
-      "autoResumeOnPlaybackErrorLabel": "Auto resume on playback error",
-      "lastSuccessfulSource": "Last used source",
-      "lastSuccessfulSourceDescription": "Automatically prioritize the source that successfully provided content for the previous episode. This helps ensure continuity when watching series.",
-      "lastSuccessfulSourceEnableLabel": "Last used source"
     },
     "reset": "Reset",
-    "save": "Save",
-    "sidebar": {
-      "info": {
-        "appVersion": "App version",
-        "backendUrl": "Backend URL",
-        "backendVersion": "Backend version",
-        "hostname": "Hostname",
-        "insecure": "Insecure",
-        "nickname": "Nickname",
-        "notLoggedIn": "You are not logged in",
-        "secure": "Secure",
-        "title": "App stats",
-        "unknownVersion": "Unknown",
-        "userId": "User ID"
-      }
-    },
     "subtitles": {
       "backgroundLabel": "Background opacity",
       "backgroundBlurEnabledLabel": "Background blur",
@@ -901,9 +232,6 @@
       "textSizeLabel": "Text size",
       "title": "Subtitles",
       "textBoldLabel": "Bold text",
-      "verticalPositionLabel": "Vertical position",
-      "high": "High",
-      "low": "Default",
       "textStyle": {
         "title": "Text style",
         "default": "Default",
@@ -913,64 +241,9 @@
         "dropShadow": "Drop Shadow"
       },
       "BorderThicknessLabel": "Border Thickness"
-    },
-    "unsaved": "You have unsaved changes... ฅ^•ﻌ•^ฅ"
+    }
   },
   "discover": {
-    "tabs": {
-      "movies": "Movies",
-      "tvshows": "TV Shows",
-      "editorpicks": "Editor Picks"
-    },
-    "carousel": {
-      "title": {
-        "loading": "Loading...",
-        "movies": "{{category}} Movies",
-        "tvshows": "{{category}} Shows",
-        "inCinemas": "In Cinemas",
-        "popular": "Most Popular",
-        "nowPlaying": "In Cinemas",
-        "topRated": "Top Rated",
-        "latestReleases": "Latest Releases",
-        "4kReleases": "4K Releases",
-        "onTheAir": "On The Air",
-        "latestTVReleases": "Latest TV Shows",
-        "popularOn": "Popular {{type}} on {{provider}}",
-        "editorPicksMovies": "Editor Picks Movies",
-        "editorPicksShows": "Editor Picks Shows",
-        "moviesOn": "Movies on {{provider}}",
-        "tvshowsOn": "Shows on {{provider}}",
-        "recommended": "Because You Watched: {{title}}",
-        "forYou": "For You",
-        "genreMovies": "{{genre}} Movies",
-        "genreShows": "{{genre}} Shows",
-        "categoryMovies": "{{category}} Movies",
-        "categoryShows": "{{category}} Shows",
-        "top10": "Top 10"
-      },
-      "change": "Change",
-      "more": "View more"
-    },
-    "featured": {
-      "playNow": "Play Now",
-      "moreInfo": "More Info"
-    },
-    "randomMovie": {
-      "button": "Watch Something Random",
-      "cancel": "Cancel Countdown",
-      "countdown": "{{countdown}}s",
-      "nowPlaying": "Now Playing",
-      "in": "in"
-    },
-    "page": {
-      "title": "Discover Movies & TV",
-      "subtitle": "Explore the latest hits and timeless classics.",
-      "loadMore": "Load more",
-      "loading": "Loading...",
-      "back": "Go back"
-    },
-    "viewLists": "View All Movie Lists",
-    "allLists": "All Movie Lists",
     "scrollToTop": "Back to top"
   }
 }

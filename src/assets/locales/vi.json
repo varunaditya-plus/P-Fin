@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Đã sao chép",
-    "copy": "Sao chép"
+    "copied": "Đã sao chép"
   },
   "errors": {
     "badge": "Lỗi",
@@ -13,34 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Thông tin",
-      "legal": "Legal / DMCA",
-      "login": "Đăng nhập",
-      "onboarding": "Cài đặt",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Đăng ký",
-      "settings": "Cài đặt",
-      "migration": "Chuyển tài khoản",
-      "discover": "Khám phá",
-      "support": "Hỗ trợ khách hàng",
-      "jip": "Jip"
+      "discover": "Khám phá"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Đánh dấu"
-    },
-    "continueWatching": {
-      "sectionTitle": "Tiếp tục xem..."
-    },
-    "mediaList": {
-      "stopEditing": "Hoàn thành"
-    },
     "search": {
-      "allResults": "Đó là tất cả chúng tôi có...",
-      "failed": "Không tìm thấy phương tiện, hãy thử lại!",
       "loading": "Đang tải...",
-      "noResults": "Chúng tôi không thể tìm thấy gì :(",
       "placeholder": {
         "default": "Bạn muốn xem gì?",
         "extra": [
@@ -54,21 +32,17 @@
           "Không phải {{serverName}} là tuyệt nhất sao?",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "Kết quả tìm kiếm",
-      "discover": "Khám phá",
-      "empty": {
-        "default": "Chào mừng, tìm phương tiện truyền thông để xem tại đây!",
-        "extra": [
-          "Không có gì ở đây :(",
-          "Thật trống rỗng...",
-          "Trống trải thật.",
-          "Xin chào người dùng mới :3"
-        ]
-      },
-      "discoverMore": "Khám phá thêm"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Muốn khuấy đảo tí cho đời thêm vui không?",
+        "extra": ["Chúc mừng 69 ngày 😘!"]
+      },
+      "420": {
+        "default": "Bạn muốn xem gì ngày 20/4 này?",
+        "extra": ["Chúc mừng ngày 20/4 🥳 !"]
+      },
       "day": {
         "default": "Chiều nay bạn muốn coi gì?",
         "extra": [
@@ -82,20 +56,7 @@
       "night": {
         "default": "Đêm nay bạn muốn coi gì?",
         "extra": ["Cảm thấy mệt? Tôi nghe nói phim The Exorcist hay đấy."]
-      },
-      "420": {
-        "default": "Bạn muốn xem gì ngày 20/4 này?",
-        "extra": ["Chúc mừng ngày 20/4 🥳 !"]
-      },
-      "69": {
-        "default": "Muốn khuấy đảo tí cho đời thêm vui không?",
-        "extra": ["Chúc mừng 69 ngày 😘!"]
       }
-    },
-    "mediaCard": {
-      "moreInfo": "Thông tin thêm",
-      "copyLink": "Sao chép Link",
-      "close": "Đóng"
     }
   },
   "media": {
@@ -104,22 +65,11 @@
       "movie": "Phim",
       "show": "Chương trình truyền hình"
     },
-    "unreleased": "Chưa phát hành",
-    "episodeShort": "T",
-    "seasonShort": "M"
+    "unreleased": "Chưa phát hành"
   },
   "navigation": {
     "banner": {
       "offline": "Hãy kiểm tra kết nối Internet của bạn"
-    },
-    "menu": {
-      "about": "Về chúng tôi và FAQ",
-      "logout": "Đăng xuất",
-      "register": "Đồng bộ hóa với đám mây",
-      "settings": "Cài đặt",
-      "support": "Hỗ trợ",
-      "discover": "Khám phá",
-      "development": "Phát triển"
     }
   },
   "notFound": {
@@ -136,214 +86,24 @@
     },
     "menus": {
       "episodes": {
-        "button": "Tập",
-        "loadingList": "Đang tải...",
-        "loadingTitle": "Đang tải...",
-        "markAsWatched": "Đánh dấu là đã xem",
-        "markAsUnwatched": "Đánh dấu là chưa xem",
-        "emptyState": "Không có tập nào trong mùa này, hãy quay lại sau (xin lỗi :3)...",
-        "episodeBadge": "T{{episode}}",
-        "loadingError": "Lỗi khi tải mùa này",
-        "unairedEpisodes": "Một hoặc nhiều tập trong mùa này đã bị tắt vì chúng chưa được phát sóng.",
-        "seasons": "Mùa",
-        "showMore": "Xem thêm",
-        "showLess": "Hiển thị ít hơn"
-      },
-      "sources": {
-        "title": "Nguồn",
-        "failed": {
-          "text": "Đã xảy ra lỗi khi cố gắng tìm video... Hãy thử nguồn khác?"
-        },
-        "noStream": {
-          "text": "Nguồn này không có luồng nào cho bộ phim hoặc chương trình này. /ᐠ - ˕ -マ Ⳋ",
-          "title": "Không có luồng :("
-        },
-        "noEmbeds": {
-          "text": "Chúng tôi không tìm thấy bất kỳ nội dung nhúng nào, vui lòng thử nguồn khác.",
-          "title": "Không tìm thấy mã nhúng"
-        },
-        "unknownOption": "Không rõ",
-        "editOrder": "Sắp xếp thứ tự"
-      },
-      "quality": {
-        "hint": "Bạn có thể thử <0>chuyển đổi nguồn</0> để có các tùy chọn chất lượng khác nhau.",
-        "iosNoQuality": "Do những hạn chế do Apple xác định, lựa chọn chất lượng không khả dụng trên iOS cho nguồn này. Bạn có thể thử <0>chuyển sang nguồn khác</0> để có các tùy chọn chất lượng khác.",
-        "automaticLabel": "Chất lượng tự động",
-        "title": "Chất lượng",
-        "auto": "Tự động"
+        "button": "Tập"
       },
       "subtitles": {
-        "notFound": "Không có tùy chọn nào có sẵn phù hợp với truy vấn của bạn",
-        "customChoice": "Thả hoặc tải tập tin lên",
-        "customizeLabel": "Tùy chỉnh",
-        "onChoice": "Bật",
         "settings": {
           "backlink": "Phụ đề tùy chỉnh",
           "delay": "Độ trễ phụ đề",
           "fixCapitals": "Sửa lỗi viết hoa"
         },
-        "title": "Phụ đề",
-        "unknownLanguage": "Không rõ",
-        "dropSubtitleFile": "Thả file phụ đề vào đây! >_<",
-        "empty": "Không có phụ đề nào được cung cấp cho video này.",
         "useNativeSubtitles": "Sử dụng phụ đề video gốc",
         "useNativeSubtitlesDescription": "Có thể sửa phụ đề khi phát và trong PiP",
-        "offChoice": "Tắt",
-        "SourceChoice": "Nguồn phụ đề",
-        "OpenSubtitlesChoice": "Phụ đề bên ngoài"
-      },
-      "playback": {
-        "speedLabel": "Tốc độ phát lại",
-        "title": "Cài đặt phát lại",
-        "disabled": "(Tắt trong buổi tiệc xem)"
+        "offChoice": "Tắt"
       },
       "settings": {
-        "downloadItem": "Tải xuống",
-        "enableSubtitles": "Bật Phụ đề",
-        "experienceSection": "Trải nghiệm xem",
         "playbackItem": "Cài đặt phát lại",
         "audioItem": "Âm thanh",
         "qualityItem": "Chất lượng",
         "sourceItem": "Nguồn",
-        "subtitleItem": "Phụ đề",
-        "videoSection": "Cài đặt video"
-      },
-      "watchparty": {
-        "watchpartyItem": "Watch Party",
-        "notice": "Legacy Watch Party có thể không khả dụng đối với một số nguồn",
-        "legacyWatchparty": "Dùng legacy Watch Party"
-      },
-      "audio": {
-        "default": "Mặc định"
-      },
-      "downloads": {
-        "openIn": "Mở trong...",
-        "vlc": "VLC",
-        "iina": "IINA",
-        "hlsOpenInDisclaimer": "Mở luồng HLS với trình phát bên ngoài CÓ THỂ KHÔNG HOẠT ĐỘNG!",
-        "hlsDisclaimer": "Tải xuống được lấy trực tiếp từ nhà cung cấp. {{serverName}} không kiểm soát cách cung cấp tải xuống.<br /><br />Xin lưu ý rằng bạn đang tải xuống danh sách phát HLS, <bold>không nên tải xuống nếu bạn không quen với các định dạng phát trực tuyến nâng cao</bold>. Hãy thử các nguồn khác nhau cho các định dạng khác nhau.",
-        "onAndroid": {
-          "1": "Để tải xuống trên Android, hãy nhấp vào nút tải xuống, sau đó trên trang mới, <bold>nhấn và giữ</bold> vào video, sau đó chọn <bold>lưu</bold>.",
-          "shortTitle": "Tải xuống / Android",
-          "title": "Tải xuống trên Android"
-        },
-        "onIos": {
-          "1": "Để tải xuống trên iOS, hãy nhấp vào nút tải xuống, sau đó trên trang mới, nhấp vào <bold><ios_share /></bold>, sau đó <bold>Lưu vào Tệp <ios_files /></bold>.",
-          "shortTitle": "Tải xuống / iOS",
-          "title": "Tải xuống trên iOS"
-        },
-        "onPc": {
-          "1": "Trên PC, nhấp vào nút tải xuống, sau đó, trên trang mới, nhấp chuột phải vào video và chọn <bold>Lưu video thành</bold>",
-          "shortTitle": "Tải xuống / PC",
-          "title": "Tải xuống trên PC"
-        },
-        "title": "Tải xuống",
-        "button": "Lượt tải xuống",
-        "hlsDownloader": "Hoặc, hãy truy cập <0>trang web tải xuống hls</0> và dán URL danh sách phát bên dưới.",
-        "disclaimer": "Tải xuống được lấy trực tiếp từ nhà cung cấp. {{serverName}} không kiểm soát cách cung cấp tải xuống.",
-        "copyHlsPlaylist": "Sao chép liên kết danh sách phát HLS",
-        "downloadSubtitle": "Tải xuống phụ đề hiện tại",
-        "downloadVideo": "Tải xuống video"
-      }
-    },
-    "metadata": {
-      "notFound": {
-        "badge": "Không tìm thấy",
-        "homeButton": "Quay lại trang chính",
-        "text": "Chúng tôi không thể tìm thấy nội dung mà bạn yêu cầu. Hoặc là nó đã bị xóa, hoặc bạn đã xáo trộn URL.",
-        "title": "Không thể tìm thấy nội dung."
-      },
-      "failed": {
-        "homeButton": "Về trang chính",
-        "badge": "Thất bại"
-      },
-      "api": {
-        "text": "Không thể tải dữ liệu API, vui lòng kiểm tra kết nối internet của bạn.",
-        "title": "Không thể tải dữ liệu API"
-      },
-      "extensionPermission": {
-        "badge": "Quyền bị thiếu",
-        "button": "Sử dụng tiện ích mở rộng",
-        "text": "Bạn có tiện ích mở rộng cho trình duyệt, nhưng chúng tôi cần sự cho phép của bạn để bắt đầu sử dụng tiện ích mở rộng. (¬_¬)",
-        "title": "Cấu hình tiện ích mở rộng"
-      },
-      "legal": {
-        "text": "Phương tiện truyền thông này không còn khả dụng do thông báo gỡ xuống hoặc khiếu nại về bản quyền. 😨",
-        "badge": "Đã xóa",
-        "title": "Phương tiện truyền thông đã bị xóa"
-      }
-    },
-    "playbackError": {
-      "title": "Rất tiếc, đã hỏng!",
-      "homeButton": "Về trang chính"
-    },
-    "scraping": {
-      "notFound": {
-        "homeButton": "Về trang chính",
-        "text": "Chúng tôi đã tìm kiếm thông qua các nhà cung cấp của mình và không thể tìm thấy phương tiện truyền thông bạn đang tìm kiếm! Chúng tôi không host các phương tiện truyền thông và không có quyền kiểm soát những gì có sẵn. Vui lòng nhấp vào 'Hiển thị chi tiết' bên dưới để biết thêm chi tiết.",
-        "badge": "Không tìm thấy",
-        "detailsButton": "Chi tiết",
-        "discoverButton": "Khám phá thêm",
-        "title": "Chúng tôi không tìm thấy"
-      },
-      "extensionFailure": {
-        "homeButton": "Về trang chính",
-        "badge": "Tiện ích mở rộng đã bị vô hiệu hóa",
-        "text": "Bạn đã cài đặt tiện ích mở rộng {{serverName}}. Để bắt đầu sử dụng, bạn cần bật tiện ích mở rộng cho trang web này.",
-        "enableExtension": "Bật tiện ích mở rộng",
-        "title": "Vui lòng bật tiện ích mở rộng"
-      },
-      "tips": {
-        "5": "Tải tiện ích mở rộng để có thêm nhiều nguồn hơn!",
-        "2": "Nhấp vào tiêu đề để sao chép liên kết!"
-      }
-    },
-    "casting": {
-      "enabled": "Truyền đến thiết bị 🎬"
-    }
-  },
-  "settings": {
-    "connections": {
-      "setup": {
-        "items": {
-          "default": "Cài đặt mặc định",
-          "extension": "Tiện ích mở rộng",
-          "proxy": "Proxy tùy chỉnh"
-        },
-        "redoSetup": "Thiết lập lại",
-        "successStatus": {
-          "description": "Tất cả mọi thứ đã sẵn sàng để bạn bắt đầu xem phương tiện bạn yêu thích. (๑>◡<๑)",
-          "title": "Mọi thứ đã hoàn tất!"
-        },
-        "unsetStatus": {
-          "title": "Bạn vẫn chưa hoàn thành cài đặt",
-          "description": "Xin nhấn vào nút bên phải để bắt đầu quy trình cài đặt."
-        },
-        "itemError": "Cài đặt của bạn có gì đó sai. Hãy làm lại bước cài đặt để sửa chữa nó. (ᴗ_ ᴗ。)"
-      },
-      "title": "Kết nối",
-      "workers": {
-        "documentation": "Tài liệu Proxy",
-        "emptyState": "Chưa có workers (｡•́︿•̀｡), thêm ở phía dưới",
-        "label": "Sử dụng các proxy worker tùy chỉnh",
-        "urlLabel": "Worker URLs",
-        "addButton": "Thêm worker mới",
-        "urlPlaceholder": "https://",
-        "proxyTMDB": {
-          "title": "Proxy TMDB",
-          "description": "Chỉ cần thiết nếu bạn không thể truy cập TheMovieDB trực tiếp, chẳng hạn như nếu ISP của bạn chặn nó. Khuyên dùng để hủy kích hoạt mục Khám phá để cải thiện hiệu suất với cái này."
-        },
-        "description": "Để làm ứng dụng hoạt động, mọi traffic đều được thông qua proxy. Kích hoạt cái này nếu bạn muốn mang theo workers của riêng bạn. <0>Instructions.</0>"
-      }
-    },
-    "preferences": {
-      "lowPerformanceModeDescription": "Tối ưu hóa ứng dụng cho các kết nối và thiết bị chậm hơn bằng cách tắt các tính năng sử dụng nhiều băng thông. Chế độ này giúp giảm mức sử dụng dữ liệu và cải thiện hiệu suất trong khi vẫn giữ nguyên chức năng tìm kiếm và xem phim. ",
-      "sourceOrderDescription": "Kéo và thả để sắp xếp lại các nguồn. Thao tác này sẽ xác định thứ tự các nguồn được kiểm tra cho phương tiện bạn đang cố gắng xem. Nếu một nguồn bị mờ đi, điều đó có nghĩa là <bold>tiện ích mở rộng</bold> là bắt buộc đối với nguồn đó. <br><br> <strong>(Thứ tự mặc định là tốt nhất cho hầu hết người dùng)</strong>",
-      "autoplayDescription": "Tự động phát tập tiếp theo trong một loạt phim sau khi kết thúc. Người dùng có thể bật bằng tiện ích mở rộng trình duyệt, proxy tùy chỉnh hoặc bằng thiết lập mặc định nếu được máy chủ cho phép."
-    },
-    "appearance": {
-      "options": {
-        "modalDescription": "Hiển thị chi tiết khi bạn nhấp vào thẻ phương tiện thay vì đi đến trang xem. Cần có Proxy hoặc Tiện ích mở rộng cho đoạn giới thiệu. Bị tắt theo mặc định."
+        "subtitleItem": "Phụ đề"
       }
     }
   },

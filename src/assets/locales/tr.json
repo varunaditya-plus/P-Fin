@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Kopyalandı",
-    "copy": "Kopyala"
+    "copied": "Kopyalandı"
   },
   "errors": {
     "badge": "Bir şeyler ters gitti",
@@ -13,34 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Hakkında",
-      "legal": "Legal / DMCA",
-      "login": "Giriş yap",
-      "onboarding": "Kur",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Kayıt ol",
-      "settings": "Ayarlar",
-      "discover": "Keşfet",
-      "support": "Destek",
-      "migration": "Hesap Taşıma",
-      "jip": "Jip"
+      "discover": "Keşfet"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Yerimleri"
-    },
-    "continueWatching": {
-      "sectionTitle": "İzlemeye devam edin"
-    },
-    "mediaList": {
-      "stopEditing": "Düzenlemeyi bırak"
-    },
     "search": {
-      "allResults": "Bu kadarını bulabildik!",
-      "failed": "Medya bulunamadı, tekrar deneyin!",
       "loading": "Yükleniyor...",
-      "noResults": "Hiçbir şey bulamadık!",
       "placeholder": {
         "default": "Ne izlemek istersiniz?",
         "extra": [
@@ -54,21 +32,17 @@
           "{{serverName}} en iyisi değil mi ya?",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "Arama sonuçları",
-      "empty": {
-        "default": "Hoş geldin, burada izlenecek içerikler bulabilirsin!",
-        "extra": [
-          "Burada hiçbir şey yok :(",
-          "Öyle boş ki...",
-          "Böyle bir boşluk.",
-          "Selam yeni kullanıcı :3"
-        ]
-      },
-      "discoverMore": "Daha fazlasını keşfet",
-      "discover": "Keşfet"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Baharatlı bir şeyler denemeye ne dersin?",
+        "extra": ["Mutlu 69 günü 😘!"]
+      },
+      "420": {
+        "default": "Bu 4/20’de ne izlemek istersin?",
+        "extra": ["Mutlu 4/20 🥳!"]
+      },
       "day": {
         "default": "Bu öğleden sonra ne izlemek istersiniz?",
         "extra": [
@@ -82,20 +56,7 @@
       "night": {
         "default": "Bu akşam ne izlemek istersiniz?",
         "extra": ["Yoruldun mu? The Exorcist'e iyi diyorlar."]
-      },
-      "420": {
-        "default": "Bu 4/20’de ne izlemek istersin?",
-        "extra": ["Mutlu 4/20 🥳!"]
-      },
-      "69": {
-        "default": "Baharatlı bir şeyler denemeye ne dersin?",
-        "extra": ["Mutlu 69 günü 😘!"]
       }
-    },
-    "mediaCard": {
-      "copyLink": "Bağlantıyı Kopyala",
-      "moreInfo": "Daha fazla bilgi",
-      "close": "Kapat"
     }
   },
   "media": {
@@ -104,20 +65,11 @@
       "movie": "Film",
       "show": "Dizi"
     },
-    "unreleased": "Yayınlanmamış",
-    "episodeShort": "B",
-    "seasonShort": "S"
+    "unreleased": "Yayınlanmamış"
   },
   "navigation": {
     "banner": {
       "offline": "İnternet bağlantınızı kontrol ediniz"
-    },
-    "menu": {
-      "about": "Hakkımızda",
-      "logout": "Çıkış yap",
-      "register": "Buluta eşitle",
-      "settings": "Ayarlar",
-      "support": "Destekle"
     }
   },
   "notFound": {
@@ -134,157 +86,33 @@
       "default": "Ana sayfaya dön",
       "short": "Geri dön"
     },
-    "casting": {
-      "enabled": "Cihaza yansıtılıyor..."
-    },
     "menus": {
-      "downloads": {
-        "copyHlsPlaylist": "HLS oynatma listesi bağlantısını kopyala",
-        "disclaimer": "İndirme bağlantıları doğrudan sağlayıcının kendisinden alınır. {{serverName}}'in sağlanan indirme bağlantıları üzerinde hiçbir konrolü yoktur.",
-        "downloadSubtitle": "Geçerli altyazıyı indir",
-        "downloadVideo": "Videoyu indir",
-        "hlsDisclaimer": "İndirmeler doğrudan sağlayıcıdan alınır. {{serverName}}, indirmelerin nasıl sağlanacağı üzerinde kontrole sahip değildir.<br /><br />Lütfen bir HLS oynatma listesi indirdiğinizi unutmayın; <bold>ileri seviye bilginiz yoksa indirmeniz önerilmez. akış biçimleri</bold>. Farklı formatlar için farklı kaynakları deneyin.",
-        "onAndroid": {
-          "1": "Android'e indirmek için önce indir butonuna basın, sonra açılan yeni sayfada video üzerine <bold>basılı tutun</bold>, ardından <bold>Videoyu indir</bold> seçeneğini seçin.",
-          "shortTitle": "İndir / Android",
-          "title": "Android'e indirme"
-        },
-        "onIos": {
-          "1": "iOS'a indirmek için öncelikle indir butonuna basın, sonra açılan yeni sayfada <bold><ios_share /></bold>'e basın, hemen ardından <bold>Dosyalara Kaydet <ios_files /></bold>'e basın.",
-          "shortTitle": "İndir / iOS",
-          "title": "iOS'a indirme"
-        },
-        "onPc": {
-          "1": "Bilgisayarda önce indir butonuna tıklayın, sonra ise açılan yeni sayfada videoya sağ tıklayın ve <bold>Videoyu farklı kaydet </bold> seçeneğini seçin",
-          "shortTitle": "İndir / Bilgisayar",
-          "title": "Bilgisayara indirme"
-        },
-        "title": "İndir"
-      },
       "episodes": {
-        "button": "Bölümler",
-        "emptyState": "Bu sezonda hiç bölüm yok, sonra tekrar deneyin!",
-        "episodeBadge": "B{{episode}}",
-        "loadingError": "Sezon yüklenirken hata oluştu",
-        "loadingList": "Yükleniyor...",
-        "loadingTitle": "Yükleniyor...",
-        "unairedEpisodes": "Bu sezondaki bir veya daha fazla bölüm henüz yayınlanmadığı için devre dışı bırakılmıştır."
-      },
-      "playback": {
-        "speedLabel": "Oynatma hızı",
-        "title": "Oynatma ayarları"
-      },
-      "quality": {
-        "automaticLabel": "Otomatik kalite",
-        "hint": "Farklı kalite seçenekleri elde etmek için <0>kaynak değiştirmeyi</0> deneyebilirsiniz.",
-        "iosNoQuality": "Apple tarafından tanımlanan sınırlamalar nedeniyle, iOS'ta bu kaynak için kalite seçimi mevcut değildir. Farklı kalite seçenekleri elde etmek için <0>başka bir kaynağa geçmeyi</0> deneyebilirsiniz.",
-        "title": "Kalite"
+        "button": "Bölümler"
       },
       "settings": {
         "audioItem": "Ses",
-        "downloadItem": "İndir",
-        "enableSubtitles": "Altyazıları Etkinleştir",
-        "experienceSection": "İzleme deneyimi",
         "playbackItem": "Oynatma ayarları",
         "qualityItem": "Kalite",
         "sourceItem": "Video kaynakları",
-        "subtitleItem": "Altyazı ayarları",
-        "videoSection": "Video ayarları"
-      },
-      "sources": {
-        "failed": {
-          "text": "Video bulunmaya çalışılırken sorun oluştu, lütfen farklı bir kaynak deneyin.",
-          "title": "Video alınırken sorun oluştu"
-        },
-        "noEmbeds": {
-          "text": "Herhangi bir video bulamadık, lütfen farklı bir kaynak deneyin.",
-          "title": "Video bulunamadı"
-        },
-        "noStream": {
-          "text": "Bu kaynakta bu film ya da dizi için akış bulunmamaktadır.",
-          "title": "Akış yok"
-        },
-        "title": "Kaynaklar",
-        "unknownOption": "Bilinmeyen"
+        "subtitleItem": "Altyazı ayarları"
       },
       "subtitles": {
-        "customChoice": "Dosya sürükleyin veya yükleyin",
-        "customizeLabel": "Seçenekler",
-        "dropSubtitleFile": "Altyazı dosyasını buraya sürükleyin",
         "offChoice": "Kapat",
         "settings": {
           "backlink": "Kişisel altyazılar",
           "delay": "Altyazı gecikmesi",
           "fixCapitals": "Büyük harf kullanımını düzelt"
-        },
-        "title": "Altyazılar",
-        "unknownLanguage": "Bilinmeyen"
+        }
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "API üstverisi yüklenemedi, lütfen internet bağlantınızı kontrol edin.",
-        "title": "API üstverisi yüklenemedi"
-      },
-      "legal": {
-        "badge": "Kaldırıldı",
-        "text": "Üzgünüz, bu içerik telif hakkı ihlali veya yayından kaldırma bildirimi nedeniyle kullanılamıyor.",
-        "title": "İçerik kaldırıldı"
-      },
-      "extensionPermission": {
-        "badge": "İzin Gerekli",
-        "button": "Uzantıyı kullanın",
-        "text": "Tarayıcı uzantısını yüklemişsiniz, ancak uzantıyı kullanmaya başlamak için izninize ihtiyacımız var.",
-        "title": "Uzantıyı Kişiselleştir"
-      },
-      "failed": {
-        "badge": "Başarısız oldu",
-        "homeButton": "Ana sayfaya dön",
-        "text": "Medyanın üstverisi TMDB'den alınamadı. Lütfen TMDB'nin göküp çökmediğini veya internet bağlantınız üzerinden engellenmediğini kontrol edin.",
-        "title": "Üstveri yüklenemedi"
-      },
-      "notFound": {
-        "badge": "Bulunamadı",
-        "homeButton": "Ana sayfaya dön",
-        "text": "İstediğiniz medyayı bulamadık. URL'yi yanlış girdiniz ya da medya kaldırıldı.",
-        "title": "Medya bulunamadı."
-      }
-    },
-    "nextEpisode": {
-      "next": "Sonraki bölüm"
     },
     "playbackError": {
-      "badge": "Oynatma hatası",
       "errors": {
         "errorAborted": "Medyanın alınması kullanıcının isteği üzerine iptal edildi.",
         "errorDecode": "Daha önce kullanılabilir olduğu belirlenmiş olmasına rağmen, medya kaynağının kodu çözülmeye çalışılırken bir hata oluştu ve bu da bir hataya neden oldu.",
         "errorGenericMedia": "Bilinmeyen medya hatası oluştu.",
         "errorNetwork": "Medya önceden mevcut olsa da başarıyla alınmasını engelleyen bir tür ağ hatası oluştu.",
         "errorNotSupported": "Medya veya medya sağlayıcısı desteklenmiyor."
-      },
-      "homeButton": "Ana sayfaya git",
-      "text": "Medya oynatılmaya çalışılırken bir hata oluştu. Lütfen tekrar deneyin.",
-      "title": "Video oynatılamadı!"
-    },
-    "scraping": {
-      "extensionFailure": {
-        "badge": "Eklenti devre dışı",
-        "enableExtension": "Eklentiyi etkinleştir",
-        "homeButton": "Eve git",
-        "text": "{{serverName}} uzantısını kurdunuz. Kullanmaya başlamak için, uzantıyı bu site için etkinleştirmeniz gerekiyor.",
-        "title": "Lütfen eklentiyi etkinleştirin"
-      },
-      "items": {
-        "failure": "Hata oluştu",
-        "notFound": "Video mevcut değil",
-        "pending": "Videolar aranıyor..."
-      },
-      "notFound": {
-        "badge": "Bulunamadı",
-        "detailsButton": "Ayrıntıları göster",
-        "homeButton": "Ana sayfaya git",
-        "text": "Sağlayıcılarımız arasında arama yaptık ve aradığınız medyayı bulamadık! Medyaları barındırmıyoruz ve mevcut olanlar üzerinde hiçbir kontrolümüz yok. Daha fazla ayrıntı için lütfen aşağıdaki 'Ayrıntıları göster' seçeneğine tıklayın.",
-        "title": "Bunu bulamadık"
       }
     },
     "time": {
@@ -292,58 +120,9 @@
       "remaining": "{{timeLeft}} kaldı • {{timeFinished, datetime}}'de bitiyor",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "Lütfen sağ taraftaki Captcha'yı çözerek insan olduğunuzu doğrulayın. Bu, {{serverName}}'i güvende tutmak içindir!",
-      "error": "İnsan olduğunuz doğrulanamadı. Lütfen tekrar deneyin.",
-      "title": "İnsan olduğunuzu doğrulamamız gerekiyor.",
-      "verifyingHumanity": "İnsan olduğunuz doğrulanıyor..."
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Cihaz adı",
-        "deviceNamePlaceholder": "Kişisel telefon",
-        "editProfile": "Düzenle",
-        "logoutButton": "Çıkış yap"
-      },
-      "actions": {
-        "delete": {
-          "button": "Hesabı sil",
-          "confirmButton": "Hesabı sil",
-          "confirmDescription": "Hesabınızı silmek istediğinize emin misiniz? Tüm verileriniz kaybedilecek!",
-          "confirmTitle": "Emin misiniz?",
-          "text": "Bu işlem geri alınamaz. Tüm veriler silinir ve hiçbir şey kurtarılamaz.",
-          "title": "Hesabı sil"
-        },
-        "title": "Eylemler",
-        "logoutAllDevices": {
-          "title": "Tüm Oturumları Sonlandır",
-          "text": "Bu işlem, hesabınıza bağlı tüm cihazlardan çıkış yapmanızı sağlar.",
-          "button": "Tüm Cihazlardan Çıkış Yap"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Cihaz adı",
-        "failed": "Oturumlar yüklenemedi",
-        "removeDevice": "Sil",
-        "title": "Cihazlar"
-      },
-      "profile": {
-        "finish": "Düzenlemeyi bitir",
-        "firstColor": "Birinci profil rengi",
-        "secondColor": "İkinci profil rengi",
-        "title": "Profil resmini düzenle",
-        "userIcon": "Kullanıcı simgesi"
-      },
-      "register": {
-        "cta": "Hadi başlayalım",
-        "text": "İzleme ilerlemenizi cihazlar arasında paylaşın ve eşit tutun.",
-        "title": "Buluta eşitle"
-      },
-      "title": "Hesap"
-    },
     "appearance": {
       "activeTheme": "Aktif",
       "themes": {
@@ -352,71 +131,9 @@
         "gray": "Gri",
         "red": "Kırmızı",
         "teal": "Turkuaz"
-      },
-      "title": "Görünüm"
-    },
-    "connections": {
-      "server": {
-        "description": "Verilerinizi depolamak için özel bir arkayüze bağlanmak istiyorsanız, bunu etkinleştirin ve URL'yi sağlayın. <0>Yönergeler.</0>",
-        "label": "Özel sunucu",
-        "urlLabel": "Özel sunucu URL'si"
-      },
-      "setup": {
-        "doSetup": "Başlayın",
-        "errorStatus": {
-          "description": "Kurulumda dikkat etmeniz gereken bir veya daha fazla öğe var gibi görünüyor.",
-          "title": "Dikkatinizi gerektiren bir şey var"
-        },
-        "itemError": "Kurulum sırasında bir hata oluşmuş olabilir. Sorunu çözmek için kurulum adımlarını tekrar izleyin.",
-        "items": {
-          "default": "Varsayılan ayarlar",
-          "extension": "Tarayıcı uzantısı",
-          "proxy": "Özel Proxy"
-        },
-        "redoSetup": "Kurulumu tekrar yapın",
-        "successStatus": {
-          "description": "Sevdiğiniz şeyleri izlemek için her şey hazır. Başlayın ve keyfini çıkarın.",
-          "title": "Tamam!"
-        },
-        "unsetStatus": {
-          "description": "Kurulum sürecini başlatmak için lütfen sağdaki düğmeye tıklayın.",
-          "title": "Kurulumu tamamlamadınız"
-        }
-      },
-      "title": "Bağlantılar",
-      "workers": {
-        "addButton": "Yeni işleyici ekle",
-        "description": "Uygulamanın çalışması için tüm trafik vekil sunucular üzerinden yönlendirilir. Kendi işleyicilerinizi getirmek istiyorsanız bunu etkinleştirin.<0>Yönergeler.</0>",
-        "emptyState": "Henüz işleyici yok, aşağıya bir tane ekleyin",
-        "label": "Özel vekil sunucu işleyici kullan",
-        "urlLabel": "İşleyici URL'leri",
-        "urlPlaceholder": "https://"
       }
-    },
-    "preferences": {
-      "language": "Uygulama dili",
-      "languageDescription": "Uygulamanın tamamı için seçili dil",
-      "thumbnail": "Küçük resimler oluştur",
-      "thumbnailDescription": "Çoğu video için ön izleme görseli bulunmaz. Bu ayarı etkinleştirerek anında oluşturulmasını sağlayabilirsiniz, ancak bu videonuzu yavaşlatabilir.",
-      "thumbnailLabel": "Küçük resim oluştur",
-      "title": "Ayarlar"
     },
     "reset": "Sıfırla",
-    "save": "Kaydet",
-    "sidebar": {
-      "info": {
-        "appVersion": "Uygulama sürümü",
-        "backendUrl": "Arkayüz URL'si",
-        "backendVersion": "Arkayüz sürümü",
-        "hostname": "Ana makine adı",
-        "insecure": "Güvensiz",
-        "notLoggedIn": "Giriş yapmadınız",
-        "secure": "Güvenli",
-        "title": "Uygulama bilgisi",
-        "unknownVersion": "Bilinmeyen",
-        "userId": "Kullanıcı Kimliği"
-      }
-    },
     "subtitles": {
       "backgroundBlurLabel": "Arka plan bulanıklığı",
       "backgroundLabel": "Arka plan opaklığı",
@@ -424,7 +141,6 @@
       "previewQuote": "Korkmamalıyım. Korku aklın katilidir.",
       "textSizeLabel": "Yazı boyutu",
       "title": "Altyazılar"
-    },
-    "unsaved": "Kaydedilmemiş değişiklikleriniz mevcut"
+    }
   }
 }

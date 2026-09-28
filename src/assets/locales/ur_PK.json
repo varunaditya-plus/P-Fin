@@ -2,17 +2,8 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "About and FAQ",
-      "legal": "Legal / DMCA",
       "discover": "Discover",
-      "support": "Support",
-      "login": "Login",
-      "onboarding": "Setup",
-      "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Register",
-      "settings": "Settings",
-      "migration": "Migrate Account",
-      "jip": "Jip"
+      "pagetitle": "{{title}} - {{serverName}}"
     }
   }
 }

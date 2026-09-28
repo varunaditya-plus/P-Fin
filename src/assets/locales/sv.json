@@ -1,9 +1,6 @@
 {
   "actions": {
-    "copied": "Kopierad",
-    "copy": "Kopiera",
-    "confirm": "Godkänn",
-    "cancel": "Avbryt"
+    "copied": "Kopierad"
   },
   "errors": {
     "badge": "Något gick fel",
@@ -15,52 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Om oss",
-      "legal": "Legal / DMCA",
-      "login": "Logga in",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Registrera",
-      "settings": "Inställningar",
-      "discover": "Upptäck",
-      "support": "Stöd",
-      "onboarding": "Installation",
-      "migration": "Migrera Konto",
-      "jip": "Jip"
+      "discover": "Upptäck"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Bokmärken",
-      "groups": {
-        "reorder": {
-          "description": "Dra och släpp för att omordna på dina bokmärkesgrupper",
-          "button": "Omordna",
-          "done": "Klar",
-          "title": "Ändra Grupp Ordning",
-          "cancel": "Avbryt",
-          "save": "Spara"
-        },
-        "dropdown": {
-          "placeholderButton": "Lägg till i grupp",
-          "empty": "Inga grupper än",
-          "addButton": "Lägg till",
-          "removeFromGroup": "Ta bort från grupp",
-          "removeAll": "Ta bort alla"
-        }
-      },
-      "showAll": "Visa alla"
-    },
-    "continueWatching": {
-      "sectionTitle": "Fortsätt titta..."
-    },
-    "mediaList": {
-      "stopEditing": "Sluta redigera"
-    },
     "search": {
-      "allResults": "Det är allt vi har!",
-      "failed": "Misslyckades med att hitta media, försök igen!",
       "loading": "Laddar...",
-      "noResults": "Vi kunde inte hitta någonting :(",
       "placeholder": {
         "default": "Vad vill du titta på?",
         "extra": [
@@ -74,21 +32,17 @@
           "Är inte {{serverName}} bara det bästa?",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "Sökresultat",
-      "empty": {
-        "default": "Välkommen, hitta media att titta på här!",
-        "extra": [
-          "Det är inget här :(",
-          "Så tomt...",
-          "Så mycket tomhet.",
-          "Hej nya användare :3"
-        ]
-      },
-      "discoverMore": "Upptäck mer",
-      "discover": "Utforska"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Sugen på något hett?",
+        "extra": ["Glad 69 dag 😘!"]
+      },
+      "420": {
+        "default": "Vad vill du titta denna 4/20?",
+        "extra": ["Glad 4/20 🥳!"]
+      },
       "day": {
         "default": "Vad vill du titta på i eftermiddag?",
         "extra": ["Viva la {{serverName}}!"]
@@ -100,20 +54,7 @@
       "night": {
         "default": "Vad vill du titta på ikväll?",
         "extra": ["Trött? Jag hör att The Exorcist är bra."]
-      },
-      "420": {
-        "default": "Vad vill du titta denna 4/20?",
-        "extra": ["Glad 4/20 🥳!"]
-      },
-      "69": {
-        "default": "Sugen på något hett?",
-        "extra": ["Glad 69 dag 😘!"]
       }
-    },
-    "mediaCard": {
-      "moreInfo": "Mer Info",
-      "copyLink": "Kopiera länk",
-      "close": "Stäng"
     }
   },
   "media": {
@@ -122,24 +63,11 @@
       "movie": "Film",
       "show": "Serie"
     },
-    "seasonWatched": "Är du säker du vill markera säsongen som tittad?",
-    "unreleased": "O-släppt",
-    "seasonUnwatched": "Är du säker du vill markera säsongen som otittad?",
-    "episodeShort": "A",
-    "seasonShort": "S"
+    "unreleased": "O-släppt"
   },
   "navigation": {
     "banner": {
       "offline": "Kontrollera din internetanslutning, tokiga gås! 🦢"
-    },
-    "menu": {
-      "about": "Om oss och FAQ",
-      "logout": "Logga ut",
-      "register": "Synkronisera till molnet",
-      "settings": "Inställningar",
-      "support": "Support",
-      "discover": "Utforska",
-      "development": "Utveckling"
     }
   },
   "notFound": {
@@ -157,164 +85,33 @@
       "default": "Tillbaka till startsidan",
       "short": "Tillbaka"
     },
-    "casting": {
-      "enabled": "Castar till enheten..."
-    },
     "menus": {
-      "downloads": {
-        "disclaimer": "Nedladdningar görs direkt från leverantören. {{serverName}} har ingen kontroll över hur nedladdningarna tillhandahålls.",
-        "downloadVideo": "Ladda ner video",
-        "onAndroid": {
-          "1": "För att ladda ner på Android, klicka på nedladdningsknappen och på den nya sidan <bold>trycker och håller</bold> på videon, välj sedan <bold>spara</bold>.",
-          "shortTitle": "Ladda ner / Android",
-          "title": "Laddar ner på Android"
-        },
-        "onIos": {
-          "1": "För att ladda ner på iOS, klicka på nedladdningsknappen och på den nya sidan klickar du på <bold><ios_share /></bold>, sedan <bold>Spara i filer <ios_files /></bold>.",
-          "shortTitle": "Ladda ner / iOS",
-          "title": "Laddar ner på iOS"
-        },
-        "onPc": {
-          "1": "På PC, klicka på nedladdningsknappen och på den nya sidan högerklickar du sedan på videon och väljer <bold>Spara video som</bold>",
-          "shortTitle": "Ladda ner / PC",
-          "title": "Laddar ner på PC"
-        },
-        "title": "Ladda ner",
-        "openIn": "Öppna i...",
-        "vlc": "VLC",
-        "iina": "IINA",
-        "outplayer": "Outplayer",
-        "hlsOpenInDisclaimer": "Att öppna HLS-strömmar i en extern spelare KANSKE INTE FUNGERAR!",
-        "hlsDisclaimer": "Nedladdningar hämtas direkt från leverantören. {{serverName}} har ingen kontroll över hur nedladdningarna tillhandahålls.<br /><br />Observera att du laddar ner en HLS-spellista, <bold>det rekommenderas inte att ladda ner om du inte är bekant med avancerade strömningsformat</bold>. Prova olika källor för olika format.",
-        "button": "Försök nedladdning",
-        "hlsDownloader": "Eller gå till <0>hls downloader website</0> och klistra in spelliste-URL\\:en från nedan.",
-        "copyHlsPlaylist": "Kopiera länk till HLS spellista",
-        "downloadSubtitle": "Ladda ned nuvarande undertext"
-      },
       "episodes": {
-        "button": "Avsnitt",
-        "emptyState": "Det finns inga avsnitt i denna säsong, kom tillbaka senare!",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Fel vid laddning av säsong",
-        "loadingList": "Laddar...",
-        "loadingTitle": "Laddar...",
-        "seasons": "Säsonger",
-        "showMore": "Visa mer",
-        "showLess": "Visa mindre",
-        "markAsUnwatched": "Markera som inte sedd",
-        "unairedEpisodes": "Ett eller flera avsnitt i den här säsongen har inaktiverats eftersom de inte har sänts än.",
-        "markAsWatched": "Markera som sedd"
+        "button": "Avsnitt"
       },
       "playback": {
-        "speedLabel": "Uppspelningshastighet",
-        "title": "Uppspelningsinställningar",
-        "disabled": "(Inaktiverat i tittarparty)",
         "speedBoosted": "Uppspelningshastighet boostad till 2x",
         "speedUnboosted": "Uppspelningshastighet återställd till {{speed}}x"
       },
-      "quality": {
-        "automaticLabel": "Automatisk kvalitet",
-        "hint": "Du kan prova att <0>byta källa</0> för att få olika kvalitetsval.",
-        "iosNoQuality": "På grund av Apple-definierade begränsningar är kvalitetsval inte tillgängligt på iOS för denna källa. Du kan prova att <0>byta till en annan källa</0> för att få olika kvalitetsval.",
-        "title": "Kvalitet",
-        "auto": "Auto"
-      },
       "settings": {
-        "downloadItem": "Ladda ner",
-        "experienceSection": "Visningsupplevelse",
         "playbackItem": "Uppspelningsinställningar",
         "qualityItem": "Kvalitet",
         "sourceItem": "Videokällor",
-        "videoSection": "Videoinställningar",
-        "enableSubtitles": "Aktivera Undertexter",
         "subtitleItem": "Undertexter",
         "audioItem": "Ljud"
       },
-      "sources": {
-        "failed": {
-          "text": "Det uppstod ett fel när vi försökte hitta några videor... Testa försök med en annan källa?",
-          "title": "Misslyckades med att skrapa"
-        },
-        "noEmbeds": {
-          "text": "Vi kunde inte hitta några inbäddningar, försök med en annan källa.",
-          "title": "Inga inbäddningar hittade"
-        },
-        "noStream": {
-          "text": "Den här källan har ingen ström för denna film eller serie. /ᐠ - ˕ -マ Ⳋ",
-          "title": "Ingen ström :("
-        },
-        "title": "Källor",
-        "unknownOption": "Okänd",
-        "editOrder": "Ändra ordning"
-      },
       "subtitles": {
-        "customChoice": "Släpp eller ladda upp fil",
-        "customizeLabel": "Anpassa",
         "offChoice": "Av",
-        "onChoice": "På",
         "settings": {
           "backlink": "Anpassade undertexter",
           "delay": "Undertexts fördrivning",
           "fixCapitals": "Reparera kapitalisering"
         },
-        "title": "Undertexter",
-        "unknownLanguage": "Okänd",
-        "dropSubtitleFile": "Släpp undertextsfil här! >_<",
-        "scrapeButton": "Skrapa undertexter",
-        "refresh": "Uppdatera externa undertexter",
-        "refreshing": "Uppdaterar...",
-        "empty": "Det finns inga tillhandahållna undertexter för detta.",
         "useNativeSubtitles": "Använd videons inbyggda undertexter",
-        "useNativeSubtitlesDescription": "Kan fixa undertexter vid casting och i PiP-läge",
-        "notFound": "Ingen av de tillgängliga alternativen matchar din sökning",
-        "SourceChoice": "Källundertexter",
-        "OpenSubtitlesChoice": "Externa Undertexter"
-      },
-      "watchparty": {
-        "watchpartyItem": "Tittarparty",
-        "notice": "Legacy Watch Party kanske inte är tillgängligt för vissa källor",
-        "legacyWatchparty": "Använd Legacy Watch Party"
-      },
-      "audio": {
-        "default": "Standard"
+        "useNativeSubtitlesDescription": "Kan fixa undertexter vid casting och i PiP-läge"
       }
-    },
-    "metadata": {
-      "failed": {
-        "badge": "Misslyckades",
-        "homeButton": "Till startsidan",
-        "text": "Kunde inte ladda medias metadata från TMDB. Kontrollera om TMDB är nere eller blockerat på din internetanslutning.",
-        "title": "Misslyckades att ladda metadata"
-      },
-      "notFound": {
-        "badge": "Ej hittad",
-        "homeButton": "Tillbaka till startsidan",
-        "text": "Vi kunde inte hitta den media du begärde. Antingen har den tagits bort eller så har du manipulerat URL:en.",
-        "title": "Kunde inte hitta den media."
-      },
-      "legal": {
-        "text": "Detta innehåll är inte längre tillgängligt på grund av en nedtagningsanmälan eller upphovsrättskrav. 😨",
-        "title": "Innehållet har tagits bort",
-        "badge": "Borttagen"
-      },
-      "extensionPermission": {
-        "badge": "Behörighet saknas",
-        "button": "Använd tillägget",
-        "title": "Konfigurera tillägget",
-        "text": "Du har webbläsartillägget, men vi behöver din tillåtelse för att börja använda tillägget. (¬_¬)"
-      },
-      "api": {
-        "text": "Kunde inte ladda API-metadata, kontrollera din internetanslutning.",
-        "title": "Misslyckades med att ladda API-metadata"
-      }
-    },
-    "nextEpisode": {
-      "next": "Nästa avsnitt",
-      "nextSeason": "Nästa säsong",
-      "replay": "Spela om"
     },
     "playbackError": {
-      "badge": "Uppspelningsfel",
       "errors": {
         "errorAborted": "Hämtningen av media avbröts på användarens begäran.",
         "errorDecode": "Trots att det tidigare bedömts som användbart uppstod ett fel vid försök att avkoda mediaresursen, vilket resulterade i ett fel.",
@@ -322,119 +119,16 @@
         "errorNetwork": "Någon form av nätverksfel inträffade vilket förhindrade att media framgångsrikt hämtades, trots att det tidigare var tillgängligt.",
         "errorNotSupported": "Media- eller mediaproviderobjektet stöds inte."
       },
-      "homeButton": "Till startsidan",
-      "text": "Det uppstod ett fel när vi försökte spela upp media. Försök igen.",
-      "title": "Misslyckades spela upp video!",
-      "copyDebugInfo": "Kopiera felsökningsinformation",
-      "debugInfo": "Kontrollera konsolen för mer information."
-    },
-    "scraping": {
-      "items": {
-        "failure": "Fel inträffade",
-        "notFound": "Har inte videon",
-        "pending": "Söker efter videor..."
-      },
-      "notFound": {
-        "badge": "Ej hittad",
-        "detailsButton": "Visa detaljer",
-        "homeButton": "Till startsidan",
-        "text": "Vi har sökt genom våra leverantörer och kan inte hitta den media du letar efter! Vi hostar inte media och har ingen kontroll över tillgängligheten. Klicka på 'Visa detaljer' nedan för mer information.",
-        "title": "Vi kunde inte hitta det",
-        "onboardingButton": "Utför installationen igen",
-        "onboarding": "Fler källor kan vara tillgängliga med tillägget eller Febbox-token!",
-        "discoverButton": "Upptäck mer"
-      },
-      "extensionFailure": {
-        "enableExtension": "Aktivera tillägget",
-        "title": "Vänligen aktivera tillägget",
-        "text": "Du har installerat {{serverName}}-tillägget. För att börja använda det måste du aktivera tillägget för denna webbplats.",
-        "badge": "Tillägget inaktiverat",
-        "homeButton": "Gå till startsidan"
-      },
-      "tips": {
-        "1": "Tryck på kugghjulsikonen för att byta källa!",
-        "2": "Tryck på titeln för att kopiera länken!",
-        "3": "Tryck och håll ned eller håll SHIFT för att visa widescreen-knappen istället för fullscreen!",
-        "4": "Vissa källor fungerar bättre än andra!",
-        "5": "Skaffa tillägget för fler källor!",
-        "6": "Håll ned bokmärken för att redigera eller ta bort dem!",
-        "7": "Håll ned SHIFT och tryck på titeln för att kopiera länken med tid!",
-        "8": "Ställ in en anpassad undertextfärg!",
-        "9": "Migrera ditt konto till en ny backend i inställningarna!",
-        "10": "Joina Discord servern!",
-        "11": "Använd [ och ] för att justera undertextens timing!",
-        "12": "Tryck på MELLANSLAG eller K för att spela/pausa!",
-        "13": "Använd vänster och höger piltangent för att hoppa 5 sekunder!",
-        "14": "Använd tangenterna J och L för att hoppa 10 sekunder!",
-        "15": "Tryck på F för att växla fullskärmsläge!",
-        "16": "Tryck på M för att slå av eller på ljudet!",
-        "17": "Använd upp- och nedpilarna för att ändra volym!",
-        "18": "Tryck på < och > för att ändra uppspelningshastighet!",
-        "19": "Tryck på . och , för att flytta bildruta för bildruta när videon är pausad!",
-        "20": "Tryck på C för att slå på eller av undertexter!",
-        "21": "Tryck på R för att göra en barrel roll!"
-      }
+      "copyDebugInfo": "Kopiera felsökningsinformation"
     },
     "time": {
       "regular": "{{timeWatched}} / {{duration}}",
       "remaining": "{{timeLeft}} kvar • Slutar kl {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "resume": {
-      "title": "Fortsätt titta?",
-      "description": "Detta avsnitt är {{percentage}}% tittat",
-      "resume": "Återuppta",
-      "restart": "Starta om"
-    },
-    "turnstile": {
-      "description": "Vänligen bevisa att din mänsklighet genom att genomföra den snabba utmaningen; detta görs för att hålla {{serverName}} säkert."
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Enhetens namn",
-        "deviceNamePlaceholder": "Min telefon",
-        "editProfile": "Redigera",
-        "logoutButton": "Logga ut"
-      },
-      "actions": {
-        "delete": {
-          "button": "Ta bort konto",
-          "confirmButton": "Ta bort konto",
-          "confirmDescription": "Är du säker på att du vill ta bort ditt konto? All din data kommer att gå förlorad!",
-          "confirmTitle": "Är du säker?",
-          "text": "Denna åtgärd är oåterkallelig. All data kommer att raderas och kan inte återställas.",
-          "title": "Ta bort konto"
-        },
-        "title": "Åtgärder",
-        "logoutAllDevices": {
-          "title": "Avsluta alla sessioner",
-          "text": "Detta loggar ut dig från alla enheter kopplade till ditt konto.",
-          "button": "Logga ut från alla enheter"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Enhetens namn",
-        "failed": "Misslyckades att ladda sessioner",
-        "removeDevice": "Ta bort",
-        "title": "Enheter"
-      },
-      "profile": {
-        "finish": "Slutför redigering",
-        "firstColor": "Profilfärg ett",
-        "secondColor": "Profilfärg två",
-        "title": "Redigera profilbild",
-        "userIcon": "Användarikon"
-      },
-      "register": {
-        "cta": "Kom igång",
-        "text": "Dela din tittarframsteg mellan enheter och håll dem synkroniserade.",
-        "title": "Synkronisera till molnet"
-      },
-      "title": "Konto"
-    },
     "appearance": {
       "activeTheme": "Aktiv",
       "themes": {
@@ -443,51 +137,8 @@
         "gray": "Grå",
         "red": "Röd",
         "teal": "Blågrön"
-      },
-      "title": "Utseende"
-    },
-    "connections": {
-      "server": {
-        "description": "Om du vill ansluta till en anpassad bakänd för att lagra dina data, aktivera detta och ange URL:en.",
-        "label": "Anpassad server",
-        "urlLabel": "Egen server URL"
-      },
-      "title": "Anslutningar",
-      "workers": {
-        "addButton": "Lägg till ny arbetare",
-        "description": "För att få applikationen att fungera skickas all trafik genom proxys. Aktivera detta om du vill använda egna arbetare.",
-        "emptyState": "Inga arbetare ännu, lägg till en nedan",
-        "label": "Använd egna proxyarbetare",
-        "urlLabel": "Arbetar-URL:er",
-        "urlPlaceholder": "https://"
       }
     },
-    "reset": "Återställ",
-    "save": "Spara",
-    "sidebar": {
-      "info": {
-        "appVersion": "Appversion",
-        "backendUrl": "Bakänd-URL",
-        "backendVersion": "Bakändversion",
-        "hostname": "Värdnamn",
-        "insecure": "Osäker",
-        "notLoggedIn": "Du är inte inloggad",
-        "secure": "Säker",
-        "title": "Appinformation",
-        "unknownVersion": "Okänd",
-        "userId": "Användar-ID"
-      }
-    },
-    "unsaved": "Du har osparade ändringar"
-  },
-  "discover": {
-    "carousel": {
-      "title": {
-        "4kReleases": "4K Releaserna",
-        "latestTVReleases": "Senaste TV Serier",
-        "latestReleases": "Senaste releaserna",
-        "recommended": "Eftersom du tittade på: {{title}}"
-      }
-    }
+    "reset": "Återställ"
   }
 }

@@ -108,7 +108,6 @@ it("uses the server name in every locale's brand and page title, including fallb
   expect(container.querySelector("p")?.textContent).toBe(
     "Settings – Home Cinema",
   );
-  expect(i18n.t("global.pages.about", { lng: "it" })).toBe("Su Home Cinema");
 });
 
 it("renders server names as literal text and falls back for empty names", async () => {

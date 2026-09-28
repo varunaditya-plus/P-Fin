@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Nokopēts",
-    "copy": "Kopēt"
+    "copied": "Nokopēts"
   },
   "errors": {
     "badge": "Saplīsa",
@@ -13,33 +12,15 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Par",
-      "legal": "Autortiesību likums",
-      "login": "Ieiet",
-      "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Reģistrēties",
-      "settings": "Iestādijumi"
+      "pagetitle": "{{title}} - {{serverName}}"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Grāmatzīmes"
-    },
-    "continueWatching": {
-      "sectionTitle": "Turpini skatīties"
-    },
-    "mediaList": {
-      "stopEditing": "Pārtraukt rediģēšanu"
-    },
     "search": {
-      "allResults": "Tass ir viss kas mums ir!",
-      "failed": "Neizdevās atrast multividi. Mēģiniet vēlreiz!",
       "loading": "Lādejas...",
-      "noResults": "Mēs nevarējām neko atrast!",
       "placeholder": {
         "default": "Ko tu gribi skatīties?"
-      },
-      "sectionTitle": "Meklējuma rezultāti"
+      }
     },
     "titles": {
       "day": {
@@ -65,13 +46,6 @@
   "navigation": {
     "banner": {
       "offline": "Pārbaudiet interneta savienojumu"
-    },
-    "menu": {
-      "about": "Par mums",
-      "logout": "Iziet",
-      "register": "Sinhronizēt ar mākoni",
-      "settings": "Iestādijumi",
-      "support": "Atbalsts"
     }
   },
   "notFound": {
@@ -88,115 +62,23 @@
       "default": "Atpakaļ uz mājām",
       "short": "Atpakaļ"
     },
-    "casting": {
-      "enabled": "Atskaņo uz ierīci..."
-    },
     "menus": {
-      "downloads": {
-        "disclaimer": "Lejupielādes tiek ņemtas tieši no pakalpojumu sniedzēja. {{serverName}} nevar kontrolēt, kā tiek nodrošinātas lejupielādes.",
-        "downloadVideo": "Lejupielādēt video",
-        "onAndroid": {
-          "1": "Lai lejupielādētu operētājsistēmā Android, noklikšķiniet uz lejupielādes pogas, pēc tam jaunajā lapā <bold>pieskarieties videoklipam un turiet to</bold>, pēc tam atlasiet <bold>saglabāt</bold>.",
-          "shortTitle": "Lejupielādēt / Android",
-          "title": "Lejupielāde operētājsistēmā Android"
-        },
-        "onIos": {
-          "1": "Lai lejupielādētu operētājsistēmā iOS, noklikšķiniet uz lejupielādes pogas, pēc tam jaunajā lapā noklikšķiniet uz <bold><ios_share /></bold> un pēc tam uz <bold>Saglabāt failos <ios_files /></bold>.",
-          "shortTitle": "Lejupielādēt / iOS",
-          "title": "Lejupielāde operētājsistēmā iOS"
-        },
-        "onPc": {
-          "1": "Datorā noklikšķiniet uz lejupielādes pogas, pēc tam jaunajā lapā ar peles labo pogu noklikšķiniet uz videoklipa un atlasiet <bold>Saglabāt video kā</bold>",
-          "shortTitle": "Lejupielādēt / datorā",
-          "title": "Lejupielāde datorā"
-        },
-        "title": "Lejupladēt"
-      },
       "episodes": {
-        "button": "Episodes",
-        "emptyState": "Šajā sezonā nav nevienas sērijas. Pārbaudiet vēlāk!",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Kļūda ladējot sezonu",
-        "loadingList": "Lādejas...",
-        "loadingTitle": "Lādejas..."
-      },
-      "playback": {
-        "speedLabel": "Atskaņošana ātrums",
-        "title": "Atskaņošana iestādijumi"
-      },
-      "quality": {
-        "automaticLabel": "Automātiskā kvalitāte",
-        "hint": "Varat mēģināt <0>pārslēgt avotu</0>, lai iegūtu dažādas kvalitātes opcijas.",
-        "iosNoQuality": "Apple noteikto ierobežojumu dēļ šim avotam iOS nav pieejama kvalitātes izvēle. Varat mēģināt <0>pārslēgties uz citu avotu</0>, lai iegūtu dažādas kvalitātes opcijas.",
-        "title": "Kvalitāte"
+        "button": "Episodes"
       },
       "settings": {
-        "downloadItem": "Lejupladēt",
-        "experienceSection": "Skatīšanās pieredze",
         "playbackItem": "Atskaņošana iestādijumi",
         "qualityItem": "Kvalitāte",
-        "sourceItem": "Video avoti",
-        "videoSection": "Video iestādijumi"
-      },
-      "sources": {
-        "failed": {
-          "text": "Mēģinot atrast videoklipus, radās kļūda. Lūdzu, mēģiniet izmantot citu avotu.",
-          "title": "Neizdevās nokasīt"
-        },
-        "noEmbeds": {
-          "text": "Mēs nevarējām atrast nevienu iegulšanu. Lūdzu, mēģiniet izmantot citu avotu.",
-          "title": "Netika atrasta neviena iegulšana"
-        },
-        "noStream": {
-          "text": "Šim avotam nav šīs filmas vai pārraides straumju.",
-          "title": "Nav streama"
-        },
-        "title": "Avoti",
-        "unknownOption": "Nezināms"
+        "sourceItem": "Video avoti"
       }
-    },
-    "metadata": {
-      "failed": {
-        "badge": "Neizdevās",
-        "homeButton": "iet uz majām",
-        "text": "Nevarēja ielādēt multivides metadatus no TMDB. Lūdzu, pārbaudiet, vai TMDB nedarbojas vai nav bloķēts jūsu interneta savienojumā.",
-        "title": "Neizdevās ielādēt metadatus"
-      },
-      "notFound": {
-        "badge": "Nav atrasts",
-        "homeButton": "Atpakaļ uz mājām",
-        "text": "Mēs nevarējām atrast jūsu pieprasīto multividi. Vai nu tas ir noņemts, vai arī jūs esat mainījis URL.",
-        "title": "Nevarēja atrast mēdiju."
-      }
-    },
-    "nextEpisode": {
-      "next": "Nakamā epizode"
     },
     "playbackError": {
-      "badge": "Atskaņošanas kļūda",
       "errors": {
         "errorAborted": "Multivides iegūšana tika pārtraukta pēc lietotāja pieprasījuma.",
         "errorDecode": "Lai gan iepriekš tika noteikts, ka tas ir lietojams, mēģinot atšifrēt multivides resursu, radās kļūda, kā rezultātā radās kļūda.",
         "errorGenericMedia": "Nezināma medijas kļūda paradijās.",
         "errorNetwork": "Radās sava veida tīkla kļūda, kas neļāva veiksmīgi ielādēt multividi, lai gan tas iepriekš bija pieejams.",
         "errorNotSupported": "Multivides vai multivides nodrošinātāja objekts netiek atbalstīts."
-      },
-      "homeButton": "iet majās",
-      "text": "Notika kļūda kamēr meiģināja atskaņot video. Lūdzu meiģini atkal.",
-      "title": "Neizdevās palaist video!"
-    },
-    "scraping": {
-      "items": {
-        "failure": "Parādijās kļūda",
-        "notFound": "Nav šī video",
-        "pending": "Pārbauda priekš video..."
-      },
-      "notFound": {
-        "badge": "Nav atrasts",
-        "detailsButton": "seriāls deteļas",
-        "homeButton": "Iet majās",
-        "text": "Mēs meklejām cour mūsu piedavatājiem un nevarējām atrast ko tu meklēji! Mēs nehostojam mediju un mums nav kontroles kas ir pieejams. Lūdzu uzpied 'šova deteļas' apakšā priekš vairāk deteļām.",
-        "title": "Mēs nevarējām atrast to"
       }
     },
     "time": {
@@ -207,49 +89,6 @@
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Ierīces vārds",
-        "deviceNamePlaceholder": "Personiskais telefons",
-        "editProfile": "Reģistrēt",
-        "logoutButton": "Iziet"
-      },
-      "actions": {
-        "delete": {
-          "button": "Dzēst kontu",
-          "confirmButton": "Dzēst kontu",
-          "confirmDescription": "Vai tiešām vēlaties dzēst savu kontu? Visi jūsu dati tiks zaudēti!",
-          "confirmTitle": "Vai tu esi pārliecināts?",
-          "text": "Šī darbība ir neatgriezeniska. Visi dati tiks dzēsti, un neko nevarēs atgūt.",
-          "title": "Dzēst kontu"
-        },
-        "title": "Darbības",
-        "logoutAllDevices": {
-          "title": "Beigt visas sesijas",
-          "text": "Šī darbība izrakstīs jūs no visiem ierīcēm, kas saistītas ar jūsu kontu.",
-          "button": "Izrakstīties no visām ierīcēm"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Ierīces vārds",
-        "failed": "Neizdevās ielādēt sesijas",
-        "removeDevice": "Nonēmt",
-        "title": "Ierīces"
-      },
-      "profile": {
-        "finish": "Pabeidziet rediģēšanu",
-        "firstColor": "Profila krāsa viens",
-        "secondColor": "Profila krāsa divi",
-        "title": "Mainīt profila bildi",
-        "userIcon": "Konta ikona"
-      },
-      "register": {
-        "cta": "Sākt",
-        "text": "Kopīgojiet pulksteņa progresu starp ierīcēm un sinhronizējiet tās.",
-        "title": "Sinhronizēt ar mākoni"
-      },
-      "title": "Konts"
-    },
     "appearance": {
       "activeTheme": "Aktīvs",
       "themes": {
@@ -258,41 +97,8 @@
         "gray": "Pelēks",
         "red": "Sarkans",
         "teal": "zilganzaļš"
-      },
-      "title": "Izskats"
-    },
-    "connections": {
-      "server": {
-        "description": "Ja vēlaties izveidot savienojumu ar pielāgotu aizmugursistēmu, lai saglabātu savus datus, iespējojiet to un norādiet URL.",
-        "label": "Pielāgots serveris",
-        "urlLabel": "Pielāgota servera URL"
-      },
-      "title": "Savienojumi",
-      "workers": {
-        "addButton": "pievienot jaunu worker",
-        "description": "Lai lietojumprogramma darbotos, visa trafika tiek maršrutēta caur starpniekserveriem. Iespējojiet šo, ja vēlaties piesaistīt savus darbiniekus.",
-        "emptyState": "Vēl nav workers. Pievienojiet vienu zemāk",
-        "label": "Izmantojiet pielāgotus starpniekserverus",
-        "urlLabel": "Worker URLs",
-        "urlPlaceholder": "https://"
       }
     },
-    "reset": "Restartēt",
-    "save": "Saglabāt",
-    "sidebar": {
-      "info": {
-        "appVersion": "Aplikācijas versija",
-        "backendUrl": "Aizmugursistēmas URL",
-        "backendVersion": "Aizmugurējā versija",
-        "hostname": "Saimniekdatora nosaukums",
-        "insecure": "Nedrošs",
-        "notLoggedIn": "Jūs neesat pievienojies",
-        "secure": "Drošs",
-        "title": "Aplikācijas informācija",
-        "unknownVersion": "Nezināms",
-        "userId": "Lietotāja ID"
-      }
-    },
-    "unsaved": "Jums ir nesaglabātas izmaiņas"
+    "reset": "Restartēt"
   }
 }

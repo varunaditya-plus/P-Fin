@@ -11,14 +11,12 @@ import {
   defaultThemeSettings,
   themeVariables,
   validateCustomTheme,
-  validatePalette,
   validateThemeSettings,
 } from "./customThemes";
 
 export type { SavedCustomTheme, ThemePalette } from "./customThemes";
 export interface ThemeStore extends ThemeSettings {
   setTheme(value: string | null): void;
-  setCustomTheme(value: ThemePalette): void;
   saveCustomTheme(value: SavedCustomTheme): void;
   deleteCustomTheme(id: string): void;
   hideDefaultTheme(id: string): void;
@@ -38,8 +36,6 @@ export const useThemeStore = create(
       theme: initialTheme,
       setTheme: (theme) =>
         set((state) => validateThemeSettings({ ...state, theme })),
-      setCustomTheme: (customTheme) =>
-        set({ customTheme: validatePalette(customTheme) }),
       saveCustomTheme: (value) =>
         set((state) => {
           const theme = validateCustomTheme(value);
@@ -92,13 +88,10 @@ export const useThemeStore = create(
 export const usePreviewThemeStore = create<{
   previewTheme: string | null;
   previewPalette: ThemePalette | null;
-  setPreviewTheme(value: string | null): void;
   setPreviewPalette(value: ThemePalette | null): void;
 }>((set) => ({
   previewTheme: null,
   previewPalette: null,
-  setPreviewTheme: (previewTheme) =>
-    set({ previewTheme, previewPalette: null }),
   setPreviewPalette: (previewPalette) =>
     set({ previewPalette, previewTheme: previewPalette ? "custom" : null }),
 }));

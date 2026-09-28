@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Meow",
-    "copy": "Meow"
+    "copied": "Meow"
   },
   "errors": {
     "badge": "It broke",
@@ -13,33 +12,15 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "About meow",
-      "legal": "Legal / DMCA",
-      "login": "Meow Login",
-      "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Meow Register",
-      "settings": "Meow Settings"
+      "pagetitle": "{{title}} - {{serverName}}"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Meow"
-    },
-    "continueWatching": {
-      "sectionTitle": "Continue Meow"
-    },
-    "mediaList": {
-      "stopEditing": "Stop meow"
-    },
     "search": {
-      "allResults": "Meow's all we meow!",
-      "failed": "Failed to meow meow, try again!",
       "loading": "Loading...",
-      "noResults": "We couldn't meow anything!",
       "placeholder": {
         "default": "Meow do you want to meow?"
-      },
-      "sectionTitle": "Meow results"
+      }
     },
     "titles": {
       "day": {
@@ -66,13 +47,6 @@
   "navigation": {
     "banner": {
       "offline": "Check your meow connection"
-    },
-    "menu": {
-      "about": "Meow us",
-      "logout": "Meow out",
-      "register": "Meow to meow",
-      "settings": "Meow",
-      "support": "Meow"
     }
   },
   "notFound": {
@@ -89,136 +63,32 @@
       "default": "Back to meow",
       "short": "Back meow"
     },
-    "casting": {
-      "enabled": "Casting to meow..."
-    },
     "menus": {
-      "downloads": {
-        "disclaimer": "Downloads are taken directly from the meow. {{serverName}} does not have meow over how the meow are meow.",
-        "downloadSubtitle": "Download current meow",
-        "downloadVideo": "Meow",
-        "hlsDisclaimer": "Downloads are taken directly from the meow. {{serverName}} does not have control over how the downloads are meow. please note that you are downloading Meow playlist, this is intended for minions familiar with advanced multimedia meow.",
-        "onAndroid": {
-          "1": "To meow on Meow, click the meow meow then, on the new meow, <bold>tap and hold</bold> on the meow, then select <bold>meow</bold>.",
-          "shortTitle": "Meow / Meow",
-          "title": "Meow"
-        },
-        "onIos": {
-          "1": "To meow on Meow, click the meow meow then, on the new meow, click <bold><ios_share /></bold>, then <bold>Meow to meow <ios_files /></bold>.",
-          "shortTitle": "Meow / Meow",
-          "title": "Meow"
-        },
-        "onPc": {
-          "1": "On PC, click the meow meow then, on the new meow, right click the meow and select <bold>Meow</bold>",
-          "shortTitle": "Meow / PC",
-          "title": "Meow"
-        },
-        "title": "Meow"
-      },
       "episodes": {
-        "button": "Meow",
-        "emptyState": "There are no meow in this meow, check back meow!",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Error loading meow",
-        "loadingList": "Loading...",
-        "loadingTitle": "Loading...",
-        "unairedEpisodes": "One or more meow in this meow have been meow because they haven't been aired yet."
-      },
-      "playback": {
-        "speedLabel": "Meow speed",
-        "title": "Meow settings"
-      },
-      "quality": {
-        "automaticLabel": "Meow",
-        "hint": "You can meow <0>meow</0> to get different meow meow.",
-        "iosNoQuality": "Due to Meow limitations, meow selection is not meow on Meow for this meow. You can meow <0>meow</0> to get different meow meow.",
-        "title": "Meow"
+        "button": "Meow"
       },
       "settings": {
-        "downloadItem": "Meow",
-        "enableSubtitles": "Enable meow",
-        "experienceSection": "Meow Viewing experience",
         "playbackItem": "Meow settings",
         "qualityItem": "Meow",
         "sourceItem": "Meow sources",
-        "subtitleItem": "Meow settings",
-        "videoSection": "Meow Video settings"
-      },
-      "sources": {
-        "failed": {
-          "text": "There was an meow while trying to meow any meow, please try a different meow.",
-          "title": "Meow to meow"
-        },
-        "noEmbeds": {
-          "text": "We were unable to meow any meow, please try a different meow.",
-          "title": "No meow found"
-        },
-        "noStream": {
-          "text": "This meow has no meow for this meow or meow.",
-          "title": "Meow stream"
-        },
-        "title": "Meow",
-        "unknownOption": "Meow"
+        "subtitleItem": "Meow settings"
       },
       "subtitles": {
-        "customChoice": "Select meows from meow",
-        "customizeLabel": "Customize meows",
         "offChoice": "Off",
         "settings": {
           "backlink": "Custom meows",
           "delay": "Meow delay",
           "fixCapitals": "Fix meows"
-        },
-        "title": "Meows",
-        "unknownLanguage": "Whaat? Unknown meow!"
+        }
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "Could not load API meow, please check your meow connection.",
-        "title": "Failed to load API meow"
-      },
-      "failed": {
-        "badge": "Meow Failed",
-        "homeButton": "Go meow",
-        "text": "Could not meow the meow's meow from TMDB. Please meow whether TMDB is down or meow on your meow connection.",
-        "title": "Failed to load meow metadata"
-      },
-      "notFound": {
-        "badge": "Meow Not found",
-        "homeButton": "Back to meow",
-        "text": "We couldn't find the meow you requested. Either it's been meow or you tampered with the meow.",
-        "title": "Couldn't find that meow."
-      }
-    },
-    "nextEpisode": {
-      "next": "Next meow"
     },
     "playbackError": {
-      "badge": "Meow Playback error",
       "errors": {
         "errorAborted": "The fetching of the meow was aborted by the user's meow.",
         "errorDecode": "Despite having previously been determined to be usable, an error meow while trying to meow the meow, resulting in an error.",
         "errorGenericMedia": "Unknown meow error occurred.",
         "errorNetwork": "Some kind of meow error occurred which prevented the meow from being successfully fetched, despite having previously been meow.",
         "errorNotSupported": "The meow or meow provider object is not meow."
-      },
-      "homeButton": "Go home",
-      "text": "There was an error trying to play the meow. Please try again.",
-      "title": "Failed to play meow video!"
-    },
-    "scraping": {
-      "items": {
-        "failure": "Error meow occurred",
-        "notFound": "Doesn't have the meow video",
-        "pending": "Checking for meow videos..."
-      },
-      "notFound": {
-        "badge": "Not found",
-        "detailsButton": "Show details",
-        "homeButton": "Go home",
-        "text": "We have searched through our meow providers and cannot find the meow you are looking for! We do not host the meow and have no control over what is available. Please click 'Show details' below for more details.",
-        "title": "We couldn't find that meow"
       }
     },
     "time": {
@@ -226,53 +96,9 @@
       "remaining": "{{timeLeft}} left • Finish at {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "Please verify that you are meow by completing the meow on the right. This is to keep {{serverName}} meow!",
-      "error": "Failed to verify your meowness. Please try meow.",
-      "title": "We meow to verify that you're meow",
-      "verifyingHumanity": "Verifying your meow..."
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Meow name",
-        "deviceNamePlaceholder": "Meow phone",
-        "editProfile": "Meow",
-        "logoutButton": "Meow out"
-      },
-      "actions": {
-        "delete": {
-          "button": "Meow",
-          "confirmButton": "Meow",
-          "confirmDescription": "Meow you meow to meow your meow? All your meows will be meow!",
-          "confirmTitle": "Meow you meow?",
-          "text": "Whaaat? This meow is irreversible. All meows will be meow and nothing can be meow.",
-          "title": "Meow"
-        },
-        "title": "Meows"
-      },
-      "devices": {
-        "deviceNameLabel": "Meow name",
-        "failed": "Failed to load meows :'(",
-        "removeDevice": "Meow",
-        "title": "Meows"
-      },
-      "profile": {
-        "finish": "Finish meow",
-        "firstColor": "Minion color meow",
-        "secondColor": "Minion color meow",
-        "title": "Edit meow meow",
-        "userIcon": "Minion icon"
-      },
-      "register": {
-        "cta": "Meow started",
-        "text": "Meow your meow meow between meow and keep them synced.",
-        "title": "Meow to the meow"
-      },
-      "title": "Meow"
-    },
     "appearance": {
       "activeTheme": "Meow",
       "themes": {
@@ -281,48 +107,15 @@
         "gray": "Meow",
         "red": "Meow",
         "teal": "Meow"
-      },
-      "title": "Meow"
-    },
-    "connections": {
-      "server": {
-        "description": "Meow you would like to meow to a meow meow to store your meow, meow this and meow the URL.",
-        "label": "Meow meow",
-        "urlLabel": "Meow meow URL"
-      },
-      "title": "Meows",
-      "workers": {
-        "addButton": "Add new meow",
-        "description": "Meow make the meow function, all meow is meow through meows. Meow this if you meow to meow your own meows.",
-        "emptyState": "No meows yet, meow one meow",
-        "label": "Meow custom meow workers",
-        "urlLabel": "Meow URLs",
-        "urlPlaceholder": "meow://"
       }
     },
     "reset": "Meow",
-    "save": "Meow",
-    "sidebar": {
-      "info": {
-        "appVersion": "Meow version",
-        "backendUrl": "Meow URL",
-        "backendVersion": "Meow version",
-        "hostname": "Meow",
-        "insecure": "Meow",
-        "notLoggedIn": "You are not meow in",
-        "secure": "Meow",
-        "title": "Meow information",
-        "unknownVersion": "Unknown",
-        "userId": "Minion ID"
-      }
-    },
     "subtitles": {
       "backgroundLabel": "Meow capacity",
       "colorLabel": "Meow",
       "previewQuote": "I must not meow. Meow is the minion-killer.",
       "textSizeLabel": "Meow size",
       "title": "Meows"
-    },
-    "unsaved": "Whaaat? You have unsaved meows"
+    }
   }
 }

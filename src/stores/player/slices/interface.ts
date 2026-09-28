@@ -21,11 +21,7 @@ export interface InterfaceSlice {
     hovering: PlayerHoverState;
     lastHoveringState: PlayerHoverState;
     canAirplay: boolean;
-    hideNextEpisodeBtn: boolean;
     error?: DisplayError;
-
-    volumeChangedWithKeybind: boolean; // has the volume recently been adjusted with the up/down arrows recently?
-    volumeChangedWithKeybindDebounce: NodeJS.Timeout | null; // debounce for the duration of the "volume changed thingamajig"
 
     leftControlHovering: boolean; // is the cursor hovered over the left side of player controls
     isHoveringControls: boolean; // is the cursor hovered over any controls?
@@ -40,7 +36,6 @@ export interface InterfaceSlice {
   setHoveringAnyControls(state: boolean): void;
   setHasOpenOverlay(state: boolean): void;
   setLastVolume(state: number): void;
-  hideNextEpisodeButton(): void;
   setSpeedBoosted(state: boolean): void;
   setShowSpeedIndicator(state: boolean): void;
 }
@@ -55,11 +50,8 @@ export const createInterfaceSlice: MakeSlice<InterfaceSlice> = (set, get) => ({
     isHoveringControls: false,
     hovering: PlayerHoverState.NOT_HOVERING,
     lastHoveringState: PlayerHoverState.NOT_HOVERING,
-    volumeChangedWithKeybind: false,
-    volumeChangedWithKeybindDebounce: null,
     timeFormat: VideoPlayerTimeFormat.REGULAR,
     canAirplay: false,
-    hideNextEpisodeBtn: false,
     isSpeedBoosted: false,
     showSpeedIndicator: false,
   },
@@ -101,11 +93,6 @@ export const createInterfaceSlice: MakeSlice<InterfaceSlice> = (set, get) => ({
   setHoveringAnyControls(state) {
     set((s) => {
       s.interface.isHoveringControls = state;
-    });
-  },
-  hideNextEpisodeButton() {
-    set((s) => {
-      s.interface.hideNextEpisodeBtn = true;
     });
   },
   setSpeedBoosted(state) {

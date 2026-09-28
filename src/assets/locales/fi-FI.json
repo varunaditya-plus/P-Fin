@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Kopioitu",
-    "copy": "Kopioi"
+    "copied": "Kopioitu"
   },
   "errors": {
     "badge": "Se hajosi",
@@ -13,34 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Tietoja",
-      "legal": "Legal / DMCA",
-      "login": "Kirjaudu sisään",
-      "onboarding": "asetus",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Rekisteröidy",
-      "settings": "Asetukset",
-      "migration": "Siirrä käyttäjätili",
-      "discover": "Löydä uutta",
-      "support": "Tuki",
-      "jip": "Jip"
+      "discover": "Löydä uutta"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Kirjanmerkit"
-    },
-    "continueWatching": {
-      "sectionTitle": "Jatka katselua..."
-    },
-    "mediaList": {
-      "stopEditing": "Lopeta muokkaaminen"
-    },
     "search": {
-      "allResults": "Siinä kaikki mitä meillä löytyy...",
-      "failed": "Mediaa ei löytynyt, yritä uudelleen!",
       "loading": "Ladataan...",
-      "noResults": "Emme löytäneet mitään :(",
       "placeholder": {
         "default": "Mitä haluat katsoa?",
         "extra": [
@@ -54,21 +32,17 @@
           "Eikö {{serverName}} olekin paras?",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "Hakutulokset",
-      "empty": {
-        "default": "Tervetuloa! Löydä katsottavaa täältä!",
-        "extra": [
-          "Täällä ei ole mitään :(",
-          "Niin tyhjää...",
-          "Aivan tyhjää.",
-          "Hei uusi tyyppi :3"
-        ]
-      },
-      "discoverMore": "Löydä lisää",
-      "discover": "Löydä katsottavaa"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Ootko valmis johonkin kuumaan?",
+        "extra": ["Hyvää 69-päivää 😘!"]
+      },
+      "420": {
+        "default": "Mitä tekisi mieli katsoa tänä 4/20-päivänä?",
+        "extra": ["Hyvää 4/20-päivää 🥳!"]
+      },
       "day": {
         "default": "Mitä haluaisit katsoa tänä iltapäivänä?",
         "extra": [
@@ -84,20 +58,7 @@
       "night": {
         "default": "Mitä haluaisit katsoa tänä iltana?",
         "extra": ["Väsynyt? Kuulin, että Manaaja (The Exorcist) on hyvä!"]
-      },
-      "420": {
-        "default": "Mitä tekisi mieli katsoa tänä 4/20-päivänä?",
-        "extra": ["Hyvää 4/20-päivää 🥳!"]
-      },
-      "69": {
-        "default": "Ootko valmis johonkin kuumaan?",
-        "extra": ["Hyvää 69-päivää 😘!"]
       }
-    },
-    "mediaCard": {
-      "moreInfo": "Lisätietoja",
-      "copyLink": "Kopioi Linkki",
-      "close": "Sulje"
     }
   },
   "media": {
@@ -106,20 +67,11 @@
       "movie": "Elokuva",
       "show": "Sarja"
     },
-    "unreleased": "Julkaisematon",
-    "episodeShort": "J",
-    "seasonShort": "K"
+    "unreleased": "Julkaisematon"
   },
   "navigation": {
     "banner": {
       "offline": "Tarkista Internet-yhteytesi"
-    },
-    "menu": {
-      "about": "Meistä",
-      "logout": "Kirjaudu ulos",
-      "register": "Synkronoi pilveen",
-      "settings": "Asetukset",
-      "support": "Tuki"
     }
   },
   "notFound": {
@@ -129,62 +81,17 @@
     "title": "Sivua ei löytynyt"
   },
   "player": {
-    "menus": {
-      "episodes": {
-        "emptyState": "Tässä kaudessa ei ole jaksoja – tarkista myöhemmin uudelleen (sori :3)..."
-      },
-      "quality": {
-        "hint": "Voit kokeilla <0>vaihtaa lähdettä</0> saadaksesi eri laatuasetuksia."
-      },
-      "sources": {
-        "noEmbeds": {
-          "text": "Emme löytäneet upotuksia, kokeile toista lähdettä."
-        },
-        "noStream": {
-          "text": "Tällä lähteellä ei ole streameja tälle elokuvalle tai sarjalle. /ᐠ - ˕ -マ Ⳋ"
-        }
-      }
-    },
-    "metadata": {
-      "api": {
-        "text": "API-metatietoja ei voitu ladata, tarkista internet-yhteys.",
-        "title": "API-metatietojen lataus epäonnistui"
-      }
-    },
     "playbackError": {
       "errors": {
         "errorAborted": "Mediatiedon haku keskeytettiin käyttäjän pyynnöstä.",
         "errorNotSupported": "Mediaa tai mediantarjoajaa ei tueta."
-      },
-      "text": "Median toistossa tapahtui virhe 😖. Yritä uudelleen tai kokeile toista lähdettä!"
+      }
     },
     "time": {
       "remaining": "{{timeLeft}} jäljellä • Päättyy {{timeFinished, datetime}}"
-    },
-    "turnstile": {
-      "error": "Ei voitu varmistaa inhimillisyyttäsi. Yritä uudelleen.",
-      "title": "Oletko robotti?"
     }
   },
   "settings": {
-    "account": {
-      "register": {
-        "text": "Jaa katseluedistymisesi laitteiden välillä ja pidä ne synkronoituna. ( ̧⸝⸝⍢⸝⸝)ෆ"
-      }
-    },
-    "connections": {
-      "setup": {
-        "unsetStatus": {
-          "description": "Käynnistä asennusprosessi napsauttamalla oikealla olevaa painiketta."
-        }
-      },
-      "workers": {
-        "emptyState": "Ei vielä työntekijöitä, lisää yksi alle"
-      }
-    },
-    "preferences": {
-      "languageDescription": "Kieli sovellettu koko sovellukseen."
-    },
     "subtitles": {
       "previewQuote": "Minun ei pidä pelätä. Pelko on mielen tappaja."
     }

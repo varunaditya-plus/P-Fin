@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "已复制",
-    "copy": "复制"
+    "copied": "已复制"
   },
   "errors": {
     "badge": "出现错误",
@@ -13,34 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "关于",
-      "legal": "Legal / DMCA",
-      "login": "登录",
-      "onboarding": "设定",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "注册",
-      "settings": "设置",
-      "support": "支持",
-      "migration": "迁移账户",
-      "jip": "Jip",
       "discover": "探索"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "书签"
-    },
-    "continueWatching": {
-      "sectionTitle": "继续观看"
-    },
-    "mediaList": {
-      "stopEditing": "编辑完成"
-    },
     "search": {
-      "allResults": "以上是我们能找到的所有结果…",
-      "failed": "查找媒体失败，请重试！",
       "loading": "加载中…",
-      "noResults": "我们找不到任何结果！",
       "placeholder": {
         "default": "您想看些什么？",
         "extra": [
@@ -54,16 +32,17 @@
           "{{serverName}} 不就是最棒的吗？",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "搜索结果",
-      "empty": {
-        "default": "欢迎，在这里找到你想看的！",
-        "extra": ["这里啥都没有", "空空如也…", "空空如也…", "Hi，新用户"]
-      },
-      "discoverMore": "探索更多",
-      "discover": "探索"
+      }
     },
     "titles": {
+      "69": {
+        "default": "想来点火热的吗？",
+        "extra": ["69 日快乐 😘！"]
+      },
+      "420": {
+        "default": "这个 4/20 你想看什么？",
+        "extra": ["4/20 快乐 🥳！"]
+      },
       "day": {
         "default": "您今天下午想看什么？",
         "extra": ["{{serverName}} 万岁！"]
@@ -75,14 +54,6 @@
       "night": {
         "default": "您今晚想看什么？",
         "extra": ["{{serverName}} 万岁！"]
-      },
-      "420": {
-        "default": "这个 4/20 你想看什么？",
-        "extra": ["4/20 快乐 🥳！"]
-      },
-      "69": {
-        "default": "想来点火热的吗？",
-        "extra": ["69 日快乐 😘！"]
       }
     }
   },
@@ -97,14 +68,6 @@
   "navigation": {
     "banner": {
       "offline": "请检查您的互联网连接"
-    },
-    "menu": {
-      "about": "关于我们",
-      "logout": "登出",
-      "register": "同步到云端",
-      "settings": "设置",
-      "support": "支持",
-      "discover": "探索"
     }
   },
   "notFound": {
@@ -122,168 +85,33 @@
       "default": "返回首页",
       "short": "返回"
     },
-    "casting": {
-      "enabled": "正在投送到设备…"
-    },
     "menus": {
-      "downloads": {
-        "copyHlsPlaylist": "复制 HLS 播放列表链接",
-        "disclaimer": "下载内容是直接从内容提供者获取的。{{serverName}} 无法控制下载内容如何被提供。",
-        "downloadSubtitle": "下载当前字幕",
-        "downloadVideo": "下载视频",
-        "hlsDisclaimer": "下载内容是直接从内容提供者获取的。{{serverName}} 无法控制下载内容如何被提供。<br /><br />请注意，您正在下载 HLS 播放列表，<bold>如您不熟悉高级流媒体格式，我们不推荐此操作</bold>。如需下载其他格式，请尝试切换视频源。",
-        "onAndroid": {
-          "1": "要从 Android 下载，先点击下载按钮，之后在新的页面上， <bold>点击并按住</bold>视频，然后选择 <bold>保存</bold>。",
-          "shortTitle": "下载 / Android",
-          "title": "正在 Android 上下载"
-        },
-        "onIos": {
-          "1": "要从 iOS 下载，点击下载按钮，之后在新的页面上，点击 <bold><ios_share /></bold>，然后选择<bold>保存到文件 <ios_files /></bold>。",
-          "shortTitle": "下载 / iOS",
-          "title": "正在 iOS 上下载"
-        },
-        "onPc": {
-          "1": "在 PC 上，点击下载按钮，之后在新的页面上，右击视频并选择 <bold>另存视频为</bold>",
-          "shortTitle": "下载 / PC",
-          "title": "正在 PC 上下载"
-        },
-        "title": "下载"
-      },
       "episodes": {
-        "button": "分集",
-        "emptyState": "该季暂无剧集，请稍后再来！",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "加载分季时发生错误",
-        "loadingList": "加载中……",
-        "loadingTitle": "加载中……",
-        "unairedEpisodes": "本季中的一集或多集已因尚未播出而被禁用。",
-        "seasons": "季"
-      },
-      "playback": {
-        "speedLabel": "播放速度",
-        "title": "播放设置"
-      },
-      "quality": {
-        "automaticLabel": "自动质量",
-        "hint": "您可以尝试<0>切换片源</0>以获取不同的质量选项。",
-        "iosNoQuality": "由于 Apple 的（common IOS L）限制，iOS 上无法为该片源提供质量选择。您可以尝试<0>切换到另一个片源</0>，以获得不同的画质选项。",
-        "title": "画质"
+        "button": "分集"
       },
       "settings": {
         "audioItem": "音频",
-        "downloadItem": "下载",
-        "enableSubtitles": "启用字幕",
-        "experienceSection": "观看体验",
         "playbackItem": "播放设置",
         "qualityItem": "画质",
         "sourceItem": "片源",
-        "subtitleItem": "字幕设置",
-        "videoSection": "视频设置"
-      },
-      "sources": {
-        "failed": {
-          "text": "尝试查找视频时出现错误… 试试其他片源？",
-          "title": "刮削失败"
-        },
-        "noEmbeds": {
-          "text": "我们无法找到任何嵌入内容，请尝试其他片源。",
-          "title": "未找到嵌入内容"
-        },
-        "noStream": {
-          "text": "此视频源没有该电影或节目的串流。",
-          "title": "没有串流"
-        },
-        "title": "片源",
-        "unknownOption": "未知",
-        "editOrder": "编辑顺序"
+        "subtitleItem": "字幕设置"
       },
       "subtitles": {
-        "customChoice": "拖入或上传文件",
-        "customizeLabel": "自定义",
-        "dropSubtitleFile": "将字幕拖入这里",
         "offChoice": "关闭",
         "settings": {
           "backlink": "自定义字幕",
           "delay": "字幕偏移",
           "fixCapitals": "修正大小写"
-        },
-        "title": "字幕",
-        "unknownLanguage": "未知",
-        "scrapeButton": "刮削字幕",
-        "SourceChoice": "来自片源的字幕",
-        "OpenSubtitlesChoice": "OpenSubtitles",
-        "empty": "没有提供的字幕。",
-        "notFound": "没有一个可用选项符合您的查询",
-        "onChoice": "打开"
+        }
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "无法载入 API 元数据，请检查您的互联网连接。",
-        "title": "载入 API 元数据失败"
-      },
-      "legal": {
-        "badge": "已移除",
-        "text": "由于侵权通知或版权要求，该媒体已不可用。",
-        "title": "媒体已被移除"
-      },
-      "extensionPermission": {
-        "badge": "没有权限",
-        "button": "使用扩展程序",
-        "text": "您已安装浏览器扩展，但我们需要您的许可才能启用它。",
-        "title": "配置扩展程序"
-      },
-      "failed": {
-        "badge": "失败",
-        "homeButton": "返回首页",
-        "text": "无法从 TMDB 载入媒体的元数据。请检查 TMDB 是否掉线或在您的网络连接中被屏蔽。",
-        "title": "载入元数据失败"
-      },
-      "notFound": {
-        "badge": "未找到",
-        "homeButton": "返回首页",
-        "text": "我们无法找到您请求的媒体。它可能已被删除，或您篡改了 URL。",
-        "title": "无法找到媒体。"
-      }
-    },
-    "nextEpisode": {
-      "next": "下一集",
-      "replay": "重新播放",
-      "nextSeason": "下一季"
     },
     "playbackError": {
-      "badge": "播放错误",
       "errors": {
         "errorAborted": "用户已请求中止获取媒体。",
         "errorDecode": "尽管媒体资源此前已确定可用，但在尝试解码时产生问题，导致错误。",
         "errorGenericMedia": "发生了未知的媒体错误。",
         "errorNetwork": "发生了一些网络错误，导致媒体无法成功获取，尽管此前它可用。",
         "errorNotSupported": "该媒体或媒体提供者对象不被支持。"
-      },
-      "homeButton": "返回首页",
-      "text": "尝试播放媒体时发生错误。请尝试其他片源。",
-      "title": "视频播放失败！"
-    },
-    "scraping": {
-      "extensionFailure": {
-        "badge": "扩展程序已禁用",
-        "enableExtension": "启用扩展程序",
-        "homeButton": "返回首页",
-        "text": "您已经安装 {{serverName}} 扩展程序。要开始使用，您需要为此站点启用扩展。",
-        "title": "请启用扩展程序"
-      },
-      "items": {
-        "failure": "发生错误",
-        "notFound": "没有此视频",
-        "pending": "正在检查视频…"
-      },
-      "notFound": {
-        "badge": "未找到",
-        "detailsButton": "显示详情",
-        "homeButton": "返回首页",
-        "text": "我们已在所有片源提供者中搜索，但无法发现您搜寻的媒体内容！我们并不托管媒体内容，也无法控制有什么内容可用。请点击下方的“显示细节”了解更多。",
-        "title": "我们无法找到它",
-        "discoverButton": "探索更多"
       }
     },
     "time": {
@@ -291,68 +119,9 @@
       "remaining": "剩余 {{timeLeft}} • 结束于 {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "请完成简短的挑战来证明你是人类，这是为了确保 {{serverName}} 的安全。",
-      "error": "人类验证失败 - 流媒体加载失败。清除缓存后重试，或切换到其他片源。",
-      "title": "您是机器人吗？",
-      "verifyingHumanity": "正在验证您是否为人类…"
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "设备名称",
-        "deviceNamePlaceholder": "我的手机",
-        "editProfile": "编辑",
-        "logoutButton": "登出"
-      },
-      "actions": {
-        "delete": {
-          "button": "删除账户",
-          "confirmButton": "删除账户",
-          "confirmDescription": "您确定要删除账户吗？所有数据将会丢失！",
-          "confirmTitle": "您确定吗？",
-          "text": "此操作不可逆。所有数据将被删除且无法恢复。",
-          "title": "删除账户"
-        },
-        "title": "操作",
-        "logoutAllDevices": {
-          "title": "结束所有会话",
-          "text": "这将会登出所有与您的账户关联的设备。",
-          "button": "登出所有设备"
-        },
-        "migration": {
-          "title": "账户迁移",
-          "text": "将账户迁移到新服务器或下载数据。",
-          "button": "迁移账户"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "设备名称",
-        "failed": "载入会话失败",
-        "removeDevice": "移除",
-        "title": "设备"
-      },
-      "profile": {
-        "finish": "完成编辑",
-        "firstColor": "个人资料颜色 1",
-        "secondColor": "个人资料颜色 2",
-        "title": "编辑个人资料图像",
-        "userIcon": "用户图标"
-      },
-      "register": {
-        "cta": "开始使用",
-        "text": "在设备之间共享并持续同步您的观看进度。",
-        "title": "同步到云端"
-      },
-      "title": "账户",
-      "admin": {
-        "title": "管理面板",
-        "text": "用于测试 {{serverName}} 状态的工具。",
-        "button": "看看这个"
-      }
-    },
     "appearance": {
       "activeTheme": "已激活",
       "themes": {
@@ -365,92 +134,9 @@
         "green": "碧草春风",
         "mocha": "摩卡",
         "pink": "桃花"
-      },
-      "title": "外观",
-      "options": {
-        "discover": "“探索”部分",
-        "discoverDescription": "在主页上书签媒体下方显示“探索”部分。默认已启用。",
-        "discoverLabel": "“探索”部分",
-        "modal": "详细信息",
-        "modalDescription": "点击媒体卡片时显示详细信息模式，而不是转到观看页面。预告片需要代理或扩展。默认已禁用。",
-        "modalLabel": "详细信息"
       }
-    },
-    "connections": {
-      "server": {
-        "description": "若您想连接到自定义后端保存数据，请启用此选项并提供 URL。 <0>查看指引</0>",
-        "label": "自定义服务器",
-        "urlLabel": "自定义服务器 URL",
-        "migration": {
-          "description": "<0>迁移我的数据</0> 到新的后端服务器。",
-          "link": "迁移我的数据"
-        }
-      },
-      "setup": {
-        "doSetup": "进行设定",
-        "errorStatus": {
-          "description": "看起来此配置中的一项或多项需要您的注意。",
-          "title": "有件事需要您的注意"
-        },
-        "itemError": "此设定存在错误。再次进行设定过程以修复它。",
-        "items": {
-          "default": "默认设定",
-          "extension": "扩展程序",
-          "proxy": "自定义代理"
-        },
-        "redoSetup": "重新进行设定",
-        "successStatus": {
-          "description": "一切就绪，您可以开始观看你喜爱的媒体了。",
-          "title": "一切就绪！"
-        },
-        "unsetStatus": {
-          "description": "请单击右侧的按钮开始进行设定。",
-          "title": "您尚未完成设定"
-        }
-      },
-      "title": "连接",
-      "workers": {
-        "addButton": "添加新的 Worker",
-        "description": "要让应用程序正常运作，所有流量会通过代理路由。若您想使用自己的 Worker，请启用该选项。 <0>查看指引</0>",
-        "emptyState": "还没有 Worker，在下方添加一个",
-        "label": "使用自定义代理 Worker",
-        "urlLabel": "Worker URL",
-        "urlPlaceholder": "https://"
-      }
-    },
-    "preferences": {
-      "language": "应用程序语言",
-      "languageDescription": "作用于整个应用程序的语言。",
-      "thumbnail": "生成缩略图",
-      "thumbnailDescription": "大多数时候，视频没有缩略图。您可以启用此设置以在视频播放时动态生成它们，但此选项可能会拖慢视频速度。",
-      "thumbnailLabel": "生成缩略图",
-      "title": "偏好设置",
-      "autoplay": "自动播放",
-      "autoplayDescription": "在系列节目（剧集）束后自动播放下一集。如果主机允许，用户可以使用浏览器扩展、自定义代理或默认设置启用。",
-      "autoplayLabel": "自动播放",
-      "skipCredits": "跳过片尾",
-      "skipCreditsDescription": "启用后在进度达到 99% 时自动播放下一集，跳过片尾字幕。禁用时会等待节目全部结束。",
-      "skipCreditsLabel": "跳过片尾",
-      "sourceOrder": "重新排序片源",
-      "sourceOrderDescription": "拖拽以排序片源，这将决定片源的检查顺序。如果某个源显示为灰色，则表示该源需要<bold>扩展程序</bold>。<br><br><strong>默认顺序最适合大多数用户</strong>",
-      "sourceOrderEnableLabel": "自定义片源顺序"
     },
     "reset": "重设",
-    "save": "保存",
-    "sidebar": {
-      "info": {
-        "appVersion": "应用版本",
-        "backendUrl": "后端 URL",
-        "backendVersion": "后端版本",
-        "hostname": "主机名",
-        "insecure": "不安全",
-        "notLoggedIn": "您尚未登录",
-        "secure": "安全",
-        "title": "应用信息",
-        "unknownVersion": "未知",
-        "userId": "用户 ID"
-      }
-    },
     "subtitles": {
       "backgroundBlurLabel": "背景模糊",
       "backgroundLabel": "背景不透明度",
@@ -459,34 +145,9 @@
       "textSizeLabel": "字体大小",
       "title": "字幕",
       "textBoldLabel": "粗体文本"
-    },
-    "unsaved": "您有未保存的更改…"
+    }
   },
   "discover": {
-    "tabs": {
-      "movies": "电影",
-      "tvshows": "节目",
-      "editorpicks": "编辑精选"
-    },
-    "carousel": {
-      "title": {
-        "movies": "{{category}}电影",
-        "tvshows": "{{category}}节目",
-        "inCinemas": "电影院中",
-        "popularOn": "{{provider}}上受欢迎的{{type}}"
-      }
-    },
-    "randomMovie": {
-      "button": "随便看点什么",
-      "cancel": "取消倒数",
-      "nowPlaying": "即将播放",
-      "in": "在",
-      "countdown": "{{countdown}}秒内"
-    },
-    "page": {
-      "title": "探索电影和节目",
-      "subtitle": "探索最新热门和永恒经典。"
-    },
     "scrollToTop": "返回顶部"
   }
 }

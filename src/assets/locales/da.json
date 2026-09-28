@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Kopieret",
-    "copy": "Kopier"
+    "copied": "Kopieret"
   },
   "errors": {
     "details": "Fejloplysninger",
@@ -13,30 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Om os",
-      "legal": "Legal / DMCA",
-      "support": "Support",
-      "login": "Log ind",
-      "onboarding": "Opsætning",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Registrer",
-      "settings": "Indstillinger",
-      "discover": "Opdag",
-      "migration": "Migrer Profil"
+      "discover": "Opdag"
     }
   },
   "home": {
-    "continueWatching": {
-      "sectionTitle": "Fortsæt med at se..."
-    },
-    "mediaList": {
-      "stopEditing": "Stop med at redigere"
-    },
     "search": {
-      "allResults": "Det er alt, hvad vi har...",
-      "failed": "Kunne ikke finde noget, prøv igen!",
       "loading": "Indlæser...",
-      "noResults": "Vi kunne ikke finde noget :(",
       "placeholder": {
         "extra": [
           "Hvad har du lyst til?",
@@ -50,24 +32,17 @@
           ">ᴗ<"
         ],
         "default": "Hvad har du lyst til at se?"
-      },
-      "empty": {
-        "default": "Velkommen, find noget at se her!",
-        "extra": [
-          "Der er intet her :(",
-          "Så tomt...",
-          "Sikke en masse luft.",
-          "Hej nye medlem :3"
-        ]
-      },
-      "sectionTitle": "Søgeresultater",
-      "discoverMore": "Opdag mere",
-      "discover": "Opdag"
-    },
-    "bookmarks": {
-      "sectionTitle": "Bogmærker"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Har du lyst til at \"hygge\"?",
+        "extra": ["Glædelig 69-dag 😘!"]
+      },
+      "420": {
+        "default": "Hvad vil du gerne se denne 4/20?",
+        "extra": ["Glædelig 4/20 🥳!"]
+      },
       "day": {
         "default": "Hvad vil du gerne se i eftermiddag?",
         "extra": ["Længe leve {{serverName}}!"]
@@ -79,14 +54,6 @@
       "night": {
         "extra": ["Længe leve {{serverName}}!"],
         "default": "Hvad vil du gerne se i aften?"
-      },
-      "420": {
-        "default": "Hvad vil du gerne se denne 4/20?",
-        "extra": ["Glædelig 4/20 🥳!"]
-      },
-      "69": {
-        "default": "Har du lyst til at \"hygge\"?",
-        "extra": ["Glædelig 69-dag 😘!"]
       }
     }
   },
@@ -99,14 +66,6 @@
     }
   },
   "navigation": {
-    "menu": {
-      "about": "Om os",
-      "logout": "Log ud",
-      "register": "Synkroniser til Cloud",
-      "settings": "Indstillinger",
-      "support": "Support",
-      "discover": "Opdag"
-    },
     "banner": {
       "offline": "Kontroller din internetforbindelse, fjollehoved!"
     }
@@ -126,228 +85,43 @@
       "default": "Tilbage til hjem",
       "short": "Tilbage"
     },
-    "casting": {
-      "enabled": "Cast til enhed 🎬"
-    },
     "menus": {
-      "downloads": {
-        "copyHlsPlaylist": "Kopier link til HLS-playliste",
-        "downloadSubtitle": "Download aktuel undertekst",
-        "downloadVideo": "Download video",
-        "onAndroid": {
-          "1": "For at downloade på Android skal du klikke på download-knappen og derefter, på den nye side, <bold>trykke og holde</bold> på videoen og derefter vælge <bold>gem</bold>.",
-          "shortTitle": "Download / Android",
-          "title": "Download på Android"
-        },
-        "onIos": {
-          "1": "For at downloade på iOS skal du klikke på download-knappen og derefter på den nye side klikke på <bold><ios_share /></bold> og derefter <bold>Save to Files <ios_files /></bold>.",
-          "shortTitle": "Download / iOS",
-          "title": "Download på iOS"
-        },
-        "onPc": {
-          "shortTitle": "Download / PC",
-          "title": "Download på pc",
-          "1": "På PC skal du klikke på download-knappen og derefter højreklikke på videoen på den nye side og vælge <bold>Gem video som</bold>"
-        },
-        "title": "Download",
-        "hlsDisclaimer": "Downloads tages direkte fra udbyderen. {{serverName}} har ikke kontrol over, hvordan downloads leveres.<br /><br />Vær opmærksom på, at du downloader en HLS-playliste, <bold>det anbefales ikke at downloade, hvis du ikke er bekendt med avancerede streamingformater</bold>. Prøv forskellige kilder til forskellige formater.",
-        "disclaimer": "Downloads tages direkte fra udbyderen. {{serverName}} har ikke kontrol over, hvordan downloads leveres."
-      },
       "episodes": {
-        "button": "Episoder",
-        "emptyState": "Der er ingen episoder i denne sæson, kom tilbage senere (undskyld :3)...",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Fejl under indlæsning af sæson",
-        "loadingList": "Indlæser...",
-        "loadingTitle": "Indlæser...",
-        "unairedEpisodes": "Et eller flere afsnit i denne sæson er blevet deaktiveret, fordi de ikke er blevet udgivet endnu.",
-        "seasons": "Sæsoner"
-      },
-      "playback": {
-        "title": "Afspilningsindstillinger",
-        "speedLabel": "Afspilningshastighed"
-      },
-      "quality": {
-        "automaticLabel": "Automatisk kvalitet",
-        "title": "Kvalitet",
-        "hint": "Du kan prøve <0>at skifte kilde</0> for at få forskellige muligheder for kvalitet.",
-        "iosNoQuality": "På grund af Apple-definerede (almindelige IOS L) begrænsninger er valg af kvalitet ikke tilgængelig på iOS for denne kilde. Du kan prøve <0>at skifte til en anden kilde</0> for at få forskellige muligheder for kvalitet."
+        "button": "Episoder"
       },
       "settings": {
-        "downloadItem": "Download",
-        "experienceSection": "Oplevelse af visning",
         "playbackItem": "Afspilningsindstillinger",
         "audioItem": "Lyd",
         "qualityItem": "Kvalitet",
         "sourceItem": "Videokilder",
-        "subtitleItem": "Undertekstindstillinger",
-        "videoSection": "Videoindstillinger",
-        "enableSubtitles": "Aktiver undertekster"
-      },
-      "sources": {
-        "failed": {
-          "text": "Der skete en fejl under søgningen efter videoer... Prøv en anden kilde?",
-          "title": "Kunne ikke scrape"
-        },
-        "noEmbeds": {
-          "text": "Vi kunne ikke finde nogen embeds, prøv venligst en anden kilde.",
-          "title": "Ingen embeds fundet"
-        },
-        "noStream": {
-          "text": "Denne kilde har ingen streams for denne film eller serie. /ᐠ - ˕ -マ Ⳋ",
-          "title": "Ingen stream :("
-        },
-        "title": "Kilder",
-        "unknownOption": "Ukendt"
+        "subtitleItem": "Undertekstindstillinger"
       },
       "subtitles": {
-        "customChoice": "Drop eller upload fil",
-        "customizeLabel": "Tilpasning",
         "offChoice": "Fra",
-        "OpenSubtitlesChoice": "OpenSubtitles",
         "settings": {
           "delay": "Undertekstforsinkelse",
           "fixCapitals": "Ret store bogstaver",
           "backlink": "Brugerdefinerede undertekster"
-        },
-        "title": "Undertekster",
-        "unknownLanguage": "Ukendt",
-        "dropSubtitleFile": "Drop undertekstfilen her! >_<",
-        "scrapeButton": "Scrape undertekster",
-        "empty": "Der er ingen undertekster til dette."
-      }
-    },
-    "metadata": {
-      "api": {
-        "text": "API-metadata kunne ikke indlæses, tjek venligst din internetforbindelse.",
-        "title": "API-metadata kunne ikke indlæses"
-      },
-      "legal": {
-        "badge": "Fjernet",
-        "title": "Mediet er blevet fjernet",
-        "text": "Dette medie er ikke længere tilgængeligt på grund af en meddelelse om fjernelse eller krav om ophavsret. 😨"
-      },
-      "extensionPermission": {
-        "badge": "Tilladelse mangler",
-        "button": "Brug udvidelse",
-        "text": "Du har browserudvidelsen, men vi har brug for din tilladelse til at komme i gang med at bruge udvidelsen. (¬_¬)",
-        "title": "Konfigurer udvidelsen"
-      },
-      "failed": {
-        "homeButton": "Gå til hjem",
-        "title": "Kunne ikke indlæse metadata",
-        "badge": "Fejlede",
-        "text": "Mediets metadata kunne ikke indlæses fra TMDB. Tjek venligst, om TMDB er nede eller blokeret på din internetforbindelse."
-      },
-      "notFound": {
-        "badge": "Ikke fundet",
-        "homeButton": "Tilbage til hjem",
-        "title": "Kunne ikke finde det medie.",
-        "text": "Vi kunne ikke finde det medie, du bad om. Enten er det blevet fjernet, eller også har du pillet ved URL'en (din pillefinger)."
+        }
       }
     },
     "playbackError": {
-      "homeButton": "Gå til hjem",
-      "badge": "Afspilningsfejl",
       "errors": {
         "errorAborted": "Indlæsningen af mediet blev afbrudt efter brugerens anmodning.",
         "errorDecode": "På trods af at mediet tidligere er blevet vurderet til at være brugbart, opstod der en fejl under forsøget på at afkode medieressourcen, hvilket resulterede i en fejl.",
         "errorGenericMedia": "Der opstod en ukendt mediefejl.",
         "errorNotSupported": "Mediet eller medieudbyderobjektet understøttes ikke.",
         "errorNetwork": "Der opstod en netværksfejl, som forhindrede, at mediet kunne hentes, selv om det tidligere havde været tilgængeligt."
-      },
-      "text": "Der opstod en fejl under forsøget på at afspille mediet 😖. Prøv venligst igen!",
-      "title": "Kunne ikke afspille videoen!"
-    },
-    "scraping": {
-      "notFound": {
-        "homeButton": "Gå til hjem",
-        "badge": "Ikke fundet",
-        "detailsButton": "Vis detaljer",
-        "title": "Vi kunne ikke finde det",
-        "discoverButton": "Opdag mere",
-        "text": "Vi har søgt gennem vores udbydere og kan ikke finde de medier, du leder efter! Vi hoster ikke medierne og har ingen kontrol over, hvad der er tilgængeligt. Klik på 'Vis detaljer' nedenfor for at få flere detaljer."
-      },
-      "extensionFailure": {
-        "homeButton": "Gå til hjem",
-        "badge": "Udvidelse deaktiveret",
-        "text": "Du har installeret {{serverName}}-udvidelsen. For at begynde at bruge den skal du aktivere udvidelsen for dette websted.",
-        "enableExtension": "Aktiver udvidelse",
-        "title": "Aktiver venligst udvidelsen"
-      },
-      "items": {
-        "failure": "Der opstod en fejl",
-        "notFound": "Har ikke videoen (╥﹏╥)",
-        "pending": "Tjekker for videoer..."
       }
-    },
-    "nextEpisode": {
-      "replay": "Gentag",
-      "next": "Næste episode",
-      "nextSeason": "Næste sæson"
     },
     "time": {
       "regular": "{{timeWatched}} / {{duration}}",
       "remaining": "{{timeLeft}} tilbage • Færdig til {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "Bevis at du er et menneske ved at udføre den hurtige opgave, det er for at holde {{serverName}} sikker.",
-      "verifyingHumanity": "Bekræfter at du er et menneske... (^▽^)👍",
-      "title": "Er du en robot 🤖?",
-      "error": "Kunne ikke bekræfte at du er et menneske! Prøv venligst igen."
     }
   },
   "settings": {
-    "account": {
-      "devices": {
-        "deviceNameLabel": "Navn på enhed",
-        "failed": "Kunne ikke indlæse sessioner",
-        "removeDevice": "Fjern",
-        "title": "Enheder"
-      },
-      "accountDetails": {
-        "deviceNameLabel": "Navn på enhed",
-        "deviceNamePlaceholder": "Personlig telefon",
-        "editProfile": "Rediger",
-        "logoutButton": "Log ud"
-      },
-      "admin": {
-        "title": "Administratorpanel",
-        "text": "Brug værktøjer, der er lavet til at teste {{serverName}}' tilstand.",
-        "button": "Tjek det ud"
-      },
-      "actions": {
-        "delete": {
-          "title": "Slet profil",
-          "confirmButton": "Bekræft sletning",
-          "button": "Slet profil",
-          "confirmDescription": "Er du sikker på, at du vil slette din profil? Alle dine data vil gå tabt! ૮₍˶Ó﹏Ò ⑅₎ა",
-          "confirmTitle": "Er du sikker?",
-          "text": "Denne handling er permanent. Alle data slettes, og intet kan gendannes."
-        },
-        "title": "Handlinger",
-        "logoutAllDevices": {
-          "title": "Afslut alle sessioner",
-          "text": "Dette vil logge dig ud fra alle enheder, der er tilknyttet din konto.",
-          "button": "Log ud af alle enheder"
-        }
-      },
-      "profile": {
-        "finish": "Afslut redigering",
-        "firstColor": "Profil farve 1",
-        "secondColor": "Profil farve 2",
-        "title": "Rediger profilbillede",
-        "userIcon": "Brugerikon"
-      },
-      "register": {
-        "text": "Del fremskridt mellem enheder, og hold dem synkroniseret. ( ̧⸝⸝⍢⸝⸝)ෆ",
-        "title": "Synkroniser med Cloud",
-        "cta": "Kom godt i gang"
-      },
-      "title": "Profil"
-    },
     "appearance": {
       "activeTheme": "Aktiv",
       "themes": {
@@ -357,76 +131,9 @@
         "red": "Rød",
         "teal": "Blågrøn",
         "classic": "Classic"
-      },
-      "title": "Udseende"
-    },
-    "connections": {
-      "server": {
-        "label": "Brugerdefineret server",
-        "urlLabel": "Brugerdefineret server URL",
-        "description": "Hvis du gerne vil oprette forbindelse til en brugerdefineret server for at gemme dine data, skal du aktivere dette og angive URL'en. <0>Instruktioner.</0>"
-      },
-      "setup": {
-        "doSetup": "Lav opsætning",
-        "errorStatus": {
-          "description": "Det ser ud til, at en eller flere ting i denne opsætning kræver din opmærksomhed.",
-          "title": "Noget kræver din opmærksomhed 😱"
-        },
-        "itemError": "Der er noget galt med denne indstilling. Gå gennem opsætningen igen for at rette det. (ᴗ_ ᴗ。)",
-        "items": {
-          "default": "Standardopsætning",
-          "extension": "Udvidelse",
-          "proxy": "Brugerdefineret proxy"
-        },
-        "redoSetup": "Gentag opsætning",
-        "successStatus": {
-          "title": "Alt er sat op!",
-          "description": "Alt er på plads, så du kan begynde at se dine yndlingsmedier. (๑>◡<๑)"
-        },
-        "unsetStatus": {
-          "description": "Klik på knappen til højre for at starte opsætningen.",
-          "title": "Du har ikke gennemgået opsætningen"
-        }
-      },
-      "title": "Forbindelser",
-      "workers": {
-        "addButton": "Tilføj ny arbejder",
-        "emptyState": "Ingen arbejdere endnu (｡-́︿-̀｡), tilføj en nedenfor",
-        "label": "Brug brugerdefinerede proxy-arbejdere",
-        "urlLabel": "Arbejder-URL'er",
-        "urlPlaceholder": "https://",
-        "description": "For at få applikationen til at fungere dirigeres al trafik gennem proxyer. Aktiver dette, hvis du vil have dine egne arbejdere. <0>Instruktioner.</0>"
       }
-    },
-    "preferences": {
-      "language": "Applikationens sprog",
-      "languageDescription": "Sproget gælder for hele applikationen, kun engelsk har fjollede ting 🙁.",
-      "thumbnailLabel": "Generer miniaturebilleder",
-      "thumbnail": "Generer miniaturebilleder",
-      "autoplay": "Autoplay",
-      "autoplayLabel": "Autoplay",
-      "sourceOrder": "Omorganisering af kilder",
-      "sourceOrderDescription": "Træk og slip for at omarrangere kilder. Det afgør, i hvilken rækkefølge kilderne tjekkes for de medier, du prøver at se. Hvis en kilde er nedtonet, betyder det, at den ikke er tilgængelig på din enhed.",
-      "title": "Præferencer",
-      "thumbnailDescription": "Det meste af tiden har videoer ikke miniaturebilleder. Du kan aktivere denne indstilling for at generere dem undervejs, men de kan gøre din video mere langsom.",
-      "autoplayDescription": "Afspil automatisk den næste episode i en serie, når den er slut. Kan aktiveres af brugere med browserudvidelsen, en brugerdefineret proxy eller med standardopsætningen, hvis hosten tillader det."
     },
     "reset": "Nulstil",
-    "save": "Gem",
-    "sidebar": {
-      "info": {
-        "appVersion": "App version",
-        "backendUrl": "Backend URL",
-        "backendVersion": "Backend version",
-        "hostname": "Hostname",
-        "insecure": "Usikker",
-        "notLoggedIn": "Du er ikke logget ind",
-        "secure": "Sikker",
-        "title": "Appstatistik (for nørder) 🤓",
-        "unknownVersion": "Ukendt",
-        "userId": "Bruger ID"
-      }
-    },
     "subtitles": {
       "backgroundLabel": "Baggrundsopacitet",
       "colorLabel": "Farve",
@@ -435,17 +142,9 @@
       "title": "Undertekster",
       "textBoldLabel": "Fed tekst",
       "backgroundBlurLabel": "Sløring af baggrund"
-    },
-    "unsaved": "Du har ændringer, der ikke er gemt... ฅ^•ﻌ•^ฅ"
+    }
   },
   "discover": {
-    "scrollToTop": "Tilbage til toppen",
-    "page": {
-      "subtitle": "Udforsk de seneste hits og tidløse klassikere.",
-      "title": "Opdag Film og TV"
-    },
-    "randomMovie": {
-      "in": "i"
-    }
+    "scrollToTop": "Tilbage til toppen"
   }
 }

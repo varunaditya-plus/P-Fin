@@ -23,20 +23,6 @@ export const useAppUpdateStore = create<{
 export function offerAppUpdate(version: string, apply: () => Promise<void>) {
   useAppUpdateStore.setState({ available: { version, apply } });
 }
-export function dismissAppUpdate() {
-  const state = useAppUpdateStore.getState();
-  if (!state.available || state.applying) return;
-  const dismissed = [
-    ...state.dismissed.filter((entry) => entry !== state.available!.version),
-    state.available.version,
-  ].slice(-20);
-  useAppUpdateStore.setState({ dismissed, error: undefined });
-  try {
-    localStorage.setItem(dismissedKey, JSON.stringify(dismissed));
-  } catch {
-    /* Private mode can deny storage. */
-  }
-}
 export async function applyAppUpdate() {
   const state = useAppUpdateStore.getState();
   if (!state.available || state.applying) return;

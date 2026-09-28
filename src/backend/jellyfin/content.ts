@@ -130,11 +130,6 @@ export function contentImageUrl(
     { maxWidth: 700, tag },
   );
 }
-export function contentDownloadUrl(itemId: string) {
-  return jellyfinUrl(`Items/${encodeURIComponent(itemId)}/Download`, {
-    ApiKey: getJellyfinSession().accessToken,
-  });
-}
 export function contentStreamUrl(item: ContentItem, sourceId?: string) {
   const source =
     item.MediaSources?.find((entry) => entry.Id === sourceId) ??

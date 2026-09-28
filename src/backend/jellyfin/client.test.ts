@@ -8,7 +8,6 @@ import {
   findItemByProviderId,
   getEpisodes,
   getImageUrl,
-  getLibraryItems,
   jellyfinRequest,
   loginJellyfin,
   logoutJellyfin,
@@ -251,18 +250,6 @@ describe("Jellyfin request boundaries", () => {
 });
 
 describe("Jellyfin user-visible catalog", () => {
-  it("paginates inside the selected user's library", async () => {
-    fetchMock.mockResolvedValue(
-      jsonResponse({ Items: [], TotalRecordCount: 99 }),
-    );
-    await getLibraryItems("movie-library", 60);
-    const url = new URL(String(fetchMock.mock.calls[0][0]));
-    expect(url.pathname).toBe("/jellyfin/Users/test-user/Items");
-    expect(url.searchParams.get("ParentId")).toBe("movie-library");
-    expect(url.searchParams.get("StartIndex")).toBe("60");
-    expect(url.searchParams.get("IncludeItemTypes")).toBe("Movie,Series");
-  });
-
   it("retains the actual season ID including specials and scopes episodes to the user", async () => {
     fetchMock.mockResolvedValue(jsonResponse({ Items: [] }));
     await getEpisodes("series-id", "specials-season-id");

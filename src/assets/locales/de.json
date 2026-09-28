@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Kopiert",
-    "copy": "Kopieren"
+    "copied": "Kopiert"
   },
   "errors": {
     "badge": "Kaputt",
@@ -13,34 +12,13 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Über",
-      "legal": "Legal / DMCA",
-      "login": "Anmelden",
-      "onboarding": "Einrichtung",
       "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Registrieren",
-      "settings": "Einstellungen",
-      "discover": "Entdecken",
-      "support": "Unterstützung",
-      "migration": "Konto übertragen",
-      "jip": "Jip"
+      "discover": "Entdecken"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Favoriten"
-    },
-    "continueWatching": {
-      "sectionTitle": "Weiter ansehen"
-    },
-    "mediaList": {
-      "stopEditing": "Bearbeiten beenden"
-    },
     "search": {
-      "allResults": "Das ist alles!",
-      "failed": "Das Medium wurde nicht gefunden, bitte versuchen Sie es erneut!",
       "loading": "Wird geladen...",
-      "noResults": "Wir haben nichts gefunden!",
       "placeholder": {
         "default": "Was möchtest du schauen?",
         "extra": [
@@ -54,21 +32,17 @@
           "Ist {{serverName}} nicht das beste?",
           ">ᴗ<"
         ]
-      },
-      "sectionTitle": "Suchergebnisse",
-      "empty": {
-        "default": "Willkommen, hier finden Sie Medien zum Anschauen!",
-        "extra": [
-          "Hier ist nichts :(",
-          "so leer...",
-          "So eine Leere.",
-          "Hallo neuer Benutzer :3"
-        ]
-      },
-      "discoverMore": "Entdecke mehr",
-      "discover": "Entdecken"
+      }
     },
     "titles": {
+      "69": {
+        "default": "Lust auf etwas scharfes?",
+        "extra": ["Schönen 69. Tag 😘!"]
+      },
+      "420": {
+        "default": "Was möchten Sie am 4/20 sehen?",
+        "extra": ["Schönen 4/20 🥳!"]
+      },
       "day": {
         "default": "Was würdest du diesem Nachmittag gerne schauen?",
         "extra": [
@@ -82,20 +56,7 @@
       "night": {
         "default": "Was möchtest du diesen Abend gerne schauen?",
         "extra": ["Müde? Ich hab gehört The Exorcist soll gut sein."]
-      },
-      "69": {
-        "default": "Lust auf etwas scharfes?",
-        "extra": ["Schönen 69. Tag 😘!"]
-      },
-      "420": {
-        "default": "Was möchten Sie am 4/20 sehen?",
-        "extra": ["Schönen 4/20 🥳!"]
       }
-    },
-    "mediaCard": {
-      "moreInfo": "Mehr Infos",
-      "copyLink": "Link kopieren",
-      "close": "Schließen"
     }
   },
   "media": {
@@ -104,22 +65,11 @@
       "movie": "Film",
       "show": "Serie"
     },
-    "unreleased": "Unveröffentlicht",
-    "episodeShort": "F",
-    "seasonShort": "S"
+    "unreleased": "Unveröffentlicht"
   },
   "navigation": {
     "banner": {
       "offline": "Internetverbindung ist instabil"
-    },
-    "menu": {
-      "about": "Über uns",
-      "logout": "Abmelden",
-      "register": "Mit der Cloud synchronisieren",
-      "settings": "Einstellungen",
-      "support": "Support",
-      "discover": "Entdecken",
-      "development": "Entwicklung"
     }
   },
   "notFound": {
@@ -137,190 +87,33 @@
       "default": "Zurück zur Startseite",
       "short": "Zurück"
     },
-    "casting": {
-      "enabled": "Casting zum Gerät..."
-    },
     "menus": {
-      "downloads": {
-        "copyHlsPlaylist": "HLS-Playlist Link kopieren",
-        "disclaimer": "Videos werden direkt vom Provider heruntergeladen. {{serverName}} hat keinen Einfluss darauf, wie Downloads bereitgestellt werden.",
-        "downloadSubtitle": "Aktuelle Untertitel herunterladen",
-        "downloadVideo": "Video herunterladen",
-        "hlsDisclaimer": "{{serverName}} hat keinen Einfluss darauf, wie Downloads bereitgestellt werden. Downloads werden direkt vom Anbieter bezogen. <br /><br />Bitte beachte, dass du eine HLS-Wiedergabeliste herunterlädst, <bold>dies ist nicht empfohlen für Nutzer die nicht mit Erweiterten Streaming Formaten vertraut sind</bold>. Probiere andere Anbieter für andere Formate.",
-        "onAndroid": {
-          "1": "Um auf Android Herunterzuladen, tippe auf den Download-Button, <bold>tippe und halte</bold> auf der neuen Seite auf das Video und wähle <bold>Speichern</bold> aus.",
-          "shortTitle": "Download / Android",
-          "title": "Auf Android herunterladen"
-        },
-        "onIos": {
-          "1": "Um Auf iOS herunterzuladen, klick auf den Download-Button. Klicke dann auf der neuen Seite auf<bold> <ios_share /></bold>, dann auf <bold>In Dateien sichern <ios_files /></bold>.",
-          "shortTitle": "Download / iOS",
-          "title": "Auf iOS herunterladen"
-        },
-        "onPc": {
-          "1": "Um am PC herunterzuladen, klicke auf den Download-Button. Klicke dann mit der rechten Maustaste auf das Video und klicke auf <bold>Video speichern als</bold>",
-          "shortTitle": "Download / PC",
-          "title": "Am PC herunterladen"
-        },
-        "title": "Download",
-        "hlsDownloader": "Oder gehen Sie auf die <0>hls downloader website</0> und füg dort die URL der Wiedergabeliste von unten ein.",
-        "button": "Versuch herunterladen"
-      },
       "episodes": {
-        "button": "Folgen",
-        "emptyState": "Keine Folgen in dieser Staffel, schau später noch einmal!",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Fehler beim Laden der Sitzung",
-        "loadingList": "Wird geladen...",
-        "loadingTitle": "Wird geladen...",
-        "unairedEpisodes": "Eine oder mehrere Episoden dieser Staffel wurden deaktiviert, weil sie noch nicht ausgestrahlt wurden.",
-        "seasons": "Staffeln"
-      },
-      "playback": {
-        "speedLabel": "Wiedergabegeschwindigkeit",
-        "title": "Wiedergabeeinstellungen"
-      },
-      "quality": {
-        "automaticLabel": "Automatische Qualitätseinstellung",
-        "hint": "Du kannst versuchen die <0>Quelle zu ändern</0> um andere Qualitätsoptionen zu erhalten.",
-        "iosNoQuality": "Durch eine Einschränkung von Apple ist die Qualitätsauswahl für iOS für diese Quelle nicht verfügbar. Du kannst versuchen <0>einen andere Quelle auszuwählen</0> um andere Qualitätsoptionen zu erhalten.",
-        "title": "Qualität"
+        "button": "Folgen"
       },
       "settings": {
         "audioItem": "Audio",
-        "downloadItem": "Download",
-        "enableSubtitles": "Untettitel aktivieren",
-        "experienceSection": "Anzeigeerlebnis",
         "playbackItem": "Wiedergabeeinstellungen",
         "qualityItem": "Qualität",
         "sourceItem": "Videoquellen",
-        "subtitleItem": "Untertiteleinstellungen",
-        "videoSection": "Videoeinstellungen"
-      },
-      "sources": {
-        "failed": {
-          "text": "Beim Versuch, Videos zu finden, ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Quelle.",
-          "title": "Fehler beim Laden"
-        },
-        "noEmbeds": {
-          "text": "Es konnten keine Embeds gefunden werden. Bitte versuchen es mit einer anderen Quelle.",
-          "title": "Keine Embeds gefunden"
-        },
-        "noStream": {
-          "text": "Diese Quelle bietet keine Streams für diesen Film oder diese Serie.",
-          "title": "Kein Stream"
-        },
-        "title": "Quellen",
-        "unknownOption": "Unbekannt",
-        "editOrder": "Bestellung bearbeiten"
+        "subtitleItem": "Untertiteleinstellungen"
       },
       "subtitles": {
-        "customChoice": "Untertiteldatei auswählen oder hier ablegen",
-        "customizeLabel": "Anpassen",
-        "dropSubtitleFile": "Untertiteldatei hier ablegen",
         "offChoice": "Aus",
         "settings": {
           "backlink": "Eigene Untertitel",
           "delay": "Untertitelverzögerung",
           "fixCapitals": "Großschreibung korrigieren"
-        },
-        "title": "Untertitel",
-        "unknownLanguage": "Unbekannt",
-        "OpenSubtitlesChoice": "offene Untertitel",
-        "notFound": "Keine der verfügbaren Optionen entspricht Ihrer Anfrage",
-        "SourceChoice": "Quellenangaben",
-        "empty": "Es sind hierfür keine Untertitel verfügbar.",
-        "onChoice": "An"
-      },
-      "watchparty": {
-        "notice": "Watch Party ist möglicherweise für einige Quellen nicht verfügbar",
-        "watchpartyItem": "Watch Party"
+        }
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "API Metadaten konnten nicht geladen werden, überprüfe deine Netzwerkverbindung.",
-        "title": "API Metadaten konnten nicht geladen werden"
-      },
-      "legal": {
-        "badge": "Entfernt",
-        "text": "Das Video ist aufgrund einer Takedown-Anfrage oder eines Urheberrechtsanspruchs nicht mehr verfügbar.",
-        "title": "Video wurde entfernt"
-      },
-      "extensionPermission": {
-        "badge": "Berechtigung fehlt",
-        "button": "Verwende Erweiterung",
-        "text": "Du hast die Browser-Erweiterung, aber wir brauchen deine Berechtigung um mit der Erweiterung zu starten.",
-        "title": "Konfiguriere die Erweiterung"
-      },
-      "failed": {
-        "badge": "Fehlgeschlagen",
-        "homeButton": "Zurück zur Startseite",
-        "text": "Konnte die Videometadaten nicht von TMDB laden. Überprüfe ob TMDB funktioniert oder von deiner Internetverbindung gesperrt wird.",
-        "title": "Laden der Metadaten ist fehlgeschlagen"
-      },
-      "notFound": {
-        "badge": "Nicht gefunden",
-        "homeButton": "Zurück zur Startseite",
-        "text": "Wir konnten das angeforderte Video nicht finden.",
-        "title": "Das Video konnte nicht gefunden werden."
-      }
-    },
-    "nextEpisode": {
-      "next": "Nächste Folge",
-      "replay": "Wiederholung",
-      "nextSeason": "nächste Staffel"
     },
     "playbackError": {
-      "badge": "Wiedergabefehler",
       "errors": {
         "errorAborted": "Das Laden des Videos wurde vom Nutzer abgebrochen.",
         "errorDecode": "Beim Versuch, das Video zu dekodieren, ist ein Fehler aufgetreten, obwohl sie zuvor als brauchbar eingestuft worden war.",
         "errorGenericMedia": "Unbekannter Videofehler ist aufgetreten.",
         "errorNetwork": "Es ist ein Netzwerkfehler aufgetreten, der verhindert hat, dass das Video erfolgreich abgerufen werden konnten, obwohl es verfügbar waren.",
         "errorNotSupported": "Das Video- oder Videoanbieter wird nicht unterstützt."
-      },
-      "homeButton": "Zurück zur Startseite",
-      "text": "Während der Wiedergabe ist ein Fehler aufgetreten. Versuche es erneut.",
-      "title": "Hoppla, etwas ist schiefgegangen!"
-    },
-    "scraping": {
-      "extensionFailure": {
-        "badge": "Erweiterung deaktiviert",
-        "enableExtension": "Erweiterung aktivieren",
-        "homeButton": "Zur Startseite",
-        "text": "Du hast die {{serverName}}e Erweiterung installiert. Um die Erweiterung zu benutzen, musst du sie für diese Seite aktivieren.",
-        "title": "Bitte aktiviere die Erweiterung"
-      },
-      "items": {
-        "failure": "Ein Fehler ist aufgetreten",
-        "notFound": "Video nicht gefunden",
-        "pending": "Suche nach Videos..."
-      },
-      "notFound": {
-        "badge": "Nicht gefunden",
-        "detailsButton": "Details anzeigen",
-        "homeButton": "Zurück zur Startseite",
-        "text": "Wir haben alle Anbieter durchsucht, konnten aber nicht das Video finden nach dem du suchst! Wir stellen keine eigenen Videos bereit und haben keine Kontrolle darüber, was verfügbar ist. Bitte klicke auf \"Details anzeigen\" für mehr Details.",
-        "title": "Wir konnten das nicht finden",
-        "discoverButton": "Endecke mehr"
-      },
-      "tips": {
-        "1": "Klicke auf das Einstellungs-Icon, um die Quelle zu wechseln!",
-        "2": "Klicke auf den Titel, um den Link zu kopieren!",
-        "7": "Halte SHIFT gedrückt und klick auf den Titel, um den Link mit der Zeitangabe zu kopieren!",
-        "3": "Halte SHIFT für Breitbildschirm anstelle von Vollbildschirm!",
-        "4": "Manche Quellen funktionieren besser als andere!",
-        "5": "Hohle dir die Erweiterung für mehr Quellen!",
-        "6": "Halte das Lesezeichen gedrückt, um sie zu verwalten oder zu löschen!",
-        "8": "Lege eine eigene Untertitelfarbe fest!",
-        "9": "Migriere dein Account zu einer neuen Backend in den Einstellungen!",
-        "10": "Tritt dem Discord bei!",
-        "11": "Verwende Sie [ und ], um das Timing der Untertitel anzupassen!",
-        "12": "Drücke LEERTASTE oder K um Abzuspielen/Pausieren!",
-        "14": "Nutze J und L Tasten, um 10 Sekunden vor-/zurückzuspulen!",
-        "13": "Nutze die LINKS und RECHTS Pfeiltasten, um 5 Sekunden vor-/zurückzuspulen!",
-        "15": "Drücke F um den Vollbildmodus umzuschalten!"
       }
     },
     "time": {
@@ -328,62 +121,9 @@
       "remaining": "{{timeLeft}} übrig • Fertig um {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "Bitte verifiziere deine Menschlichkeit mit dem Captcha auf der Rechten Seite. Dies ist um {{serverName}} sicher zu halten!",
-      "error": "Menschlichkeit konnte nicht verifiziert werden. Bitte versuche es erneut.",
-      "title": "Wir müssen sicherstellen, dass du Menschlich bist.",
-      "verifyingHumanity": "Verifiziere deine Menschlichkeit..."
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Gerätename",
-        "deviceNamePlaceholder": "Handy",
-        "editProfile": "Bearbeiten",
-        "logoutButton": "Abmelden"
-      },
-      "actions": {
-        "delete": {
-          "button": "Konto löschen",
-          "confirmButton": "Konto löschen",
-          "confirmDescription": "Konto wirklich löschen? Alle deine Daten gehen dabei verloren!",
-          "confirmTitle": "Bist du sicher?",
-          "text": "Diese Aktion kann nicht rückgängig gemacht werden. Alle Daten werden gelöscht und können nicht wiederhergestellt werden.",
-          "title": "Konto löschen"
-        },
-        "title": "Aktionen",
-        "logoutAllDevices": {
-          "title": "Alle Sitzungen beenden",
-          "text": "Dies wird dich von allen Geräten abmelden, die mit deinem Konto verbunden sind.",
-          "button": "Von allen Geräten abmelden"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Gerätename",
-        "failed": "Laden der Sitzungen fehlgeschlagen",
-        "removeDevice": "Entfernen",
-        "title": "Geräte"
-      },
-      "profile": {
-        "finish": "Bearbeiten beenden",
-        "firstColor": "Profilfarbe 1",
-        "secondColor": "Profilfarbe 2",
-        "title": "Profilbild bearbeiten",
-        "userIcon": "Symbol"
-      },
-      "register": {
-        "cta": "Los geht's",
-        "text": "Teilen deinen Fortschritt zwischen Geräten und halte sie synchronisiert.",
-        "title": "Mit der Cloud synchronisieren"
-      },
-      "title": "Konto",
-      "admin": {
-        "title": "Admin-Bereich",
-        "text": "Nutzen Sie Tools zum Testen des {{serverName}}-Zustands."
-      }
-    },
     "appearance": {
       "activeTheme": "Aktiv",
       "themes": {
@@ -396,87 +136,9 @@
         "mocha": "Mokka",
         "pink": "Pink",
         "classic": "Klassik"
-      },
-      "title": "Aussehen",
-      "options": {
-        "discoverLabel": "Abschnitt „Entdecken“",
-        "discover": "Abschnitt „Entdecken“",
-        "discoverDescription": "Zeigen Sie den Abschnitt „Entdecken“ auf der Startseite unter Ihren mit Lesezeichen versehenen Medien an. Standardmäßig aktiviert."
       }
-    },
-    "connections": {
-      "server": {
-        "description": "Falls du dich mit einem anderen Server verbinden willst, um deine Daten zu speichern. Aktiviere dies und gebe die URL an. <0>Anweisungen.</0>",
-        "label": "Eigener Server",
-        "urlLabel": "Eigene Server-URL",
-        "migration": {
-          "link": "übertrage meine Daten"
-        }
-      },
-      "setup": {
-        "doSetup": "Einrichten",
-        "errorStatus": {
-          "description": "Es scheint so, als bräuchte eine oder mehrere Schritte in dieser Einrichtung deine Aufmerksamkeit.",
-          "title": "Etwas braucht deine Aufmerksamkeit"
-        },
-        "itemError": "Mit diesem Setup stimmt etwas nicht. Führen Sie das Setup erneut durch, um das Problem zu beheben.",
-        "items": {
-          "default": "Standard Einstellungen",
-          "extension": "Erweiterung",
-          "proxy": "Eigene Proxy"
-        },
-        "redoSetup": "Erneut einrichten",
-        "successStatus": {
-          "description": "Alles ist bereit, damit du deine Lieblingsserien und Filme ansehen kannst.",
-          "title": "Alles eingerichtet!"
-        },
-        "unsetStatus": {
-          "description": "Klicken Sie bitte auf den Button rechts, um die Setup zu starten.",
-          "title": "Du hast das Setup noch nicht durchgeführt"
-        }
-      },
-      "title": "Verbindung",
-      "workers": {
-        "addButton": "Neuen Worker hinzufügen",
-        "description": "Damit die App funktioniert werden alle Anfrage durch einen Proxy geleitet. Aktiviere dies, falls du deinen eigenen Worker verwenden willst. <0>Anweisungen.</0>",
-        "emptyState": "Keine Worker vorhanden, füge einen unten hinzu",
-        "label": "Verwenden deinen eigenen Worker-Proxys",
-        "urlLabel": "Worker-URLs",
-        "urlPlaceholder": "https://"
-      }
-    },
-    "preferences": {
-      "language": "App-Sprache",
-      "languageDescription": "Sprache für die ganze App.",
-      "thumbnail": "Miniaturansichten generieren",
-      "thumbnailDescription": "Meistens haben Videos keine Miniaturansicht. Du kannst diese Einstellung anmachen, um sie automatisch zu generieren, aber sie können dein Video langsamer machen.",
-      "thumbnailLabel": "Miniaturansichten generieren",
-      "title": "Einstellungen",
-      "autoplayLabel": "Automatische Wiedergabe",
-      "skipCredits": "Abspann überspringen",
-      "skipCreditsDescription": "Wenn aktiviert, wird die nächste Episode automatisch abgespielt, wenn 99 % der Episode abgeschlossen sind, um den Abspann zu überspringen. Wenn deaktiviert, wird gewartet, bis die Episode vollständig abgeschlossen ist.",
-      "sourceOrder": "Quellen neu anordnen",
-      "sourceOrderEnableLabel": "Benutzerdefinierte Quellreihenfolge",
-      "autoplay": "Automatische Wiedergabe",
-      "autoplayDescription": "Nach Erreichen des Serienendes wird automatisch die nächste Folge abgespielt. Kann von Benutzern mit der Browsererweiterung, einem benutzerdefinierten Proxy oder mit der Standardkonfiguration aktiviert werden, sofern der Host dies zulässt.",
-      "sourceOrderDescription": "Per Drag & Drop können Sie Quellen neu anordnen. Dadurch wird die Reihenfolge bestimmt, in der die Quellen für die Medien, die Sie ansehen möchten, geprüft werden. Ist eine Quelle ausgegraut, bedeutet dies, dass die <bold>Erweiterung</bold> für diese Quelle erforderlich ist. <br><br> <strong>(Die Standardreihenfolge ist für die meisten Benutzer am besten geeignet)</strong>"
     },
     "reset": "Zurücksetzen",
-    "save": "Speichern",
-    "sidebar": {
-      "info": {
-        "appVersion": "App-Version",
-        "backendUrl": "Server-URL",
-        "backendVersion": "Server-Version",
-        "hostname": "Hostname",
-        "insecure": "Unsicher",
-        "notLoggedIn": "Du bist nicht angemeldet",
-        "secure": "Sicher",
-        "title": "App-Informationen",
-        "unknownVersion": "Unbekannt",
-        "userId": "Nutzer-ID"
-      }
-    },
     "subtitles": {
       "backgroundBlurLabel": "Hintergrundunschärfe",
       "backgroundLabel": "Hintergrunddeckkraft",
@@ -485,58 +147,9 @@
       "textSizeLabel": "Schriftgröße",
       "title": "Untertitel",
       "textBoldLabel": "Fettgedruckter Text"
-    },
-    "unsaved": "Du hast ungespeicherte Änderungen"
+    }
   },
   "discover": {
-    "tabs": {
-      "movies": "Filme",
-      "tvshows": "Serien",
-      "editorpicks": "Empfehlungen der Redaktion"
-    },
-    "carousel": {
-      "title": {
-        "movies": "{{category}} Filme",
-        "tvshows": "{{category}} Serien",
-        "inCinemas": "Im Kino",
-        "popular": "Am beliebtesten",
-        "nowPlaying": "Im Kino",
-        "topRated": "Am besten bewertet",
-        "latestReleases": "Neueste Veröffentlichungen",
-        "4kReleases": "4K-Veröffentlichungen",
-        "onTheAir": "Aktuell im TV",
-        "popularOn": "Beliebte {{type}} auf {{provider}}",
-        "editorPicksMovies": "Redaktionstipps Filme",
-        "editorPicksShows": "Redaktionstipps Serien",
-        "moviesOn": "Filme auf {{provider}}",
-        "tvshowsOn": "Serien auf {{provider}}",
-        "recommended": "Weil du gesehen hast: {{title}}",
-        "genreMovies": "{{genre}} Filme",
-        "genreShows": "{{genre}} Serien",
-        "categoryMovies": "{{category}} Filme",
-        "categoryShows": "{{category}} Serien"
-      },
-      "change": "Ändern",
-      "more": "Mehr anzeigen"
-    },
-    "featured": {
-      "playNow": "Jetzt abspielen",
-      "moreInfo": "Mehr Infos"
-    },
-    "randomMovie": {
-      "button": "Zufälligen Titel abspielen",
-      "cancel": "Countdown abbrechen",
-      "countdown": "{{countdown}}s",
-      "nowPlaying": "Jetzt läuft",
-      "in": "in"
-    },
-    "page": {
-      "title": "Filme & Serien entdecken",
-      "subtitle": "Entdecke aktuelle Highlights und zeitlose Klassiker.",
-      "loadMore": "Mehr laden",
-      "loading": "Lade...",
-      "back": "Zurück"
-    },
     "scrollToTop": "Nach oben"
   }
 }

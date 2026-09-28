@@ -18,17 +18,6 @@ export interface HomePreferences {
   sections?: Record<string, HomeSectionPreferences>;
 }
 
-export function homeSectionPreferences(
-  preferences: HomePreferences,
-  id: string,
-) {
-  return {
-    rows: preferences.sections?.[id]?.rows ?? preferences.rows,
-    density: preferences.sections?.[id]?.density ?? preferences.density,
-    editing: preferences.sections?.[id]?.editing === true,
-  };
-}
-
 export const defaultHomePreferences: HomePreferences = {
   order: [],
   hidden: [],
@@ -45,21 +34,6 @@ export function homePreferenceScope(session: JellyfinSession | null) {
         session.userId,
       ])
     : "";
-}
-
-export function orderedHomeSections<T extends { id: string }>(
-  sections: T[],
-  preferences: HomePreferences,
-) {
-  const order = [
-    ...new Set([
-      ...preferences.order,
-      ...sections.map((section) => section.id),
-    ]),
-  ];
-  return [...sections].sort(
-    (a, b) => order.indexOf(a.id) - order.indexOf(b.id),
-  );
 }
 
 export const useHomePreferences = create(

@@ -1,7 +1,6 @@
 {
   "actions": {
-    "copied": "Copiado",
-    "copy": "Copiar"
+    "copied": "Copiado"
   },
   "errors": {
     "badge": "Rompeu",
@@ -13,30 +12,12 @@
   "global": {
     "name": "{{serverName}}",
     "pages": {
-      "about": "Acerca de",
-      "legal": "Legal / DMCA",
-      "login": "Iniciar sesión",
-      "onboarding": "Configuración",
-      "pagetitle": "{{title}} - {{serverName}}",
-      "register": "Rexistrarse",
-      "settings": "Configuración"
+      "pagetitle": "{{title}} - {{serverName}}"
     }
   },
   "home": {
-    "bookmarks": {
-      "sectionTitle": "Marcadores"
-    },
-    "continueWatching": {
-      "sectionTitle": "Continuar vendo"
-    },
-    "mediaList": {
-      "stopEditing": "Deter edición"
-    },
     "search": {
-      "allResults": "Esto é todo o que temos!",
-      "failed": "Error ao encontrar contido... intentao de novo!",
       "loading": "Cargando...",
-      "noResults": "Non atopamos nada!",
       "placeholder": {
         "default": "Que che gustaría ver?",
         "extra": [
@@ -45,8 +26,7 @@
           "Cal é a túa película favorita?",
           "Cal é a túa serie favorita?"
         ]
-      },
-      "sectionTitle": "Resultados da busca"
+      }
     },
     "titles": {
       "day": {
@@ -75,13 +55,6 @@
   "navigation": {
     "banner": {
       "offline": "Verifica a túa conexión a internet"
-    },
-    "menu": {
-      "about": "Acerca de nós",
-      "logout": "Cerrar sesión",
-      "register": "Sincronizar coa nube",
-      "settings": "Configuración",
-      "support": "Soporte"
     }
   },
   "notFound": {
@@ -98,150 +71,33 @@
       "default": "Volver ao inicio",
       "short": "Volver"
     },
-    "casting": {
-      "enabled": "Transmitiendo ao dispositivo..."
-    },
     "menus": {
-      "downloads": {
-        "copyHlsPlaylist": "Copiar a ligazón da lista HLS",
-        "disclaimer": "As descargas proveñen do provedor. {{serverName}} non ten control sobre as descargas e a súa procedencia.",
-        "downloadSubtitle": "Descargar subtítulos actuais",
-        "downloadVideo": "Descargar video",
-        "hlsDisclaimer": "As descargas realizanse directamente dende o proovedor. {{serverName}} non ten control sobre como se xestionan as descargas. <br /><br />Ten en conta que estás a descargar unha lista de reproducción HLS, <bold>non está recomendado instalalos se non estás familiarizado con estos sistemas de contidos avanzados</bold> Proba fontes diferentes ou formatos diferentes.",
-        "onAndroid": {
-          "1": "Para descargar en Android, fai click no botón de descarga e despois, na nova páxina, <bold>mantén presionado</bold>o vídeo e selecciona <bold>gardar</bold>.",
-          "shortTitle": "Descargar / Android",
-          "title": "Descargando en Android"
-        },
-        "onIos": {
-          "1": "Para descargar en iOS, fai clic no botón de descarga e despois, na nova páxina, fai click en <bold><ios_share /></bold>, e despois <bold>Gardar en archivos <ios_files /></bold>.",
-          "shortTitle": "Descargar / iOS",
-          "title": "Descargando en iOS"
-        },
-        "onPc": {
-          "1": "Nunha PC, fai click no botón de descargas e despois, na nova páxina, fai click dereito no video e selecciona <bold>Gardar vídeo como...</bold>",
-          "shortTitle": "Descargar / PC",
-          "title": "Descargando en PC"
-        },
-        "title": "Descargar"
-      },
       "episodes": {
-        "button": "Episodios",
-        "emptyState": "Non hai episodios nesta temporada, Intentao máis tarde!",
-        "episodeBadge": "E{{episode}}",
-        "loadingError": "Error cargando a sesión",
-        "loadingList": "Cargando...",
-        "loadingTitle": "Cargando...",
-        "unairedEpisodes": "Un ou máis episodios nesta temporada foron desactivados porque non sairon aínda."
-      },
-      "playback": {
-        "speedLabel": "Velocidade de reproducción",
-        "title": "Configuración de reproducción"
-      },
-      "quality": {
-        "automaticLabel": "Calidade automática",
-        "hint": "Podes intentar <0>cambiar de fonte</0> para obter diferentes opcións de calidade.",
-        "iosNoQuality": "Debido a limitacións definidas por Apple, a selección de calidade no está disponible en iOS para esta fonte. Podes intentar <0>cambiar a outra fonte</0> para obter diferentes opcións de calidade.",
-        "title": "Calidade"
+        "button": "Episodios"
       },
       "settings": {
         "audioItem": "Audio",
-        "downloadItem": "Descargar",
-        "enableSubtitles": "Activar subtítulos",
-        "experienceSection": "Configuración de experiencia",
         "playbackItem": "Configuración do playback",
         "qualityItem": "Calidade",
         "sourceItem": "Fonte do video",
-        "subtitleItem": "Configuración dos subtítulos",
-        "videoSection": "Configuración de video"
-      },
-      "sources": {
-        "failed": {
-          "text": "Acaba de producirse un erro ao intentar atopar videos, por favor, intenta cunha fonte distinta.",
-          "title": "Erro ao retirar"
-        },
-        "noEmbeds": {
-          "text": "Non puidemos atopar ningún embed, por favor, intenta cunha fonte diferente.",
-          "title": "No se atoparon embeds"
-        },
-        "noStream": {
-          "text": "Nesta fonte non hai contidos sobre esta película ou episodio.",
-          "title": "Sin fonte"
-        },
-        "title": "Fontes",
-        "unknownOption": "Descoñecido"
+        "subtitleItem": "Configuración dos subtítulos"
       },
       "subtitles": {
-        "customChoice": "Sube ou arrastra o arquivo",
-        "customizeLabel": "Personalizar",
-        "dropSubtitleFile": "Solta o arquivo de subtítulos aquí",
         "offChoice": "Apagar",
         "settings": {
           "backlink": "Subtítulos personalizados",
           "delay": "Retardo dos subtítulos",
           "fixCapitals": "Arreglar capitalización"
-        },
-        "title": "Subtítulos",
-        "unknownLanguage": "Descoñecido"
+        }
       }
-    },
-    "metadata": {
-      "api": {
-        "text": "Non puiden cargar os metadatos da API, por favor, comproba a túa conexión a internet.",
-        "title": "Non foi posible cargar os metadatos da API"
-      },
-      "legal": {
-        "badge": "Agochado",
-        "text": "Este contido non está dispoñible debido a unha reclamación dos dereitos de autor.",
-        "title": "Os contidos foron retirados"
-      },
-      "extensionPermission": {
-        "badge": "Non hai permisos suficientes",
-        "button": "Usar extensión",
-        "text": "Si que tes a extensión de navegador, pero precisamos do teu permiso para empezar a usala.",
-        "title": "Configura a extensión"
-      },
-      "failed": {
-        "badge": "Erro",
-        "homeButton": "Ir ao inicio",
-        "text": "Non se puideron cargar os metadatos do contido de TMDB. Por favor, verifica se TMDB está caído ou bloqueado na túa conexión a internet.",
-        "title": "Error ao cargar os metadatos"
-      },
-      "notFound": {
-        "badge": "Non atopado",
-        "homeButton": "Volver ao inicio",
-        "text": "Non puidemos encontrar o contenido que solicitache. Xa seña que se eliminara ou modificara a URL.",
-        "title": "No se pudo atopar ese contenido."
-      }
-    },
-    "nextEpisode": {
-      "next": "Seguinte episodio"
     },
     "playbackError": {
-      "badge": "Error de reproducción",
       "errors": {
         "errorAborted": "A obtención do contido foi cancelada pola solicitude do usuario.",
         "errorDecode": "A pesar de ser determinado previamente como utilizable, produciuse un erro ao intentar decodificar o recurso do contido, o que resultou nun erro.",
         "errorGenericMedia": "Produxose un erro descoñecido no contido.",
         "errorNetwork": "Produxose un erro de rede que impidideu obter o contido de maneira exitosa, a pesar de estar disponible anteriormente.",
         "errorNotSupported": "O contido ou o proovedor do contido non é compatible."
-      },
-      "homeButton": "Ir ao inicio",
-      "text": "Produxose un erro ao intentar reproducir o contenido. Por favor, inténtao de novo.",
-      "title": "Non se puido reproducir o video!"
-    },
-    "scraping": {
-      "items": {
-        "failure": "Ocurreu un erro",
-        "notFound": "Non ten o video",
-        "pending": "Verificando vídeos..."
-      },
-      "notFound": {
-        "badge": "Non atopado",
-        "detailsButton": "Mostrar detalles",
-        "homeButton": "Ir ao inicio",
-        "text": "Buscamos nos nosos proovedores e non puidemos atopar o contido que estás a buscar. Nós, non aloxamos o contido e non temos control sobre o que está dispoñible. Fai click en 'Mostrar detalles' a continuación para obter máis información.",
-        "title": "Non puidemos atopar eso"
       }
     },
     "time": {
@@ -249,58 +105,9 @@
       "remaining": "{{timeLeft}} restante • Finaliza ás {{timeFinished, datetime}}",
       "shortRegular": "{{timeWatched}}",
       "shortRemaining": "-{{timeLeft}}"
-    },
-    "turnstile": {
-      "description": "Por favor, verifica que eres un humán completando o Captcha. Isto é para mantee {{serverName}} seguro!",
-      "error": "Houbo un erro ao verificar a túa humanidade. Por favor, volve a intentalo.",
-      "title": "Necesitamos verificar que realmente eres un humán.",
-      "verifyingHumanity": "Verificando a túa humanidade…"
     }
   },
   "settings": {
-    "account": {
-      "accountDetails": {
-        "deviceNameLabel": "Nome do dispositivo",
-        "deviceNamePlaceholder": "Teléfono persoal",
-        "editProfile": "Editar",
-        "logoutButton": "Pechar sesión"
-      },
-      "actions": {
-        "delete": {
-          "button": "Eliminar conta",
-          "confirmButton": "Eliminar conta",
-          "confirmDescription": "Estás seguro/a de que queres eliminar a túa conta? Todos os datos serán eliminados!",
-          "confirmTitle": "Estás seguro/a?",
-          "text": "Esta acción é irreversible. Todos os datos serán eliminados e nada poderá ser recuperado.",
-          "title": "Eliminar conta"
-        },
-        "title": "Accións",
-        "logoutAllDevices": {
-          "title": "Finalizar todas as sesións",
-          "text": "Isto pechará a túa sesión en todos os dispositivos vinculados á túa conta.",
-          "button": "Pechar sesión en todos os dispositivos"
-        }
-      },
-      "devices": {
-        "deviceNameLabel": "Nome do dispositivo",
-        "failed": "Erro ao cargar sesións",
-        "removeDevice": "Quitar",
-        "title": "Dispositivos"
-      },
-      "profile": {
-        "finish": "Acabar de editar",
-        "firstColor": "Cór de perfil un",
-        "secondColor": "Cór de perfil dous",
-        "title": "Editar foto de perfil",
-        "userIcon": "Icono de usuario"
-      },
-      "register": {
-        "cta": "Empezar",
-        "text": "Compartir o teu progreso entre dispositivos e mantelos sincronizados.",
-        "title": "Sincronizar á nube"
-      },
-      "title": "Conta"
-    },
     "appearance": {
       "activeTheme": "Activo",
       "themes": {
@@ -309,71 +116,9 @@
         "gray": "Gris",
         "red": "Vermello",
         "teal": "Turquesa"
-      },
-      "title": "Apariencia"
-    },
-    "connections": {
-      "server": {
-        "description": "Se che gustaría conectar un servidor personalizado de backend para almacenar os teus datos, activa esto e indica a URL. <0>Instruccións.</0>",
-        "label": "Servidor personalizado",
-        "urlLabel": "Servidor personalizado URL"
-      },
-      "setup": {
-        "doSetup": "Configurar",
-        "errorStatus": {
-          "description": "Parece que hay un ou varios puntos que precisan da tua atención.",
-          "title": "Hai algo que require da túa atención"
-        },
-        "itemError": "Hai un erro nesta configuración. Volve atrás para solucionalo.",
-        "items": {
-          "default": "Configuración por defecto",
-          "extension": "Extensión",
-          "proxy": "Proxy personalizado"
-        },
-        "redoSetup": "Retroceder na configuración",
-        "successStatus": {
-          "description": "Todo está no seu sitio para que podas empezar a ver os teus contidos favoritos.",
-          "title": "Todo está configurado!"
-        },
-        "unsetStatus": {
-          "description": "Por favor, preme no botón para empezar o proceso de configuración.",
-          "title": "Non empezaches ningunha configuración"
-        }
-      },
-      "title": "Conexións",
-      "workers": {
-        "addButton": "Añadir novo",
-        "description": "Para facer que a aplicación funcione, todo o tráfico é organizado en proxies. Activa esta opción se queres empregar os teus propios workers. <0>Instruccións.</0>",
-        "emptyState": "Non hai workers aínda, engade un abaixo",
-        "label": "Usar proxy workers personalizados",
-        "urlLabel": "URLs dos workers",
-        "urlPlaceholder": "https://"
       }
-    },
-    "preferences": {
-      "language": "Linguaxe da aplicación",
-      "languageDescription": "Lingua aplicada a toda a aplicación.",
-      "thumbnail": "Xerar miniaturas",
-      "thumbnailDescription": "Na maioría das veces, os videos non teñen miniaturas. Podes activar esta configuración para xeralas ao momento, pero podes realentizar o video.",
-      "thumbnailLabel": "Xerar miniaturas",
-      "title": "Preferencias"
     },
     "reset": "Reinicio",
-    "save": "Gardar",
-    "sidebar": {
-      "info": {
-        "appVersion": "Versión da aplicación",
-        "backendUrl": "URL do Backend",
-        "backendVersion": "Versión do Backend",
-        "hostname": "Nome do Host (Hostname)",
-        "insecure": "Non seguro",
-        "notLoggedIn": "Non iniciache sesión",
-        "secure": "Seguro",
-        "title": "Información da aplicación",
-        "unknownVersion": "Descoñecido",
-        "userId": "ID do usuario"
-      }
-    },
     "subtitles": {
       "backgroundBlurLabel": "Desenfoque do fondo",
       "backgroundLabel": "Opacidade do fondo",
@@ -381,7 +126,6 @@
       "previewQuote": "Non debo temer. O medo é o asasino da mente.",
       "textSizeLabel": "Tamaño da fonte",
       "title": "Subtítulos"
-    },
-    "unsaved": "Tes cambios sen gardar"
+    }
   }
 }

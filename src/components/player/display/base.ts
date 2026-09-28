@@ -124,7 +124,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         const exceptions = [
           "Failed to execute 'appendBuffer' on 'SourceBuffer': This SourceBuffer has been removed from the parent media source.",
         ];
-        hls?.on(Hls.Events.ERROR, (event, data) => {
+        hls?.on(Hls.Events.ERROR, (_event, data) => {
           console.error(
             "HLS error",
             data.details,

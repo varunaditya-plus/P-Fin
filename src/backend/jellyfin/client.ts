@@ -259,28 +259,6 @@ export async function getLibraries(signal?: AbortSignal) {
   );
 }
 
-export function getLibraryItems(
-  parentId: string,
-  startIndex?: number,
-  signal?: AbortSignal,
-) {
-  return jellyfinRequest<JellyfinItems>(
-    `Users/${getJellyfinSession().userId}/Items`,
-    { signal },
-    {
-      ParentId: parentId,
-      Recursive: true,
-      IncludeItemTypes: "Movie,Series",
-      Fields: fields,
-      SortBy: "SortName",
-      SortOrder: "Ascending",
-      StartIndex: startIndex ?? 0,
-      Limit: 60,
-      EnableUserData: true,
-    },
-  );
-}
-
 export async function searchItems(query: string, signal?: AbortSignal) {
   const result = await jellyfinRequest<JellyfinItems>(
     `Users/${getJellyfinSession().userId}/Items`,

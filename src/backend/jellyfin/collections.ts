@@ -38,23 +38,6 @@ async function requireContainerPermission(type: ContainerType, id?: string) {
   }
 }
 
-export function parseLibraryDrop(value: string): string[] {
-  try {
-    const parsed: unknown = JSON.parse(value);
-    if (!Array.isArray(parsed) || parsed.length > 200) return [];
-    return [
-      ...new Set(
-        parsed.filter(
-          (id): id is string =>
-            typeof id === "string" && /^[a-f\d]{32}$/i.test(id),
-        ),
-      ),
-    ];
-  } catch {
-    return [];
-  }
-}
-
 export async function getContainerItemIds(
   type: ContainerType,
   id: string,
@@ -94,29 +77,6 @@ export async function getContainerItemIds(
   signal?.throwIfAborted();
   requireSameAccount(captured);
   return ids;
-}
-
-export async function createEmptyContainer(type: ContainerType, name: string) {
-  if (!name.trim()) throw new Error("Enter a name.");
-  const captured = identity();
-  await requireContainerPermission(type);
-  requireSameAccount(captured);
-  return type === "BoxSet"
-    ? jellyfinRequest<{ Id: string }>(
-        "Collections",
-        { method: "POST" },
-        { name: name.trim(), isLocked: false },
-      )
-    : jellyfinRequest<{ Id: string }>("Playlists", {
-        method: "POST",
-        body: JSON.stringify({
-          Name: name.trim(),
-          Ids: [],
-          UserId: getJellyfinSession().userId,
-          MediaType: "Video",
-          IsPublic: false,
-        }),
-      });
 }
 
 export async function addUniqueContainerItems(

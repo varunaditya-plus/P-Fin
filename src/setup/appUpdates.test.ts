@@ -6,8 +6,6 @@ import {
   activateWaitingWorker,
   applyAppUpdate,
   buildVersion,
-  dismissAppUpdate,
-  offerAppUpdate,
   startAppUpdateMonitor,
   useAppUpdateStore,
 } from "./appUpdates";
@@ -81,19 +79,6 @@ describe("explicit app updates", () => {
     expect(reload).not.toHaveBeenCalled();
     await applyAppUpdate();
     expect(reload).toHaveBeenCalledOnce();
-  });
-  it("dismisses the same version across checks but offers a later version", async () => {
-    const refresh = vi.fn();
-    offerAppUpdate("one", refresh);
-    dismissAppUpdate();
-    offerAppUpdate("one", refresh);
-    expect(useAppUpdateStore.getState().dismissed).toContain("one");
-    expect(
-      JSON.parse(localStorage.getItem("movie-fin-dismissed-updates")!),
-    ).toContain("one");
-    offerAppUpdate("two", refresh);
-    expect(useAppUpdateStore.getState().dismissed).not.toContain("two");
-    expect(refresh).not.toHaveBeenCalled();
   });
   it("skips offline checks and quietly tolerates failed background requests", async () => {
     vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
