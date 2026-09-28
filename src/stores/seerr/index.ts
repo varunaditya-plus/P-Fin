@@ -2,6 +2,10 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { JellyfinSession } from "@/stores/jellyfin";
+import {
+  persistentSessionStorage,
+  syncSessionAcrossTabs,
+} from "@/stores/persistentSession";
 
 export interface SeerrConnection {
   url: string;
@@ -37,7 +41,14 @@ export const useSeerrConnection = create(
     }),
     {
       name: "seerr-connection",
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => persistentSessionStorage),
     },
   ),
 );
+
+const stopSessionSync = syncSessionAcrossTabs(
+  "seerr-connection",
+  () => useSeerrConnection.persist.rehydrate(),
+  () => useSeerrConnection.getState().setConnection(null),
+);
+if (import.meta.hot) import.meta.hot.dispose(stopSessionSync);

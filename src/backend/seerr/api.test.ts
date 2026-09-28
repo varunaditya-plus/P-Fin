@@ -169,7 +169,7 @@ describe("Seerr opt-in and session boundaries", () => {
       }),
     ]);
     expect(useSeerrConnection.getState().connection).toBeNull();
-    expect(sessionStorage.getItem("seerr-connection")).not.toContain(
+    expect(localStorage.getItem("seerr-connection")).not.toContain(
       "test-password",
     );
   });

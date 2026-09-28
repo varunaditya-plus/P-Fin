@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import {
+  persistentSessionStorage,
+  syncSessionAcrossTabs,
+} from "@/stores/persistentSession";
+
 export interface JellyfinServer {
   id: string;
   name: string;
@@ -28,9 +33,16 @@ export const useJellyfinAuth = create(
     setSession: (session: JellyfinSession | null) => void;
   }>((set) => ({ session: null, setSession: (session) => set({ session }) }), {
     name: "jellyfin-session",
-    storage: createJSONStorage(() => sessionStorage),
+    storage: createJSONStorage(() => persistentSessionStorage),
   }),
 );
+
+const stopSessionSync = syncSessionAcrossTabs(
+  "jellyfin-session",
+  () => useJellyfinAuth.persist.rehydrate(),
+  () => useJellyfinAuth.getState().setSession(null),
+);
+if (import.meta.hot) import.meta.hot.dispose(stopSessionSync);
 
 export const useJellyfinServers = create(
   persist<{
