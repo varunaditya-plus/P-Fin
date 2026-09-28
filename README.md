@@ -8,9 +8,9 @@
 </div>
 
 # P-Fin
-![GitHub License](https://www.shieldcn.dev/github/license/varunaditya-plus/P-Fin.svg?variant=outline&size=sm)
-[![GitHub Downloads (all assets, all releases)](https://shieldcn.dev/github/downloads/varunaditya-plus/P-Fin.svg?variant=outline&size=sm)](https://github.com/varunaditya-plus/P-Fin/releases/latest)
-[![GitHub Release](https://shieldcn.dev/github/release/varunaditya-plus/P-Fin.svg?size=sm)](https://github.com/varunaditya-plus/P-Fin/releases/latest)
+[![MIT License](https://shieldcn.dev/badge/license-MIT.svg?variant=outline&size=sm)](LICENSE.md)
+[![Docker Pulls](https://shieldcn.dev/docker/pulls/varunadityaaga/p-fin.svg?variant=outline&size=sm)](https://hub.docker.com/r/varunadityaaga/p-fin)
+[![Docker Version](https://shieldcn.dev/docker/v/varunadityaaga/p-fin.svg?size=sm)](https://hub.docker.com/r/varunadityaaga/p-fin/tags)
 ![Please star this repo](https://shieldcn.dev/badge/★%20please%20star-22c55e.svg?theme=amber&color=eab308&size=sm&variant=outline)
 
 A brand new web client for Jellyfin, built using the P-Stream (or movie-web) interface as a base, and adapted for your Jellyfin server. This web client includes a Seerr integration for discovering and requesting media, eliminating the need for needing two sites.
@@ -36,7 +36,7 @@ A brand new web client for Jellyfin, built using the P-Stream (or movie-web) int
 
 ## Installation
 
-P-Fin runs in a contatiner alongsideo an existing Jellyfin server with optional Seerr integration. It needs Docker but no media mounts, database, GPU access or persistent volume. The images P-Fin currently supports are AMD64, ARM64 and ARMv7.
+P-Fin runs in a container alongside an existing Jellyfin server with optional Seerr integration. It needs Docker but no media mounts, database, GPU access or persistent volume. The images P-Fin currently supports are AMD64, ARM64 and ARMv7.
 
 ### General guide
 
